@@ -1,4 +1,21 @@
 <Solution>
+  <Project Path="Lab.Csharp.Arithmetic Operators/Lab.Csharp.Arithmetic Operators.csproj" Id="3fed45ba-db47-4001-b0ae-f42f5826ea03" />
+  <Project Path="Lab.Csharp.coculator program/Lab.Csharp.coculator program.csproj" Id="82b3e6f1-d540-4558-b61d-2d4918fc2ec8" />
+  <Project Path="Lab.Csharp.Constants/Lab.Csharp.Constants.csproj" Id="ee51a6a3-5a21-46a0-a929-c5e6c838c17b" />
+  <Project Path="Lab.Csharp.for loops/Lab.Csharp.for loops.csproj" Id="ebb574f1-19c8-4b83-8ba9-5e52bbc6358d" />
+  <Project Path="Lab.Csharp.hypotenuse calculator program/Lab.Csharp.hypotenuse calculator program.csproj" Id="8dad973c-3fb1-411e-a6fb-220244fe8d1e" />
+  <Project Path="Lab.Csharp.if statement/Lab.Csharp.if statement.csproj" Id="ddcf92e3-7d37-47bd-971c-8c34527cbfed" />
+  <Project Path="Lab.Csharp.logical  operators/Lab.Csharp.logical  operators.csproj" Id="e934d618-5e62-416e-90b5-576da3eae83f" />
+  <Project Path="Lab.Csharp.Math Class/Lab.Csharp.Math Class.csproj" Id="50f5ee73-4544-4364-9cc4-ac4d25ae4306" />
+  <Project Path="Lab.Csharp.nested loops/Lab.Csharp.NestedLoops.csproj" Id="320c4b65-544b-40d0-a03e-8e06a60644d1" />
+  <Project Path="Lab.Csharp.numbers guessing game/Lab.Csharp.numbers guessing game.csproj" Id="4695c8d1-5055-4efe-b7c6-b91ca767fa96" />
   <Project Path="Lab.Csharp.Output/Lab.Csharp.Output.csproj" />
+  <Project Path="Lab.Csharp.Random Numbers/Lab.Csharp.Random Numbers.csproj" Id="c27e15d0-acb9-45e9-b61a-06d851ef5e4e" />
+  <Project Path="Lab.Csharp.rock-paper-sciccors game/Lab.Csharp.rock-paper-sciccors game.csproj" Id="5c5314f2-ca63-4e74-b146-34971c0d28f6" />
+  <Project Path="Lab.Csharp.string methods/Lab.Csharp.string methods.csproj" Id="3de1d881-9ca3-4b0e-93b1-a0e3cb33d1e0" />
+  <Project Path="Lab.Csharp.switches/Lab.Csharp.switches.csproj" Id="e1d87040-8e11-4784-b3e8-00f893e6ced6" />
+  <Project Path="Lab.Csharp.Type Casting/Lab.Csharp.Type Casting.csproj" Id="43b13f42-817e-4a2a-9af0-9f442f14e5c0" />
+  <Project Path="Lab.Csharp.User Input/Lab.Csharp.User Input.csproj" Id="b5f42080-9a8d-4420-8354-8b4a8771c2b3" />
   <Project Path="Lab.Csharp.Variables/Lab.Csharp.Variables.csproj" Id="3d755f51-9b82-41ed-94cd-a547d961c32b" />
+  <Project Path="Lab.Csharp.while loops/Lab.Csharp.while loops.csproj" Id="2dfd2f7a-fd65-4a01-af1f-a26652b64bbd" />
 </Solution>
