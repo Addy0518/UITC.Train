@@ -1,9 +1,35 @@
 ﻿
 
-Console.WriteLine(Multiply(3,4,5));
+Dog dog1=new Dog();
+Cat cat1=new Cat();
 
-static double Multiply(double x,double y,double z)//方法重載
+
+dog1.Speak();
+cat1.Speak(); 
+
+
+class Animal
 {
-    return x * y * z;
+    public virtual void Speak()
+    {
+        Console.WriteLine("brrrr");
+    }
+
+}
+
+class Dog : Animal
+{
+    //覆蓋父類別方法 override=>virtual
+    public override void Speak()
+    {
+        Console.WriteLine("woooo");
+    }
+}
+class Cat : Animal
+{
+    public override void Speak()
+    {
+        Console.WriteLine("meowwww");
+    }
 
 }
