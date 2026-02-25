@@ -19,11 +19,15 @@
   <Project Path="Lab.API.LINQ.DistinctBy/Lab.API.LINQ.DistinctBy.csproj" />
   <Project Path="Lab.API.LINQ.ElementAt &amp; ElementAtOrDefault/Lab.API.LINQ.ElementAt &amp; ElementAtOrDefault.csproj" />
   <Project Path="Lab.API.LINQ.Enumerable.Empty/Lab.API.LINQ.Enumerable.Empty.csproj" />
+  <Project Path="Lab.API.LINQ.Enumerable.Range/Lab.API.LINQ.Enumerable.Range.csproj" />
   <Project Path="Lab.API.LINQ.Enumerable.Repeat/Lab.API.LINQ.Enumerable.Repeat.csproj" />
+  <Project Path="Lab.API.LINQ.Except/Lab.API.LINQ.Except.csproj" />
   <Project Path="Lab.API.LINQ.GroupBy/Lab.API.LINQ.GroupBy.csproj" Id="e53a1a0e-968e-4b49-b5fc-d74f6bb7e756" />
   <Project Path="Lab.API.LINQ.GroupJoin/Lab.API.LINQ.GroupJoin.csproj" Id="acd7d384-ec16-4703-b3ff-fd8a8d3ee5c2" />
+  <Project Path="Lab.API.LINQ.Intersect/Lab.API.LINQ.Intersect.csproj" />
   <Project Path="Lab.API.LINQ.Join/Lab.API.LINQ.Join.csproj" Id="cb4bc48d-0928-4cca-88f2-d3604089a386" />
   <Project Path="Lab.API.LINQ.Last &amp; LastOrDefault/Lab.API.LINQ.Last &amp; LastOrDefault.csproj" />
+  <Project Path="Lab.API.LINQ.LongCount/Lab.API.LINQ.LongCount.csproj" />
   <Project Path="Lab.API.LINQ.Max/Lab.API.LINQ.Max.csproj" />
   <Project Path="Lab.API.LINQ.MaxBy/Lab.API.LINQ.MaxBy.csproj" />
   <Project Path="Lab.API.LINQ.Min &amp; MinBy/Lab.API.LINQ.Min &amp; MinBy.csproj" />
@@ -31,7 +35,6 @@
   <Project Path="Lab.API.LINQ.Order/Lab.API.LINQ.Order.csproj" Id="66b18679-58d9-4995-acbb-7eb8d78abf98" />
   <Project Path="Lab.API.LINQ.OrderBy/Lab.API.LINQ.OrderBy.csproj" Id="71ccac00-4294-430f-b9a1-941fce39796f" />
   <Project Path="Lab.API.LINQ.OrderDescending &amp; OrderByDescending/Lab.API.LINQ.OrderDescending &amp; OrderByDescending.csproj" Id="22478cc1-8a4e-416f-ad5a-b32c33477c3c" />
-  <Project Path="Lab.API.LINQ.PLINQ/Lab.API.LINQ.PLINQ.csproj" Id="5668828d-abea-4ed5-a574-89ad339c1247" />
   <Project Path="Lab.API.LINQ.Revers/Lab.API.LINQ.Revers.csproj" Id="0fa4eb63-b48b-49c7-8514-f6d5631d8dec" />
   <Project Path="Lab.API.LINQ.Select/Lab.API.LINQ.Select.csproj" />
   <Project Path="Lab.API.LINQ.SelectMany/Lab.API.LINQ.SelectMany.csproj" />
@@ -39,12 +42,21 @@
   <Project Path="Lab.API.LINQ.SelectWithIndex/Lab.API.LINQ.SelectWithIndex.csproj" />
   <Project Path="Lab.API.LINQ.SequenceEqual/Lab.API.LINQ.SequenceEqual.csproj" Id="03cecd56-a7b4-486e-a438-8b09686dbbaf" />
   <Project Path="Lab.API.LINQ.Set Operations Theory (Union, Intersect, Except)/Lab.API.LINQ.Set Operations Theory (Union, Intersect, Except).csproj" />
+  <Project Path="Lab.API.LINQ.Single &amp; SingleOrDefault/Lab.API.LINQ.Single &amp; SingleOrDefault.csproj" />
   <Project Path="Lab.API.LINQ.Skip/Lab.API.LINQ.Skip.csproj" />
   <Project Path="Lab.API.LINQ.SkipLast &amp; TakeLast/Lab.API.LINQ.SkipLast &amp; TakeLast.csproj" />
   <Project Path="Lab.API.LINQ.SkipWhile &amp; TakeWhile/Lab.API.LINQ.SkipWhile &amp; TakeWhile.csproj" />
+  <Project Path="Lab.API.LINQ.Sum/Lab.API.LINQ.Sum.csproj" />
   <Project Path="Lab.API.LINQ.Take/Lab.API.LINQ.Take.csproj" />
   <Project Path="Lab.API.LINQ.ThenBy &amp; ThenByDescending/Lab.API.LINQ.ThenBy &amp; ThenByDescending.csproj" Id="d8c46437-abe0-49ca-b404-1254e58f8ccc" />
+  <Project Path="Lab.API.LINQ.ToArray/Lab.API.LINQ.ToArray.csproj" />
+  <Project Path="Lab.API.LINQ.ToDictionary/Lab.API.LINQ.ToDictionary.csproj" />
+  <Project Path="Lab.API.LINQ.ToEnumerable &amp; ToQueryable/Lab.API.LINQ.ToEnumerable &amp; ToQueryable.csproj" />
+  <Project Path="Lab.API.LINQ.ToHashSet/Lab.API.LINQ.ToHashSet.csproj" />
+  <Project Path="Lab.API.LINQ.ToList/Lab.API.LINQ.ToList.csproj" />
+  <Project Path="Lab.API.LINQ.ToLookUp/Lab.API.LINQ.ToLookUp.csproj" />
   <Project Path="Lab.API.LINQ.TryGetNonEnumeratedCount/Lab.API.LINQ.TryGetNonEnumeratedCount.csproj" />
+  <Project Path="Lab.API.LINQ.Union/Lab.API.LINQ.Union.csproj" />
   <Project Path="Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except/Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except.csproj" />
   <Project Path="Lab.API.LINQ.Where/Lab.API.LINQ.Where.csproj" />
   <Project Path="Lab.API.LINQ.Zip/Lab.API.LINQ.Zip.csproj" Id="8cf6e7df-861c-43c5-9659-abc4e9632c80" />
