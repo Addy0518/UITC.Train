@@ -41,6 +41,7 @@
   <Project Path="Lab.API.LINQ.SkipWhile &amp; TakeWhile/Lab.API.LINQ.SkipWhile &amp; TakeWhile.csproj" />
   <Project Path="Lab.API.LINQ.Take/Lab.API.LINQ.Take.csproj" />
   <Project Path="Lab.API.LINQ.ThenBy &amp; ThenByDescending/Lab.API.LINQ.ThenBy &amp; ThenByDescending.csproj" Id="d8c46437-abe0-49ca-b404-1254e58f8ccc" />
+  <Project Path="Lab.API.LINQ.TryGetNonEnumeratedCount/Lab.API.LINQ.TryGetNonEnumeratedCount.csproj" />
   <Project Path="Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except/Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except.csproj" />
   <Project Path="Lab.API.LINQ.Where/Lab.API.LINQ.Where.csproj" />
   <Project Path="Lab.API.LINQ.Zip/Lab.API.LINQ.Zip.csproj" Id="8cf6e7df-861c-43c5-9659-abc4e9632c80" />
