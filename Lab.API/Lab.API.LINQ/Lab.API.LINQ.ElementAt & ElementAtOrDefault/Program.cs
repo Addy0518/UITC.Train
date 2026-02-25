@@ -1,2 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿
+
+IEnumerable<int> collection = [1,2,3];
+
+
+Console.WriteLine(collection.ElementAtOrDefault(12));
