@@ -3,7 +3,6 @@
 
 
 // 可以建立多個相同名稱的建構函式
-
 Pizza piz = new Pizza("good cheese", "spicy");
 Pizza piz2 = new Pizza("good cheese");
 

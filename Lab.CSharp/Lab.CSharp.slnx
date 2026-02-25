@@ -1,19 +1,49 @@
 <Solution>
+  <Project Path="Lab.Csharp.AbstractClasses/Lab.Csharp.AbstractClasses.csproj" Id="3082c4e1-5df7-4a29-9cac-42f732f98ce2" />
   <Project Path="Lab.Csharp.Arithmetic Operators/Lab.Csharp.Arithmetic Operators.csproj" Id="3fed45ba-db47-4001-b0ae-f42f5826ea03" />
+  <Project Path="Lab.Csharp.ArrayofObject/Lab.Csharp.ArrayofObject.csproj" Id="49ca1ec6-c4b1-4210-8917-3056e4d74dca" />
+  <Project Path="Lab.Csharp.Arrays/Lab.Csharp.Arrays.csproj" Id="76c57d3d-2add-433a-8f1a-651c4e245cd9" />
+  <Project Path="Lab.Csharp.AutoImplementedProperties/Lab.Csharp.AutoImplementedProperties.csproj" Id="b86e9c14-ccf5-421a-8bdd-87f9b2523924" />
+  <Project Path="Lab.Csharp.Classes/Lab.Csharp.Classes.csproj" Id="79f6fee8-3e1f-4774-87d7-057b251c1970" />
   <Project Path="Lab.Csharp.coculator program/Lab.Csharp.coculator program.csproj" Id="82b3e6f1-d540-4558-b61d-2d4918fc2ec8" />
+  <Project Path="Lab.Csharp.ConditionalOperator/Lab.Csharp.ConditionalOperator.csproj" Id="e2adcd2f-aba4-4f63-a16a-ca849a7685b8" />
   <Project Path="Lab.Csharp.Constants/Lab.Csharp.Constants.csproj" Id="ee51a6a3-5a21-46a0-a929-c5e6c838c17b" />
+  <Project Path="Lab.Csharp.Constructor/Lab.Csharp.Constructor.csproj" Id="c3225cff-3038-4a04-90bf-41f9c9d0dc87" />
+  <Project Path="Lab.Csharp.Enums/Lab.Csharp.Enums.csproj" Id="57c5d828-faf1-43c6-871c-b5fb60a43c0c" />
+  <Project Path="Lab.Csharp.ExcepstionHanding/Lab.Csharp.ExcepstionHanding.csproj" Id="68564e40-b2cc-4983-aa79-ff74167423bf" />
   <Project Path="Lab.Csharp.for loops/Lab.Csharp.for loops.csproj" Id="ebb574f1-19c8-4b83-8ba9-5e52bbc6358d" />
+  <Project Path="Lab.Csharp.ForeachLoops/Lab.Csharp.ForeachLoops.csproj" Id="8b059ea5-6094-4360-9af1-0faa85ef0508" />
+  <Project Path="Lab.Csharp.Generics/Lab.Csharp.Generics.csproj" Id="abd275f1-cab1-44ae-a8fc-f7e4d435f3c0" />
+  <Project Path="Lab.Csharp.GettersAndSetters/Lab.Csharp.GettersAndSetters.csproj" Id="c0f9ac3e-01df-4493-9f60-9fad1318b999" />
   <Project Path="Lab.Csharp.hypotenuse calculator program/Lab.Csharp.hypotenuse calculator program.csproj" Id="8dad973c-3fb1-411e-a6fb-220244fe8d1e" />
   <Project Path="Lab.Csharp.if statement/Lab.Csharp.if statement.csproj" Id="ddcf92e3-7d37-47bd-971c-8c34527cbfed" />
+  <Project Path="Lab.Csharp.Inheritance/Lab.Csharp.Inheritance.csproj" Id="324f28f7-1e88-47f3-9622-f12b8112b864" />
+  <Project Path="Lab.Csharp.Interfaces/Lab.Csharp.Interfaces.csproj" Id="7d2019ae-573c-4469-b6ed-fd65e4ff32e5" />
+  <Project Path="Lab.Csharp.Lists/Lab.Csharp.Lists.csproj" Id="9e6a7c97-22de-4dd9-b013-141e69699248" />
+  <Project Path="Lab.Csharp.ListsOfObject/Lab.Csharp.ListsOfObject.csproj" Id="17c300c7-b54c-407d-919d-6e44388e302b" />
   <Project Path="Lab.Csharp.logical  operators/Lab.Csharp.logical  operators.csproj" Id="e934d618-5e62-416e-90b5-576da3eae83f" />
   <Project Path="Lab.Csharp.Math Class/Lab.Csharp.Math Class.csproj" Id="50f5ee73-4544-4364-9cc4-ac4d25ae4306" />
+  <Project Path="Lab.Csharp.MethodOverLoadings/Lab.Csharp.MethodOverLoadings.csproj" Id="b74a531c-f668-45ff-8558-89858741fdad" />
+  <Project Path="Lab.Csharp.MethodOverriding/Lab.Csharp.MethodOverriding.csproj" Id="eee64797-5080-42d7-bc59-71a051aea172" />
+  <Project Path="Lab.Csharp.Methods/Lab.Csharp.Methods.csproj" Id="650c9e8f-7d5c-4a0f-b9fb-e499f78990c6" />
+  <Project Path="Lab.Csharp.MultidimensioanlArrays/Lab.Csharp.MultidimensioanlArrays.csproj" Id="d81178e4-a7ff-4ba0-80cb-244c9e62d341" />
+  <Project Path="Lab.Csharp.Multithreading/Lab.Csharp.Multithreading.csproj" Id="4a8dc2e1-7512-4a2d-afb7-081da857c4df" />
   <Project Path="Lab.Csharp.nested loops/Lab.Csharp.NestedLoops.csproj" Id="320c4b65-544b-40d0-a03e-8e06a60644d1" />
   <Project Path="Lab.Csharp.numbers guessing game/Lab.Csharp.numbers guessing game.csproj" Id="4695c8d1-5055-4efe-b7c6-b91ca767fa96" />
+  <Project Path="Lab.Csharp.Object/Lab.Csharp.Object.csproj" Id="ceba3049-e6d4-4722-8463-e1fc2c64570c" />
+  <Project Path="Lab.Csharp.ObjectAsArgumenta/Lab.Csharp.ObjectAsArgumenta.csproj" Id="0701f22a-3fed-448b-aa48-988db0264479" />
   <Project Path="Lab.Csharp.Output/Lab.Csharp.Output.csproj" />
+  <Project Path="Lab.Csharp.OverloadConstructor/Lab.Csharp.OverloadConstructor.csproj" Id="c31f50d1-af61-4244-8ba0-24445eff97f6" />
+  <Project Path="Lab.Csharp.ParamsKeyWords/Lab.Csharp.ParamsKeyWords.csproj" Id="0d56aaf9-2d71-4fb2-b183-cd1f97be34bd" />
+  <Project Path="Lab.Csharp.Polymorphsim/Lab.Csharp.Polymorphsim.csproj" Id="bc0dec6a-a292-475d-b676-b5609f47d417" />
   <Project Path="Lab.Csharp.Random Numbers/Lab.Csharp.Random Numbers.csproj" Id="c27e15d0-acb9-45e9-b61a-06d851ef5e4e" />
+  <Project Path="Lab.Csharp.ReturnKeyWords/Lab.Csharp.ReturnKeyWords.csproj" Id="9581e31c-f38e-4b09-851a-f01225861511" />
   <Project Path="Lab.Csharp.rock-paper-sciccors game/Lab.Csharp.rock-paper-sciccors game.csproj" Id="5c5314f2-ca63-4e74-b146-34971c0d28f6" />
+  <Project Path="Lab.Csharp.Static/Lab.Csharp.Static.csproj" Id="8509b595-0883-450a-9fc8-56fbfb9f92e2" />
   <Project Path="Lab.Csharp.string methods/Lab.Csharp.string methods.csproj" Id="3de1d881-9ca3-4b0e-93b1-a0e3cb33d1e0" />
+  <Project Path="Lab.Csharp.StringInterPolation/Lab.Csharp.StringInterPolation.csproj" Id="bf8d3623-3954-402c-a3db-51bf85ec175f" />
   <Project Path="Lab.Csharp.switches/Lab.Csharp.switches.csproj" Id="e1d87040-8e11-4784-b3e8-00f893e6ced6" />
+  <Project Path="Lab.Csharp.ToStringMethod/Lab.Csharp.ToStringMethod.csproj" Id="0bd06902-a90a-4bd4-8722-b77345d06533" />
   <Project Path="Lab.Csharp.Type Casting/Lab.Csharp.Type Casting.csproj" Id="43b13f42-817e-4a2a-9af0-9f442f14e5c0" />
   <Project Path="Lab.Csharp.User Input/Lab.Csharp.User Input.csproj" Id="b5f42080-9a8d-4420-8354-8b4a8771c2b3" />
   <Project Path="Lab.Csharp.Variables/Lab.Csharp.Variables.csproj" Id="3d755f51-9b82-41ed-94cd-a547d961c32b" />
