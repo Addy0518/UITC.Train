@@ -24,6 +24,9 @@
   <Project Path="Lab.API.LINQ.GroupJoin/Lab.API.LINQ.GroupJoin.csproj" Id="acd7d384-ec16-4703-b3ff-fd8a8d3ee5c2" />
   <Project Path="Lab.API.LINQ.Join/Lab.API.LINQ.Join.csproj" Id="cb4bc48d-0928-4cca-88f2-d3604089a386" />
   <Project Path="Lab.API.LINQ.Last &amp; LastOrDefault/Lab.API.LINQ.Last &amp; LastOrDefault.csproj" />
+  <Project Path="Lab.API.LINQ.Max/Lab.API.LINQ.Max.csproj" />
+  <Project Path="Lab.API.LINQ.MaxBy/Lab.API.LINQ.MaxBy.csproj" />
+  <Project Path="Lab.API.LINQ.Min &amp; MinBy/Lab.API.LINQ.Min &amp; MinBy.csproj" />
   <Project Path="Lab.API.LINQ.OfType/Lab.API.LINQ.OfType.csproj" />
   <Project Path="Lab.API.LINQ.Order/Lab.API.LINQ.Order.csproj" Id="66b18679-58d9-4995-acbb-7eb8d78abf98" />
   <Project Path="Lab.API.LINQ.OrderBy/Lab.API.LINQ.OrderBy.csproj" Id="71ccac00-4294-430f-b9a1-941fce39796f" />
