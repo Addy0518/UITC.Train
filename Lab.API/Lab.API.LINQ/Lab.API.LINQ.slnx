@@ -1,9 +1,29 @@
 <Solution>
+  <Project Path="ClobalUsing/ClobalUsing.csproj" Id="f5724cfb-442c-497c-b881-0dfc3dffd2e1" />
+  <Project Path="Lab.API.LINQ. Aggregate (overload 1)/Lab.API.LINQ. Aggregate (overload 1).csproj" />
+  <Project Path="Lab.API.LINQ. Aggregate (overload 2)/Lab..API.LINQ. Aggregate (overload 2).csproj" />
+  <Project Path="Lab.API.LINQ. Aggregate (overload 3)/Lab..API.LINQ. Aggregate (overload 3).csproj" />
+  <Project Path="Lab.API.LINQ. First &amp; FirstOrDefault/Lab..API.LINQ. First &amp; FirstOrDefault.csproj" />
+  <Project Path="Lab.API.LINQ.All/Lab..API.LINQ.All.csproj" />
+  <Project Path="Lab.API.LINQ.Any/Lab..API.LINQ.Any.csproj" />
+  <Project Path="Lab.API.LINQ.Append &amp; Prepend/Lab..API.LINQ.Append &amp; Prepend.csproj" />
+  <Project Path="Lab.API.LINQ.Average/Lab..API.LINQ.Average.csproj" />
   <Project Path="Lab.API.LINQ.Cast/Lab..API.LINQ.Cast.csproj" />
+  <Project Path="Lab.API.LINQ.Chunk/Lab..API.LINQ.Chunk.csproj" />
   <Project Path="Lab.API.LINQ.Concat/Lab.API.LINQ.Concat.csproj" Id="8fbd38b7-526a-4df4-b1a6-b373292f728e" />
+  <Project Path="Lab.API.LINQ.Contains/Lab..API.LINQ.Contains.csproj" />
+  <Project Path="Lab.API.LINQ.Count/Lab..API.LINQ.Count.csproj" />
+  <Project Path="Lab.API.LINQ.DefaultIfEmpty/Lab..API.LINQ.DefaultIfEmpty.csproj" />
+  <Project Path="Lab.API.LINQ.Deferred Execution vs Immediate Execution/Lab..API.LINQ.Deferred Execution vs Immediate Execution.csproj" />
+  <Project Path="Lab.API.LINQ.Distinct/Lab.API.LINQ.Distinct.csproj" />
+  <Project Path="Lab.API.LINQ.DistinctBy/Lab.API.LINQ.DistinctBy.csproj" />
+  <Project Path="Lab.API.LINQ.ElementAt &amp; ElementAtOrDefault/Lab.API.LINQ.ElementAt &amp; ElementAtOrDefault.csproj" />
+  <Project Path="Lab.API.LINQ.Enumerable.Empty/Lab.API.LINQ.Enumerable.Empty.csproj" />
+  <Project Path="Lab.API.LINQ.Enumerable.Repeat/Lab.API.LINQ.Enumerable.Repeat.csproj" />
   <Project Path="Lab.API.LINQ.GroupBy/Lab.API.LINQ.GroupBy.csproj" Id="e53a1a0e-968e-4b49-b5fc-d74f6bb7e756" />
   <Project Path="Lab.API.LINQ.GroupJoin/Lab.API.LINQ.GroupJoin.csproj" Id="acd7d384-ec16-4703-b3ff-fd8a8d3ee5c2" />
   <Project Path="Lab.API.LINQ.Join/Lab.API.LINQ.Join.csproj" Id="cb4bc48d-0928-4cca-88f2-d3604089a386" />
+  <Project Path="Lab.API.LINQ.Last &amp; LastOrDefault/Lab.API.LINQ.Last &amp; LastOrDefault.csproj" />
   <Project Path="Lab.API.LINQ.OfType/Lab.API.LINQ.OfType.csproj" />
   <Project Path="Lab.API.LINQ.Order/Lab.API.LINQ.Order.csproj" Id="66b18679-58d9-4995-acbb-7eb8d78abf98" />
   <Project Path="Lab.API.LINQ.OrderBy/Lab.API.LINQ.OrderBy.csproj" Id="71ccac00-4294-430f-b9a1-941fce39796f" />
@@ -15,49 +35,13 @@
   <Project Path="Lab.API.LINQ.SelectManyWithIndex/Lab.API.LINQ.SelectManyWithIndex.csproj" />
   <Project Path="Lab.API.LINQ.SelectWithIndex/Lab.API.LINQ.SelectWithIndex.csproj" />
   <Project Path="Lab.API.LINQ.SequenceEqual/Lab.API.LINQ.SequenceEqual.csproj" Id="03cecd56-a7b4-486e-a438-8b09686dbbaf" />
+  <Project Path="Lab.API.LINQ.Set Operations Theory (Union, Intersect, Except)/Lab.API.LINQ.Set Operations Theory (Union, Intersect, Except).csproj" />
   <Project Path="Lab.API.LINQ.Skip/Lab.API.LINQ.Skip.csproj" />
   <Project Path="Lab.API.LINQ.SkipLast &amp; TakeLast/Lab.API.LINQ.SkipLast &amp; TakeLast.csproj" />
   <Project Path="Lab.API.LINQ.SkipWhile &amp; TakeWhile/Lab.API.LINQ.SkipWhile &amp; TakeWhile.csproj" />
   <Project Path="Lab.API.LINQ.Take/Lab.API.LINQ.Take.csproj" />
   <Project Path="Lab.API.LINQ.ThenBy &amp; ThenByDescending/Lab.API.LINQ.ThenBy &amp; ThenByDescending.csproj" Id="d8c46437-abe0-49ca-b404-1254e58f8ccc" />
+  <Project Path="Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except/Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except.csproj" />
   <Project Path="Lab.API.LINQ.Where/Lab.API.LINQ.Where.csproj" />
   <Project Path="Lab.API.LINQ.Zip/Lab.API.LINQ.Zip.csproj" Id="8cf6e7df-861c-43c5-9659-abc4e9632c80" />
-  <Project Path="Lab.LINQ. Aggregate (overload 1)/Lab.API.LINQ. Aggregate (overload 1).csproj" Id="89d33f4e-7725-4ab1-99b5-071a5530be2d" />
-  <Project Path="Lab.LINQ. Aggregate (overload 2)/Lab..API.LINQ. Aggregate (overload 2).csproj" Id="1666f513-e37a-4eca-903f-a01e276ea7bb" />
-  <Project Path="Lab.LINQ. Aggregate (overload 3)/Lab..API.LINQ. Aggregate (overload 3).csproj" Id="1c02be4e-8029-40a4-89ff-fa4e9385d808" />
-  <Project Path="Lab.LINQ. First &amp; FirstOrDefault/Lab..API.LINQ. First &amp; FirstOrDefault.csproj" Id="a6efe2a1-ae0d-429f-b3ac-43eef68e9ca2" />
-  <Project Path="Lab.LINQ.All/Lab..API.LINQ.All.csproj" Id="4edff129-6f68-4366-aae8-190fdcce8069" />
-  <Project Path="Lab.LINQ.Any/Lab..API.LINQ.Any.csproj" Id="4901fcf1-5916-47f1-a46e-c554305eddce" />
-  <Project Path="Lab.LINQ.Append &amp; Prepend/Lab..API.LINQ.Append &amp; Prepend.csproj" Id="f9e4fa4d-cc2c-48bb-9750-fa8632133244" />
-  <Project Path="Lab.LINQ.Average/Lab..API.LINQ.Average.csproj" Id="25562ad6-53ec-4c43-9bd0-722fe09d5176" />
-  <Project Path="Lab.LINQ.Chunk/Lab..API.LINQ.Chunk.csproj" Id="697ad339-a129-4ebd-b094-edc4f3cf4107" />
-  <Project Path="Lab.LINQ.Contains/Lab..API.LINQ.Contains.csproj" Id="052fe169-5364-44d5-974a-77318912b10d" />
-  <Project Path="Lab.LINQ.Count/Lab..API.LINQ.Count.csproj" Id="6f7445a2-4d6e-4340-9652-de2d5ed9ae02" />
-  <Project Path="Lab.LINQ.DefaultIfEmpty/Lab..API.LINQ.DefaultIfEmpty.csproj" Id="1163ee3b-b591-45e3-9793-557ffa0a90b5" />
-  <Project Path="Lab.LINQ.Deferred Execution vs Immediate Execution/Lab..API.LINQ.Deferred Execution vs Immediate Execution.csproj" Id="6f0371f5-b918-44f3-bd1a-8574b5f2eacd" />
-  <Project Path="Lab.LINQ.Distinct/Lab.API.LINQ.Distinct.csproj" Id="6dc05b5f-4613-41e4-a969-efe608244145" />
-  <Project Path="Lab.LINQ.DistinctBy/Lab.API.LINQ.DistinctBy.csproj" Id="dec192ee-c143-4e9d-a0a5-000420164614" />
-  <Project Path="Lab.LINQ.ElementAt &amp; ElementAtOrDefault/Lab.API.LINQ.ElementAt &amp; ElementAtOrDefault.csproj" Id="32dd3ccb-b006-478a-897a-9de044da41e6" />
-  <Project Path="Lab.LINQ.Enumerable.Empty/Lab.API.LINQ.Enumerable.Empty.csproj" Id="c493b1a1-9cf2-4449-9d26-36043b60f54d" />
-  <Project Path="Lab.LINQ.Enumerable.Range/Lab.API.LINQ.Enumerable.Range.csproj" Id="253121e8-2eb4-44ad-9453-dded6c9fa6fe" />
-  <Project Path="Lab.LINQ.Enumerable.Repeat/Lab.API.LINQ.Enumerable.Repeat.csproj" Id="3d6417af-346d-4b49-9199-6754d309e019" />
-  <Project Path="Lab.LINQ.Except/Lab.API.LINQ.Except.csproj" Id="5f04ff79-1455-46a5-b16c-aa9b2af1d102" />
-  <Project Path="Lab.LINQ.Intersect/Lab.API.LINQ.Intersect.csproj" Id="d8ecd812-36ac-4fdc-8325-68cfbd213971" />
-  <Project Path="Lab.LINQ.Last &amp; LastOrDefault/Lab.API.LINQ.Last &amp; LastOrDefault.csproj" Id="ca46673c-9dfb-4aab-a006-758569b51347" />
-  <Project Path="Lab.LINQ.LongCount/Lab.API.LINQ.LongCount.csproj" Id="f4e1cb3c-2eda-4f9c-b983-631f59611d3a" />
-  <Project Path="Lab.LINQ.Max/Lab.API.LINQ.Max.csproj" Id="15eba7c8-e0c8-4da6-bde3-79850051f9f2" />
-  <Project Path="Lab.LINQ.MaxBy/Lab.API.LINQ.MaxBy.csproj" Id="659ff802-d207-43f3-8104-e6aec92013d2" />
-  <Project Path="Lab.LINQ.Min &amp; MinBy/Lab.API.LINQ.Min &amp; MinBy.csproj" Id="c4c78cdf-dc63-4053-bd52-42a742ca82d2" />
-  <Project Path="Lab.LINQ.Set Operations Theory (Union, Intersect, Except)/Lab.API.LINQ.Set Operations Theory (Union, Intersect, Except).csproj" Id="97fa62ba-124f-494c-865f-4101dd3b3032" />
-  <Project Path="Lab.LINQ.Single &amp; SingleOrDefault/Lab.API.LINQ.Single &amp; SingleOrDefault.csproj" Id="2edcb800-f59e-40b9-8342-606a38928770" />
-  <Project Path="Lab.LINQ.Sum/Lab.API.LINQ.Sum.csproj" Id="417b3fe1-6601-4da9-bf7b-a1cb1bc68e4b" />
-  <Project Path="Lab.LINQ.ToArray/Lab.API.LINQ.ToArray.csproj" Id="3d86f7ec-e04d-4845-ab71-922e1d67df00" />
-  <Project Path="Lab.LINQ.ToDictionary/Lab.API.LINQ.ToDictionary.csproj" Id="9d21d738-f086-4719-bc95-8f6983098e40" />
-  <Project Path="Lab.LINQ.ToEnumerable &amp; ToQueryable/Lab.API.LINQ.ToEnumerable &amp; ToQueryable.csproj" Id="d4a2cf0f-7e97-4b12-8fed-c85c62417e47" />
-  <Project Path="Lab.LINQ.ToHashSet/Lab.API.LINQ.ToHashSet.csproj" Id="a4f222a4-2a13-4b9a-b7e3-320c03f767d6" />
-  <Project Path="Lab.LINQ.ToList/Lab.API.LINQ.ToList.csproj" Id="e698af7f-31f0-450c-9bbf-f83a47f59bbc" />
-  <Project Path="Lab.LINQ.ToLookUp/Lab.API.LINQ.ToLookUp.csproj" Id="3a40e2a9-fe67-4cb8-abe1-457b3940f4ae" />
-  <Project Path="Lab.LINQ.TryGetNonEnumeratedCount/Lab.API.LINQ.TryGetNonEnumeratedCount.csproj" Id="d13a9b8d-64d1-489b-a4d5-be85f21d42c7" />
-  <Project Path="Lab.LINQ.Union/Lab.API.LINQ.Union.csproj" Id="91f592c3-4941-4540-83af-67cd2f56e3c2" />
-  <Project Path="Lab.LINQ.UnionBy &amp; IntersectBy &amp; Except/Lab.API.LINQ.UnionBy &amp; IntersectBy &amp; Except.csproj" Id="053980ab-0738-46da-8776-273ede296c23" />
 </Solution>
