@@ -1,2 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿
+using Dumpify;
+
+IEnumerable<int> coll = Enumerable.Empty<int>();
+
+
+
+coll.Dump();
