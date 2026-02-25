@@ -9,7 +9,7 @@ IEnumerable<Person> coll = [
     ];
 
 
-coll.ToLookup(x => x.age)[15].Single().Name.Dump();
+coll.ToLookup(x => x.age).Dump();
 
 record Person(string Name, int age);
     

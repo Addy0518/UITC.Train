@@ -12,7 +12,5 @@ coll.GroupJoin(
     (person, product) => $"{person.Name} bought {string.Join(',',product)}").Dump();
 
 
-
-
 record Person(int Id, string Name, int age);
 record Product(int ProductId, string Name);

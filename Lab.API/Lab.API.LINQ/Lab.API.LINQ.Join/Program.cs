@@ -12,7 +12,5 @@ coll.Join(
     (person, product) => $"{person.Name} bought {product.Name}").Dump();
 
 
-
-
 record Person(int Id, string Name, int age);
 record Product(int ProductId, string Name);
