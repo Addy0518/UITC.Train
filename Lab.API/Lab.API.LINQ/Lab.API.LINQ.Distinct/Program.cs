@@ -1,2 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Dumpify;
+
+
+
+
+IEnumerable<int> coll = [1, 2, 2, 2];
+
+
+
+coll.Distinct().Dump();
