@@ -1,2 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿
+
+IEnumerable<object> collection = [1, 2, 3, 4, 5];
+
+
+Console.WriteLine(collection.Sum(x=>(int)x));
