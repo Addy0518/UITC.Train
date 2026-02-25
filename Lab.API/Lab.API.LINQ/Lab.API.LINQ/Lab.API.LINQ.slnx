@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="../Lab.LINQ.CastIndex/Lab.LINQ.CastIndex.csproj" />
+  <Project Path="../Lab.LINQ.OfType/Lab.LINQ.OfType.csproj" />
+  <Project Path="../Lab.LINQ.Select/Lab.LINQ.Select.csproj" />
+  <Project Path="../Lab.LINQ.SelectMany/Lab.LINQ.SelectMany.csproj" />
+  <Project Path="../Lab.LINQ.SelectManyWithIndex/Lab.LINQ.SelectManyWithIndex.csproj" />
+  <Project Path="../Lab.LINQ.SelectWithIndex/Lab.LINQ.SelectWithIndex.csproj" />
+  <Project Path="../Lab.LINQ.Skip/Lab.LINQ.Skip.csproj" />
+  <Project Path="../Lab.LINQ.SkipLast &amp; TakeLast/Lab.LINQ.SkipLast &amp; TakeLast.csproj" />
+  <Project Path="../Lab.LINQ.SkipWhile &amp; TakeWhile/Lab.LINQ.SkipWhile &amp; TakeWhile.csproj" />
+  <Project Path="../Lab.LINQ.Take/Lab.LINQ.Take.csproj" />
+  <Project Path="../Lab.LINQ.Where/Lab.LINQ.Where.csproj" />
+</Solution>
