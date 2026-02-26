@@ -178,6 +178,7 @@ public IActionResult UrlGet()
      if (ModelState.IsValid)
      {  
          // 用 ViewData 傳更新成功的訊息 
+         // ViewDate 在頁面導向後就會清除
          ViewData["Message"] = $"Successful edit of customer {id}";
          // RedirectToAction就是傳統跳轉 View 的方法
          return RedirectToAction("Index");
