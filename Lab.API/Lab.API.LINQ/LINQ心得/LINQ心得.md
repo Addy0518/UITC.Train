@@ -67,5 +67,68 @@ IEnumerable<int> collection = [];
 Console.WriteLine(collection.FirstOrDefault(-1));
 ```
 
+### 7 . All , Any
+
+1. All是要求所有查詢物件都要達到標準
+2. Any則是有任一物件達到標準即可
+
+```csharp
+IEnumerable<int> collection = [1, 2, 3, 4, 5];
+// 所有都要大於0
+collection.All(x => x > 0).Dump();
+
+
+IEnumerable<int> collection = [1, 2, 3, 4, 5];
+// 其中一個大於2
+collection.Any(x => x > 2).Dump();
+
+```
+
+### 8 . Distinct , DistinctBy
+
+1. Distinct 是單純消除重複元素
+2. DistinctBy 則是針對 " 屬性 " 去除重複
+
+```csharp
+
+IEnumerable<int> coll = [1, 2, 2, 2];
+// 單純比對元素
+coll.Distinct().Dump();
+
+
+List<Person> coll = [
+      new(1,"A",15),
+      new(2,"B",16),
+      new(2,"C",17),
+
+    ];
+// 針對某一個屬性去除重複
+coll.DistinctBy(x => x.Id).Dump();
+record Person(int Id,string Name, int age);
+```
+
+### 9 . Select , SelectMany , SelectManyWithIndex
+
+1. Select 算是 最常用到的語法 , 用於尋找資料也可以指定元素
+2. SelectMany 則會將select的結果扁平化,用來搜尋陣列或集合
+3. 再加上Index的話就可以尋找索引
+
+```csharp
+
+IEnumerable<int> collection = [1, 2, 3, 4, 5];
+
+// Select 的 Landa 函式裡,分別可以指定索引跟元素
+collection.Select((x,i) => $"{i},{x}").Dump();
+
+
+// SelectMany 可以展開多個陣列或集合,然後再用select選擇裡面的元素
+collection.SelectMany(x => x.Select(x=>x.ToString())).Dump();
+
+// 用索引指定哪一個集合
+collection.SelectMany((x,i) => x.Select(x => $"{i},{x}".ToString())).Dump();
+
+```
+
 ## 教學影片推薦的 Dumpify 套件不錯用 , 能夠讓結果的畫面更明瞭一點
-## 
+
+##

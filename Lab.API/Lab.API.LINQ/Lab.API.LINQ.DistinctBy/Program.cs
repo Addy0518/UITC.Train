@@ -10,8 +10,6 @@ List<Person> coll = [
     ];
 
 coll.DistinctBy(x => x.Id).Dump();
-
-
 record Person(int Id,string Name, int age);
 
 
