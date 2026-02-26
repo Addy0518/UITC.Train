@@ -23,12 +23,15 @@ namespace Lab.API.Template.Controllers
 
         // Get : api/TodoItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
+        public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems(int page,int pagenumber)
         {
 
             return await _context.TodoItems
                          //  toDTO是我寫的私有方法,我放在下面
                          .Select(x =>ToDTO(x))
+                         // 用Skip跟Take控制顯示數量(分頁)
+                         .Skip(pagenumber)
+                         .Take(page)
                          .ToListAsync();
 
         }
@@ -51,15 +54,9 @@ namespace Lab.API.Template.Controllers
 
         // Post : api/TodoItems
         [HttpPost]
-        public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO dto)
+        public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItem item)
         {
-            // 投影DTO欄位
-            var item = new TodoItem
-            {
-                isComplete = dto.isComplete,
-                Name = dto.Name,
-            };
-
+           
             _context.TodoItems.Add(item);   
             // Add 標記完之後 SaveChangesAsync 非同步儲存所有改變
             await _context.SaveChangesAsync();

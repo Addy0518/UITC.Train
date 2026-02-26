@@ -8,6 +8,6 @@
 
         public bool isComplete { get; set; }
 
-
+        public string Password { get; set; }
     }
 }
