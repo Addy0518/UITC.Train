@@ -1,0 +1,6 @@
+@Lab.API.Configuration_HostAddress = http://localhost:5287
+
+GET {{Lab.API.Configuration_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
