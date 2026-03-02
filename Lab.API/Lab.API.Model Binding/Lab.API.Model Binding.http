@@ -1,0 +1,6 @@
+@Lab.API.Model_Binding_HostAddress = http://localhost:5227
+
+GET {{Lab.API.Model_Binding_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
