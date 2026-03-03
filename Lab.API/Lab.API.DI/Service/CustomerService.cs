@@ -56,4 +56,30 @@ namespace Lab.API.DI.Service
             Console.WriteLine("HairDryerPlug connected!\n");
         }
     }
+
+    // 4. 再做一個身分驗證 , 確認是母親身分才允許使用
+    public class SecruHairDyperPlug : IElectricalPlug
+    {
+        // 注入插座
+        public IElectricalPlug plug { get; set; }
+
+        // 識別證
+        public string identity { get; set; }
+
+        public SecruHairDyperPlug(IElectricalPlug plug, string identity)
+        {
+            this.plug = plug;
+            this.identity = identity;
+        }
+
+        public void Connect()
+        {
+            // 假設身分是母親才能用
+            if (identity == "Mom")
+            {
+                Console.WriteLine("身分驗證成功");
+                plug.Connect();
+            }
+        }
+    }
 }

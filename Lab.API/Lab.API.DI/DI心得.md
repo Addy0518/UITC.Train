@@ -62,7 +62,7 @@ builder.Services.AddSingleton<ISampleSingleton, Sample>();
 // Singleton : 在整個程式運行期間只會有一個實例
 ```
 
-4. 我翻到另一篇文章講的也很不錯 , 我在試一個例子
+4. 我翻到另一篇文章講的也很不錯 , 我再試一個例子
 
 ```csharp
 
@@ -74,7 +74,6 @@ public interface IElectricalPlug
 
 
 // 2. 再來定義使用插頭的插座
-
 public class Socket
 {
     private readonly IElectricalPlug _plug;
@@ -111,4 +110,38 @@ public class HairDryerPlug : IElectricalPlug
  IElectricalPlug hairDryerPlug = new HairDryerPlug();
  var socket = new Socket(hairDryerPlug);
  socket.SendPower();
+
+
+ // 5. 再做一個身分驗證 , 確認是母親身分才允許使用
+public class SecruHairDyperPlug : IElectricalPlug
+{
+    // 注入插座
+    public IElectricalPlug plug { get; set; }
+
+    // 識別證
+    public string identity { get; set; }
+
+    public SecruHairDyperPlug(IElectricalPlug plug, string identity)
+    {
+        this.plug = plug;
+        this.identity = identity;
+    }
+
+    public void Connect()
+    {
+        // 假設身分是母親才能用
+        if (identity == "Mom")
+        {
+            Console.WriteLine("身分驗證成功");
+            plug.Connect();
+        }
+    }
+}
+
+
+// 6. 這樣再把使用吹風機插頭的介面跟母親身分注入 , 就可以了
+Console.WriteLine("使用經身分驗證的安全吹風機插頭");
+IElectricalPlug secureHairDryerPlug = new SecruHairDyperPlug(hairDryerPlug, "Mom");
+var socketDecorated = new Socket(secureHairDryerPlug);
+socketDecorated.SendPower();
 ```

@@ -30,6 +30,12 @@ namespace Lab.API.DI.Controllers
             var socket = new Socket(hairDryerPlug);
             socket.SendPower();
 
+            // 6. 這樣再把使用吹風機插頭的介面跟母親身分注入 , 就可以了
+            Console.WriteLine("使用經身分驗證的安全吹風機插頭");
+            IElectricalPlug secureHairDryerPlug = new SecruHairDyperPlug(hairDryerPlug, "Mom");
+            var socketDecorated = new Socket(secureHairDryerPlug);
+            socketDecorated.SendPower();
+
             ViewBag.TransientId = _transient.Id;
             ViewBag.TransientHashCode = _transient.GetHashCode();
 
