@@ -13,6 +13,12 @@ var defaultConnectionString = builder.Configuration.GetValue<string>(
     "ConnectionStrings:DefaultConnection"
 );
 
+// 用 Configure 註冊並且型別是剛剛創建的 StrongholdInfoOptions
+builder.Services.Configure<StrongholdInfoOptions>(
+    // 再用 GetSection 指定內容是在 appsetting 的 StrongholdInfo
+    builder.Configuration.GetSection("StrongholdInfo")
+);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

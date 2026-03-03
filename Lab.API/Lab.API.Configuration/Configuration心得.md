@@ -57,3 +57,115 @@ dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
 
 ```
 
+
+3. appsettings.json 讀取
+
+
+```csharp
+
+{
+    "ConnectionStrings": {
+        // 連線字串
+        "DefaultConnection": "Data Source=localhost\\SQLEXPRESS;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Application Name=SQL"
+    },
+    "OpenAPIKey": "The_API_Key",
+    "ApiSettings": {
+        // Key1
+        "ApiOne": "OneKey",
+        // Key2
+        "ApiTwo": "TwoKey"
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "AllowedHosts": "*"
+}
+
+
+ [HttpGet]
+ public IActionResult Get()
+ {
+     
+     var Api1 = _configuration["ApiSettings:ApiOne"];
+     var Api2 = _configuration["ApiSettings:ApiTwo"];
+
+     var constr = _configuration.GetConnectionString("DefaultConnection");
+
+     return Ok(
+         new
+         {
+             constr,
+             Api1,
+             Api2,
+         }
+     );
+ }
+
+```
+
+
+4. Options Pattern 使用
+
+
+```csharp
+
+// 設定值
+"StrongholdInfo": {
+    "Index": 49,
+    "Name": "劍閣",
+    "Enabled": true,
+    "General": [
+        "姜維",
+        "廖化",
+        "張翼",
+        "董厥"
+    ]
+},
+
+// 建立類別放設定值
+public class StrongholdInfoOptions
+{
+
+    public int Index { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public bool Enabled { get; set; }
+
+    public string[]? General { get; set; }
+}
+
+// 用 Configure 註冊並且型別是剛剛創建的 StrongholdInfoOptions
+builder.Services.Configure<StrongholdInfoOptions>(
+    // 再用 GetSection 指定內容是在 appsetting 的 StrongholdInfo
+    builder.Configuration.GetSection("StrongholdInfo")
+);
+
+
+// 新增一個剛剛創建的類別
+private readonly StrongholdInfoOptions _Info;
+
+
+// 依賴 StrongholdInfoOptions 注入 , 用 IOptions 取得內容
+public SampleController(
+    IConfiguration configuration,
+    IOptions<StrongholdInfoOptions> options
+)
+{
+    _configuration = configuration;
+    _Info = options.Value;
+}
+
+
+[HttpGet("IOption")]
+public Object GetInfo()
+{
+    return _Info;
+}
+
+
+
+```
