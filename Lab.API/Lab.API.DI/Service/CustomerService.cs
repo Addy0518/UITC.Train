@@ -57,7 +57,7 @@ namespace Lab.API.DI.Service
         }
     }
 
-    // 4. 再做一個身分驗證 , 確認是母親身分才允許使用
+    // 5. 再做一個身分驗證 , 確認是母親身分才允許使用
     public class SecruHairDyperPlug : IElectricalPlug
     {
         // 注入插座

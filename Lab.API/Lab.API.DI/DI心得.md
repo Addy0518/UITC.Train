@@ -145,3 +145,45 @@ IElectricalPlug secureHairDryerPlug = new SecruHairDyperPlug(hairDryerPlug, "Mom
 var socketDecorated = new Socket(secureHairDryerPlug);
 socketDecorated.SendPower();
 ```
+
+
+5. 介面隔離實作練習
+
+```csharp
+
+ public interface IEmailNotifier
+ {
+     Task SendEmailAsync(string to, string title, string body);
+ }
+
+ public interface ISmsNotifier
+ {
+     Task SendSmsAsync(string phonenumber, string username);
+ }
+
+ public interface IMessageNotifier
+ {
+     Task SendMessageAsync(int userId, string username, string body);
+ }
+
+ private readonly IEmailNotifier _emailNotifier;
+
+ private readonly IMessageNotifier _messageNotifier;
+
+ public EmailController(IEmailNotifier notifier, IMessageNotifier messageNotifier)
+ {
+     _emailNotifier = notifier;
+     _messageNotifier = messageNotifier;
+ }
+
+  
+ public async Task ConfrimOrderAsync(Order order)
+ {
+     await _emailNotifier.SendEmailAsync(
+         order.CustomerEmail,
+         "訂單確認",
+         $"訂購的商品{order.Name}已到達"
+     );
+ }
+ 
+```
