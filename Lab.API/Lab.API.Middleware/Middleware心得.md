@@ -159,3 +159,35 @@ app.UseAuthorization();
 // Session 相關處理
 app.UseSession();
 ```
+
+
+6. 關於 http 與 https
+
+   1. 當今天我使用 https 開啟網頁 , 但是我又複製一個網頁並改成 http , 那就會變成 " 跨域 " , 也就是 CORS 機制 。
+   會不允許網頁發送請求 , 因為通訊埠被修改了 ( 443=>80 ) 
+   2. https 會給網頁憑證 , 讓他在傳輸過程中做加密
+   3. https 的速度也會比 http 快 , 所以通常都使用 https 的情況居多 
+
+7. 實際測試
+
+```csharp
+//拿到 HTTP 請求
+app.Use(
+    async (context, next) =>
+    {
+        Console.WriteLine(
+            // 印出 1. 通訊埠 2. 網址本身 3. 請求方法
+            $"通訊埠 : {context.Request.Scheme}, 網址本身 : {context.Request.Headers["Origin"]}, 請求方法 : {context.Request.Method}"
+        );
+        // 繼續往下走
+        await next();
+    }
+);
+
+app.UseHsts();
+app.UseHttpsRedirection();
+
+// 輸出結果 , 證明 CORS 發生
+通訊埠 : http, 網址本身 : http:/localhost:5158, 請求方法 : POST
+通訊埠 : https, 網址本身 : http:/localhost:5158, 請求方法 : OPTIONS
+```
