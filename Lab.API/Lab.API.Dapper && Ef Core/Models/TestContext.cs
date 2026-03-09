@@ -21,9 +21,6 @@ public partial class TestContext : DbContext
     {
         modelBuilder.Entity<Book>(entity =>
         {
-            entity.HasNoKey();
-
-            entity.Property(e => e.BookId).ValueGeneratedOnAdd();
             entity.Property(e => e.BookName)
                 .HasMaxLength(10)
                 .IsFixedLength();
@@ -31,7 +28,7 @@ public partial class TestContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength();
 
-            entity.HasOne(d => d.User).WithMany()
+            entity.HasOne(d => d.User).WithMany(p => p.Books)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK_Books_User");
         });

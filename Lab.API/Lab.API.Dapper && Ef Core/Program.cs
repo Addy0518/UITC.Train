@@ -16,9 +16,9 @@ builder.Services.AddControllers();
 builder.Services.ADDDIConfig();
 
 // 註冊連線
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-//builder.Services.AddDbContext<TestContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<TestContext>(options => options.UseSqlServer(connectionString));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
