@@ -12,12 +12,10 @@ namespace Lab.API.Dapper.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _iuserrepository;
-        private readonly TestContext _context;
 
-        public UserController(IUserRepository repository, TestContext context)
+        public UserController(IUserRepository repository)
         {
             _iuserrepository = repository;
-            _context = context;
         }
 
         //// 登入
@@ -39,6 +37,12 @@ namespace Lab.API.Dapper.Controllers
         public async Task<List<UserViewDTO>> GetAllUser()
         {
             return await _iuserrepository.GetAllUsersAsync();
+        }
+
+        [HttpGet("UserAndBooks")]
+        public async Task<UserAndBooksDTO> GetBooksAndUser([FromQuery] int id)
+        {
+            return await _iuserrepository.GetBooksAndUser(id);
         }
 
         [HttpDelete]
@@ -67,10 +71,28 @@ namespace Lab.API.Dapper.Controllers
             return result > 0;
         }
 
+        [HttpPut("UserAndBooksUpdate")]
+        public async Task<bool> UpdateUserAndBooks([FromBody] UserUpdateDTO dto)
+        {
+            var target = await _iuserrepository.GetBooksAndUser(dto.Id);
+            if (target is null)
+            {
+                return false;
+            }
+
+            return await _iuserrepository.UpdateUserAndBooks(dto);
+        }
+
         [HttpPost]
         public async Task<int> CreateUser([FromBody] UserInsertDTO dto)
         {
             return await _iuserrepository.InsertUserAsync(dto);
+        }
+
+        [HttpPost("Insert20000User")]
+        public async Task<int> Create20000User()
+        {
+            return await _iuserrepository.InsertUserMoreTest();
         }
     }
 }

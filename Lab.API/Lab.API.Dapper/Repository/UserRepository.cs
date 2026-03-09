@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Diagnostics;
+using Dapper;
 using Lab.API.Dapper.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
@@ -6,18 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lab.API.Dapper.Repository
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(UserConnection connection) : IUserRepository
     {
-        private readonly TestContext _context;
-
-        public UserRepository(TestContext context)
-        {
-            _context = context;
-        }
-
         public async Task<int> DeleteUserAsync(int id)
         {
-            using var conn = _context.Database.GetDbConnection();
+            using var conn = connection.CreateConnection();
             {
                 var sql = @"Delete From [User] Where Id=@id";
 
@@ -27,7 +21,7 @@ namespace Lab.API.Dapper.Repository
 
         public async Task<List<UserViewDTO>> GetAllUsersAsync()
         {
-            using var conn = _context.Database.GetDbConnection();
+            using var conn = connection.CreateConnection();
             {
                 var sql = @"Select * From [User]";
 
@@ -40,7 +34,7 @@ namespace Lab.API.Dapper.Repository
 
         public async Task<UserViewDTO> GetUserAsync(int id)
         {
-            using var conn = _context.Database.GetDbConnection();
+            using var conn = connection.CreateConnection();
             {
                 var sql = "Select * From [User] Where Id=@id";
 
@@ -52,7 +46,7 @@ namespace Lab.API.Dapper.Repository
         public async Task<int> InsertUserAsync(UserInsertDTO userDto)
         {
             // using 連線 , 等結束把資源釋放
-            using var conn = _context.Database.GetDbConnection();
+            using var conn = connection.CreateConnection();
 
             // 建立 Sql 語法
             var sql =
@@ -72,7 +66,7 @@ namespace Lab.API.Dapper.Repository
 
         public async Task<int> UpdateUserAsync(UserUpdateDTO user)
         {
-            using var conn = _context.Database.GetDbConnection();
+            using var conn = connection.CreateConnection();
             {
                 var sql =
                     @"Update [User] 
@@ -81,6 +75,106 @@ namespace Lab.API.Dapper.Repository
 
                 // 使用 ExecuteAsync 執行操作 , 他會回傳影響的列數 , 因為 Update 跟 Delete 只要回傳是否有成功 , 所以就回傳列述並判斷 true 或 false
                 return await conn.ExecuteAsync(sql, user);
+            }
+        }
+
+        public async Task<UserAndBooksDTO> GetBooksAndUser(int id)
+        {
+            // 建立兩個 SQL 查詢兩張表
+            var sql = "Select * From [User] Where Id=@id ;Select * From [Books] Where UserID=@id";
+
+            using var conn = connection.CreateConnection();
+            {
+                // 使用非同步 QueryMultiple 做多個 SQL 查詢 , 放入 Sql 跟 Id 參數
+                using (var multi = await conn.QueryMultipleAsync(sql, new { Id = id }))
+                {
+                    // 使用 Read 把結果轉物件
+                    var user = multi.Read<User>().FirstOrDefault();
+                    var book = multi.Read<Book>().ToList();
+                    return new UserAndBooksDTO { users = user, books = book };
+                }
+            }
+        }
+
+        public async Task<bool> UpdateUserAndBooks(UserUpdateDTO dto)
+        {
+            // 建立兩個執行緒來同時進行兩個連線
+            var userTask = Task.Run(async () =>
+            {
+                using var userconn = connection.CreateConnection();
+                {
+                    string userSql =
+                        "Update [User] Set Name=@Name,Email=@Email,Password=@Password  Where Id=@Id";
+                    var userQuery = await userconn.ExecuteAsync(userSql, dto);
+                }
+            });
+
+            var bookTask = Task.Run(async () =>
+            {
+                using var bookconn = connection.CreateConnection();
+                {
+                    string bookSql =
+                        "Update [Books] Set BookName=@BookName,BookPrice=@BookPrice Where UserId=@UserId";
+                    var bookQuery = await bookconn.ExecuteAsync(bookSql, dto.UserBooks);
+                }
+            });
+            // WhenAll 則會等待這兩個執行緒都完成時 , 才會繼續執行
+            await Task.WhenAll(userTask, bookTask);
+
+            return true;
+        }
+
+        public async Task<int> InsertUserMoreTest()
+        {
+            // 我先加上一個 .Net 內建的功能 StopWatch , 用來計時有無交易的時間差異
+            var sw = Stopwatch.StartNew();
+            // 使用列舉的範圍 20000 筆加上 Lambda 函式做一個迴圈新增資料
+            var users = Enumerable
+                .Range(1, 20000)
+                .Select(i =>
+                {
+                    // 新增 Parameters 物件來防止隱式轉型
+                    var param = new DynamicParameters();
+                    param.Add("Name", $"User{i}", System.Data.DbType.String, size: 50);
+                    param.Add("Role", $"User", System.Data.DbType.String, size: 50);
+                    param.Add("Email", $"Email{i}", System.Data.DbType.String, size: 100);
+                    param.Add("Password", $"Password{i}", System.Data.DbType.String, size: 50);
+
+                    return param;
+                })
+                .ToList();
+
+            using var conn = connection.CreateConnection();
+            // 非同步開啟交易
+            await conn.OpenAsync();
+
+            using var tran = conn.BeginTransaction();
+
+            try
+            {
+                // Dapper 會自動展開存入資料 , 所以這裡一樣正常加入參數就好
+                var sql =
+                    "Insert Into [User] (Name,Role,Email,Password) Values (@Name,@Role,@Email,@Password);";
+                var result = await conn.ExecuteAsync(sql, users, tran);
+
+                if (result == users.Count)
+                {
+                    // 成功後就停止 StopWatch , 看計算的時間
+                    sw.Stop();
+                    Console.WriteLine($"耗時 {sw.ElapsedMilliseconds} ms");
+                    tran.Commit();
+                    // 回傳成功新增了幾筆
+                    return result;
+                }
+                else
+                {
+                    tran.Rollback();
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
     }

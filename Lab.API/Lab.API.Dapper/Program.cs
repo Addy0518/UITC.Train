@@ -12,17 +12,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// 註冊連線
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// 最後在 Program 註冊
+builder.Services.ADDDIConfig();
 
-builder.Services.AddDbContext<TestContext>(options => options.UseSqlServer(connectionString));
+// 註冊連線
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+//builder.Services.AddDbContext<TestContext>(options => options.UseSqlServer(connectionString));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // 註冊 UserRepository 的介面服務
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 

@@ -6,11 +6,17 @@ namespace Lab.API.Dapper.Repository
     {
         Task<int> InsertUserAsync(UserInsertDTO userDto);
 
+        Task<int> InsertUserMoreTest();
+
         Task<List<UserViewDTO>> GetAllUsersAsync();
 
         Task<UserViewDTO> GetUserAsync(int id);
 
         Task<int> UpdateUserAsync(UserUpdateDTO user);
+
+        Task<bool> UpdateUserAndBooks(UserUpdateDTO dto);
+
+        Task<UserAndBooksDTO> GetBooksAndUser(int id);
 
         Task<int> DeleteUserAsync(int id);
     }
