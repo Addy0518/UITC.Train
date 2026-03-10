@@ -58,6 +58,12 @@ namespace Lab.API.Dapper.Controllers
             return await _iuserrepository.GetUserAsync(id);
         }
 
+        [HttpGet("DapperMergeEfCore")]
+        public async Task<UserAndBooksDTO> GetUserMerge([FromQuery] int id)
+        {
+            return await _iuserrepository.GetBooksAndUsermerge(id);
+        }
+
         [HttpPut]
         public async Task<bool> UpdateUser([FromBody] UserUpdateDTO dto)
         {

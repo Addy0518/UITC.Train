@@ -5,10 +5,11 @@ using Lab.API.Dapper.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Lab.API.Dapper.Repository
 {
-    public class UserRepository(UserConnection connection) : IUserRepository
+    public class UserRepository(UserConnection connection, TestContext context) : IUserRepository
     {
         public async Task<int> DeleteUserAsync(int id)
         {
@@ -94,6 +95,30 @@ namespace Lab.API.Dapper.Repository
                     var book = multi.Read<Book>().ToList();
                     return new UserAndBooksDTO { users = user, books = book };
                 }
+            }
+        }
+
+        public async Task<UserAndBooksDTO> GetBooksAndUsermerge(int id)
+        {
+            // 要確保 Dapper 跟 Ef Core 都在同一個連線交易 , 所以 Dapper 連線也改從 Db 拿
+            var conn = context.Database.GetDbConnection();
+
+            using (var trn = context.Database.BeginTransaction())
+            {
+                var book = await context.Books.Where(x => x.UserId == id).ToListAsync();
+
+                var sql = "Select * From [User] Where Id=@id";
+
+                var userdto = await conn.QuerySingleAsync<User>(
+                    sql,
+                    new { Id = id },
+                    // 加入 Ef 的交易
+                    transaction: trn.GetDbTransaction()
+                );
+                // 加入 DTO
+                var result = new UserAndBooksDTO { books = book, users = userdto };
+
+                return result;
             }
         }
 

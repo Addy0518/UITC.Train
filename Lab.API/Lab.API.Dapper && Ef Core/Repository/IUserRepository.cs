@@ -16,6 +16,8 @@ namespace Lab.API.Dapper.Repository
 
         Task<UserViewDTO> GetUserAsync(int id);
 
+        Task<UserAndBooksDTO> GetBooksAndUsermerge(int id);
+
         Task<int> UpdateUserAsync(UserUpdateDTO user);
 
         Task<bool> UpdateUserAndBooks(UserUpdateDTO dto);

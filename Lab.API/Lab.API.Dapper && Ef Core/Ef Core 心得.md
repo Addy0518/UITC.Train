@@ -231,5 +231,34 @@ await using var tran = await context.Database.BeginTransactionAsync();
 ```
 
 
+4. EfCore 跟 Dapper 混用在同一筆交易的方法
+
+```csharp
+public async Task<UserAndBooksDTO> GetBooksAndUsermerge(int id)
+{
+    // 要確保 Dapper 跟 Ef Core 都在同一個連線交易 , 所以 Dapper 連線也改從 Db 拿
+    var conn = context.Database.GetDbConnection();
+
+    using (var trn = context.Database.BeginTransaction())
+    {
+        var book = await context.Books.Where(x => x.UserId == id).ToListAsync();
+
+        var sql = "Select * From [User] Where Id=@id";
+
+        var userdto = await conn.QuerySingleAsync<User>(
+            sql,
+            new { Id = id },
+            // 加入 Ef 的交易
+            transaction: trn.GetDbTransaction()
+        );
+        // 加入 DTO
+        var result = new UserAndBooksDTO { books = book, users = userdto };
+
+        return result;
+    }
+}
+```
+
+
 
 
