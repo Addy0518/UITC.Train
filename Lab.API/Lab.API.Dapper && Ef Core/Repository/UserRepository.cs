@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Data;
+using System.Diagnostics;
 using Dapper;
 using Lab.API.Dapper.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -164,7 +165,7 @@ namespace Lab.API.Dapper.Repository
             // 非同步開啟交易
             await conn.OpenAsync();
 
-            // 使用 Chunk 分割總量變成 10000 每筆
+            // 使用 Chunk 分割總量變成 5000 每筆
             var chunks5000 = allusers.Chunk(5000);
 
             foreach (var chunk in chunks5000)
@@ -244,6 +245,45 @@ namespace Lab.API.Dapper.Repository
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        public void InserUserSqlBulkTest()
+        {
+            var sw = new Stopwatch();
+
+            // 建立 datatable 對應資料庫欄位
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Name", typeof(string));
+            dt.Columns.Add("Role", typeof(string));
+            dt.Columns.Add("Email", typeof(string));
+            dt.Columns.Add("Password", typeof(string));
+
+            for (int i = 0; i < 10000; i++)
+            {
+                // 迴圈把每一列測試資料加入
+                DataRow dr = dt.NewRow();
+                dr["Name"] = $"Name{i}";
+                dr["Role"] = "User";
+                dr["Email"] = "aaa";
+                dr["Password"] = "bbb";
+
+                dt.Rows.Add(dr);
+            }
+
+            using var conn = connection.CreateConnection();
+            conn.Open();
+
+            // 使用 SqlBulkCopy 內建套件 , 加入連線
+            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn))
+            {
+                // 對應資料庫名稱
+                bulkCopy.DestinationTableName = "[dbo].[User]";
+                // 寫入資料庫
+                bulkCopy.WriteToServer(dt);
+                // 成功後就停止 StopWatch , 看計算的時間
+                sw.Stop();
+                Console.WriteLine($"耗時 {sw.ElapsedMilliseconds} ms");
             }
         }
     }

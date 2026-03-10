@@ -100,5 +100,11 @@ namespace Lab.API.Dapper.Controllers
         {
             return await _iuserrepository.InsertUserChunkTest();
         }
+
+        [HttpPost("InsertBulkUser")]
+        public void CreateMoreBolkUser()
+        {
+            _iuserrepository.InserUserSqlBulkTest();
+        }
     }
 }

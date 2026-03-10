@@ -10,6 +10,8 @@ namespace Lab.API.Dapper.Repository
 
         Task<int> InsertUserChunkTest();
 
+        void InserUserSqlBulkTest();
+
         Task<List<UserViewDTO>> GetAllUsersAsync();
 
         Task<UserViewDTO> GetUserAsync(int id);
