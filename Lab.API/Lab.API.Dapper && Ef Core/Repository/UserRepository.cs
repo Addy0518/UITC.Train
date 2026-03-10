@@ -118,13 +118,82 @@ namespace Lab.API.Dapper.Repository
                     var bookQuery = await bookconn.ExecuteAsync(bookSql, dto.UserBooks);
                 }
             });
+
+            //using var userconn = connection.CreateConnection();
+            //string userSql =
+            //         "Update [User] Set Name=@Name,Email=@Email,Password=@Password  Where Id=@Id";
+            //var userQuery = userconn.ExecuteAsync(userSql, dto);
+
+            //using var bookconn = connection.CreateConnection();
+            //string bookSql =
+            //        "Update [Books] Set BookName=@BookName,BookPrice=@BookPrice Where UserId=@UserId";
+            //var bookQuery = bookconn.ExecuteAsync(bookSql, dto.UserBooks);
+            //await Task.WhenAll(userQuery, bookQuery);
+
             // WhenAll 則會等待這兩個執行緒都完成時 , 才會繼續執行
             await Task.WhenAll(userTask, bookTask);
 
             return true;
         }
 
-        public async Task<int> InsertUserMoreTest()
+        public async Task<int> InsertUserChunkTest()
+        {
+            // 我先加上一個 .Net 內建的功能 StopWatch , 用來計時有無交易的時間差異
+            var sw = Stopwatch.StartNew();
+            // 紀錄最後回傳的總影響行數
+            int totalcount = 0;
+
+            // 使用列舉的範圍 20000 筆加上 Lambda 函式做一個迴圈新增資料
+            var allusers = Enumerable
+                .Range(1, 20000)
+                .OrderBy(x => x)
+                .Select(i =>
+                {
+                    // 新增 Parameters 物件來防止隱式轉型
+                    var param = new DynamicParameters();
+                    param.Add("Name", $"User{i}", System.Data.DbType.String, size: 50);
+                    param.Add("Role", $"User", System.Data.DbType.String, size: 50);
+                    param.Add("Email", $"Email{i}", System.Data.DbType.String, size: 100);
+                    param.Add("Password", $"Password{i}", System.Data.DbType.String, size: 50);
+
+                    return param;
+                })
+                .ToList();
+
+            using var conn = connection.CreateConnection();
+            // 非同步開啟交易
+            await conn.OpenAsync();
+
+            // 使用 Chunk 分割總量變成 10000 每筆
+            var chunks5000 = allusers.Chunk(5000);
+
+            foreach (var chunk in chunks5000)
+            {
+                // 因為是用迴圈批次儲存 , 所以交易移到迴圈裡 , 每存一次開啟一次交易 , 確保當某一批失敗時前面的不會失敗
+                using var tran = await conn.BeginTransactionAsync();
+                try
+                {
+                    // Dapper 會自動展開存入資料 , 所以這裡一樣正常加入參數就好
+                    var sql =
+                        "Insert Into [User] (Name,Role,Email,Password) Values (@Name,@Role,@Email,@Password);";
+                    var result = await conn.ExecuteAsync(sql, chunk, tran);
+                    totalcount += result;
+                    tran.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    tran.RollbackAsync();
+                    return 0;
+                    throw;
+                }
+            }
+            // 成功後就停止 StopWatch , 看計算的時間
+            sw.Stop();
+            Console.WriteLine($"耗時 {sw.ElapsedMilliseconds} ms");
+            return totalcount;
+        }
+
+        public async Task<int> InsertUserTest()
         {
             // 我先加上一個 .Net 內建的功能 StopWatch , 用來計時有無交易的時間差異
             var sw = Stopwatch.StartNew();

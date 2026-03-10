@@ -89,10 +89,16 @@ namespace Lab.API.Dapper.Controllers
             return await _iuserrepository.InsertUserAsync(dto);
         }
 
-        [HttpPost("Insert20000User")]
-        public async Task<int> Create20000User()
+        [HttpPost("InsertUser")]
+        public async Task<int> CreateMoreUser()
         {
-            return await _iuserrepository.InsertUserMoreTest();
+            return await _iuserrepository.InsertUserTest();
+        }
+
+        [HttpPost("InsertChunkUser")]
+        public async Task<int> CreateMoreChunkUser()
+        {
+            return await _iuserrepository.InsertUserChunkTest();
         }
     }
 }

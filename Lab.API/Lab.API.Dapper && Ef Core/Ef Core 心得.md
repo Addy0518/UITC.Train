@@ -233,20 +233,3 @@ await using var tran = await context.Database.BeginTransactionAsync();
 
 
 
-// 1. new 一個實體，只給主鍵：ApplyNo、ID、UserType
-var bankTrace = new Reviewer_BankTrace()
-{
-    ApplyNo = context.ApplyNo,
-    ID = mainContext.ID,
-    UserType = mainContext.UserType,
-};
-
-// 2. Attach → EF 會把它當成「已經在 DB 裡的那一筆」（Unchanged）
-_context.Attach(bankTrace);
-
-// 3. 再設其他屬性 → 這些會被標成 Modified
-bankTrace.InternalEmailSame_Flag = mainContext.命中檢核行內Email == 命中檢核結果.命中 ? "Y" : "N";
-// bankTrace.InternalMobileSame_Flag = ...
-
-// 4. SaveChanges → EF 會生出 UPDATE Reviewer_BankTrace SET ... WHERE ApplyNo = @... AND ID = @... AND UserType = @...
-await _context.SaveChangesAsync();

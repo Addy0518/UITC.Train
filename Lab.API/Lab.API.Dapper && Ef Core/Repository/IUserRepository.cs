@@ -6,7 +6,9 @@ namespace Lab.API.Dapper.Repository
     {
         Task<int> InsertUserAsync(UserInsertDTO userDto);
 
-        Task<int> InsertUserMoreTest();
+        Task<int> InsertUserTest();
+
+        Task<int> InsertUserChunkTest();
 
         Task<List<UserViewDTO>> GetAllUsersAsync();
 

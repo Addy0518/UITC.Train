@@ -186,57 +186,118 @@ public async Task<bool> UpdateUserAndBooks(UserUpdateDTO dto)
 5. 批次新增時得隱式轉換以及 Transation 的同時 Commit => 最後計算結果 : 有用交易是 5 秒 , 沒用是 6.6 秒
 
 ```csharp
-  public async Task<int> InsertUserMoreTest()
-  {
-      // 我先加上一個 .Net 內建的功能 StopWatch , 用來計時有無交易的時間差異
-      var sw = Stopwatch.StartNew();
-      // 使用列舉的範圍 20000 筆加上 Lambda 函式做一個迴圈新增資料
-      var users = Enumerable
-          .Range(1, 20000)
-          .Select(i =>
-          {
-              // 新增 Parameters 物件來防止隱式轉型
-              var param = new DynamicParameters();
-              param.Add("Name", $"User{i}", System.Data.DbType.String, size: 50);
-              param.Add("Role", $"User", System.Data.DbType.String, size: 50);
-              param.Add("Email", $"Email{i}", System.Data.DbType.String, size: 100);
-              param.Add("Password", $"Password{i}", System.Data.DbType.String, size: 50);
+ public async Task<int> InsertUserTest()
+ {
+     // 我先加上一個 .Net 內建的功能 StopWatch , 用來計時有無交易的時間差異
+     var sw = Stopwatch.StartNew();
+     // 使用列舉的範圍 20000 筆加上 Lambda 函式做一個迴圈新增資料
+     var users = Enumerable
+         .Range(1, 100000)
+         .Select(i =>
+         {
+             // 新增 Parameters 物件來防止隱式轉型
+             var param = new DynamicParameters();
+             param.Add("Name", $"User{i}", System.Data.DbType.String, size: 50);
+             param.Add("Role", $"User", System.Data.DbType.String, size: 50);
+             param.Add("Email", $"Email{i}", System.Data.DbType.String, size: 100);
+             param.Add("Password", $"Password{i}", System.Data.DbType.String, size: 50);
 
-              return param;
-          })
-          .ToList();
+             return param;
+         })
+         .ToList();
 
-      using var conn = connection.CreateConnection();
-      // 非同步開啟交易
-      await conn.OpenAsync();
+     using var conn = connection.CreateConnection();
+     // 非同步開啟交易
+     await conn.OpenAsync();
 
-      using var tran = conn.BeginTransaction();
+     using var tran = conn.BeginTransaction();
 
-      try
-      {
-          // Dapper 會自動展開存入資料 , 所以這裡一樣正常加入參數就好
-          var sql =
-              "Insert Into [User] (Name,Role,Email,Password) Values (@Name,@Role,@Email,@Password);";
-          var result = await conn.ExecuteAsync(sql, users, tran);
+     try
+     {
+         // Dapper 會自動展開存入資料 , 所以這裡一樣正常加入參數就好
+         var sql =
+             "Insert Into [User] (Name,Role,Email,Password) Values (@Name,@Role,@Email,@Password);";
+         var result = await conn.ExecuteAsync(sql, users, tran);
 
-          if (result == users.Count)
-          {
-              // 成功後就停止 StopWatch , 看計算的時間
-              sw.Stop();
-              Console.WriteLine($"耗時 {sw.ElapsedMilliseconds} ms");
-              tran.Commit();
-              // 回傳成功新增了幾筆
-              return result;
-          }
-          else
-          {
-              tran.Rollback();
-              return 0;
-          }
-      }
-      catch (Exception ex)
-      {
-          throw;
-      }
-  }
+         if (result == users.Count)
+         {
+             // 成功後就停止 StopWatch , 看計算的時間
+             sw.Stop();
+             Console.WriteLine($"耗時 {sw.ElapsedMilliseconds} ms");
+             tran.Commit();
+             // 回傳成功新增了幾筆
+             return result;
+         }
+         else
+         {
+             tran.Rollback();
+             return 0;
+         }
+     }
+     catch (Exception ex)
+     {
+         throw;
+     }
+ }
 ```
+
+6. 新增一個分批儲存的版本 , 本來是一次 Commit , 換每五千 Commit 一次 => 沒分批耗時 : 4337 ms , 有分批耗時 : 4607 ms , 目前有成功分批 , 但是我發現 Dapper 在寫入時好像不會做分批的動作 , 所以耗時沒什麼差別 , 甚至因為每一次迴圈都開一次交易所以耗時更久一點 , 我看 Dapper 要實際做到分批存入要其他特殊的語法?
+
+```csharp
+ public async Task<int> InsertUserChunkTest()
+ {
+
+     var sw = Stopwatch.StartNew();
+     // 紀錄最後回傳的總影響行數
+     int totalcount = 0;
+
+     var allusers = Enumerable
+         .Range(1, 20000)
+         .OrderBy(x => x)
+         .Select(i =>
+         {
+
+             var param = new DynamicParameters();
+             param.Add("Name", $"User{i}", System.Data.DbType.String, size: 50);
+             param.Add("Role", $"User", System.Data.DbType.String, size: 50);
+             param.Add("Email", $"Email{i}", System.Data.DbType.String, size: 100);
+             param.Add("Password", $"Password{i}", System.Data.DbType.String, size: 50);
+
+             return param;
+         })
+         .ToList();
+
+     using var conn = connection.CreateConnection();
+
+     await conn.OpenAsync();
+
+     // 使用 Chunk 分割總量變成 5000 每筆
+     var chunks5000 = allusers.Chunk(5000);
+
+     foreach (var chunk in chunks5000)
+     {
+         // 因為是用迴圈批次儲存 , 所以交易移到迴圈裡 , 每存一次開啟一次交易 , 確保當某一批失敗時前面的不會失敗
+         using var tran = conn.BeginTransaction();
+         try
+         {
+     
+             var sql =
+                 "Insert Into [User] (Name,Role,Email,Password) Values (@Name,@Role,@Email,@Password);";
+             var result = await conn.ExecuteAsync(sql, chunk, tran);
+             totalcount += result;
+             tran.Commit();
+         }
+         catch (Exception ex)
+         {
+             tran.Rollback();
+             return 0;
+             throw;
+         }
+     }
+  
+     sw.Stop();
+     Console.WriteLine($"耗時 {sw.ElapsedMilliseconds} ms");
+     return totalcount;
+ }
+```
+
