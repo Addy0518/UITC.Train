@@ -114,7 +114,7 @@ finally
 像這樣
 
 ```
-09:30:35 INF] Starting web host
+[09:30:35 INF] Starting web host
 [09:30:35 INF] Now listening on: https://localhost:7240
 [09:30:35 INF] Now listening on: http://localhost:5142
 [09:30:35 INF] Application started. Press Ctrl+C to shut down.
@@ -497,8 +497,7 @@ public IActionResult GetFalut()
 
 ```
 ```sql
-hello 
-'$type': 'MyProblemDetails', ActionName: 'GetFalut', ControllerName: 'Log', Detail: 'hell… null'
+hello '$type': 'MyProblemDetails', ActionName: 'GetFalut', ControllerName: 'Log', Detail: 'hell… null'
 ActionId : e976edf6-6399-42bc-8791-7f539748f061
 
 ActionName : Lab.API.Serilog___Seq.Controllers.LogController.GetFalut (Lab.API.Serilog + Seq)

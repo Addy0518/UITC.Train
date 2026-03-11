@@ -1,0 +1,6 @@
+﻿namespace Lab.API.Swagger.Path.To
+{
+    public class AssemblyDoc
+    {
+    }
+}

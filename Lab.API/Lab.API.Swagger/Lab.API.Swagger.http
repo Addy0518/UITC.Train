@@ -1,4 +1,4 @@
-@Lab.API.Swagger_HostAddress = http://localhost:5014
+@Lab.API.Swagger_HostAddress = http://localhost:5283
 
 GET {{Lab.API.Swagger_HostAddress}}/weatherforecast/
 Accept: application/json
