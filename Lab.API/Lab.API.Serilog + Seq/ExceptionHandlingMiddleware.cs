@@ -54,10 +54,14 @@ namespace Lab.API.Serilog___Seq
             }
             // 格式化輸出給 Seq
             _logger.LogInformation(
-                "Incoming Request: TraceId={TraceId}, Controller={ControllerName}, Action={ActionName}",
-                traceId,
-                controllerName,
-                actionName
+                "Incoming Request {@result}",
+                new
+                {
+                    TraceId = traceId,
+                    ControllerName = controllerName,
+                    ActionName = actionName,
+                    Title = "RequestLog",
+                }
             );
         }
 

@@ -484,3 +484,54 @@ public class LoggingService<T> : ILoggingService<T>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(typeof(ILoggingService<>), typeof(LoggingService<>));
 ```
+
+發出一隻 API
+
+```csharp
+[HttpGet("fault")]
+public IActionResult GetFalut()
+{
+    _looger.LogInformation("hello");
+    return Ok();
+}
+
+```
+```sql
+hello 
+'$type': 'MyProblemDetails', ActionName: 'GetFalut', ControllerName: 'Log', Detail: 'hell… null'
+ActionId : e976edf6-6399-42bc-8791-7f539748f061
+
+ActionName : Lab.API.Serilog___Seq.Controllers.LogController.GetFalut (Lab.API.Serilog + Seq)
+
+ConnectionId : 0HNJUH90D3189
+
+Message : hello
+
+RequestId : 0HNJUH90D3189:00000001
+
+RequestPath : /api/Log/fault
+
+result.ActionName : GetFalut
+
+result.ControllerName : Log
+
+result.Detail : hello
+
+result.Extensions : {}
+
+result.Instance : /api/Log/fault
+
+result.Status : 200
+
+result.Title : LogInfo
+
+result.TraceId :  0HNJUH90D3189:00000001
+
+result.Type : 
+ 
+result['$type'] : 
+MyProblemDetails : 
+SourceContext : Lab.API.Serilog___Seq.Controllers.LogController
+
+structuredData : 
+```
