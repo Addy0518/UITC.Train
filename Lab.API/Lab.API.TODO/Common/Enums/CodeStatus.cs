@@ -5,7 +5,9 @@ namespace Lab.API.TODO.Common.Enums;
 // 狀態碼
 public enum CodeStatus
 {
-    [Description("成功")]
+    /// <summary>
+    /// 成功
+    /// </summary>
     Success = 2000,
 
     [Description("Request驗證失敗")]

@@ -1,9 +1,23 @@
 namespace Lab.API.TODO.Common.Responses;
 
-// 統一回傳訊息
+/// <summary>
+/// 統一回復 Response
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class ApiResponse<T>
 {
+    /// <summary>
+    /// 狀態碼
+    /// </summary>
     public CodeStatus CodeStatus { get; set; } = CodeStatus.Success;
+
+    /// <summary>
+    /// 訊息
+    /// </summary>
     public string Message { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 回傳資料
+    /// </summary>
     public T ReturnData { get; set; } = default!;
 }
