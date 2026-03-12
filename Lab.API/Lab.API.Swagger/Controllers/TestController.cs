@@ -57,6 +57,22 @@ namespace Lab.API.Swagger.Controllers
             return Ok(user1);
         }
 
+        /// <summary>
+        /// 查看列舉值
+        /// </summary>
+        /// <param name="num">列舉值參數</param>
+        /// <returns>是否正確跟在列舉裡的排名</returns>
+        /// /// <remarks>
+        /// 範例請求 :
+        ///
+        ///     Get / Test / enum
+        ///     {
+        ///        "num" : 1
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">回傳查到的物件</response>
+        /// <response code="400">如果物件是空的</response>
         [HttpGet("enum")]
         public string GetEnum([FromQuery] DayOfTheWeekAsString num)
         {

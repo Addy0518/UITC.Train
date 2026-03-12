@@ -1,4 +1,4 @@
-# Swagger 心得
+# Swagger + Xml 心得
 
 
 1. 安裝 Swashbuckle.AspNetCore.SwaggerUI 套件來使用 Swagger UI 介面
@@ -93,4 +93,69 @@ public string GetEnum([FromQuery] DayOfTheWeekAsString num)
     // 回傳是否正確跟在列舉裡的排名
     return $"{number},{(int)num}";
 }
+```
+
+6. 讀取 XML , 我換安裝另一個套件 NSwag , 這個讀取比較沒問題 , 好了之後再檔案加入這行來讀取 Xml 檔案 , XMl 檔案會生成在資料夾的 obj => debug => net 裡面
+
+```CSharp
+<GenerateDocumentationFile>true</GenerateDocumentationFile>
+```
+
+7. 並在 Program 註冊
+
+```CSharp
+builder.Services.AddOpenApiDocument(options =>
+{
+    options.PostProcess = document =>
+    {
+        document.Info = new OpenApiInfo
+        {
+            // 可以放 Swagger 頁面標題跟描述
+            Version = "v1",
+            Title = "Swagger 練習",
+            Description = "測試 Nswagger 讀取",
+            // 也可以放入網址
+            TermsOfService = "https://example.com/terms",
+            Contact = new OpenApiContact
+            {
+                Name = "Example Contact",
+                Url = "https://example.com/contact",
+            },
+            License = new OpenApiLicense
+            {
+                Name = "Example License",
+                Url = "https://example.com/license",
+            },
+        };
+    };
+});
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi();
+    app.UseSwaggerUI();
+}
+```
+
+8. 標籤寫法
+
+```csharp
+/// <summary>  //這是一般註解
+/// 查看列舉值
+/// </summary>
+/// <param name="num">列舉值參數</param> // 參數註解
+/// <returns>是否正確跟在列舉裡的排名</returns>  // 回傳值註解
+/// /// <remarks>    // 標記提示重點
+/// 範例請求 :
+///
+///     Get / Test / enum
+///     {
+///        "num" : 1
+///     }
+///
+/// </remarks> 
+/// <response code="200">回傳查到的物件</response>  // 回傳狀態碼註解
+/// <response code="400">如果物件是空的</response>
+[HttpGet("enum")]
+public string GetEnum([FromQuery] DayOfTheWeekAsString num)
 ```

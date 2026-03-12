@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace Lab.API.Swagger.Models;
 
+/// <summary>
+/// User 模型
+/// </summary>
 public partial class User
 {
     public int Id { get; set; }
