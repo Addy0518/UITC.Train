@@ -392,3 +392,24 @@ join stops middle on r3.stop=middle.id
 join stops endstop on (r4.stop=endstop.id)
 where startstop.name='Craiglockhart' and endstop.name='Sighthill'
 ```
+
+### 暫存表
+
+#### 指只存在查詢當下的 , 暫時的表 , 這裡我用 CTE 的形式 , 我使用前面寫過的來示範
+
+1. 本來是這樣
+
+```sql
+select name
+from world 
+where gdp>all(select gdp from world where continent='Europe' )
+```
+
+2. 改成這樣 , 讀起來比較順
+
+```sql
+with cte (gdp) as (select gdp from world where continent='Europe')
+select name
+from world 
+where gdp>all(select gdp from cte)
+```
