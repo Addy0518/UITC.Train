@@ -34,7 +34,7 @@ try
     builder.Services.AddDIConfig();
 
     var app = builder.Build();
-    app.UseHttpsRedirection();
+    // app.UseHttpsRedirection();
     app.UseOpenApi();
     app.UseSwaggerUI();
     // 加入 response 跟 request 讀取 middleware
