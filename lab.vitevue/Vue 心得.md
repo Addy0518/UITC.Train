@@ -1,5 +1,7 @@
 # Vue 心得
 
+### 基礎語法
+
 1. ref 是指響應式資料 , 將所有資料內容包起來 , 當今天資料更新了 , 他就會自動更新網頁對應的地方
 
 ```html
@@ -226,3 +228,21 @@
   watch(todoId, fetchData);
 </script>
 ```
+
+### 深入組件
+
+1. 局部註冊 (跟 Angular 的註冊 compoment 有點像)
+
+```html
+<script setup>
+  // 先 import 組件進來
+  import HomeView from './HomeView.vue';
+</script>
+
+<template>
+  <!-- 在 template 引用就行 -->
+  <HomeView />
+</template>
+```
+
+2.
