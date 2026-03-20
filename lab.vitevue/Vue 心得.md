@@ -245,4 +245,173 @@
 </template>
 ```
 
-2.
+2. props 父元件傳給子元件的單向傳遞方法
+
+```html
+<!-- 父元件 -->
+<!-- 父元件先傳給子元件一個參數 => msg -->
+<ChildCompoment v-model:light="light" v-model:swag="swag" msg="hello" />
+
+<!-- 子元件 -->
+<!--  要接參數的變數要用 {} 包起來 , 因為 defineProps(['msg']) 這裡面有所有父元件傳過來的參數 , 我們只要 msg 所以解構 props 確保只拿到這個參數 -->
+<!-- defineProps(['msg']) 則要用 [] 起來 -->
+<!-- defineProps 只能呼叫一次 , 所有父綁定的值都在這設定就好 -->
+import { defineProps } from 'vue'; const { msg } = defineProps(['msg']);
+```
+
+```html
+<!-- 也可以一次丟多個參數過去 , 但記得在子這裡改不了值 , 因為 prop 值是唯讀 -->
+const post = { id: 1, title: 'HHHHHH', };
+<!-- v-bind綁定 -->
+<ChildCompoment v-model:light="light" v-model:swag="swag" v-bind="post" />
+```
+
+3. 組件 v-model , 使用 defineModel() 雙向綁定 , 讓父跟子能共同變化
+
+```html
+<!-- 父元件 -->
+<script setup>
+  import { ref } from 'vue';
+  import ChildCompoment from './ChildCompoment.vue';
+
+  const light = ref(false);
+</script>
+
+<template>
+  <!-- 綁一個bool值到子元件上 -->
+  <ChildCompoment v-model="light" />
+</template>
+
+<!-- 子元件 -->
+<script setup>
+  // 使用 defindModel 拿到父元件丟過來的值
+  const model = defineModel();
+</script>
+
+<template>
+  <button @click="model = !model">切換開關</button>
+  <p>目前狀態：{{ model ? '開燈' : '關燈' }}</p>
+</template>
+```
+
+```html
+<!-- 也可以綁多個 v-model 傳遞給子元件 -->
+<ChildCompoment v-model:light="light" v-model:swag="swag" />
+```
+
+4. 路由 , 依序從程式進入點 => 主畫面 => 子畫面 => 子元件.. 為順序
+
+5. 觸發跟監聽事件
+
+```html
+<!-- 在父元件可以監聽子元件的動作 , 這裡我在子元件有一個按鈕事件 add1  -->
+ <!-- 測試函式 -->
+ function add1() {
+  numberrr++;
+}
+</script>
+
+<template>
+ <!-- 用 emit 去觸發我定義的事件 (add1) -->
+  <button
+    type="button"
+    @click="$emit('add1')"
+    class="rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white shadow-md transition duration-150 ease-in-out hover:bg-blue-600 active:scale-95"
+  >
+    Click me
+  </button>
+</template>
+
+ <!-- 父元件一旦監聽到這個事件處發 , 就會觸發父元件這邊的事件 (addchild) -->
+ <ChildCompoment @add1="addchild" />
+```
+
+```html
+<!-- 也可以在事件後面帶參數 , 父元件監聽到後就會拿到這個值 -->
+<!-- 子元件 -->
+@click="$emit('add1', 10)"
+
+<!-- 父元件 -->
+<!-- 接到 n 然後賦值 -->
+function addchild(n) { childnumber.value += n; }
+
+<ChildCompoment @add1="addchild" />
+```
+
+```html
+<!-- 可以在子元件先處理這個事件 , 預防一些狀況 , 父元件監聽到後就會拿到這個值 -->
+<!-- 子元件 -->
+<!-- 使用 defineEmits 處理監聽事件發生時的狀況 -->
+const emit = defineEmits({ add1: ({ one, two }) => { if (one > 5 && two > 10) {
+console.log('Yeeee'); return true; } else { console.log('NOOOOOO'); return false; } }, });
+<!-- handleClick 函式則會丟參數進 emit 檢查  -->
+function handleClick() { emit('add1', { one: 20, two: 20 }); }
+
+<button @click="handleClick">Click me</button>
+
+<!-- 父元件 -->
+<!-- 接到 n 然後處理物件裡的 one 跟 two -->
+function addchild(n) { console.log(n.one); console.log(n.two); }
+```
+
+6. 屬性繼承
+
+```html
+<!-- 在沒有指名類別的情況下 -->
+<!-- 子元件有一個按鈕 -->
+<button>Click meeeee</button>
+<!-- 父元件放一個 class -->
+<ChildCompoment class="large" />
+<!-- 最後就會變成這樣 , 父的會默認給子的 -->
+<button class="large">Click meeeee</button>
+```
+
+```html
+<!-- 如果子已經有 class 了 , 他也會從父的繼承並合併 -->
+<button class="btn">Click meeeee</button>
+<!-- 變這樣 -->
+<button class="btn large">Click meeeee</button>
+```
+
+```html
+<!-- click 這種監聽事件也會繼承喔 -->
+<ChildCompoment @click="childnumber++" />
+```
+
+```html
+<!-- 想要禁用的話就在子元件這樣設定 -->
+<script setup>
+  defineOptions({
+    inheritAttrs: false,
+  });
+  // ...setup 邏輯
+</script>
+```
+
+7. Slot 插槽
+
+```html
+<!-- 在父元件插入要寫入的內容 -->
+<ChildCompoment>click</ChildCompoment>
+
+<!-- 子元件加上 slot , 就會把父的內容寫在這 , 包含 style 等等做綁定 -->
+<button>
+  <slot></slot>
+</button>
+```
+
+```html
+<!-- 可以給插槽上名字 -->
+<!-- 父元件 -->
+<ChildCompoment>
+  click
+  <!-- v-slot -->
+  <template v-slot:foo>
+    <span>hhhh</span>
+  </template>
+</ChildCompoment>
+<!-- 子元件 -->
+<span style="color: blue">
+  <slot name="foo"></slot>
+</span>
+```

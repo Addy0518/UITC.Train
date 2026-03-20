@@ -1,26 +1,84 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue';
-
-const x = '';
-if (!x) {
-  console.log('真值2');
-} else {
-  console.log('假值2');
-}
-
-const y = null;
-if (y) {
-  console.log('假值我不做');
-}
-
-if (0 && 'dog') {
-  console.log('123');
-}
+import { RouterLink, RouterView } from 'vue-router';
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-    <p>122222</p>
-  </main>
+  <header>
+    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+
+    <div class="wrapper">
+      <HelloWorld msg="You did it!" />
+
+      <nav>
+        <RouterLink to="/ParantsCompoment">子頁面</RouterLink>
+        <RouterLink to="/ChildCompoment">子元件</RouterLink>
+      </nav>
+    </div>
+  </header>
+
+  <RouterView />
 </template>
+
+<style scoped>
+header {
+  line-height: 1.5;
+  max-height: 100vh;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
+}
+
+nav {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+nav a.router-link-exact-active {
+  color: var(--color-text);
+}
+
+nav a.router-link-exact-active:hover {
+  background-color: transparent;
+}
+
+nav a {
+  display: inline-block;
+  padding: 0 1rem;
+  border-left: 1px solid var(--color-border);
+}
+
+nav a:first-of-type {
+  border: 0;
+}
+
+@media (min-width: 1024px) {
+  header {
+    display: flex;
+    place-items: center;
+    padding-right: calc(var(--section-gap) / 2);
+  }
+
+  .logo {
+    margin: 0 2rem 0 0;
+  }
+
+  header .wrapper {
+    display: flex;
+    place-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  nav {
+    text-align: left;
+    margin-left: -1rem;
+    font-size: 1rem;
+
+    padding: 1rem 0;
+    margin-top: 1rem;
+  }
+}
+</style>
