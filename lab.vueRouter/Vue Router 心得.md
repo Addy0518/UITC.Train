@@ -169,3 +169,106 @@ defineProps({
       name: 'User',
       component: UserView,
 ```
+
+9. 路由守衛
+
+```html
+
+<!-- 路由守衛 , to 代表要去的網址 , from 則是來自哪個網址 -->
+router.beforeEach((to, from) => {
+  <!-- 可以 console.log 出來看看裡面都有啥 -->
+  console.log(to);
+  <!-- 簡單的攔截器 -->
+  if (to.name === 'User' || to.name === 'UserName') {
+    return { name: 'NotFound' };
+  }
+  console.log(`to=>${to.name}`);
+  console.log(`from=>${from.name}`);
+});
+
+<!-- 還有一個叫做 beforeResolve , 在 beforeEach 後面執行 -->
+router.beforeResolve(async (to) => {
+  console.log(`我是beforeResolve=>${to}`);
+});
+```
+
+```html
+<!-- 在守衛內可以全域注入 -->
+app.provide('global', 'hello injections');
+
+router.beforeEach((to, from) => {
+  <!-- 顯示 hello injections -->
+  const global = inject('global');
+  console.log(global);
+});
+```
+
+```html
+<!-- 也可以直接在路徑上用 -->
+ {
+      path: '/User/:id(\\d+)?',
+      props: true,
+      name: 'UserById',
+      component: UserView,
+      <!-- 要注意的是 , 當今天是套在父路由上時 , 如果我剛進來時會觸發  -->
+      <!-- 但當我在子路由間切換 (比如現在的 Left 跟 Right ) , 就不會觸發  -->
+      beforeEnter: (to, from) => {
+        console.log('進來home');
+      },
+      children: [
+        {
+          path: '',
+          name: 'userprofile',
+          components: { Left: UserProfile, Right: UserRight },
+        },
+      ],
+    },
+```
+
+```html
+<!-- 其他的守衛 -->
+<!-- 當今天網址餐被更新時 (比如剛剛的兩個子路由切換 , 就可以用這個偵測) -->
+beforeRouteUpdate
+<!-- 當要離開時 -->
+beforeRouteLeave
+```
+
+10. meta 路由信息
+
+```html
+<!-- 在路由這裡可以加入 meta 讓路由攜帶訊息 -->
+ {
+      path: '/User/:Name',
+      name: 'UserName',
+      component: UserView,
+      meta: { required: true },
+    },
+
+<!-- 在守衛這裡就可以驗證訊息  -->
+router.beforeEach((to, from) => {
+  if (to.meta.required) {
+    console.log('可以登入');
+    return { path: '/:pathMatch(.*)*' };
+  } else {
+    console.log('不能登入');
+  }
+});
+```
+
+11. 路遊懶加載
+
+```html
+<!-- 可以把本來的 import 改成這樣寫 , 再使用這個路由時才載入她 -->
+<!-- import UserRight from '@/views/UserRight.vue'; -->
+const UserRight = () => import('@/views/UserRight.vue');
+
+<!-- 或者這樣寫 : -->
+  {
+      path: '/User/:Name',
+      name: 'UserName',
+      <!-- 寫在裡面 -->
+      component: () => import('@/views/UserView.vue'),
+      meta: { required: true },
+    },
+
+```

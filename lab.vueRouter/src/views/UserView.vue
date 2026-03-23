@@ -25,8 +25,18 @@ watch(
   () => route.params.id,
   (newId, oldId) => {
     (console.log('新的', newId), console.log('舊的', oldId));
+    if (newId) fetchData(newId);
   },
 );
+
+async function fetchData(id) {
+  try {
+    const Id = id;
+    console.log(Id);
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 onBeforeRouteUpdate((to) => {
   value.value = to.params.id;
