@@ -8,8 +8,17 @@ const currpage = ref(1);
 // 每頁幾筆
 const perpage = ref(10);
 
+// 判斷排序往上還是往下
+const sortType = ref('asc');
+
+// 切換排序
+const toggleSort = () => {
+  sortType.value === 'asc' ? (sortType.value = 'desc') : (sortType.value = 'asc');
+};
+
 // 搜尋
 const search = ref('');
+
 // 用 watch 監聽 search 有沒有變化 , 有變化就返回第一頁 , 不然搜尋完頁數還會停在本來的地方
 watch(search, () => {
   currpage.value = 1;
@@ -22,8 +31,37 @@ onMounted(async () => {
   );
 
   bikeData.value = await response.json();
-  console.log(bikeData.value);
 });
+// 先找出總頁數 , 判斷總長度好做限制
+const totalPage = computed(() => {
+  return bikeData.value.length / perpage.value;
+});
+
+const pageNumbers = computed(() => {
+  // 找出小於現在頁數的5頁跟大於的四頁 ( 總共10 );
+  let start = currpage.value - 5;
+  let end = currpage.value + 4;
+
+  // 小於 1 就不置中現在頁數 , 維持顯示 1 - 10 頁
+  if (start < 1) {
+    start = 1;
+    end = 10;
+  }
+
+  // 跟小於一樣概念 , 直接從最後減九就可以了
+  if (end > totalPage.value) {
+    end = totalPage.value;
+    start = totalPage.value - 9;
+  }
+
+  // 最重要得 , 用迴圈拿到動態頁碼 , 待會 html 根據這個迴圈渲染
+  const pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
 // 根據地址搜尋(篩選)
 const searchData = computed(() => {
   if (!search.value) {
@@ -39,11 +77,25 @@ const searchData = computed(() => {
 const filterData = computed(() => {
   if (!searchData.value) return [];
 
+  // 因為要依照這個欄位去排序 , 所以要先解構本來的資料才拿的到欄位
+  const items = [...searchData.value];
+  items.sort((a, b) => {
+    // 要轉數字不然本來是 json
+    const valA = Number(a.available_rent_bikes);
+    const valB = Number(b.available_rent_bikes);
+    if (sortType.value === 'asc') {
+      return valA - valB;
+    } else if (sortType.value === 'desc') {
+      return valB - valA;
+    }
+  });
+
   // 設定開始和結束的範圍
   const start = (currpage.value - 1) * perpage.value;
   const end = start + perpage.value;
+
   // 用 js 的 slice 切段
-  return searchData.value.slice(start, end);
+  return items.slice(start, end);
 });
 </script>
 
@@ -70,7 +122,10 @@ const filterData = computed(() => {
             <th class="px-4 py-3 font-semibold border-b">站點所在區域</th>
             <th class="px-4 py-3 font-semibold border-b text-center">站點地址</th>
             <th class="px-4 py-3 font-semibold border-b text-center">總車位數量</th>
-            <th class="px-4 py-3 font-semibold border-b text-center">可租借的腳踏車數量</th>
+            <th class="px-4 py-3 font-semibold border-b text-center" @click="toggleSort">
+              <span>{{ sortType == 'desc' ? '▼' : '▲' }}</span>
+              可租借的腳踏車數量
+            </th>
             <th class="px-4 py-3 font-semibold border-b text-center">站點緯度</th>
             <th class="px-4 py-3 font-semibold border-b text-center">站點經度</th>
             <th class="px-4 py-3 font-semibold border-b text-center">可歸還的腳踏車數量</th>
@@ -91,7 +146,7 @@ const filterData = computed(() => {
         </tbody>
       </table>
     </div>
-    <div class="flex gap-2 mt-4 items-center">
+    <div class="flex gap-2 mt-4 items-center justify-center">
       <!-- disabled :　當第一頁的時候就點不了 -->
       <button
         @click="currpage--"
@@ -101,7 +156,18 @@ const filterData = computed(() => {
         上一頁
       </button>
 
-      <span>第 {{ currpage }} 頁</span>
+      <div>
+        <!-- 根據剛剛的動態頁數迴圈列出來 , 用動態切換 class 讓點到的頁碼變色 -->
+        <button
+          v-for="page in pageNumbers"
+          :key="page"
+          @click="currpage = page"
+          class="px-3 py-1 border rounded disabled:opacity-50"
+          :class="{ 'bg-blue-500 text-white': page === currpage }"
+        >
+          {{ page }}
+        </button>
+      </div>
 
       <button @click="currpage++" class="px-3 py-1 border rounded disabled:opacity-50">
         下一頁
@@ -109,3 +175,9 @@ const filterData = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.numbercolor {
+  color: red;
+}
+</style>
