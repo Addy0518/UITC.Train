@@ -34,36 +34,6 @@ onMounted(async () => {
   console.log('總項目數', bikeData.value.length);
 });
 
-// 先找出總頁數 , 判斷總長度好做限制
-const totalPage = computed(() => {
-  return Math.ceil(bikeData.value.length / perpage.value);
-});
-
-const pageNumbers = computed(() => {
-  // 找出小於現在頁數的5頁跟大於的四頁 ( 總共10 );
-  let start = currpage.value - 5;
-  let end = currpage.value + 4;
-
-  // 小於 1 就不置中現在頁數 , 維持顯示 1 - 10 頁
-  if (start < 1) {
-    start = 1;
-    end = 10;
-  }
-
-  // 跟小於一樣概念 , 直接從最後減九就可以了
-  if (end > totalPage.value) {
-    end = totalPage.value;
-    start = totalPage.value - 9;
-  }
-  console.log(totalPage.value);
-  // 最重要得 , 用迴圈拿到動態頁碼 , 待會 html 根據這個迴圈渲染
-  const pages = [];
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-  return pages;
-});
-
 // 根據地址搜尋(篩選)
 const searchData = computed(() => {
   if (!search.value) {
@@ -73,6 +43,13 @@ const searchData = computed(() => {
   return bikeData.value.filter((item) => {
     return item.ar.includes(search.value);
   });
+});
+
+// 找出總頁數 , 判斷總長度好做限制
+// 注意是依照搜尋完的數量去算 (searchData) , 而不是原始資料 (bikeData) , 不然頁碼不會跟著搜尋結果變
+const totalPage = computed(() => {
+  const count = searchData.value.length;
+  return count > 0 ? Math.ceil(count / perpage.value) : 1;
 });
 
 // 經過每頁 10 筆篩選過的資料
@@ -99,6 +76,39 @@ const filterData = computed(() => {
   // 用 js 的 slice 切段
   return items.slice(start, end);
 });
+
+
+const pageNumbers = computed(() => {
+  // 找出小於現在頁數的5頁跟大於的四頁 ( 總共10 );
+  let start = currpage.value - 5;
+  let end = currpage.value + 4;
+
+  // 先看有沒有搜尋 , 有搜尋結果到小於 10 之後 , 就依照剛剛設定的搜尋結果分頁
+  if (totalPage.value <= 10) {
+    start = 1;
+    end = totalPage.value;
+  } else {
+    // 小於 1 就不置中現在頁數 , 維持顯示 1 - 10 頁
+    if (start < 1) {
+      start = 1;
+      end = 10;
+    }
+    // 跟小於一樣概念 , 直接從最後減九就可以了
+    if (end > totalPage.value) {
+      end = totalPage.value;
+      start = totalPage.value - 9;
+    }
+  }
+
+  console.log(totalPage.value);
+  // 最重要得 , 用迴圈拿到動態頁碼 , 待會 html 根據這個迴圈渲染
+  const pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
 </script>
 
 <template>
