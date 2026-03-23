@@ -31,10 +31,12 @@ onMounted(async () => {
   );
 
   bikeData.value = await response.json();
+  console.log('總項目數', bikeData.value.length);
 });
+
 // 先找出總頁數 , 判斷總長度好做限制
 const totalPage = computed(() => {
-  return bikeData.value.length / perpage.value;
+  return Math.ceil(bikeData.value.length / perpage.value);
 });
 
 const pageNumbers = computed(() => {
@@ -53,7 +55,7 @@ const pageNumbers = computed(() => {
     end = totalPage.value;
     start = totalPage.value - 9;
   }
-
+  console.log(totalPage.value);
   // 最重要得 , 用迴圈拿到動態頁碼 , 待會 html 根據這個迴圈渲染
   const pages = [];
   for (let i = start; i <= end; i++) {
@@ -122,8 +124,12 @@ const filterData = computed(() => {
             <th class="px-4 py-3 font-semibold border-b">站點所在區域</th>
             <th class="px-4 py-3 font-semibold border-b text-center">站點地址</th>
             <th class="px-4 py-3 font-semibold border-b text-center">總車位數量</th>
-            <th class="px-4 py-3 font-semibold border-b text-center" @click="toggleSort">
-              <span>{{ sortType == 'desc' ? '▼' : '▲' }}</span>
+            <th
+              class="px-4 py-3 font-semibold border-b text-center"
+              style="cursor: pointer"
+              @click="toggleSort"
+            >
+              <button>{{ sortType == 'desc' ? '▼' : '▲' }}</button>
               可租借的腳踏車數量
             </th>
             <th class="px-4 py-3 font-semibold border-b text-center">站點緯度</th>
@@ -169,7 +175,11 @@ const filterData = computed(() => {
         </button>
       </div>
 
-      <button @click="currpage++" class="px-3 py-1 border rounded disabled:opacity-50">
+      <button
+        @click="currpage++"
+        class="px-3 py-1 border rounded disabled:opacity-50"
+        :disabled="currpage === totalPage"
+      >
         下一頁
       </button>
     </div>
