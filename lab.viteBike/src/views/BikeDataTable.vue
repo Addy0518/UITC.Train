@@ -6,10 +6,10 @@ const bikeData = ref([]);
 // 當前頁數
 const currpage = ref(1);
 // 每頁幾筆
-const perpage = ref(10);
+const perpage = ref(20);
 
 // 判斷排序往上還是往下
-const sortType = ref('asc');
+const sortType = ref('desc');
 
 // 切換排序
 const toggleSort = () => {
