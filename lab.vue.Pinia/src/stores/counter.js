@@ -6,13 +6,16 @@ export const useCounterStore = defineStore('counter', () => {
   function increment() {
     count.value--
   }
+  function add() {
+    count.value++
+  }
   function $resert() {
     count.value = 0
   }
   const name = 'Andy'
   const items = ref([])
 
-  return { items, name, count, doubleCount, increment, $resert }
+  return { items, name, count, doubleCount, increment, $resert, add }
 })
 
 export const userCounterStore2 = defineStore('counter2', {
