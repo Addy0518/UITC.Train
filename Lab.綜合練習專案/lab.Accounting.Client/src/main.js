@@ -4,7 +4,18 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import App from './App.vue';
 import router from './router';
-
+import './assets/main.css';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import TreeSelect from 'primevue/treeselect';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import Select from 'primevue/select';
+import Textarea from 'primevue/textarea';
+import DatePicker from 'primevue/datepicker';
+import Button from 'primevue/button';
 const app = createApp(App);
 
 app.use(createPinia());
@@ -14,4 +25,17 @@ app.use(PrimeVue, {
     preset: Aura,
   },
 });
+
+app.component('DataTable', DataTable);
+app.component('Column', Column);
+app.component('TreeSelect', TreeSelect);
+app.component('InputGroup', InputGroup);
+app.component('TreeSelect', TreeSelect);
+app.component('InputGroupAddon', InputGroupAddon);
+app.component('InputText', InputText);
+app.component('InputNumber', InputNumber);
+app.component('Select', Select);
+app.component('Textarea', Textarea);
+app.component('Button', Button);
+app.component('DatePicker', DatePicker);
 app.mount('#app');
