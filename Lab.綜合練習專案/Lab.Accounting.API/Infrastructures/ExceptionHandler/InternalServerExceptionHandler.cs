@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Lab.API.TODO.Infrastructures.ExceptionHandler;
 
 public class InternalServerExceptionHandler : IExceptionHandler

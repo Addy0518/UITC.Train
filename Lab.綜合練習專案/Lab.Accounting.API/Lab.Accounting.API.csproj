@@ -16,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\NewFolder\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 </Project>

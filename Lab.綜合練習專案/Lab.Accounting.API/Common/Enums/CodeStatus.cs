@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace Lab.Accounting.API.Common.Enums;
 
 // 狀態碼

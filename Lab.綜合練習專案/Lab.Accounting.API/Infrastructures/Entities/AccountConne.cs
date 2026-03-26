@@ -1,6 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-
-namespace Lab.Accounting.API.Infrastructures.Entities
+﻿namespace Lab.Accounting.API.Infrastructures.Entities
 {
     public class AccountConne
     {
