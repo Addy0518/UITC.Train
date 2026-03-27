@@ -49,6 +49,8 @@ const nodes = ref([
     icon: 'pi pi-fw pi-inbox',
   },
 ]);
+// 日期選擇
+const date = ref();
 // 她選了哪些類別
 const selectedValue = ref(null);
 // 所有項目
@@ -71,21 +73,6 @@ onMounted(() => {});
 </script>
 
 <template>
-  <!-- 導覽列 -->
-  <div class="w-full bg-black">
-    <div class="container flex mx-auto h-20 items-center">
-      <strong class="text-white text-2xl">記帳</strong>
-      <div class="flex-1 flex items-center justify-end gap-6">
-        <RouterLink :to="{ name: 'login' }">
-          <strong class="text-white text-2xl">登入</strong>
-        </RouterLink>
-        <RouterLink :to="{ name: 'createaccount' }">
-          <strong class="text-white text-2xl">註冊</strong>
-        </RouterLink>
-      </div>
-    </div>
-  </div>
-
   <!-- 主區域 -->
   <div class="w-full mx-auto max-w-screen-2xl">
     <div class="container mx-auto text-xl mt-10 mb-auto">
@@ -107,23 +94,19 @@ onMounted(() => {});
             class="md:w-80"
           />
         </div>
+        <div>
+          <DatePicker
+            v-model="date"
+            placeholder="選擇日期"
+            dateFormat="yy-mm-dd"
+            class="md:w-80 h-11.5"
+            :placeholder="font - size"
+          />
+        </div>
         <div class="w-10">
-          <RouterLink :to="{ name: 'addledger' }">
+          <RouterLink :to="{ name: 'add-ledger' }">
             <img src="/src/img/add.png" alt=""
           /></RouterLink>
-        </div>
-        <!-- 新增帳目 -->
-        <div
-          v-if="$route.matched.length > 1"
-          class="fixed inset-0 z-50 flex items-center justify-center"
-        >
-          <!-- 點擊彈窗外面時,路徑改為 / , 用這方法取消彈窗 -->
-          <div class="absolute inset-0 bg-black/50" @click="$router.push('/')"></div>
-          <div
-            class="h-auto relative bg-white w-120 h-150 max-3xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in"
-          >
-            <RouterView />
-          </div>
         </div>
       </div>
       <!-- 顯示所有帳目 -->
@@ -137,7 +120,7 @@ onMounted(() => {});
             <Column
               ><template #body="slotProps">
                 <div class="flex justify-start gap-3 ml-10">
-                  <RouterLink :to="{ name: 'addledger', params: { id: slotProps.data.code } }">
+                  <RouterLink :to="{ name: 'edit-ledger', params: { id: slotProps.data.code } }">
                     <button class="bg-black text-white p-4 rounded-2xl cursor-pointer font-bold">
                       編輯
                     </button>

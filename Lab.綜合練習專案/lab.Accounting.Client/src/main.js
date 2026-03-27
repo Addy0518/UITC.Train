@@ -16,6 +16,7 @@ import Select from 'primevue/select';
 import Textarea from 'primevue/textarea';
 import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
 const app = createApp(App);
 
 app.use(createPinia());
@@ -23,6 +24,12 @@ app.use(router);
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
+    options: {
+      cssLayer: {
+        name: 'primevue',
+        order: 'theme, base, primevue',
+      },
+    },
   },
 });
 
@@ -38,4 +45,6 @@ app.component('Select', Select);
 app.component('Textarea', Textarea);
 app.component('Button', Button);
 app.component('DatePicker', DatePicker);
+app.component('Dialog', Dialog);
+
 app.mount('#app');

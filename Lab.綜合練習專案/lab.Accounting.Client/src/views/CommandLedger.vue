@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 // 路由參數
 const route = useRoute();
@@ -15,11 +15,13 @@ const category = ref([
   { name: 'Istanbul', code: 'IST' },
   { name: 'Paris', code: 'PRS' },
 ]);
+
+const isAdd = computed(() => route.name === 'add-ledger');
 </script>
 
 <template>
   <div class="container mx-auto p-10">
-    <p class="text-center mb-10 text-3xl font-bold">新增帳本項目</p>
+    <p class="text-center mb-10 text-3xl font-bold">{{ isAdd ? '新增' : '編輯' }}帳本項目</p>
 
     <!-- 項目欄位 -->
     <div class="card grid grid-cols-1 gap-4 gap-y-10 max-h-[370px] overflow-y-auto">

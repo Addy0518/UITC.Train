@@ -1,25 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import accountingPractice from '@/views/AccountingPractice.vue';
-import AddLedger from '@/views/AddLedger.vue';
-import Login from '@/views/Login.vue';
 import CreateAccount from '@/views/CreateAccount.vue';
+import AccountingLayout from '@/views/AccountingLayout.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'accountung',
-      component: accountingPractice,
+      name: 'layout',
+      component: AccountingLayout,
       children: [
         {
-          path: 'AddLedger/:id?',
-          name: 'addledger',
-          component: AddLedger,
+          path: '',
+          name: 'home',
+          component: () => import('@/views/Home.vue'),
+        },
+        {
+          path: 'accounting-practice',
+          name: 'accounting-practice',
+          component: () => import('@/views/AccountingPractice.vue'),
+        },
+        {
+          path: 'add-ledger',
+          name: 'add-ledger',
+          component: () => import('@/views/CommandLedger.vue'),
+        },
+        {
+          path: 'edit-ledger/:id',
+          name: 'edit-ledger',
+          component: () => import('@/views/CommandLedger.vue'),
         },
         {
           path: '/Login',
           name: 'login',
-          component: Login,
+          component: () => import('@/views/Login.vue'),
         },
         {
           path: '/CreateAccount',

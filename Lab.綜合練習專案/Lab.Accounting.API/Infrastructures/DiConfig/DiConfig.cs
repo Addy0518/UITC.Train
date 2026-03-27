@@ -9,7 +9,7 @@
 
             services.AddScoped<IAccountRepositories, AccountRepositories>();
 
-            services.AddScoped<IAccountRepositories, AccountRepositories>();
+            services.AddScoped<IAccountService, AccountService>();
         }
     }
 }
