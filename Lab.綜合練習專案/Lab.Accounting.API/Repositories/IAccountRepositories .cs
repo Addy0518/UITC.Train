@@ -9,7 +9,7 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
-        Task<LedgerItem> GetLedger(int ledgerId);
+        Task<LedgerItemDTO> GetLedger(int ledgerId);
 
         /// <summary>
         /// 查看全部帳本項目
@@ -18,7 +18,7 @@ namespace Lab.Accounting.API.Repositories
         ///  <param name="date">日期</param>
         ///  <param name="categoryname">項目名稱</param>
         /// <returns>所有項目</returns>
-        Task<List<LedgerItem>> GetAllLedger(
+        Task<List<LedgerItemDTO>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname

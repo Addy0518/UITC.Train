@@ -25,7 +25,7 @@
         /// <summary>
         /// 花費
         /// </summary>
-        public Decimal Cost { get; set; }
+        public Decimal ItemCost { get; set; }
 
         /// <summary>
         /// 項目更新日期
@@ -40,7 +40,7 @@
         /// <summary>
         /// 詳細說明
         /// </summary>
-        public string? Illustrate { get; set; }
+        public string? ItemIllustrate { get; set; }
 
         /// <summary>
         /// 是否為刪除狀態

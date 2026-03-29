@@ -11,7 +11,7 @@ namespace Lab.Accounting.API.Services
         ///  <param name="date">日期</param>
         ///  <param name="categoryname">項目名稱</param>
         /// <returns>所有項目</returns>
-        public async Task<ApiResponse<List<LedgerItem>>> GetAllLedger(
+        public async Task<ApiResponse<List<LedgerItemDTO>>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname
@@ -28,12 +28,12 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
-        public async Task<ApiResponse<LedgerItem>> GetLedger(int ledgerId)
+        public async Task<ApiResponse<LedgerItemDTO>> GetLedger(int ledgerId)
         {
             var target = await repositories.GetLedger(ledgerId);
             if (target == null)
             {
-                return ApiResponseHelper.NotFound<LedgerItem>();
+                return ApiResponseHelper.NotFound<LedgerItemDTO>();
             }
             return ApiResponseHelper.Success(target);
         }

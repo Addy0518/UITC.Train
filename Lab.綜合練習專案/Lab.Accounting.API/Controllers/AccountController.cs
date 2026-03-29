@@ -26,7 +26,7 @@ namespace Lab.Accounting.API.Controllers
         [HttpGet]
         [ProducesResponseType(
             StatusCodes.Status200OK,
-            Type = typeof(ApiResponse<List<LedgerItem>>)
+            Type = typeof(ApiResponse<List<LedgerItemDTO>>)
         )]
         public async Task<IActionResult> GetAllLedger(
             [FromQuery] List<int>? categoryId,
@@ -43,7 +43,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItem>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItemDTO>))]
         public async Task<IActionResult> GetLedger([FromQuery] int ledgerId)
         {
             return Ok(await service.GetLedger(ledgerId));
@@ -58,8 +58,8 @@ namespace Lab.Accounting.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
         public async Task<IActionResult> CreateLedger(
-            LedgerInsertRequest insert,
-            string categoryname
+            [FromBody] LedgerInsertRequest insert,
+            [FromQuery] string categoryname
         )
         {
             return Ok(await service.CreateLedger(insert, categoryname));
@@ -74,8 +74,8 @@ namespace Lab.Accounting.API.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
         public async Task<IActionResult> UpdateLedger(
-            LedgerUpdateRequest update,
-            string? categoryname
+            [FromBody] LedgerUpdateRequest update,
+            [FromQuery] string? categoryname
         )
         {
             return Ok(await service.UpdateLedger(update, categoryname));
@@ -87,7 +87,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="ledgerId">項目 ID</param>
         /// <param name="isDelete">刪除狀態</param>
         /// <returns>影響列數</returns>
-        [HttpDelete]
+        [HttpDelete("{ledgerId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
         public async Task<IActionResult> DeleteLedger(int ledgerId)
         {

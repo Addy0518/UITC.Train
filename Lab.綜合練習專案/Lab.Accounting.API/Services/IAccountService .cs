@@ -11,7 +11,7 @@ namespace Lab.Accounting.API.Services
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
         /// <returns>所有項目</returns>
-        Task<ApiResponse<List<LedgerItem>>> GetAllLedger(
+        Task<ApiResponse<List<LedgerItemDTO>>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname
@@ -22,7 +22,7 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
-        Task<ApiResponse<LedgerItem>> GetLedger(int ledgerId);
+        Task<ApiResponse<LedgerItemDTO>> GetLedger(int ledgerId);
 
         /// <summary>
         /// 新增帳本項目

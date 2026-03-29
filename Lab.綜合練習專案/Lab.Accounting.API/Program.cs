@@ -28,6 +28,16 @@ try
             };
         };
     });
+    // 啟用 CORS 設定
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowVueApp", policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    });
     // 加入剛剛設定的錯誤處理 middleware
     builder.Services.AddExceptionHandler<InternalServerExceptionHandler>();
     builder.Services.AddProblemDetails();
@@ -39,15 +49,17 @@ try
     // app.UseHttpsRedirection();
     app.UseOpenApi();
     app.UseSwaggerUI();
+    app.UseCors();
     // 加入 response 跟 request 讀取 middleware
     app.UseMiddleware<ResponseRequestMiddleware>();
     app.UseSerilogRequestLogging(opts =>
         opts.EnrichDiagnosticContext = SerilogConfig.EnrichFromRequest
     );
     app.UseExceptionHandler();
-
+    app.UseHttpsRedirection();
+    app.UseCors("AllowVueApp");
     app.UseAuthorization();
-
+    
     app.MapControllers();
 
     app.Run();

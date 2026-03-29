@@ -10,13 +10,13 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
-        public async Task<LedgerItem> GetLedger(int ledgerId)
+        public async Task<LedgerItemDTO> GetLedger(int ledgerId)
         {
             using var conn = connecting.CreateConnec();
 
-            var sql = @"Select * From LedgerItem where ItemId=@ledgerId";
+            var sql = @"Select *, c.CategoryName From LedgerItem l join LedgerItemCategory c on c.CategoryId=l.CategoryId where ItemId=@ledgerId";
 
-            var result = await conn.QuerySingleAsync<LedgerItem>(sql, new { ledgerId = ledgerId });
+            var result = await conn.QuerySingleAsync<LedgerItemDTO>(sql, new { ledgerId = ledgerId });
 
             return result;
         }
@@ -28,7 +28,7 @@ namespace Lab.Accounting.API.Repositories
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
         /// <returns>所有項目</returns>
-        public async Task<List<LedgerItem>> GetAllLedger(
+        public async Task<List<LedgerItemDTO>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname
@@ -37,33 +37,34 @@ namespace Lab.Accounting.API.Repositories
             using var conn = connecting.CreateConnec();
 
             // 沒帶參數的查詢 , 用 where 1=1 來讓後面可以動態街上其他查詢參數
-            var sql = @"Select * From LedgerItem where 1=1";
+            var sql = @"Select *, c.CategoryName From LedgerItem l join LedgerItemCategory c on c.CategoryId=l.CategoryId where 1=1";
             var parm = new DynamicParameters();
             //如果有丟入參數就接上查詢 , 要用 In 因為是 List 多筆
             if (categoryId != null && categoryId.Any())
             {
-                sql += @" and CategoryId in @CategoryId";
-                parm.Add("CategoryId", categoryId);
+                sql += @" and l.CategoryId in @categoryId";
+                parm.Add("categoryId", categoryId);
             }
             if (date.HasValue)
             {
-                sql += @" and ItemUpdateDate=@date";
+                // 只比對到日 , 小時那些不用
+                sql += @" and CAST(ItemCreateDate AS DATE) = @date";
                 parm.Add("date", date);
             }
-            if (itemname != null && itemname.Any())
+            if (itemname != null && !string.IsNullOrWhiteSpace(itemname))
             {
-                sql += @" and ItemName like @categoryname";
-                parm.Add("categoryname", itemname + '%');
+                sql += @" and ItemName like @itemname";
+                parm.Add("itemname", itemname + '%');
             }
 
-            var result = await conn.QueryAsync<LedgerItem>(sql, parm);
+            var result = await conn.QueryAsync<LedgerItemDTO>(sql, parm);
             return result.ToList();
         }
 
         /// <summary>
         /// 新增帳本項目
         /// </summary>
-        /// <param name="insert">新增帳本項目所有細項</param>
+        /// <param name="insert">新增帳本項目所有細項</param> 
         /// <param name="categoryname">項目類別名稱</param>
         /// <returns>新增的帳本項目</returns>
         public async Task<int> CreateLedger(LedgerInsertRequest insert, string categoryname)
@@ -86,14 +87,14 @@ namespace Lab.Accounting.API.Repositories
             );
 
             var sql =
-                "Insert Into LedgerItem (ItemName,ItemCost,CategoryId,ItemCreateDate,UserId) values(@ItemName,@ItemCost,@CategoryId,@ItemCreateDate,@UserId) Select Cast(Scope_Identity() as int);";
+                "Insert Into LedgerItem (ItemName,ItemCost,CategoryId,ItemCreateDate,UserId,ItemIllustrate) values(@ItemName,@ItemCost,@CategoryId,@ItemCreateDate,@UserId,@ItemIllustrate) Select Cast(Scope_Identity() as int);";
 
             var result = new LedgerInsertRequest
             {
                 CategoryId = categoryId,
                 ItemCost = insert.ItemCost,
                 ItemName = insert.ItemName,
-                ItemCreateDate = DateTime.Now,
+                ItemCreateDate = insert.ItemCreateDate??DateTime.Now,
                 ItemIllustrate = insert.ItemIllustrate,
                 UserId = 1,
                 isDelete = false,
@@ -131,7 +132,7 @@ namespace Lab.Accounting.API.Repositories
             }
             // 這裡我 CategoryId 用 COALESCE 來確保使用者沒輸入的話就保持原樣
             var sql =
-                "Update LedgerItem Set ItemName=@ItemName,ItemCost=@ItemCost,CategoryId=COALESCE(@CategoryId, CategoryId),ItemUpdateDate=@ItemUpdateDate where ItemId=@ItemId";
+                "Update LedgerItem Set ItemName=COALESCE(@ItemName,ItemName),ItemCost=COALESCE(@ItemCost,ItemCost),CategoryId=COALESCE(@CategoryId, CategoryId),ItemUpdateDate=COALESCE(@ItemUpdateDate,ItemUpdateDate),IsDelete=COALESCE(@IsDelete,IsDelete),ItemIllustrate=COALESCE(@ItemIllustrate,ItemIllustrate) where ItemId=@ItemId";
 
             return await conn.ExecuteAsync(
                 sql,
@@ -140,8 +141,10 @@ namespace Lab.Accounting.API.Repositories
                     update.ItemId,
                     update.ItemName,
                     update.ItemCost,
+                    update.isDelete,
+                    update.ItemIllustrate,
                     CategoryId = categoryId,
-                    ItemUpdateDate = DateTime.Now,
+                    ItemUpdateDate = update.ItemUpdateDate?? DateTime.Now,
                 }
             );
         }

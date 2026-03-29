@@ -37,7 +37,6 @@ app.component('DataTable', DataTable);
 app.component('Column', Column);
 app.component('TreeSelect', TreeSelect);
 app.component('InputGroup', InputGroup);
-app.component('TreeSelect', TreeSelect);
 app.component('InputGroupAddon', InputGroupAddon);
 app.component('InputText', InputText);
 app.component('InputNumber', InputNumber);

@@ -1,9 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 const account = ref();
 const password = ref();
 const name = ref();
 const phone = ref();
+
+
 </script>
 
 <template>
