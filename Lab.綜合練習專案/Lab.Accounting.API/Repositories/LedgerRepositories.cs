@@ -87,7 +87,20 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
     {
         using var conn = connecting.CreateConnecting();
         var sql =
-            "Insert Into LedgerItem (ItemName,ItemCost,CategoryId,ItemCreateDate,UserId,ItemIllustrate,IsDelete) values(@ItemName,@ItemCost,@CategoryId,@ItemCreateDate,@UserId,@ItemIllustrate,@IsDelete); Select Cast(Scope_Identity() as int);";
+            @"Insert Into LedgerItem (
+                  ItemName, ItemCost, CategoryId, ItemCreateDate, 
+                  UserId, ItemIllustrate, IsDelete
+                ) 
+                values 
+                  (
+                    @ItemName, @ItemCost, @CategoryId, 
+                    @ItemCreateDate, @UserId, @ItemIllustrate, 
+                    @IsDelete
+                  );
+                Select 
+                  Cast(
+                    Scope_Identity() as int
+                  );";
 
         return await conn.QuerySingleAsync<int>(sql, insert);
     }
@@ -103,7 +116,17 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
         //throw new Exception("錯誤拉!");
         // 這裡我用 COALESCE 來確保使用者沒輸入的話就保持原樣
         var sql =
-            "Update LedgerItem Set ItemName=COALESCE(@ItemName,ItemName),ItemCost=COALESCE(@ItemCost,ItemCost),CategoryId=COALESCE(@CategoryId, CategoryId),ItemUpdateDate=COALESCE(@ItemUpdateDate,ItemUpdateDate),IsDelete=COALESCE(@IsDelete,IsDelete),ItemIllustrate=COALESCE(@ItemIllustrate,ItemIllustrate) where ItemId=@ItemId";
+            @"Update 
+                  LedgerItem 
+                Set 
+                  ItemName = COALESCE(@ItemName, ItemName), 
+                  ItemCost = COALESCE(@ItemCost, ItemCost), 
+                  CategoryId = COALESCE(@CategoryId, CategoryId), 
+                  ItemUpdateDate = COALESCE(@ItemUpdateDate, ItemUpdateDate), 
+                  IsDelete = COALESCE(@IsDelete, IsDelete), 
+                  ItemIllustrate = COALESCE(@ItemIllustrate, ItemIllustrate) 
+                where 
+                  ItemId = @ItemId";
 
         return await conn.ExecuteAsync(sql, update);
     }

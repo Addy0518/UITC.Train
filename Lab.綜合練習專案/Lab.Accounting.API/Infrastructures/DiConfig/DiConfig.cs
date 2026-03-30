@@ -9,9 +9,13 @@
 
             services.AddScoped<ILedgerRepositories, LedgerRepositories>();
 
-            services.AddScoped<ILedgerService, LedgerService>();
+            services.AddScoped<IUserRepositories, UserRepositories>();
 
             services.AddScoped<ILedgerItemCategoryRepositories, LedgerItemCategoryRepositories>();
+
+            services.AddScoped<ILedgerService, LedgerService>();
+
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

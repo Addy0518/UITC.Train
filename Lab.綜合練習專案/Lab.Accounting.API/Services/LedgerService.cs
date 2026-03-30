@@ -2,8 +2,7 @@
 {
     public class LedgerService(
         ILedgerRepositories accountrepo,
-        ILedgerItemCategoryRepositories categoryrepo,
-        DBConnecting connecting
+        ILedgerItemCategoryRepositories categoryrepo
     ) : ILedgerService
     {
         /// <summary>
@@ -47,9 +46,12 @@
         /// <returns>新增的帳本項目</returns>
         public async Task<ApiResponse<int>> CreateLedger(LedgerInsertRequest insert)
         {
-            using var conn = connecting.CreateConnecting();
+            // 這裡交易我使用 TransactionScope 而不是 Begintran , 因為 scope 直接包起來就能做一個交易 , 比較好寫
+            // Begintran 則是要每個 repository 都要傳連線跟交易進去 , 會比較好控制但也比較麻煩
+            // TransactionScopeAsyncFlowOption.Enabled 用來因應 Task 或 async/await 這類非同步作業
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
+                // CategoryExistCreate 這個是檢查類別是否存在的私有方法 , 不管有沒有都會回傳類別 id
                 int categoryId = await CategoryExistCreate(insert.CategoryName);
                 var result = new LedgerItem
                 {
@@ -65,7 +67,7 @@
                 };
 
                 var done = await accountrepo.CreateLedger(result);
-
+                // 完成就 complete , 也不用特別 rollback , 沒成功就會取消交易了
                 trxScope.Complete();
 
                 return ApiResponseHelper.Success(done, "成功!");
@@ -79,7 +81,6 @@
         /// <returns>影響列數</returns>
         public async Task<ApiResponse<int>> UpdateLedger(LedgerUpdateRequest update)
         {
-            using var conn = connecting.CreateConnecting();
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 int categoryId = await CategoryExistCreate(update.CategoryName);
@@ -120,14 +121,17 @@
             int existcategory = 0;
             if (!string.IsNullOrWhiteSpace(categoryname))
             {
+                // 查看類別是否存在
                 existcategory = await categoryrepo.GetLedgerItemCategory(categoryname);
             }
 
             int categoryId = 0;
+            // 存在就回傳 0 以上 , 直接塞 id
             if (existcategory > 0)
             {
                 categoryId = existcategory;
             }
+            // 不存在就創一個新類別 , 一樣塞 id 回去
             else
             {
                 categoryId = await categoryrepo.CreateLedgerItemCategory(categoryname);
