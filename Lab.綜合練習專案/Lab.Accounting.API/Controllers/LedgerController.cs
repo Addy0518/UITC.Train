@@ -1,4 +1,5 @@
-﻿using Lab.API.TODO.Common.Requests;
+﻿using Lab.Accounting.API.Infrastructures.Data.Views;
+using Lab.API.TODO.Common.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,19 +15,19 @@ namespace Lab.Accounting.API.Controllers
         StatusCodes.Status400BadRequest,
         Type = typeof(ApiResponse<Dictionary<string, string[]>>)
     )]
-    public class AccountController(IAccountService service) : ControllerBase
+    public class LedgerController(ILedgerService service) : ControllerBase
     {
         /// <summary>
         /// 查看全部帳本項目
         /// </summary>
         /// <param name="categoryId">項目類別</param>
         ///  <param name="date">日期</param>
-        ///  <param name="categoryname">項目名稱</param>
+        ///  <param name="itemname">項目名稱</param>
         /// <returns>單筆或多筆項目</returns>
         [HttpGet]
         [ProducesResponseType(
             StatusCodes.Status200OK,
-            Type = typeof(ApiResponse<List<LedgerItemDTO>>)
+            Type = typeof(ApiResponse<List<LedgerItemJoinCategoryView>>)
         )]
         public async Task<IActionResult> GetAllLedger(
             [FromQuery] List<int>? categoryId,
@@ -43,7 +44,10 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItemDTO>))]
+        [ProducesResponseType(
+            StatusCodes.Status200OK,
+            Type = typeof(ApiResponse<LedgerItemJoinCategoryView>)
+        )]
         public async Task<IActionResult> GetLedger([FromQuery] int ledgerId)
         {
             return Ok(await service.GetLedger(ledgerId));
@@ -53,32 +57,24 @@ namespace Lab.Accounting.API.Controllers
         /// 新增帳本項目
         /// </summary>
         /// <param name="insert">新增帳本項目所有細項</param>
-        /// <param name="categoryname">項目類別名稱</param>
         /// <returns>新增的帳本項目</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> CreateLedger(
-            [FromBody] LedgerInsertRequest insert,
-            [FromQuery] string categoryname
-        )
+        public async Task<IActionResult> CreateLedger([FromBody] LedgerInsertRequest insert)
         {
-            return Ok(await service.CreateLedger(insert, categoryname));
+            return Ok(await service.CreateLedger(insert));
         }
 
         /// <summary>
         /// 更新指定帳本項目
         /// </summary>
         /// <param name="update">更新帳本項目所有細項</param>
-        /// <param name="categoryname">項目類別名稱</param>
         /// <returns>影響列數</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> UpdateLedger(
-            [FromBody] LedgerUpdateRequest update,
-            [FromQuery] string? categoryname
-        )
+        public async Task<IActionResult> UpdateLedger([FromBody] LedgerUpdateRequest update)
         {
-            return Ok(await service.UpdateLedger(update, categoryname));
+            return Ok(await service.UpdateLedger(update));
         }
 
         /// <summary>

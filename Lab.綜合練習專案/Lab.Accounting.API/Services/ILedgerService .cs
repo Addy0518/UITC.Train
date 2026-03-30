@@ -1,8 +1,9 @@
-﻿using Lab.API.TODO.Common.Requests;
+﻿using Lab.Accounting.API.Infrastructures.Data.Views;
+using Lab.API.TODO.Common.Requests;
 
 namespace Lab.Accounting.API.Services
 {
-    public interface IAccountService
+    public interface ILedgerService
     {
         /// <summary>
         /// 查看全部帳本項目
@@ -11,7 +12,7 @@ namespace Lab.Accounting.API.Services
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
         /// <returns>所有項目</returns>
-        Task<ApiResponse<List<LedgerItemDTO>>> GetAllLedger(
+        Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname
@@ -22,23 +23,21 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
-        Task<ApiResponse<LedgerItemDTO>> GetLedger(int ledgerId);
+        Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(int ledgerId);
 
         /// <summary>
         /// 新增帳本項目
         /// </summary>
         /// <param name="insert">新增帳本項目所有細項</param>
-        /// <param name="categoryname">項目類別名稱</param>
         /// <returns>新增的帳本項目</returns>
-        Task<ApiResponse<int>> CreateLedger(LedgerInsertRequest insert, string categoryname);
+        Task<ApiResponse<int>> CreateLedger(LedgerInsertRequest insert);
 
         /// <summary>
         /// 更新指定帳本項目
         /// </summary>
         /// <param name="update">更新帳本項目所有細項</param>
-        /// <param name="categoryname">項目類別名稱</param>
         /// <returns>影響列數</returns>
-        Task<ApiResponse<int>> UpdateLedger(LedgerUpdateRequest update, string? categoryname);
+        Task<ApiResponse<int>> UpdateLedger(LedgerUpdateRequest update);
 
         /// <summary>
         /// 刪除指定帳本項目

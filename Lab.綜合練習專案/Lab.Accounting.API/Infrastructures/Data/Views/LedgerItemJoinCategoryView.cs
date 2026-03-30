@@ -1,6 +1,6 @@
-﻿namespace Lab.Accounting.API.Infrastructures.Entities
+﻿namespace Lab.Accounting.API.Infrastructures.Data.Views
 {
-    public class LedgerItemDTO:LedgerItem
+    public class LedgerItemJoinCategoryView : LedgerItem
     {
         /// <summary>
         /// 項目類別名稱

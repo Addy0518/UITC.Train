@@ -18,33 +18,34 @@
         public string? ItemName { get; set; }
 
         /// <summary>
-        /// 帳本項目類別 ID
+        /// 帳本項目名稱
         /// </summary>
-        [Display(Name = "帳本項目類別 ID")]
-        public string? CategoryId { get; set; }
+        [Display(Name = "帳本項目名稱")]
+        [Required(ErrorMessage = "{0} 必輸")]
+        public string CategoryName { get; set; }
 
         /// <summary>
         /// 帳本項目花費
         /// </summary>
         [Display(Name = "帳本項目花費")]
-        public Decimal? ItemCost { get; set; }
+        public Decimal ItemCost { get; set; }
 
         /// <summary>
         /// 帳本項目更新日期
         /// </summary>
         [Display(Name = "帳本項目更新日期")]
-        public DateTime? ItemUpdateDate { get; set; } = DateTime.Now;
+        public DateTime ItemUpdateDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 詳細說明
         /// </summary>
         [Display(Name = "詳細說明")]
-        public string? ItemIllustrate { get; set; }
+        public string ItemIllustrate { get; set; }
 
         /// <summary>
         /// 是否為刪除狀態
         /// </summary>
         [Display(Name = "是否為刪除狀態")]
-        public bool? isDelete { get; set; }
+        public bool isDelete { get; set; }
     }
 }

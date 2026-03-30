@@ -19,11 +19,11 @@
         public int UserId { get; set; }
 
         /// <summary>
-        /// 帳本項目類別 ID
+        /// 帳本項目名稱
         /// </summary>
-        [Display(Name = "帳本項目類別 ID")]
+        [Display(Name = "帳本項目名稱")]
         [Required(ErrorMessage = "{0} 必輸")]
-        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
 
         /// <summary>
         /// 帳本項目花費
@@ -48,6 +48,6 @@
         /// 是否為刪除狀態
         /// </summary>
         [Display(Name = "是否為刪除狀態")]
-        public bool isDelete { get; set; }
+        public bool IsDelete { get; set; } = false;
     }
 }

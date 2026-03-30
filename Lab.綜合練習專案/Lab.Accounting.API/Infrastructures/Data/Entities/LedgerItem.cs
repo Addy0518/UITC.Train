@@ -30,7 +30,7 @@
         /// <summary>
         /// 項目更新日期
         /// </summary>
-        public DateTime? ItemUpdateDate { get; set; }
+        public DateTime ItemUpdateDate { get; set; }
 
         /// <summary>
         /// 項目建立日期

@@ -5,11 +5,13 @@
         //管理註冊
         public static void AddDiConfig(this IServiceCollection services)
         {
-            services.AddSingleton<AccountConne>();
+            services.AddSingleton<DBConnecting>();
 
-            services.AddScoped<IAccountRepositories, AccountRepositories>();
+            services.AddScoped<ILedgerRepositories, LedgerRepositories>();
 
-            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ILedgerService, LedgerService>();
+
+            services.AddScoped<ILedgerItemCategoryRepositories, LedgerItemCategoryRepositories>();
         }
     }
 }
