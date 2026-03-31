@@ -6,20 +6,23 @@ public interface ILedgerRepositories
     /// 查看單一帳本項目
     /// </summary>
     /// <param name="ledgerId">項目名稱</param>
+    /// <param name="userId">使用者 ID</param>
     /// <returns>單筆項目</returns>
-    Task<LedgerItemJoinCategoryView> GetLedger(int ledgerId);
+    Task<LedgerItemJoinCategoryView> GetLedger(int ledgerId,int userId);
 
     /// <summary>
     /// 查看全部帳本項目
     /// </summary>
     /// <param name="categoryId">項目類別</param>
     ///  <param name="date">日期</param>
-    ///  <param name="categoryname">項目名稱</param>
+    ///  <param name="itemname">項目名稱</param>
+    ///  <param name="userId">使用者 ID</param>
     /// <returns>所有項目</returns>
     Task<List<LedgerItemJoinCategoryView>> GetAllLedger(
         List<int>? categoryId,
         DateTime? date,
-        string? itemname
+        string? itemname,
+        int userId
     );
 
     /// <summary>
@@ -41,6 +44,7 @@ public interface ILedgerRepositories
     /// </summary>
     /// <param name="ledgerId">項目 ID</param>
     /// <param name="isDelete">刪除狀態</param>
+    /// <param name="userId">使用者 ID</param>
     /// <returns>影響列數</returns>
-    Task<int> DeleteLedger(int ledgerId, bool isDelete);
+    Task<int> DeleteLedger(int ledgerId, bool isDelete, int userId);
 }

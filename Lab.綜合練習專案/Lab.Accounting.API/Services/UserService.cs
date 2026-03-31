@@ -1,9 +1,11 @@
-﻿using Lab.Accounting.API.Common.Requests;
+﻿using Lab.Accounting.API.Common.Helpers;
+using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lab.Accounting.API.Services
 {
-    public class UserService(IUserRepositories userrepo) : IUserService
+    public class UserService(IUserRepositories userrepo, TokenHelper tokenHelper) : IUserService
     {
         /// <summary>
         /// 使用者註冊
@@ -38,7 +40,24 @@ namespace Lab.Accounting.API.Services
         /// <returns>登入成功</returns>
         public async Task<ApiResponse<UserResponse>> Login(UserLoginRequest loginRequest)
         {
-            return null;
+            var user = new User
+            {
+                UserAccount = loginRequest.UserAccount,
+                UserPassword = loginRequest.UserPassword,
+            };
+
+            var dbuser=await userrepo.Login(user);
+
+            if (dbuser==null)
+            { 
+               return ApiResponseHelper.NotFound<UserResponse>();
+            }
+
+            var token= tokenHelper.GeneratedToken(dbuser.UserId,dbuser.UserName);
+
+
+            dbuser.Token = token;
+            return ApiResponseHelper.Success(dbuser, "成功");
         }
     }
 }

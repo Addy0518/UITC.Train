@@ -1,4 +1,7 @@
 using Lab.Accounting.API.Infrastructures.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using NSwag.Generation.Processors.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,18 @@ try
                 Description = "記帳系統",
             };
         };
+
+        options.AddSecurity("Bearer", new OpenApiSecurityScheme
+        {
+            Type = OpenApiSecuritySchemeType.Http,
+            Scheme = "Bearer",                    
+            BearerFormat = "JWT",
+            Description = "輸入 Token "
+        });
+
+        options.OperationProcessors.Add(
+            new AspNetCoreOperationSecurityScopeProcessor("Bearer")
+        );
     });
     // 啟用 CORS 設定
     builder.Services.AddCors(options =>
@@ -38,6 +53,35 @@ try
                   .AllowAnyMethod();
         });
     });
+
+    builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        // 有錯誤就會顯示詳細原因
+        options.IncludeErrorDetails = true;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            // 發行人
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration.GetValue<string>("JwtSettings:Issuer"),
+            // 接收者
+            ValidateAudience = false,
+            ValidAudience = "JwtAuthDemo",
+            // Token 的有效期間
+            ValidateLifetime = true,
+            // 如果 Token 中包含 key 才需要驗證，一般都只有簽章而已
+            ValidateIssuerSigningKey = true,
+            // key
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    builder.Configuration.GetValue<string>("JwtSettings:SignKey")
+                )
+            ),
+        };
+    });
+    
     // 加入剛剛設定的錯誤處理 middleware
     builder.Services.AddExceptionHandler<InternalServerExceptionHandler>();
     builder.Services.AddProblemDetails();
@@ -46,20 +90,26 @@ try
     builder.Services.AddDiConfig();
 
     var app = builder.Build();
-    // app.UseHttpsRedirection();
+    app.UseExceptionHandler();
     app.UseOpenApi();
     app.UseSwaggerUI();
-    app.UseCors();
+    app.UseHttpsRedirection();
+    
+    
+    app.UseCors("AllowVueApp");
     // 加入 response 跟 request 讀取 middleware
     app.UseMiddleware<ResponseRequestMiddleware>();
     app.UseSerilogRequestLogging(opts =>
         opts.EnrichDiagnosticContext = SerilogConfig.EnrichFromRequest
     );
-    app.UseExceptionHandler();
-    app.UseHttpsRedirection();
-    app.UseCors("AllowVueApp");
-    app.UseAuthorization();
     
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+
+
+
     app.MapControllers();
 
     app.Run();

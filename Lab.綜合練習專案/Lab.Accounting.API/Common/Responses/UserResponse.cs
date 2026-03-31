@@ -11,5 +11,10 @@
         /// 使用者名稱
         /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Token
+        /// </summary>
+        public string? Token { get; set; }
     }
 }

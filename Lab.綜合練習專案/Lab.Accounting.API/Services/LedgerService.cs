@@ -11,15 +11,17 @@
         /// /// <param name="categoryId">項目類別</param>
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
+        ///  <param name="userId">使用者 ID</param>
         /// <returns>所有項目</returns>
         public async Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
-            string? itemname
+            string? itemname,
+            int userId
         )
         {
             return ApiResponseHelper.Success(
-                await accountrepo.GetAllLedger(categoryId, date, itemname),
+                await accountrepo.GetAllLedger(categoryId, date, itemname,userId),
                 "成功!"
             );
         }
@@ -28,10 +30,11 @@
         /// 查看單一帳本項目
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
+        /// <param name="userId">使用者 ID</param>
         /// <returns>單筆項目</returns>
-        public async Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(int ledgerId)
+        public async Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(int ledgerId, int userId)
         {
-            var target = await accountrepo.GetLedger(ledgerId);
+            var target = await accountrepo.GetLedger(ledgerId,userId);
             if (target == null)
             {
                 return ApiResponseHelper.NotFound<LedgerItemJoinCategoryView>();
@@ -61,8 +64,7 @@
                     ItemCreateDate = insert.ItemCreateDate ?? DateTime.Now,
                     ItemUpdateDate = DateTime.Now,
                     ItemIllustrate = insert.ItemIllustrate,
-                    // User 這邊要改
-                    UserId = 1,
+                    UserId = insert.UserId,
                     IsDelete = false,
                 };
 
@@ -93,8 +95,7 @@
                     ItemCost = update.ItemCost,
                     ItemUpdateDate = DateTime.Now,
                     ItemIllustrate = update.ItemIllustrate,
-                    // User 這邊要改
-                    UserId = 1,
+                    UserId = update.UserId,
                     IsDelete = false,
                 };
 
@@ -144,15 +145,16 @@
         /// 刪除指定帳本項目
         /// </summary>
         /// <param name="ledgerId">項目 ID</param>
+        /// <param name="userId">使用者 ID</param>
         /// <returns>影響列數</returns>
-        public async Task<ApiResponse<int>> DeleteLedger(int ledgerId)
+        public async Task<ApiResponse<int>> DeleteLedger(int ledgerId, int userId)
         {
-            var target = await accountrepo.GetLedger(ledgerId);
+            var target = await accountrepo.GetLedger(ledgerId, userId);
             if (target == null)
             {
                 return ApiResponseHelper.NotFound<int>();
             }
-            var deletetarget = await accountrepo.DeleteLedger(ledgerId, target.IsDelete);
+            var deletetarget = await accountrepo.DeleteLedger(ledgerId, target.IsDelete, userId);
 
             return ApiResponseHelper.Success<int>(deletetarget, "成功!");
         }

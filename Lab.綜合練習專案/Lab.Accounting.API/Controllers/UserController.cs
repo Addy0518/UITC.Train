@@ -1,7 +1,10 @@
 ﻿using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lab.Accounting.API.Controllers
 {
@@ -23,9 +26,9 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="registerRequest">使用者註冊資訊</param>
         /// <returns>註冊成功</returns>
         [HttpPost]
-        public async Task<ApiResponse<UserResponse>> Register(UserRegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromBody]UserRegisterRequest registerRequest)
         {
-            return null;
+            return Ok(await userserivce.Register(registerRequest));
         }
 
         /// <summary>
@@ -33,9 +36,11 @@ namespace Lab.Accounting.API.Controllers
         /// </summary>
         /// <param name="loginRequest">使用者登入資訊</param>
         /// <returns>登入成功</returns>
-        public async Task<ApiResponse<UserResponse>> Login(UserLoginRequest loginRequest)
+        [HttpPost]
+        
+        public async Task<IActionResult> Login([FromBody]UserLoginRequest loginRequest)
         {
-            return null;
+            return Ok(await userserivce.Login(loginRequest));
         }
     }
 }

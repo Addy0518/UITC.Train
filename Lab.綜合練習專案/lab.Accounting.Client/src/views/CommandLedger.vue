@@ -1,10 +1,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+// 引入 pinia 的 useAuthStore 來管理登入狀態
+const authStore = useAuthStore();
 // 路由參數
 const route = useRoute();
-// 使用者 id (暫定)
-const userId = ref(1);
+
 // 項目名稱
 const itemName = ref(null);
 // 項目說明
@@ -23,7 +25,11 @@ const categoryData = async () => {
   try {
     let url = `https://localhost:7124/api/Ledger/GetAllLedger`;
 
-    const res = await fetch(url);
+    const res = await fetch(url,{ method: 'Get',
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`,
+        }});
+
     const data = await res.json();
 
     if (data.codeStatus === 2000) {
@@ -47,7 +53,10 @@ const updateData = async (id) => {
   if (!id) return;
   let url = `https://localhost:7124/api/Ledger/GetLedger?ledgerId=${id}`;
 
-  const res = await fetch(url);
+  const res = await fetch(url,{ method: 'Get',
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`,
+        }});
   const data = await res.json();
 
   if (data.codeStatus === 2000) {
@@ -94,11 +103,11 @@ const addoreditledger = async (id = null) => {
         method: 'Post',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`,
         },
         body: JSON.stringify({
           categoryname: categoryname,
           ItemName: itemName.value,
-          UserId: userId.value,
           // 轉日期格式
           ItemCreateDate: itemDate.value
             ? new Date(itemDate.value).toLocaleDateString('en-CA')
@@ -116,12 +125,12 @@ const addoreditledger = async (id = null) => {
         method: 'Put',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`,
         },
         body: JSON.stringify({
           categoryname: categoryname || '',
           ItemId: parseInt(id),
           ItemName: itemName.value,
-          UserId: userId.value,
           // 轉日期格式
           ItemUpdateDate: new Date(itemDate.value).toLocaleDateString('en-CA'),
           ItemCost: itemCost.value,

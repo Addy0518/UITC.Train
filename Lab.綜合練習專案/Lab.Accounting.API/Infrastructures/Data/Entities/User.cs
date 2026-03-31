@@ -25,6 +25,6 @@
         /// <summary>
         /// 使用者電話
         /// </summary>
-        public string UserPhone { get; set; }
+        public int? UserPhone { get; set; }
     }
 }

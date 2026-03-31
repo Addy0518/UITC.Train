@@ -13,7 +13,7 @@ namespace Lab.Accounting.API.Repositories
         {
             using var conn = connecting.CreateConnecting();
             var sql =
-                @"Insert Into User (
+                @"Insert Into [User] (
                   UserName, UserAccount, UserPassword, UserPhone
                 ) 
                 values 
@@ -39,7 +39,7 @@ namespace Lab.Accounting.API.Repositories
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"Select UserId,UserName From User Where UserAccount=@UserAccount && UserPassword=@UserPassword";
+                @"Select UserId,UserName From [User] Where UserAccount=@UserAccount and UserPassword=@UserPassword";
 
             return await conn.QuerySingleAsync<UserResponse>(
                 sql,

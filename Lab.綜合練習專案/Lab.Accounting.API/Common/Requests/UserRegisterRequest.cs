@@ -32,6 +32,6 @@
         /// 使用者電話
         /// </summary>
         [Display(Name = "使用者電話")]
-        public string? UserPhone { get; set; }
+        public int? UserPhone { get; set; }
     }
 }

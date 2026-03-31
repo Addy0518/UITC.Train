@@ -11,6 +11,13 @@
         public int ItemId { get; set; }
 
         /// <summary>
+        /// 使用者 ID
+        /// </summary>
+        [Display(Name = "使用者 ID")]
+        [Required(ErrorMessage = "{0} 必輸")]
+        public int UserId { get; set; }
+
+        /// <summary>
         /// 帳本項目名稱
         /// </summary>
         [Display(Name = "項目名稱")]

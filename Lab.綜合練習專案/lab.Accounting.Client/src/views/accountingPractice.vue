@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, compile, computed, watch } from 'vue';
-
+import { useAuthStore } from '@/stores/auth';
+const authStore = useAuthStore();
 // 總花費
 const spend = computed(() => {
   let total = 0;
@@ -16,6 +17,9 @@ const deleteChange = async (id) => {
   if (!id) return;
   const res = await fetch(`https://localhost:7124/api/Ledger/DeleteLedger/${id}`, {
     method: 'Delete',
+    headers: {
+    'Authorization': `Bearer ${authStore.token}`,
+  },
   });
 
   if (res.ok) {
@@ -31,6 +35,7 @@ const reserve = async (item) => {
     method: 'Put',
     headers: {
       'Content-Type': 'application/json', // 告訴後端這是 JSON
+      'Authorization': `Bearer ${authStore.token}`,
     },
     body: JSON.stringify({
       categoryname: item.categoryName || '',
@@ -83,7 +88,9 @@ const ItemData = async (selectdate = null, cateId = null) => {
       const datestring = selectdate.toLocaleDateString('en-CA');
       url += (url.includes('?') ? '&' : '?') + `date=${datestring}`;
     }
-    const res = await fetch(url);
+    const res = await fetch(url,{headers: {
+    'Authorization': `Bearer ${authStore.token}`,
+  },});
     const data = await res.json();
 
     if (data.codeStatus === 2000) {
