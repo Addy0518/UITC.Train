@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, compile, computed, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { getAllLedger, getAllLedger2 } from '@/api/account-api';
+
 const authStore = useAuthStore();
 // 總花費
 const spend = computed(() => {
@@ -18,8 +20,8 @@ const deleteChange = async (id) => {
   const res = await fetch(`https://localhost:7124/api/Ledger/DeleteLedger/${id}`, {
     method: 'Delete',
     headers: {
-    'Authorization': `Bearer ${authStore.token}`,
-  },
+      Authorization: `Bearer ${authStore.token}`,
+    },
   });
 
   if (res.ok) {
@@ -35,7 +37,7 @@ const reserve = async (item) => {
     method: 'Put',
     headers: {
       'Content-Type': 'application/json', // 告訴後端這是 JSON
-      'Authorization': `Bearer ${authStore.token}`,
+      Authorization: `Bearer ${authStore.token}`,
     },
     body: JSON.stringify({
       categoryname: item.categoryName || '',
@@ -88,9 +90,34 @@ const ItemData = async (selectdate = null, cateId = null) => {
       const datestring = selectdate.toLocaleDateString('en-CA');
       url += (url.includes('?') ? '&' : '?') + `date=${datestring}`;
     }
-    const res = await fetch(url,{headers: {
-    'Authorization': `Bearer ${authStore.token}`,
-  },});
+
+    let querystring = '';
+    if (cateId && cateId.length > 0) {
+      querystring += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
+    }
+    if (selectdate) {
+      // 如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
+
+      const datestring = selectdate.toLocaleDateString('en-CA');
+      querystring += (url.includes('?') ? '&' : '?') + `date=${datestring}`;
+    }
+    console.log(`querystring`, querystring);
+
+    try {
+      const res2 = await getAllLedger(querystring);
+      console.log('res2)', res2);
+    } catch (error) {
+      console.error('res2', error.response);
+    }
+
+    const res3 = await getAllLedger2(querystring);
+    console.log('res3', res3);
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    });
     const data = await res.json();
 
     if (data.codeStatus === 2000) {

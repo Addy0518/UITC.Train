@@ -8,7 +8,7 @@ namespace Lab.Accounting.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize] 
+    [Authorize]
     [ProducesResponseType(
         StatusCodes.Status500InternalServerError,
         Type = typeof(ApiResponse<ProblemDetails>)
@@ -19,9 +19,8 @@ namespace Lab.Accounting.API.Controllers
     )]
     public class LedgerController(ILedgerService service) : ControllerBase
     {
-
         // 私有方法 : 從 Token 取出 UserId
-        private int CurrentUserId=> int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+        private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");
 
         /// <summary>
         /// 查看全部帳本項目
@@ -36,14 +35,12 @@ namespace Lab.Accounting.API.Controllers
             Type = typeof(ApiResponse<List<LedgerItemJoinCategoryView>>)
         )]
         public async Task<IActionResult> GetAllLedger(
-            
             [FromQuery] List<int>? categoryId,
             [FromQuery] DateTime? date,
             [FromQuery] string? itemname
         )
         {
-
-            return Ok(await service.GetAllLedger(categoryId, date, itemname,CurrentUserId));
+            return Ok(await service.GetAllLedger(categoryId, date, itemname, CurrentUserId));
         }
 
         /// <summary>
@@ -83,7 +80,7 @@ namespace Lab.Accounting.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
         public async Task<IActionResult> UpdateLedger([FromBody] LedgerUpdateRequest update)
         {
-            update.UserId = CurrentUserId; 
+            update.UserId = CurrentUserId;
             return Ok(await service.UpdateLedger(update));
         }
 

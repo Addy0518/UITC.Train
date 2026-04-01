@@ -14,23 +14,37 @@ namespace Lab.Accounting.API.Services
         /// <returns>註冊成功</returns>
         public async Task<ApiResponse<UserResponse>> Register(UserRegisterRequest registerRequest)
         {
-            var user = new User
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                UserName = registerRequest.UserName,
-                UserAccount = registerRequest.UserAccount,
-                UserPhone = registerRequest.UserPhone,
-                UserPassword = registerRequest.UserPassword,
-            };
+                var user = new User
+                {
+                    UserName = registerRequest.UserName,
+                    UserAccount = registerRequest.UserAccount,
+                    UserPhone = registerRequest.UserPhone,
+                    UserPassword = registerRequest.UserPassword,
+                };
+                var exist = await userrepo.ExistRegister(user);
 
-            var result = await userrepo.Register(user);
+                if (exist == true)
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { "UserAccount", new[] { "該帳號已被註冊!" } },
+                    };
 
-            var userresult = new UserResponse
-            {
-                UserId = result.UserId,
-                UserName = result.UserName,
-            };
+                    return ApiResponseHelper.RequestError<UserResponse>(errors);
+                }
 
-            return ApiResponseHelper.Success<UserResponse>(userresult, "成功!");
+                var result = await userrepo.Register(user);
+
+                var userresult = new UserResponse
+                {
+                    UserId = result.UserId,
+                    UserName = result.UserName,
+                };
+                trxScope.Complete();
+                return ApiResponseHelper.Success<UserResponse>(userresult, "成功!");
+            }
         }
 
         /// <summary>
@@ -46,15 +60,14 @@ namespace Lab.Accounting.API.Services
                 UserPassword = loginRequest.UserPassword,
             };
 
-            var dbuser=await userrepo.Login(user);
+            var dbuser = await userrepo.Login(user);
 
-            if (dbuser==null)
-            { 
-               return ApiResponseHelper.NotFound<UserResponse>();
+            if (dbuser == null)
+            {
+                return ApiResponseHelper.NotFound<UserResponse>();
             }
 
-            var token= tokenHelper.GeneratedToken(dbuser.UserId,dbuser.UserName);
-
+            var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName);
 
             dbuser.Token = token;
             return ApiResponseHelper.Success(dbuser, "成功");

@@ -2,44 +2,26 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { loginApi } from '@/api/account-api';
 // 引入 pinia 的 useAuthStore 來管理登入狀態
 const authStore = useAuthStore();
 const route = useRouter();
 const account = ref(null);
 const password = ref(null);
 
-
-
-
-const userLogin=async()=>{
+const userLogin = async () => {
   try {
-    const res = await fetch(`https://localhost:7124/api/User/Login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userAccount: account.value,
-        userPassword: password.value,
-      }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      // 把後端回傳的 token 和 userId 存到 pinia 的 authStore 裡面
-      authStore.setAuth(data.returnData);
-      route.push('/accounting-practice');
-      console.log('登入成功:', data);
-    } else {
-      console.error('登入失敗:', res.statusText);
-      alert('登入失敗，請檢查帳號和密碼');
+    const userlogin = { userAccount: account.value, userPassword: password.value };
+    const res = await loginApi(userlogin);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      alert('登入成功!');
+      route.push('accounting-practice');
     }
   } catch (error) {
-    console.error('連線失敗:', error);
-    alert('連線失敗，請稍後再試');
+    console.error('使用者登入錯誤 ', error.response);
   }
 };
-
 </script>
 
 <template>

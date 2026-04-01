@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import CreateAccount from '@/views/CreateAccount.vue';
 import AccountingLayout from '@/views/AccountingLayout.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

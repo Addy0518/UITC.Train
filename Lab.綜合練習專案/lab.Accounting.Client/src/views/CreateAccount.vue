@@ -1,43 +1,39 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { registerApi } from '@/api/account-api';
 const route = useRouter();
 const account = ref();
 const password = ref();
 const name = ref();
 const phone = ref();
 
-const userRegister=async()=>{
-  try {
-    const res = await fetch(`https://localhost:7124/api/User/Register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userAccount: account.value,
-        userPassword: password.value,
-        userName: name.value,
-        userPhone: phone.value,
-      }),
-    });
+const userRegister = async () => {
+  const userRegisterData = {
+    userAccount: account.value,
+    userPassword: password.value,
+    userName: name.value,
+    userPhone: phone.value,
+  };
 
-    if (res.ok) {
-      const data = await res.json();
+  try {
+    const res = await registerApi(userRegisterData);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      alert('註冊成功!');
       route.push('/login');
-      console.log('註冊成功:', data);
+    }
+    // 帳號重複註冊
+    else if (data.codeStatus === 4000) {
+      const errorMsg = data.error400.UserAccount;
+      alert(errorMsg);
     } else {
-      console.error('註冊失敗:', res.statusText);
-      alert('註冊失敗，請檢查輸入資訊');
+      alert(`意外成功:${data.codeStatus}`);
     }
   } catch (error) {
-    console.error('連線失敗:', error);
-    alert('連線失敗，請稍後再試');
+    console.error('使用者註冊錯誤 ', error.response);
   }
 };
-
-
 </script>
 
 <template>

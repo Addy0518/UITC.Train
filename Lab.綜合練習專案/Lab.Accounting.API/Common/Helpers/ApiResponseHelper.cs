@@ -1,3 +1,5 @@
+using NPOI.SS.Formula.Functions;
+
 namespace Lab.Accounting.API.Helpers;
 
 public static class ApiResponseHelper
@@ -13,25 +15,24 @@ public static class ApiResponseHelper
         };
     }
 
-    public static ApiResponse<ProblemDetails> InternalException(ProblemDetails errors)
+    public static ApiResponse<T> InternalException(ProblemDetails errors)
     {
-        return new ApiResponse<ProblemDetails>
+        return new ApiResponse<T>
         {
             CodeStatus = CodeStatus.InternalException,
-            ReturnData = errors,
             Message = CodeStatus.InternalException.GetDescription(),
+            Error500 = errors,
         };
     }
 
-    public static ApiResponse<Dictionary<string, string[]>> RequestError(
-        Dictionary<string, string[]> errors
-    )
+    public static ApiResponse<T> RequestError<T>(Dictionary<string, string[]> errors)
     {
-        return new ApiResponse<Dictionary<string, string[]>>
+        return new ApiResponse<T>
         {
             CodeStatus = CodeStatus.RequestError,
-            ReturnData = errors,
+            ReturnData = default,
             Message = CodeStatus.RequestError.GetDescription(),
+            Error400 = errors,
         };
     }
 

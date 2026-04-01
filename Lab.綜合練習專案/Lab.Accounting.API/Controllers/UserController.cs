@@ -26,7 +26,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="registerRequest">使用者註冊資訊</param>
         /// <returns>註冊成功</returns>
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody]UserRegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromBody] UserRegisterRequest registerRequest)
         {
             return Ok(await userserivce.Register(registerRequest));
         }
@@ -37,8 +37,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="loginRequest">使用者登入資訊</param>
         /// <returns>登入成功</returns>
         [HttpPost]
-        
-        public async Task<IActionResult> Login([FromBody]UserLoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest loginRequest)
         {
             return Ok(await userserivce.Login(loginRequest));
         }

@@ -17,5 +17,12 @@ namespace Lab.Accounting.API.Repositories
         /// <param name="userInformation">使用者登入資訊</param>
         /// <returns>使用者資訊</returns>
         Task<UserResponse> Login(User userInformation);
+
+        /// <summary>
+        /// 檢查使用者是否註冊過
+        /// </summary>
+        /// <param name="userInformation">使用者註冊資訊</param>
+        /// <returns>是否註冊過</returns>
+        Task<bool> ExistRegister(User userInformation);
     }
 }

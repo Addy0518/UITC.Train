@@ -19,5 +19,9 @@ public class ApiResponse<T>
     /// <summary>
     /// 回傳資料
     /// </summary>
-    public T ReturnData { get; set; } = default!;
+    public T? ReturnData { get; set; } = default!;
+
+    public Dictionary<string, string[]>? Error400 { get; set; } = null;
+
+    public ProblemDetails? Error500 { get; set; } = null;
 }
