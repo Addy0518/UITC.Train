@@ -2,6 +2,8 @@
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { registerApi } from '@/api/account-api';
+import Swal from 'sweetalert2';
+
 const route = useRouter();
 const account = ref();
 const password = ref();
@@ -20,15 +22,24 @@ const userRegister = async () => {
     const res = await registerApi(userRegisterData);
     const { data } = res;
     if (data.codeStatus === 2000) {
-      alert('註冊成功!');
+      Swal.fire({
+        icon: 'success',
+        title: '註冊成功!',
+      });
       route.push('/login');
     }
     // 帳號重複註冊
     else if (data.codeStatus === 4000) {
       const errorMsg = data.error400.UserAccount;
-      alert(errorMsg);
+      Swal.fire({
+        icon: 'error',
+        title: errorMsg,
+      });
     } else {
-      alert(`意外成功:${data.codeStatus}`);
+      Swal.fire({
+        icon: 'question',
+        title: `意外成功:${data.codeStatus}`,
+      });
     }
   } catch (error) {
     console.error('使用者註冊錯誤 ', error.response);

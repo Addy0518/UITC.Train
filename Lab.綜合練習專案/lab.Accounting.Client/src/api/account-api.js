@@ -1,12 +1,25 @@
 import accountApiInstance from '@/api/accountInstance.js';
 
-export const getAllLedger = (queryString = '') =>
-  accountApiInstance.get(`/Ledger/GetAllLedger${queryString}`);
 // 使用者註冊
 export const registerApi = (userRegister) =>
   accountApiInstance.post(`/User/Register`, userRegister);
 // 使用者登入
 export const loginApi = (userLogin) => accountApiInstance.post(`/User/Login`, userLogin);
+//  搜尋全部帳本
+export const getAllLedger = (queryString = '') =>
+  accountApiInstance.get(`/Ledger/GetAllLedger${queryString}`);
+// 搜尋單一帳本
+export const getLedger = (ledgerId) =>
+  accountApiInstance.get(`/Ledger/GetLedger?ledgerId=${ledgerId}`);
+// 新增帳本
+export const createLedger = (ledgerCreate) =>
+  accountApiInstance.post(`Ledger/CreateLedger`, ledgerCreate);
+// 編輯帳本
+export const updateLedger = (ledgerUpdate) =>
+  accountApiInstance.put(`Ledger/UpdateLedger`, ledgerUpdate);
+// 刪除帳本
+export const deleteLedger = (ledgerDelete = null) =>
+  accountApiInstance.delete(`Ledger/DeleteLedger/${ledgerDelete}`);
 
 // export const getAllLedger2 = async (cateId = [], selectdate = null) => {
 //   let queryString = '';

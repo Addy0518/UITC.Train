@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { getAllLedger, getLedger, createLedger, updateLedger } from '@/api/account-api';
 // 引入 pinia 的 useAuthStore 來管理登入狀態
 const authStore = useAuthStore();
 // 路由參數
@@ -23,52 +24,40 @@ const itemDate = ref(null);
 // 初始時抓取所有資料 < 這裡只需要類別
 const categoryData = async () => {
   try {
-    let url = `https://localhost:7124/api/Ledger/GetAllLedger`;
+    const res = await getAllLedger();
+    console.log('抓到的類別', res);
+    // 這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
+    const categorydata = [...new Set(res.data.returnData.map((item) => item.categoryName))];
 
-    const res = await fetch(url,{ method: 'Get',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        }});
-
-    const data = await res.json();
-
-    if (data.codeStatus === 2000) {
-      // 這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
-      const categorydata = [...new Set(data.returnData.map((item) => item.categoryName))];
-
-      category.value = categorydata.map((name, index) => ({
-        key: index.toString(),
-        name: name,
-      }));
-    } else {
-      console.error('API 回傳錯誤:', data.message);
-    }
+    category.value = categorydata.map((name, index) => ({
+      key: index.toString(),
+      name: name,
+    }));
   } catch (error) {
     console.error('連線失敗:', error);
   }
 };
 
-// 初始化抓取單筆資料 , 用來編輯
 const updateData = async (id) => {
-  if (!id) return;
-  let url = `https://localhost:7124/api/Ledger/GetLedger?ledgerId=${id}`;
+  try {
+    if (!id) return;
+    console.log('ID', id);
+    const res = await getLedger(id);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      const item = data.returnData;
 
-  const res = await fetch(url,{ method: 'Get',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        }});
-  const data = await res.json();
+      itemName.value = item.itemName;
+      itemCost.value = item.itemCost;
+      itemIllustrate.value = item.itemIllustrate;
 
-  if (data.codeStatus === 2000) {
-    const item = data.returnData;
-
-    itemName.value = item.itemName;
-    itemCost.value = item.itemCost;
-    itemIllustrate.value = item.itemIllustrate;
-
-    selectedCategory.value = item.categoryName;
-  } else {
-    console.error('API 回傳錯誤:', data.message);
+      selectedCategory.value = item.categoryName;
+    }
+    if (data.codeStatus === 4001) {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error('編輯錯誤 ', error.response);
   }
 };
 
@@ -82,68 +71,58 @@ onMounted(() => {
 
 // 新增帳本
 const addoreditledger = async (id = null) => {
-  if (!itemName.value || !itemCost.value || !selectedCategory.value) {
-    alert('項目名稱,花費,類別為必填');
-    return;
-  }
-
-  if (!itemCost.value || itemCost.value < 0) {
-    alert('請輸入正確金額,不能為負數');
-    return;
-  }
   try {
     // 我後端已經寫了轉換類別的方法了 , 這裡就丟類別名稱回去就好
     // 但是因為儲存類別有兩個方法 , 一個是選現有的就會是物件 , 一個用輸入的就會是變數 , 所以要看他的型別來判斷
     const categoryname =
       typeof selectedCategory.value === 'object'
-        ? selectedCategory.value.name
+        ? selectedCategory.value?.name
         : selectedCategory.value;
     if (isAdd.value) {
-      const addres = await fetch(`https://localhost:7124/api/Ledger/CreateLedger`, {
-        method: 'Post',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authStore.token}`,
-        },
-        body: JSON.stringify({
-          categoryname: categoryname,
-          ItemName: itemName.value,
-          // 轉日期格式
-          ItemCreateDate: itemDate.value
-            ? new Date(itemDate.value).toLocaleDateString('en-CA')
-            : null,
-          ItemCost: itemCost.value,
-          ItemIllustrate: itemIllustrate.value,
-        }),
-      });
-      if (addres.ok) {
+      const createdata = {
+        categoryname: categoryname,
+        ItemName: itemName.value,
+        // 轉日期格式
+        ItemCreateDate: itemDate.value
+          ? new Date(itemDate.value).toLocaleDateString('en-CA')
+          : null,
+        ItemCost: itemCost.value || 0,
+        ItemIllustrate: itemIllustrate.value,
+      };
+
+      const res = await createLedger(createdata);
+      console.log('新增成功回傳資料', res);
+      const { data } = res;
+      if (data.returnData > 0 && data.codeStatus === 2000) {
         // 成功就關閉彈窗
         visible.value = false;
       }
+      if (data.codeStatus === 4001) {
+        alert(data.message);
+      }
     } else if (!isAdd.value) {
-      const updateres = await fetch(`https://localhost:7124/api/Ledger/UpdateLedger`, {
-        method: 'Put',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authStore.token}`,
-        },
-        body: JSON.stringify({
-          categoryname: categoryname || '',
-          ItemId: parseInt(id),
-          ItemName: itemName.value,
-          // 轉日期格式
-          ItemUpdateDate: new Date(itemDate.value).toLocaleDateString('en-CA'),
-          ItemCost: itemCost.value,
-          ItemIllustrate: itemIllustrate.value,
-        }),
-      });
-      if (updateres.ok) {
+      const updatedata = {
+        categoryname: categoryname || '',
+        ItemId: parseInt(id),
+        ItemName: itemName.value,
+        // 轉日期格式
+        ItemUpdateDate: new Date(itemDate.value).toLocaleDateString('en-CA'),
+        ItemCost: itemCost.value,
+        ItemIllustrate: itemIllustrate.value,
+      };
+      const res = await updateLedger(updatedata);
+      console.log('編輯成功回傳資料', res);
+      const { data } = res;
+      if (data.returnData > 0 && data.codeStatus === 2000) {
         // 成功就關閉彈窗
         visible.value = false;
+      }
+      if (data.codeStatus === 4001) {
+        alert(data.message);
       }
     }
   } catch (err) {
-    console.log(err);
+    console.error('資料操作錯誤 ', error.response);
   }
 };
 
@@ -151,6 +130,7 @@ const addoreditledger = async (id = null) => {
 const visible = ref(true);
 // 路由判斷新增或刪除
 const isAdd = computed(() => route.name === 'add-ledger');
+console.log('isAdd', isAdd.value);
 </script>
 
 <template>

@@ -1,45 +1,37 @@
 <script setup>
-import { ref, onMounted, compile, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { getAllLedger, getAllLedger2 } from '@/api/account-api';
+import { getAllLedger, deleteLedger, updateLedger } from '@/api/account-api';
 
 const authStore = useAuthStore();
-// 總花費
-const spend = computed(() => {
-  let total = 0;
-  for (let i = 0; i < products.value.length; i++) {
-    if (!products.value[i].isDelete) {
-      total += products.value[i].itemCost || 0;
-    }
-  }
-  return total;
-});
+//所設立的類別
+const category = ref([]);
+// 監聽 datepicker 選擇的日期並呼叫 api
+const date = ref();
+const selectedValue = ref(null);
+// 所有項目
+const products = ref([]);
+
 // 刪除 (判斷 isDelete 欄位決定是否真的刪除)
 const deleteChange = async (id) => {
-  if (!id) return;
-  const res = await fetch(`https://localhost:7124/api/Ledger/DeleteLedger/${id}`, {
-    method: 'Delete',
-    headers: {
-      Authorization: `Bearer ${authStore.token}`,
-    },
-  });
+  try {
+    if (!id) return;
 
-  if (res.ok) {
-    await ItemData();
-  } else {
-    alert('刪除失敗!');
+    const res = await deleteLedger(id);
+
+    if (res.data.codeStatus === 2000) {
+      await ItemData();
+    }
+  } catch (error) {
+    console.error('帳本刪除錯誤 ', error.response);
   }
 };
+
 // 復原軟刪除狀態 (用更新 api)
 const reserve = async (item) => {
-  if (!item) return;
-  const res = await fetch(`https://localhost:7124/api/Ledger/UpdateLedger`, {
-    method: 'Put',
-    headers: {
-      'Content-Type': 'application/json', // 告訴後端這是 JSON
-      Authorization: `Bearer ${authStore.token}`,
-    },
-    body: JSON.stringify({
+  try {
+    if (!item) return;
+    const updateData = {
       categoryname: item.categoryName || '',
       itemId: item.itemId,
       itemName: item.itemName,
@@ -48,49 +40,21 @@ const reserve = async (item) => {
       categoryId: item.categoryId ? String(item.categoryId) : null,
       isDelete: false,
       itemUpdateDate: new Date().toLocaleDateString('en-CA'),
-    }),
-  });
+    };
 
-  if (res.ok) {
-    await ItemData();
-  } else {
-    alert('復原失敗!');
-    const errorData = await res.json();
-    console.log('400 錯誤詳情:', errorData);
+    const res = await updateLedger(updateData);
+
+    if (res.data.codeStatus === 2000) {
+      await ItemData();
+    }
+  } catch (error) {
+    console.error('帳本復原錯誤 ', error.response);
   }
 };
 
-//所設立的類別
-const category = ref([]);
-
-// 監聽 datepicker 選擇的日期並呼叫 api
-const date = ref();
-const selectedValue = ref(null);
-
-// 一次監聽兩個 日期跟類別 , 一起塞進 url
-watch([date, selectedValue], ([newDate, newVal]) => {
-  console.log(newVal);
-  const ids = newVal ? Object.keys(newVal).map(Number) : null;
-  ItemData(newDate ?? null, ids);
-});
-
-// 所有項目
-const products = ref([]);
 // 初始時抓取所有資料
 const ItemData = async (selectdate = null, cateId = null) => {
   try {
-    let url = `https://localhost:7124/api/Ledger/GetAllLedger`;
-
-    if (cateId && cateId.length > 0) {
-      url += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
-    }
-    if (selectdate) {
-      // 如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
-
-      const datestring = selectdate.toLocaleDateString('en-CA');
-      url += (url.includes('?') ? '&' : '?') + `date=${datestring}`;
-    }
-
     let querystring = '';
     if (cateId && cateId.length > 0) {
       querystring += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
@@ -99,27 +63,12 @@ const ItemData = async (selectdate = null, cateId = null) => {
       // 如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
 
       const datestring = selectdate.toLocaleDateString('en-CA');
-      querystring += (url.includes('?') ? '&' : '?') + `date=${datestring}`;
-    }
-    console.log(`querystring`, querystring);
-
-    try {
-      const res2 = await getAllLedger(querystring);
-      console.log('res2)', res2);
-    } catch (error) {
-      console.error('res2', error.response);
+      querystring += (querystring.includes('?') ? '&' : '?') + `date=${datestring}`;
     }
 
-    const res3 = await getAllLedger2(querystring);
-    console.log('res3', res3);
+    const res = await getAllLedger(querystring);
 
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-      },
-    });
-    const data = await res.json();
-
+    const { data } = res;
     if (data.codeStatus === 2000) {
       products.value = data.returnData;
       // 這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
@@ -143,13 +92,28 @@ const ItemData = async (selectdate = null, cateId = null) => {
             label: item.categoryName,
           }));
       }
-    } else {
-      console.error('API 回傳錯誤:', data.message);
     }
   } catch (error) {
-    console.error('連線失敗:', error);
+    console.error('搜尋資料錯誤 ', error.response);
   }
 };
+
+// 總花費
+const spend = computed(() => {
+  let total = 0;
+  for (let i = 0; i < products.value.length; i++) {
+    if (!products.value[i].isDelete) {
+      total += products.value[i].itemCost || 0;
+    }
+  }
+  return total;
+});
+
+// 一次監聽兩個 日期跟類別 , 一起塞進 url
+watch([date, selectedValue], ([newDate, newVal]) => {
+  const ids = newVal ? Object.keys(newVal).map(Number) : null;
+  ItemData(newDate ?? null, ids);
+});
 
 onMounted(() => {
   ItemData();
@@ -175,6 +139,7 @@ onMounted(() => {
             display="chip"
             placeholder="選擇類別"
             class="md:w-80"
+            showClear
           />
         </div>
         <div>
@@ -184,12 +149,16 @@ onMounted(() => {
             dateFormat="yy-mm-dd"
             class="md:w-80 h-11.5"
             :placeholder="font - size"
+            showClear
           />
         </div>
         <div class="w-10">
           <RouterLink :to="{ name: 'add-ledger' }">
             <img src="/src/img/add.png" alt=""
           /></RouterLink>
+        </div>
+        <div class="w-10 bg-amber-300">
+          <RouterLink :to="{ name: 'chart' }">統計圖表</RouterLink>
         </div>
       </div>
       <!-- 顯示所有帳目 -->

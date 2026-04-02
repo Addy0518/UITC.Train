@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import 'sweetalert2/src/sweetalert2.scss';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import App from './App.vue';
@@ -17,6 +18,7 @@ import Textarea from 'primevue/textarea';
 import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+
 const app = createApp(App);
 
 app.use(createPinia());

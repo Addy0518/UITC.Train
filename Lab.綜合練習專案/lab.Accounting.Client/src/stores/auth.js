@@ -2,10 +2,9 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 
 export const useAuthStore = defineStore('auth', () => {
-   const token=ref(localStorage.getItem('token') || null);
-   const userId = ref(Number(localStorage.getItem('userId')) || null);
-   const userName = ref(localStorage.getItem('userName') || null);
-
+  const token = ref(localStorage.getItem('token') || null);
+  const userId = ref(Number(localStorage.getItem('userId')) || null);
+  const userName = ref(localStorage.getItem('userName') || null);
 
   // 登入時存入
   function setAuth(data) {
@@ -18,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('userName', data.userName);
   }
 
-   // 登出時清除
+  // 登出時清除
   function clearAuth() {
     token.value = null;
     userId.value = null;

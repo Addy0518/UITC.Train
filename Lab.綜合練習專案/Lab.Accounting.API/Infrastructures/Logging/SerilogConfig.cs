@@ -1,4 +1,6 @@
-﻿namespace Lab.API.TODO.Infrastructures.Logging
+﻿using Serilog.Exceptions;
+
+namespace Lab.API.TODO.Infrastructures.Logging
 {
     public class SerilogConfig
     {
@@ -13,6 +15,7 @@
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning) // 設定 Microsoft.AspNetCore 訊息為 Warning 為最小輸出
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning) // 設定 Microsoft.EntityFrameworkCore 訊息為 Warning 為最小輸出
                 .Enrich.FromLogContext() // 可以增加Log輸出欄位 https://www.cnblogs.com/wd4j/p/15043489.html
+                .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Application", "UITC.Todo")
                 .WriteTo.Seq("http://localhost:5341")
                 .WriteTo.Console(

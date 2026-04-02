@@ -56,7 +56,7 @@ namespace Lab.Accounting.API.Repositories
             var sql =
                 @"Select UserId,UserName From [User] Where UserAccount=@UserAccount and UserPassword=@UserPassword";
 
-            return await conn.QuerySingleAsync<UserResponse>(
+            return await conn.QueryFirstOrDefaultAsync<UserResponse>(
                 sql,
                 new
                 {

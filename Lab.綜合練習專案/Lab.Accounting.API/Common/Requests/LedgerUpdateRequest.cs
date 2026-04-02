@@ -47,7 +47,7 @@
         /// 詳細說明
         /// </summary>
         [Display(Name = "詳細說明")]
-        public string ItemIllustrate { get; set; }
+        public string? ItemIllustrate { get; set; }
 
         /// <summary>
         /// 是否為刪除狀態

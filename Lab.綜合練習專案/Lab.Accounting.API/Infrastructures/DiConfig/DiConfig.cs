@@ -20,6 +20,8 @@ namespace Lab.Accounting.API.Infrastructures.DiConfig
             services.AddScoped<ILedgerService, LedgerService>();
 
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<PasswordSecureHelper>();
         }
     }
 }

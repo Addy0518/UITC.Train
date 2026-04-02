@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
-
+import router from '@/router';
+import Swal from 'sweetalert2';
+const authStore = useAuthStore();
 // 先定義一個 axios 基礎設定的地方
 const instance = axios.create({
   baseURL: import.meta.env.VITE_TODO_BASE_URL,
@@ -10,10 +12,12 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     // 統一把所有 api header 加上 token
-    const authStore = useAuthStore();
+
+    console.log('authStoreToken', authStore.token);
     if (authStore.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`;
     }
+    console.log('config', config.headers.Authorization);
     return config;
   },
   function (error) {
@@ -35,11 +39,26 @@ instance.interceptors.response.use(
       const errorMsg = Object.values(data.errors)
         .flatMap((x) => x)
         .join('\r\n');
-      alert(errorMsg);
+      Swal.fire({
+        icon: 'error',
+        title: errorMsg,
+      });
+    }
+    if (status === 401) {
+      Swal.fire({
+        icon: 'error',
+        title: '登入時間過期 , 請重新登入 !',
+      });
+      authStore.clearAuth();
+
+      router.push('login');
     }
     if (status === 500) {
       const errorMsg = `狀況 : ${data.message} \r\n Url : ${data.error500.instance} \r\n 錯誤訊息 : ${data.error500.title}`;
-      alert(errorMsg);
+      Swal.fire({
+        icon: 'error',
+        title: `連線錯誤 : ${errorMsg}`,
+      });
     }
 
     return Promise.reject(error);

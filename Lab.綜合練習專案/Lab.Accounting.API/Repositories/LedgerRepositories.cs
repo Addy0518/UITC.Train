@@ -10,7 +10,7 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
     /// <param name="ledgerId">項目名稱</param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>單筆項目</returns>
-    public async Task<LedgerItemJoinCategoryView> GetLedger(int ledgerId,int userId)
+    public async Task<LedgerItemJoinCategoryView> GetLedger(int ledgerId, int userId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -20,14 +20,14 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
                       c.CategoryName 
                     From 
                       LedgerItem l 
-                      join LedgerItemCategory c on c.CategoryId = l.CategoryId 
+                      left join LedgerItemCategory c on c.CategoryId = l.CategoryId 
                     where 
                       ItemId = @ledgerId and UserId=@userId
                     ";
 
-        var result = await conn.QuerySingleAsync<LedgerItemJoinCategoryView>(
+        var result = await conn.QueryFirstOrDefaultAsync<LedgerItemJoinCategoryView>(
             sql,
-            new { ledgerId = ledgerId , userId = userId }
+            new { ledgerId = ledgerId, userId = userId }
         );
 
         return result;
@@ -145,7 +145,7 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
     /// <param name="isDelete">刪除狀態</param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<int> DeleteLedger(int ledgerId, bool isDelete,int userId)
+    public async Task<int> DeleteLedger(int ledgerId, bool isDelete, int userId)
     {
         using var conn = connecting.CreateConnecting();
         //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
@@ -153,6 +153,6 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
             ? @"Delete From LedgerItem Where ItemId=@ledgerId"
             : @"Update LedgerItem Set IsDelete=1 Where ItemId=@ledgerId and UserId=@userId";
 
-        return await conn.ExecuteAsync(deletesql, new { ledgerId = ledgerId, userId= userId });
+        return await conn.ExecuteAsync(deletesql, new { ledgerId = ledgerId, userId = userId });
     }
 }

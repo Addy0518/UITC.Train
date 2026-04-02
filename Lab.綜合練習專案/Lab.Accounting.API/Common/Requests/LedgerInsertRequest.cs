@@ -15,7 +15,6 @@
         /// 使用者 ID
         /// </summary>
         [Display(Name = "使用者 ID")]
-        [Required(ErrorMessage = "{0} 必輸")]
         public int UserId { get; set; }
 
         /// <summary>
@@ -42,7 +41,7 @@
         /// 帳本項目詳細說明
         /// </summary>
         [Display(Name = "帳本項目詳細說明")]
-        public string ItemIllustrate { get; set; }
+        public string? ItemIllustrate { get; set; }
 
         /// <summary>
         /// 是否為刪除狀態
