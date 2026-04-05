@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
 import Swal from 'sweetalert2';
-const authStore = useAuthStore();
+
 // 先定義一個 axios 基礎設定的地方
 const instance = axios.create({
   baseURL: import.meta.env.VITE_TODO_BASE_URL,
@@ -12,7 +12,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     // 統一把所有 api header 加上 token
-
+    const authStore = useAuthStore();
     console.log('authStoreToken', authStore.token);
     if (authStore.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`;

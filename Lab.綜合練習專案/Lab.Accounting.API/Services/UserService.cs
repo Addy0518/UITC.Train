@@ -1,4 +1,5 @@
-﻿using Lab.Accounting.API.Common.Helpers;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Lab.Accounting.API.Common.Helpers;
 using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
 using Serilog.Core;
@@ -10,7 +11,8 @@ namespace Lab.Accounting.API.Services
         IUserRepositories userrepo,
         TokenHelper tokenHelper,
         PasswordSecureHelper passwordSecureHelper,
-        ILogger<UserService> logger
+        ILogger<UserService> logger,
+        ITokenBlacklistRepositories tokenBlacklistRepositories
     ) : IUserService
     {
         /// <summary>
@@ -57,13 +59,7 @@ namespace Lab.Accounting.API.Services
         /// <returns>登入成功</returns>
         public async Task<ApiResponse<UserResponse>> Login(UserLoginRequest loginRequest)
         {
-            var user = new User
-            {
-                UserAccount = loginRequest.UserAccount,
-                UserPassword = loginRequest.UserPassword,
-            };
-            // 記錄資料
-            logger.LogInformation("使用者帳號{account}", user.UserAccount);
+            var user = new User { UserAccount = loginRequest.UserAccount };
 
             var dbuser = await userrepo.Login(user);
 
@@ -72,10 +68,60 @@ namespace Lab.Accounting.API.Services
                 return ApiResponseHelper.NotFound<UserResponse>();
             }
 
+            bool isValid = passwordSecureHelper.VerifyPassword(
+                loginRequest.UserPassword,
+                dbuser.UserPassword
+            );
+
+            if (isValid == false)
+                return ApiResponseHelper.NotFound<UserResponse>();
+
+            dbuser.UserPassword = null;
+
             var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName);
 
-            dbuser.Token = token;
-            return ApiResponseHelper.Success(dbuser, "成功");
+            var userresponse = new UserResponse
+            {
+                Token = token,
+                UserId = dbuser.UserId,
+                UserName = dbuser.UserName,
+            };
+
+            return ApiResponseHelper.Success(userresponse, "成功");
+        }
+
+        /// <summary>
+        /// 使用者登出
+        /// </summary>
+        /// <param name="Token">登出的 Token</param>
+        /// <returns>是否成功登出</returns>
+        public async Task<ApiResponse<string>> Logout(string Token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            if (!tokenHandler.CanReadToken(Token))
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Token", new[] { "無效的 Token !" } },
+                };
+
+                return ApiResponseHelper.RequestError<string>(errors);
+            }
+
+            var jwt = tokenHandler.ReadJwtToken(Token);
+
+            var jit = jwt.Id;
+            var expiresAt = jwt.ValidTo;
+
+            if (await tokenBlacklistRepositories.isBlackList(jit))
+            {
+                return ApiResponseHelper.Success<string>("已登出");
+            }
+
+            await tokenBlacklistRepositories.AddToken(jit, expiresAt);
+
+            return ApiResponseHelper.Success<string>("登出成功,以新增至黑名單");
         }
     }
 }

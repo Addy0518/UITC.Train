@@ -1,6 +1,6 @@
 ﻿using Serilog.Exceptions;
 
-namespace Lab.API.TODO.Infrastructures.Logging
+namespace Lab.Accounting.API.Infrastructures.Logging
 {
     public class SerilogConfig
     {

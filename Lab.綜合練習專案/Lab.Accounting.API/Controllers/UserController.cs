@@ -1,4 +1,6 @@
 ﻿using Lab.Accounting.API.Common.Requests;
+using Lab.Accounting.API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lab.Accounting.API.Controllers
 {
@@ -34,6 +36,20 @@ namespace Lab.Accounting.API.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginRequest loginRequest)
         {
             return Ok(await userserivce.Login(loginRequest));
+        }
+
+        /// <summary>
+        /// 使用者登出
+        /// </summary>
+        /// <param name="Token">登出的 Token</param>
+        /// <returns>是否成功登出</returns>
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            var Token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            return Ok(await userserivce.Logout(Token));
         }
     }
 }

@@ -5,6 +5,8 @@ export const registerApi = (userRegister) =>
   accountApiInstance.post(`/User/Register`, userRegister);
 // 使用者登入
 export const loginApi = (userLogin) => accountApiInstance.post(`/User/Login`, userLogin);
+// 使用者登出
+export const logoutApi = () => accountApiInstance.post(`/User/Logout`);
 //  搜尋全部帳本
 export const getAllLedger = (queryString = '') =>
   accountApiInstance.get(`/Ledger/GetAllLedger${queryString}`);

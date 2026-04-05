@@ -18,5 +18,12 @@ namespace Lab.Accounting.API.Services
         /// <param name="loginRequest">使用者登入資訊</param>
         /// <returns>登入成功</returns>
         Task<ApiResponse<UserResponse>> Login(UserLoginRequest loginRequest);
+
+        /// <summary>
+        /// 使用者登出
+        /// </summary>
+        /// <param name="Token">登出的 Token</param>
+        /// <returns>是否成功登出</returns>
+        Task<ApiResponse<string>> Logout(string Token);
     }
 }

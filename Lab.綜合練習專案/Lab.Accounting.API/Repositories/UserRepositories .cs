@@ -49,20 +49,16 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="userInformation">使用者註冊資訊</param>
         /// <returns>使用者資訊</returns>
-        public async Task<UserResponse> Login(User userInformation)
+        public async Task<User> Login(User userInformation)
         {
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"Select UserId,UserName From [User] Where UserAccount=@UserAccount and UserPassword=@UserPassword";
+                @"Select UserId,UserName,UserPassword From [User] Where UserAccount=@UserAccount";
 
-            return await conn.QueryFirstOrDefaultAsync<UserResponse>(
+            return await conn.QueryFirstOrDefaultAsync<User>(
                 sql,
-                new
-                {
-                    UserAccount = userInformation.UserAccount,
-                    UserPassword = userInformation.UserPassword,
-                }
+                new { UserAccount = userInformation.UserAccount }
             );
         }
     }

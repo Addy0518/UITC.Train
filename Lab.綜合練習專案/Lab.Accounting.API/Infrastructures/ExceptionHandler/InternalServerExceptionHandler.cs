@@ -1,4 +1,4 @@
-namespace Lab.API.TODO.Infrastructures.ExceptionHandler;
+namespace Lab.Accounting.API.Infrastructures.ExceptionHandler;
 
 public class InternalServerExceptionHandler : IExceptionHandler
 {

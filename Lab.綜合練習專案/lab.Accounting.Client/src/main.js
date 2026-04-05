@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import 'sweetalert2/src/sweetalert2.scss';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
@@ -21,12 +22,15 @@ import Dialog from 'primevue/dialog';
 
 const app = createApp(App);
 
-app.use(createPinia());
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+app.use(pinia);
 app.use(router);
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
     options: {
+      darkModeSelector: false,
       cssLayer: {
         name: 'primevue',
         order: 'theme, base, primevue',
