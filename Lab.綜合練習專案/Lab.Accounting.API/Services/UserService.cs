@@ -97,8 +97,10 @@ namespace Lab.Accounting.API.Services
         /// <returns>是否成功登出</returns>
         public async Task<ApiResponse<string>> Logout(string Token)
         {
+            // 新增 JwtSecurityTokenHandler 物件
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            // 如果解析不了就退回
             if (!tokenHandler.CanReadToken(Token))
             {
                 var errors = new Dictionary<string, string[]>
@@ -109,16 +111,22 @@ namespace Lab.Accounting.API.Services
                 return ApiResponseHelper.RequestError<string>(errors);
             }
 
+            // 解析 JWT Token，拿到 Jti 和過期時間 ( 這裡只是拆開解析 , 還沒驗證 )
             var jwt = tokenHandler.ReadJwtToken(Token);
 
+            // Id 是 Guid 字串
             var jit = jwt.Id;
+
+            // ValidTo 則是 JWT　標準名稱　exp (expiration) 過期時間的值
             var expiresAt = jwt.ValidTo;
 
+            // 先檢查有沒有登出過了 , 有登出過就會在黑名單
             if (await tokenBlacklistRepositories.isBlackList(jit))
             {
                 return ApiResponseHelper.Success<string>("已登出");
             }
 
+            // 沒有就登出並加入黑名單
             await tokenBlacklistRepositories.AddToken(jit, expiresAt);
 
             return ApiResponseHelper.Success<string>("登出成功,以新增至黑名單");
