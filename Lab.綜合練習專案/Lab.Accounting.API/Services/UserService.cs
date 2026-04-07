@@ -22,6 +22,7 @@ namespace Lab.Accounting.API.Services
         /// <returns>註冊成功</returns>
         public async Task<ApiResponse<UserResponse>> Register(UserRegisterRequest registerRequest)
         {
+            // 123
             var user = new User
             {
                 UserName = registerRequest.UserName,
