@@ -50,7 +50,7 @@ const router = createRouter({
           component: () => import('@/views/accountingPractice.vue'),
         },
         {
-          // 記帳主畫面
+          // 統計圖表
           path: 'chart',
           name: 'chart',
           meta: {
@@ -58,6 +58,7 @@ const router = createRouter({
           },
           component: () => import('@/views/chart.vue'),
         },
+
         {
           // 新增帳本
           path: 'add-ledger',
