@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-namespace Lab.Accounting.API.Infrastructures.Logging
+namespace Lab.Accounting.API.Infrastructures.Jwt
 {
     public class TokenBlackListMiddleware
     {

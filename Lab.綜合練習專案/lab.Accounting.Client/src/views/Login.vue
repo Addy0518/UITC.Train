@@ -12,7 +12,7 @@ const password = ref(null);
 
 // 測試用帳號
 const testUser = () => {
-  account.value = 'aaa@gmail.com';
+  account.value = 'andy@gmail.com';
   password.value = 'Andy1111';
 };
 

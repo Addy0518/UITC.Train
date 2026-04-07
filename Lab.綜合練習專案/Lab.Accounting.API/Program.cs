@@ -1,4 +1,4 @@
-using Lab.Accounting.API.Infrastructures.Logging;
+using Lab.Accounting.API.Infrastructures.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag.Generation.Processors.Security;
@@ -66,7 +66,7 @@ try
             {
                 policy
                     //  只允許來自這個來源的請求，其他來源會被瀏覽器阻擋
-                    .WithOrigins("http://localhost:5174")
+                    .WithOrigins("http://localhost:5173")
                     // 允許任何 HTTP 方法（GET、POST、PUT、DELETE 等）
                     .AllowAnyMethod()
                     // 允許任何 HTTP 標頭（Header）
@@ -147,7 +147,7 @@ try
     app.UseSwaggerUI();
 
     // ========================================================
-    // 【Middleware 順序（非常重要！）】
+    // 【Middleware 順序】
     //
     // UseSerilogRequestLogging 要在最外層（最先註冊）
     // 這樣它的「出來」時間點是最晚的，

@@ -37,7 +37,7 @@ namespace Lab.Accounting.API.Repositories
         /// 比對這個 Token 是否在黑名單
         /// </summary>
         /// <param name="jti">Jti 識別碼</param>
-        /// <returns>是否是黑名單</returns>
+        /// <returns>是否在黑名單</returns>
         public async Task<bool> isBlackList(string jti)
         {
             using var conn = connecting.CreateConnecting();
