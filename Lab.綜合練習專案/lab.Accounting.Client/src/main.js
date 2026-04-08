@@ -19,6 +19,7 @@ import Textarea from 'primevue/textarea';
 import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+import Password from 'primevue/password';
 
 const app = createApp(App);
 
@@ -51,5 +52,6 @@ app.component('Textarea', Textarea);
 app.component('Button', Button);
 app.component('DatePicker', DatePicker);
 app.component('Dialog', Dialog);
+app.component('Password', Password);
 
 app.mount('#app');

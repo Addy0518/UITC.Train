@@ -45,12 +45,7 @@ instance.interceptors.response.use(
       });
     }
     if (status === 401) {
-      Swal.fire({
-        icon: 'error',
-        title: '登入時間過期 , 請重新登入 !',
-      });
-      authStore.clearAuth();
-
+      alert('登入時間過期 , 請重新登入 !');
       router.push('login');
     }
     if (status === 500) {

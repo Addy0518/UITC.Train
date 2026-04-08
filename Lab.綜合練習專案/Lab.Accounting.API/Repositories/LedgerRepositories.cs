@@ -50,7 +50,6 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
     {
         using var conn = connecting.CreateConnecting();
 
-        // 沒帶參數的查詢 , 用 where 1=1 來讓後面可以動態街上其他查詢參數
         var sql =
             @"Select 
                       *, 

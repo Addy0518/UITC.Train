@@ -77,6 +77,7 @@ const router = createRouter({
           },
           component: () => import('@/views/commandLedger.vue'),
         },
+
         // 404 頁面
         {
           path: '/:pathMatch(.*)*',

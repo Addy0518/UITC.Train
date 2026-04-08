@@ -23,45 +23,44 @@ onMounted(async () => {
   const res = await getAllLedger();
   const { data } = res;
 
-  const categoryName = [...new Set(data.returnData.map((item) => item.categoryName))];
+  /*
+  reduce 把所有同類別的值加總
+  acc 代表例如 1+1=2, 2+3=5 , 5+5=10 , 這個值就是 acc
+  curr 是下一個數字 ( 例如現在是 1 下一個是 2 , 這個 2 就是 curr )
 
-  const categoryCost = [...new Set(data.returnData.map((item) => item.itemCost))];
+  acc[curr.categoryName] += curr.itemCost
+  代表每一次加總都會加上相同類別的項目 ( curr.categoryName ) , 一直加直到把項目加完
 
-  const chartdata = [
-    {
-      name: categoryName,
-      type: 'bar',
-      data: categoryCost,
-    },
-  ];
+  最後再把他們的 key 跟 value 取出來 , 就是類別名稱跟花費
+  */
+  const aggregatedData = data.returnData.reduce((acc, curr) => {
+    if (!acc[curr.categoryName]) {
+      acc[curr.categoryName] = 0;
+    }
+    acc[curr.categoryName] += curr.itemCost;
+
+    return acc;
+  }, {});
+
+  const chartData = Object.entries(aggregatedData).map(([name, value]) => ({
+    name,
+    value,
+  }));
+  console.log('aggregatedData', aggregatedData);
 
   let option = {
     title: {
-      text: '類別總金額統計',
-      textStyle: {
-        fontSize: 36,
-        color: '#333',
-      },
+      text: '各類別金額統計',
+      left: 'center',
+      top: 'center',
     },
-
-    xAxis: {
-      data: categoryName,
-      axisLabel: {
-        textStyle: {
-          fontSize: 25,
-        },
+    series: [
+      {
+        type: 'pie',
+        data: chartData,
+        radius: ['40%', '70%'],
       },
-    },
-
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        textStyle: {
-          fontSize: 20,
-        },
-      },
-    },
-    series: chartdata,
+    ],
   };
 
   categoryChart.setOption(option);
@@ -81,50 +80,31 @@ onMounted(async () => {
      itemName : 類別名稱
      chartdata2 : 細項圖表資料
     */
-    const filteCategory = [
-      ...new Set(data.returnData.filter((item) => item.categoryName === params.name)),
-    ];
 
-    const itemCost = [...new Set(filteCategory.map((x) => x.itemCost))];
+    const filteCategory = data.returnData.filter((item) => item.categoryName === params.name);
 
-    const itemName = [...new Set(filteCategory.map((x) => x.itemName))];
+    const chartData2 = filteCategory.map((item) => ({
+      name: item.itemName,
+      value: item.itemCost,
+    }));
 
-    const chartdata2 = [
-      {
-        name: itemName,
-        type: 'bar',
-        data: itemCost,
-      },
-    ];
+    console.log('chartData2', chartData2);
 
     let option2 = {
       title: {
         text: `${params.name}各項目金額統計`,
-        textStyle: {
-          fontSize: 36,
-          color: '#333',
-        },
+        left: 'center',
+        top: 'center',
       },
-
-      xAxis: {
-        data: itemName,
-        axisLabel: {
-          textStyle: {
-            fontSize: 25,
-          },
+      series: [
+        {
+          type: 'pie',
+          data: chartData2,
+          radius: ['40%', '70%'],
         },
-      },
-
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          textStyle: {
-            fontSize: 20,
-          },
-        },
-      },
-      series: chartdata2,
+      ],
     };
+
     itemChart.setOption(option2);
     itemChart.resize({
       width: 800,
@@ -136,9 +116,19 @@ onMounted(async () => {
 
 <template>
   <div class="w-full">
-    <div class="container mx-auto text-xl mt-10 flex">
+    <div class="container text-xl mt-10 flex">
       <div ref="categoryChartRef"></div>
       <div ref="itemChartRef"></div>
+    </div>
+    <div class="container mx-auto flex items-center justify-center">
+      <div class="border-4 rounded-xl p-5 w-30 cursor-pointer content-center">
+        <RouterLink
+          :to="{ name: 'accounting-practice' }"
+          :class="['py-3 text-center text-xl cursor-pointer content-center w-20']"
+        >
+          <button class="cursor-pointer content-center w-20">回到首頁</button>
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>

@@ -157,7 +157,7 @@ onMounted(() => {
             <img src="/src/img/add.png" alt=""
           /></RouterLink>
         </div>
-        <div class="w-10 bg-amber-300">
+        <div class="w-18 border-3 p-3 flex align-center items-center rounded-lg">
           <RouterLink :to="{ name: 'chart' }">統計圖表</RouterLink>
         </div>
       </div>

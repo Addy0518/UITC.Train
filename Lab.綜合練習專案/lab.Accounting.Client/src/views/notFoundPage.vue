@@ -16,7 +16,7 @@ const authStore = useAuthStore();
       <div class="flex-1 flex justify-center">
         <div class="border-4 rounded-xl p-5">
           <RouterLink :to="{ name: 'home' }" :class="['py-3 text-center']">
-            <button class="cursor-pointer">回到首頁</button>
+            <button class="cursor-pointer">回到登入頁</button>
           </RouterLink>
         </div>
       </div>
