@@ -93,25 +93,6 @@ public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> 
     }
 
     /// <summary>
-    /// 查看使用者軟刪除的帳本項目
-    /// </summary>
-    ///  <param name="userId">使用者 ID</param>
-    /// <returns>軟刪除的帳本項目</returns>
-    public async Task<List<LedgerItemJoinCategoryView>> GetAllDeleteLedger(int userId)
-    {
-        using var conn = connecting.CreateConnecting();
-
-        var storeprocedure = @"sp_SelectAllSoftDelete";
-
-        var result = await conn.QueryAsync<LedgerItemJoinCategoryView>(
-            storeprocedure,
-            new { UserId = userId },
-            commandType: CommandType.StoredProcedure
-        );
-        return result.ToList();
-    }
-
-    /// <summary>
     /// 新增帳本項目
     /// </summary>
     /// <param name="insert">新增帳本項目所有細項</param>

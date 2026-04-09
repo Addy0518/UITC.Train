@@ -49,20 +49,6 @@ namespace Lab.Accounting.API.Controllers
         }
 
         /// <summary>
-        /// 查看使用者軟刪除的帳本項目
-        /// </summary>
-        /// <returns>軟刪除的帳本項目</returns>
-        [HttpGet]
-        [ProducesResponseType(
-            StatusCodes.Status200OK,
-            Type = typeof(ApiResponse<List<LedgerItemJoinCategoryView>>)
-        )]
-        public async Task<IActionResult> GetAllDeleteLedger()
-        {
-            return Ok(await service.GetAllDeleteLedger(CurrentUserId));
-        }
-
-        /// <summary>
         /// 查看單一帳本項目
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>

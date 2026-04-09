@@ -28,13 +28,6 @@ public interface ILedgerRepositories
     );
 
     /// <summary>
-    /// 查看使用者軟刪除的帳本項目
-    /// </summary>
-    ///  <param name="userId">使用者 ID</param>
-    /// <returns>軟刪除的帳本項目</returns>
-    Task<List<LedgerItemJoinCategoryView>> GetAllDeleteLedger(int userId);
-
-    /// <summary>
     /// 新增帳本項目
     /// </summary>
     /// <param name="insert">新增帳本項目所有細項</param>

@@ -32,24 +32,6 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 查看使用者軟刪除的帳本項目
-        /// </summary>
-        ///  <param name="userId">使用者 ID</param>
-        /// <returns>軟刪除的帳本項目</returns>
-        public async Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllDeleteLedger(
-            int userId
-        )
-        {
-            var target = await accountrepo.GetAllDeleteLedger(userId);
-
-            if (target == null || !target.Any())
-            {
-                return ApiResponseHelper.NotFound<List<LedgerItemJoinCategoryView>>();
-            }
-            return ApiResponseHelper.Success(target, "成功!");
-        }
-
-        /// <summary>
         /// 查看單一帳本項目
         /// </summary>
         /// <param name="ledgerId">項目名稱</param>
