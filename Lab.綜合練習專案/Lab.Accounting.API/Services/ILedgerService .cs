@@ -11,14 +11,23 @@ namespace Lab.Accounting.API.Services
         /// /// <param name="categoryId">項目類別</param>
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
+        ///  <param name="isDelete">刪除狀態</param>
         ///  <param name="userId">使用者 ID</param>
         /// <returns>所有項目</returns>
         Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname,
+            bool? isDelete,
             int userId
         );
+
+        /// <summary>
+        /// 查看使用者軟刪除的帳本項目
+        /// </summary>
+        ///  <param name="userId">使用者 ID</param>
+        /// <returns>軟刪除的帳本項目</returns>
+        Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllDeleteLedger(int userId);
 
         /// <summary>
         /// 查看單一帳本項目
@@ -49,5 +58,11 @@ namespace Lab.Accounting.API.Services
         /// <param name="userId">使用者 ID</param>
         /// <returns>影響列數</returns>
         Task<ApiResponse<int>> DeleteLedger(int ledgerId, int userId);
+
+        /// <summary>
+        /// 刪除所有已軟刪除的帳本項目
+        /// </summary>
+        /// <returns>所有被刪除的項目</returns>
+        Task<ApiResponse<IEnumerable<LedgerItem>>> DeleteAllSoftDeleteLedger(int userId);
     }
 }

@@ -3,10 +3,11 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { logoutApi } from '@/api/account-api';
+import sidebar from '@/views/sidebar.vue';
 // 引入 pinia 的 useAuthStore 來管理登入狀態
 const authStore = useAuthStore();
 const router = useRouter();
-const visible = ref(false);
+
 // 登出
 const logout = async () => {
   const res = await logoutApi();
@@ -41,5 +42,9 @@ const logout = async () => {
       </div>
     </div>
   </div>
-  <RouterView></RouterView>
+  <div class="flex">
+    <sidebar v-if="authStore.token" class="w-80 h-screen " />
+
+    <RouterView />
+  </div>
 </template>

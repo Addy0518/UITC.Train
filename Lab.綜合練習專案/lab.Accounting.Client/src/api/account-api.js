@@ -10,6 +10,7 @@ export const logoutApi = () => accountApiInstance.post(`/User/Logout`);
 //  搜尋全部帳本
 export const getAllLedger = (queryString = '') =>
   accountApiInstance.get(`/Ledger/GetAllLedger${queryString}`);
+
 // 搜尋單一帳本
 export const getLedger = (ledgerId) =>
   accountApiInstance.get(`/Ledger/GetLedger?ledgerId=${ledgerId}`);
@@ -22,6 +23,9 @@ export const updateLedger = (ledgerUpdate) =>
 // 刪除帳本
 export const deleteLedger = (ledgerDelete = null) =>
   accountApiInstance.delete(`Ledger/DeleteLedger/${ledgerDelete}`);
+// 刪除所有軟刪除狀態帳本
+export const deleteAllSoftDeleteLedger = () =>
+  accountApiInstance.delete(`Ledger/DeleteAllSoftDeleteLedger`);
 
 // export const getAllLedger2 = async (cateId = [], selectdate = null) => {
 //   let queryString = '';

@@ -11,7 +11,6 @@ namespace Lab.Accounting.API.Services
         IUserRepositories userrepo,
         TokenHelper tokenHelper,
         PasswordSecureHelper passwordSecureHelper,
-        ILogger<UserService> logger,
         ITokenBlacklistRepositories tokenBlacklistRepositories
     ) : IUserService
     {

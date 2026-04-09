@@ -1,15 +1,21 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-
-import { getAllLedger, deleteLedger } from '@/api/account-api';
-
+import Swal from 'sweetalert2';
+import {
+  deleteAllSoftDeleteLedger,
+  updateLedger,
+  getAllLedger,
+  deleteLedger,
+} from '@/api/account-api';
+// 所有項目
+const products = ref([]);
+// 是否有資料顯示
+let isItem = ref(true);
 //所設立的類別
 const category = ref([]);
 // 監聽 datepicker 選擇的日期並呼叫 api
 const date = ref();
 const selectedValue = ref(null);
-// 所有項目
-const products = ref([]);
 
 // 刪除 (判斷 isDelete 欄位決定是否真的刪除)
 const deleteChange = async (id) => {
@@ -20,16 +26,46 @@ const deleteChange = async (id) => {
 
     if (res.data.codeStatus === 2000) {
       await ItemData();
+      if (products.value.length === 0) {
+        isItem.value = false;
+      }
     }
   } catch (error) {
     console.error('帳本刪除錯誤 ', error.response);
   }
 };
 
+// 復原軟刪除狀態 (用更新 api)
+const reserve = async (item) => {
+  try {
+    console.log('item', item);
+    if (!item) return;
+    const updateData = {
+      categoryname: item.categoryName || '',
+      itemId: item.itemId,
+      itemName: item.itemName,
+      itemCost: item.itemCost,
+      ItemIllustrate: item.ItemIllustrate || '',
+      categoryId: item.categoryId ? String(item.categoryId) : null,
+      isDelete: false,
+      itemUpdateDate: new Date().toLocaleDateString('en-CA'),
+    };
 
+    const res = await updateLedger(updateData);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      await ItemData();
+      if (products.value.length === 0) {
+        isItem.value = false;
+      }
+    }
+  } catch (error) {
+    console.error('帳本復原錯誤 ', error.response);
+  }
+};
 
 // 初始時抓取所有資料
-const ItemData = async (selectdate = null, cateId = null) => {
+const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
   try {
     let querystring = '';
     if (cateId && cateId.length > 0) {
@@ -40,6 +76,10 @@ const ItemData = async (selectdate = null, cateId = null) => {
 
       const datestring = selectdate.toLocaleDateString('en-CA');
       querystring += (querystring.includes('?') ? '&' : '?') + `date=${datestring}`;
+    }
+
+    if (isDelete) {
+      querystring += (querystring.includes('?') ? '&' : '?') + `isDelete=${isDelete}`;
     }
 
     const res = await getAllLedger(querystring);
@@ -73,17 +113,18 @@ const ItemData = async (selectdate = null, cateId = null) => {
     console.error('搜尋資料錯誤 ', error.response);
   }
 };
-
-// 總花費
-const spend = computed(() => {
-  let total = 0;
-  for (let i = 0; i < products.value.length; i++) {
-    if (!products.value[i].isDelete) {
-      total += products.value[i].itemCost || 0;
+// 刪除 (刪除所有軟刪除狀態項目)
+const deleteAll = async () => {
+  try {
+    const res = await deleteAllSoftDeleteLedger();
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      await ItemData();
     }
+  } catch (error) {
+    console.error('帳本刪除錯誤 ', error.response);
   }
-  return total;
-});
+};
 
 // 一次監聽兩個 日期跟類別 , 一起塞進 url
 watch([date, selectedValue], ([newDate, newVal]) => {
@@ -91,24 +132,28 @@ watch([date, selectedValue], ([newDate, newVal]) => {
   ItemData(newDate ?? null, ids);
 });
 
-const visible = computed(() => {
-  return products.value.filter((m) => !m.isDelete);
-});
+onMounted(async () => {
+  await ItemData();
 
-onMounted(() => {
-  ItemData();
+  if (products.value.length === 0) {
+    isItem.value = false;
+  }
 });
 </script>
 
 <template>
   <!-- 主區域 -->
-  <div class="w-full mx-auto max-w-screen-2xl">
+
+  <div v-if="isItem" class="w-full mx-auto max-w-screen-2xl">
     <div class="container mx-auto text-xl mt-10 mb-auto">
-      <!-- 金額 -->
-      <div class="text-center text-5xl font-bold">
-        <p class="pb-10">總消費</p>
-        <p>$ : {{ spend }}</p>
+      <div class="justify-items-end pe-50 pt-10">
+        <div class="justify-items-end">
+          <Button class="bg-red-500" @click="deleteAll">刪除所有已刪除狀態項目</Button>
+        </div>
       </div>
+
+      <!-- 金額 -->
+
       <div class="flex justify-center items-center gap-10 mt-10">
         <!-- 選擇顯示項目 -->
         <div class="card">
@@ -136,7 +181,7 @@ onMounted(() => {
       <!-- 顯示所有帳目 -->
       <div style="margin-top: 50px">
         <div class="card max-w-6xl mx-auto px-10">
-          <DataTable :value="visible" scrollable scrollHeight="430px" size="large">
+          <DataTable :value="products" scrollable scrollHeight="430px" size="large">
             <Column field="itemId" header="編號"></Column>
             <Column field="itemName" header="項目名稱"></Column>
             <Column field="categoryName" header="類別"></Column>
@@ -160,17 +205,18 @@ itemCreateDate
             <Column
               ><template #body="slotProps">
                 <div class="flex justify-start gap-3 ml-10">
-                  <RouterLink :to="{ name: 'edit-ledger', params: { id: slotProps.data.itemId } }">
-                    <button class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold">
-                      編輯
-                    </button>
-                  </RouterLink>
-
+                  <button
+                    @click="reserve(slotProps.data)"
+                    class="text-white p-3 rounded-2xl cursor-pointer bg-amber-500 font-bold"
+                    v-if="slotProps.data.isDelete"
+                  >
+                    復原
+                  </button>
                   <button
                     @click="deleteChange(slotProps.data.itemId)"
                     class="text-white p-3 rounded-2xl cursor-pointer bg-red-500 font-bold"
                   >
-                    {{ slotProps.data.isDelete ? '確定刪除' : '刪除' }}
+                    確定刪除
                   </button>
                 </div>
               </template></Column
@@ -180,4 +226,9 @@ itemCreateDate
       </div>
     </div>
   </div>
+
+  <div
+    v-else
+    class="w-full mx-auto max-w-screen-2xl bg-[url(../img/查無資料.png)] bg-no-repeat bg-size-[auto_350px] bg-center"
+  ></div>
 </template>

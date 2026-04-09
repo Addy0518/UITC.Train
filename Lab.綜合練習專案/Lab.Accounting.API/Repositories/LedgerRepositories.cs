@@ -1,8 +1,11 @@
-﻿using Lab.Accounting.API.Infrastructures.Entities;
+﻿using System.Text.Json;
+using Lab.Accounting.API.Infrastructures.Entities;
+using Serilog.Core;
 
 namespace Lab.Accounting.API.Repositories;
 
-public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
+public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> logger)
+    : ILedgerRepositories
 {
     /// <summary>
     /// 查看單一帳本項目
@@ -40,11 +43,13 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
     ///  <param name="date">日期</param>
     ///  <param name="itemname">項目名稱</param>
     ///  <param name="userId">使用者 ID</param>
+    ///  <param name="isDelete">刪除狀態</param>
     /// <returns>所有項目</returns>
     public async Task<List<LedgerItemJoinCategoryView>> GetAllLedger(
         List<int>? categoryId,
         DateTime? date,
         string? itemname,
+        bool? isDelete,
         int userId
     )
     {
@@ -78,8 +83,31 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
             sql += @" and ItemName like @itemname";
             parm.Add("itemname", itemname + '%');
         }
+        if (isDelete.HasValue)
+        {
+            sql += @" and IsDelete =1";
+        }
 
         var result = await conn.QueryAsync<LedgerItemJoinCategoryView>(sql, parm);
+        return result.ToList();
+    }
+
+    /// <summary>
+    /// 查看使用者軟刪除的帳本項目
+    /// </summary>
+    ///  <param name="userId">使用者 ID</param>
+    /// <returns>軟刪除的帳本項目</returns>
+    public async Task<List<LedgerItemJoinCategoryView>> GetAllDeleteLedger(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var storeprocedure = @"sp_SelectAllSoftDelete";
+
+        var result = await conn.QueryAsync<LedgerItemJoinCategoryView>(
+            storeprocedure,
+            new { UserId = userId },
+            commandType: CommandType.StoredProcedure
+        );
         return result.ToList();
     }
 
@@ -149,9 +177,25 @@ public class LedgerRepositories(DBConnecting connecting) : ILedgerRepositories
         using var conn = connecting.CreateConnecting();
         //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
         var deletesql = isDelete
-            ? @"Delete From LedgerItem Where ItemId=@ledgerId"
+            ? @"Delete From LedgerItem Where ItemId=@ledgerId and UserId=@userId"
             : @"Update LedgerItem Set IsDelete=1 Where ItemId=@ledgerId and UserId=@userId";
 
         return await conn.ExecuteAsync(deletesql, new { ledgerId = ledgerId, userId = userId });
+    }
+
+    /// <summary>
+    /// 刪除所有已軟刪除的帳本項目
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>所有被刪除的項目</returns>
+    public async Task<IEnumerable<LedgerItem>> DeleteAllSoftDeleteLedger(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+        var sql =
+            @"DELETE
+            FROM   [dbo].[LedgerItem] output deleted.*
+            WHERE  isdelete=1 and UserId=@userId";
+
+        return await conn.QueryAsync<LedgerItem>(sql, new { userId = userId });
     }
 }

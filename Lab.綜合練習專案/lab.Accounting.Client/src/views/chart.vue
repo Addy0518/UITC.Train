@@ -88,8 +88,6 @@ onMounted(async () => {
       value: item.itemCost,
     }));
 
-    console.log('chartData2', chartData2);
-
     let option2 = {
       title: {
         text: `${params.name}各項目金額統計`,
@@ -119,16 +117,6 @@ onMounted(async () => {
     <div class="container text-xl mt-10 flex">
       <div ref="categoryChartRef"></div>
       <div ref="itemChartRef"></div>
-    </div>
-    <div class="container mx-auto flex items-center justify-center">
-      <div class="border-4 rounded-xl p-5 w-30 cursor-pointer content-center">
-        <RouterLink
-          :to="{ name: 'accounting-practice' }"
-          :class="['py-3 text-center text-xl cursor-pointer content-center w-20']"
-        >
-          <button class="cursor-pointer content-center w-20">回到首頁</button>
-        </RouterLink>
-      </div>
     </div>
   </div>
 </template>

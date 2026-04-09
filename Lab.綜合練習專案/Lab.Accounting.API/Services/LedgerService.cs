@@ -1,8 +1,11 @@
-﻿namespace Lab.Accounting.API.Services
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace Lab.Accounting.API.Services
 {
     public class LedgerService(
         ILedgerRepositories accountrepo,
-        ILedgerItemCategoryRepositories categoryrepo
+        ILedgerItemCategoryRepositories categoryrepo,
+        ILogger<LedgerService> logger
     ) : ILedgerService
     {
         /// <summary>
@@ -12,18 +15,38 @@
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
         ///  <param name="userId">使用者 ID</param>
+        ///  <param name="isDelete">刪除狀態</param>
         /// <returns>所有項目</returns>
         public async Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllLedger(
             List<int>? categoryId,
             DateTime? date,
             string? itemname,
+            bool? isDelete,
             int userId
         )
         {
             return ApiResponseHelper.Success(
-                await accountrepo.GetAllLedger(categoryId, date, itemname,userId),
+                await accountrepo.GetAllLedger(categoryId, date, itemname, isDelete, userId),
                 "成功!"
             );
+        }
+
+        /// <summary>
+        /// 查看使用者軟刪除的帳本項目
+        /// </summary>
+        ///  <param name="userId">使用者 ID</param>
+        /// <returns>軟刪除的帳本項目</returns>
+        public async Task<ApiResponse<List<LedgerItemJoinCategoryView>>> GetAllDeleteLedger(
+            int userId
+        )
+        {
+            var target = await accountrepo.GetAllDeleteLedger(userId);
+
+            if (target == null || !target.Any())
+            {
+                return ApiResponseHelper.NotFound<List<LedgerItemJoinCategoryView>>();
+            }
+            return ApiResponseHelper.Success(target, "成功!");
         }
 
         /// <summary>
@@ -32,9 +55,12 @@
         /// <param name="ledgerId">項目名稱</param>
         /// <param name="userId">使用者 ID</param>
         /// <returns>單筆項目</returns>
-        public async Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(int ledgerId, int userId)
+        public async Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(
+            int ledgerId,
+            int userId
+        )
         {
-            var target = await accountrepo.GetLedger(ledgerId,userId);
+            var target = await accountrepo.GetLedger(ledgerId, userId);
             if (target == null)
             {
                 return ApiResponseHelper.NotFound<LedgerItemJoinCategoryView>();
@@ -157,6 +183,20 @@
             var deletetarget = await accountrepo.DeleteLedger(ledgerId, target.IsDelete, userId);
 
             return ApiResponseHelper.Success<int>(deletetarget, "成功!");
+        }
+
+        /// <summary>
+        /// 刪除所有已軟刪除的帳本項目
+        /// </summary>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>所有被刪除的項目</returns>
+        public async Task<ApiResponse<IEnumerable<LedgerItem>>> DeleteAllSoftDeleteLedger(
+            int userId
+        )
+        {
+            var deletetarget = await accountrepo.DeleteAllSoftDeleteLedger(userId);
+
+            return ApiResponseHelper.Success<IEnumerable<LedgerItem>>(deletetarget, "成功!");
         }
     }
 }

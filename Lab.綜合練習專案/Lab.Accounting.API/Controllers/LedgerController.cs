@@ -3,6 +3,7 @@ using Lab.API.TODO.Common.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lab.Accounting.API.Controllers
 {
@@ -28,6 +29,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="categoryId">項目類別</param>
         ///  <param name="date">日期</param>
         ///  <param name="itemname">項目名稱</param>
+        ///  <param name="isDelete">刪除狀態</param>
         /// <returns>單筆或多筆項目</returns>
         [HttpGet]
         [ProducesResponseType(
@@ -37,10 +39,27 @@ namespace Lab.Accounting.API.Controllers
         public async Task<IActionResult> GetAllLedger(
             [FromQuery] List<int>? categoryId,
             [FromQuery] DateTime? date,
-            [FromQuery] string? itemname
+            [FromQuery] string? itemname,
+            [FromQuery] bool? isDelete
         )
         {
-            return Ok(await service.GetAllLedger(categoryId, date, itemname, CurrentUserId));
+            return Ok(
+                await service.GetAllLedger(categoryId, date, itemname, isDelete, CurrentUserId)
+            );
+        }
+
+        /// <summary>
+        /// 查看使用者軟刪除的帳本項目
+        /// </summary>
+        /// <returns>軟刪除的帳本項目</returns>
+        [HttpGet]
+        [ProducesResponseType(
+            StatusCodes.Status200OK,
+            Type = typeof(ApiResponse<List<LedgerItemJoinCategoryView>>)
+        )]
+        public async Task<IActionResult> GetAllDeleteLedger()
+        {
+            return Ok(await service.GetAllDeleteLedger(CurrentUserId));
         }
 
         /// <summary>
@@ -94,6 +113,17 @@ namespace Lab.Accounting.API.Controllers
         public async Task<IActionResult> DeleteLedger(int ledgerId)
         {
             return Ok(await service.DeleteLedger(ledgerId, CurrentUserId));
+        }
+
+        /// <summary>
+        /// 刪除所有已軟刪除的帳本項目
+        /// </summary>
+        /// <returns>影響列數</returns>
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+        public async Task<IActionResult> DeleteAllSoftDeleteLedger()
+        {
+            return Ok(await service.DeleteAllSoftDeleteLedger(CurrentUserId));
         }
     }
 }

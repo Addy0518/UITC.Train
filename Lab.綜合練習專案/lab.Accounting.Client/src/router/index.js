@@ -41,6 +41,24 @@ const router = createRouter({
           ],
         },
         {
+          // 側邊攔
+          path: 'sidebar',
+          name: 'sidebar',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/sidebar.vue'),
+        },
+        {
+          // 回收桶
+          path: 'recyclingBin',
+          name: 'recyclingBin',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/recyclingBin.vue'),
+        },
+        {
           // 記帳主畫面
           path: 'accounting-practice',
           name: 'accounting-practice',
@@ -77,17 +95,17 @@ const router = createRouter({
           },
           component: () => import('@/views/commandLedger.vue'),
         },
-
-        // 404 頁面
-        {
-          path: '/:pathMatch(.*)*',
-          name: 'NotFound',
-          meta: {
-            isPermissionVerification: false,
-          },
-          component: () => import('@/views/notFoundPage.vue'),
-        },
       ],
+    },
+    // 404 頁面
+    {
+      path: '/:pathMatch(.*)*',
+
+      name: 'NotFound',
+      meta: {
+        isPermissionVerification: false,
+      },
+      component: () => import('@/views/notFoundPage.vue'),
     },
   ],
 });
