@@ -1,5 +1,8 @@
 import accountApiInstance from '@/api/accountInstance.js';
 
+/*
+   從 accountInstance 匯入 axios 設定 , 開始串接後端 api
+*/
 // 使用者註冊
 export const registerApi = (userRegister) =>
   accountApiInstance.post(`/User/Register`, userRegister);
@@ -7,10 +10,13 @@ export const registerApi = (userRegister) =>
 export const loginApi = (userLogin) => accountApiInstance.post(`/User/Login`, userLogin);
 // 使用者登出
 export const logoutApi = () => accountApiInstance.post(`/User/Logout`);
-//  搜尋全部帳本
+
+// 使用者大頭照新增編輯
+export const userHeadShot = (userFile) =>
+  accountApiInstance.post(`/User/UserHeadShotUpload`, userFile);
+// 搜尋全部帳本
 export const getAllLedger = (queryString = '') =>
   accountApiInstance.get(`/Ledger/GetAllLedger${queryString}`);
-
 // 搜尋單一帳本
 export const getLedger = (ledgerId) =>
   accountApiInstance.get(`/Ledger/GetLedger?ledgerId=${ledgerId}`);

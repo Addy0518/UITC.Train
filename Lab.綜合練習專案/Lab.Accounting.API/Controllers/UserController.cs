@@ -1,6 +1,7 @@
 ﻿using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace Lab.Accounting.API.Controllers
 {
@@ -16,6 +17,9 @@ namespace Lab.Accounting.API.Controllers
     )]
     public class UserController(IUserService userserivce) : ControllerBase
     {
+        // 私有方法 : 從 Token 取出 UserId
+        private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+
         /// <summary>
         /// 使用者註冊
         /// </summary>
@@ -50,6 +54,18 @@ namespace Lab.Accounting.API.Controllers
             var Token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
             return Ok(await userserivce.Logout(Token));
+        }
+
+        /// <summary>
+        /// 使用者大頭照上傳
+        /// </summary>
+        /// <param name="userFile">使用者大頭照檔案 </param>
+        /// <returns>使用者資訊</returns>
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> UserHeadShotUpload(IFormFile userFile)
+        {
+            return Ok(await userserivce.UserHeadShotUpload(userFile, CurrentUserId));
         }
     }
 }

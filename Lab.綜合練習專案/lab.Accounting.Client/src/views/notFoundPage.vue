@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 </script>
-
+/* 404 導向頁 */
 <template>
   <div
     class="min-h-screen w-full bg-center flex items-center justify-center"

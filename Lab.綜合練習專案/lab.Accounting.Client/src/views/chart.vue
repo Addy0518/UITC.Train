@@ -9,12 +9,12 @@ const itemChartRef = ref(null);
 */
 onMounted(async () => {
   /*
-  參數名稱代表意義
-  categoryChart : 類別圖表
-  itemChart : 各類別細項圖表
-  categoryName : 類別名稱
-  categoryCost : 類別花費
-  chartdata : 類別圖表資料
+    變數名稱代表意義
+    categoryChart : 類別圖表
+    itemChart : 各類別細項圖表
+    categoryName : 類別名稱
+    categoryCost : 類別花費
+    chartdata : 類別圖表資料
   */
   const categoryChart = echarts.init(categoryChartRef.value);
 
@@ -24,14 +24,14 @@ onMounted(async () => {
   const { data } = res;
 
   /*
-  reduce 把所有同類別的值加總
-  acc 代表例如 1+1=2, 2+3=5 , 5+5=10 , 這個值就是 acc
-  curr 是下一個數字 ( 例如現在是 1 下一個是 2 , 這個 2 就是 curr )
+    reduce 把所有同類別的值加總
+    acc 代表例如 1+1=2, 2+3=5 , 5+5=10 , 這個值就是 acc
+    curr 是下一個數字 ( 例如現在是 1 下一個是 2 , 這個 2 就是 curr )
 
-  acc[curr.categoryName] += curr.itemCost
-  代表每一次加總都會加上相同類別的項目 ( curr.categoryName ) , 一直加直到把項目加完
+    acc[curr.categoryName] += curr.itemCost
+    代表每一次加總都會加上相同類別的項目 ( curr.categoryName ) , 一直加直到把項目加完
 
-  最後再把他們的 key 跟 value 取出來 , 就是類別名稱跟花費
+    最後再把他們的 key 跟 value 取出來 , 就是類別名稱跟花費
   */
   const aggregatedData = data.returnData.reduce((acc, curr) => {
     if (!acc[curr.categoryName]) {
@@ -46,7 +46,7 @@ onMounted(async () => {
     name,
     value,
   }));
-  console.log('aggregatedData', aggregatedData);
+
 
   let option = {
     title: {
@@ -70,17 +70,16 @@ onMounted(async () => {
   });
 
   /*
-  點擊類別圖表到細項表
+    點擊類別圖表到細項表
   */
   categoryChart.on('click', (params) => {
     /*
-     參數名稱代表意義
-     filteCategory : 點選到的類別的細項
-     itemCost : 各類別細項圖表
-     itemName : 類別名稱
-     chartdata2 : 細項圖表資料
+      變數名稱代表意義
+      filteCategory : 點選到的類別的細項
+      itemCost : 各類別細項圖表
+      itemName : 類別名稱
+      chartdata2 : 細項圖表資料
     */
-
     const filteCategory = data.returnData.filter((item) => item.categoryName === params.name);
 
     const chartData2 = filteCategory.map((item) => ({

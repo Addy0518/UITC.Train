@@ -4,14 +4,20 @@ import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { logoutApi } from '@/api/account-api';
 import sidebar from '@/views/sidebar.vue';
-// 引入 pinia 的 useAuthStore 來管理登入狀態
+
+/*
+   變數名稱代表意義
+   authStore : pinia 注入
+   route : 獲取路由資訊
+*/
 const authStore = useAuthStore();
 const router = useRouter();
 
-// 登出
+/*
+   呼叫登出 API , 並退回登入頁面
+*/
 const logout = async () => {
-  const res = await logoutApi();
-  console.log('登出', res);
+  await logoutApi();
   authStore.clearAuth();
   router.push('login');
 };
@@ -43,7 +49,7 @@ const logout = async () => {
     </div>
   </div>
   <div class="flex">
-    <sidebar v-if="authStore.token" class="w-80 h-screen " />
+    <sidebar v-if="authStore.token" class="w-80 h-screen" />
 
     <RouterView />
   </div>

@@ -135,6 +135,9 @@ try
     // 強制 HTTP 請求重導到 HTTPS ( 加密安全 )
     app.UseHttpsRedirection();
 
+    // 瀏覽靜態檔案
+    app.UseStaticFiles();
+
     // 使用剛剛設定的 Cors
     // 排序上 , 必須在 UseAuthentication、UseAuthorization 之前
     // 否則瀏覽器會先攔截跨域請求，導致認證失敗

@@ -3,34 +3,47 @@ import { useAuthStore } from '@/stores/auth';
 import AccountingLayout from '@/views/accountingLayout.vue';
 import Swal from 'sweetalert2';
 
+/*
+    路由設定
+*/
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      // 最外層 layout
+      /*
+         最外層 layout
+      */
       path: '/',
       name: 'layout',
       component: AccountingLayout,
       children: [
         {
-          // 主頁登入畫面
+          /*
+            主頁 ( 預設導向登入畫面 )
+          */
           path: '',
           name: 'home',
           redirect: { name: 'login' },
           component: () => import('@/views/home.vue'),
           children: [
             {
-              // 登入
+              /*
+                 登入
+              */
               path: '/Login',
               name: 'login',
-              // meta 自訂屬性 , 用來讓守衛知道誰要驗證 token
+              /*
+                 meta 自訂屬性 , 用來讓守衛知道誰要驗證 token
+              */
               meta: {
                 isPermissionVerification: false,
               },
               component: () => import('@/views/login.vue'),
             },
             {
-              // 註冊
+              /*
+                 註冊
+              */
               path: '/CreateAccount',
               name: 'createaccount',
               meta: {
@@ -41,7 +54,9 @@ const router = createRouter({
           ],
         },
         {
-          // 側邊攔
+          /*
+            側邊欄
+          */
           path: 'sidebar',
           name: 'sidebar',
           meta: {
@@ -50,7 +65,9 @@ const router = createRouter({
           component: () => import('@/views/sidebar.vue'),
         },
         {
-          // 回收桶
+          /*
+            帳本回收桶
+          */
           path: 'recyclingBin',
           name: 'recyclingBin',
           meta: {
@@ -59,7 +76,9 @@ const router = createRouter({
           component: () => import('@/views/recyclingBin.vue'),
         },
         {
-          // 記帳主畫面
+          /*
+            帳本主畫面
+          */
           path: 'accounting-practice',
           name: 'accounting-practice',
           meta: {
@@ -68,7 +87,9 @@ const router = createRouter({
           component: () => import('@/views/accountingPractice.vue'),
         },
         {
-          // 統計圖表
+          /*
+            帳本統計圖表
+          */
           path: 'chart',
           name: 'chart',
           meta: {
@@ -78,7 +99,9 @@ const router = createRouter({
         },
 
         {
-          // 新增帳本
+          /*
+            新增帳本
+          */
           path: 'add-ledger',
           name: 'add-ledger',
           meta: {
@@ -87,7 +110,9 @@ const router = createRouter({
           component: () => import('@/views/commandLedger.vue'),
         },
         {
-          // 編輯帳本
+          /*
+            編輯帳本
+          */
           path: 'edit-ledger/:id',
           name: 'edit-ledger',
           meta: {
@@ -97,7 +122,9 @@ const router = createRouter({
         },
       ],
     },
-    // 404 頁面
+    /*
+       404 畫面
+    */
     {
       path: '/:pathMatch(.*)*',
 
@@ -110,6 +137,9 @@ const router = createRouter({
   ],
 });
 
+/*
+   路由守衛 ( to 是 目標路由 , from 是來自哪個路由 )
+*/
 router.beforeEach((to) => {
   const authStore = useAuthStore();
   if (to.meta.isPermissionVerification && !authStore.token) {

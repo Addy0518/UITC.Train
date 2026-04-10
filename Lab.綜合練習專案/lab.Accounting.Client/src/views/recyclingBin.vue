@@ -7,17 +7,40 @@ import {
   getAllLedger,
   deleteLedger,
 } from '@/api/account-api';
-// 所有項目
-const products = ref([]);
-// 是否有資料顯示
+
+/*
+  變數名稱代表意義
+  ledger : 所有帳本項目
+  isItem : 是否有資料顯示
+  category : 帳本類別
+  date : datePicker 選擇的日期
+  selectedValue : treeSelect 選擇的類別
+*/
+const ledger = ref([]);
 let isItem = ref(true);
-//所設立的類別
 const category = ref([]);
-// 監聽 datepicker 選擇的日期並呼叫 api
 const date = ref();
 const selectedValue = ref(null);
 
-// 刪除 (判斷 isDelete 欄位決定是否真的刪除)
+onMounted(async () => {
+  await ItemData();
+
+  if (ledger.value.length === 0) {
+    isItem.value = false;
+  }
+});
+
+/*
+   一次監聽兩個 日期跟類別 , 一起塞進 url
+*/
+watch([date, selectedValue], ([newDate, newVal]) => {
+  const ids = newVal ? Object.keys(newVal).map(Number) : null;
+  ItemData(newDate ?? null, ids);
+});
+
+/*
+  呼叫刪除帳本 API (判斷 isDelete 欄位決定是否真的刪除)
+*/
 const deleteChange = async (id) => {
   try {
     if (!id) return;
@@ -26,7 +49,7 @@ const deleteChange = async (id) => {
 
     if (res.data.codeStatus === 2000) {
       await ItemData();
-      if (products.value.length === 0) {
+      if (ledger.value.length === 0) {
         isItem.value = false;
       }
     }
@@ -35,10 +58,11 @@ const deleteChange = async (id) => {
   }
 };
 
-// 復原軟刪除狀態 (用更新 api)
+/*
+  呼叫更新帳本 API ( 復原軟刪除狀態項目 )
+*/
 const reserve = async (item) => {
   try {
-    console.log('item', item);
     if (!item) return;
     const updateData = {
       categoryname: item.categoryName || '',
@@ -55,7 +79,7 @@ const reserve = async (item) => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       await ItemData();
-      if (products.value.length === 0) {
+      if (ledger.value.length === 0) {
         isItem.value = false;
       }
     }
@@ -64,7 +88,9 @@ const reserve = async (item) => {
   }
 };
 
-// 初始時抓取所有資料
+/*
+   呼叫查看所有帳本 API
+*/
 const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
   try {
     let querystring = '';
@@ -72,8 +98,9 @@ const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
       querystring += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
     }
     if (selectdate) {
-      // 如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
-
+      /*
+         如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
+      */
       const datestring = selectdate.toLocaleDateString('en-CA');
       querystring += (querystring.includes('?') ? '&' : '?') + `date=${datestring}`;
     }
@@ -86,15 +113,19 @@ const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
 
     const { data } = res;
     if (data.codeStatus === 2000) {
-      products.value = data.returnData;
-      // 這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
-      // 但是 Set 沒有索引所以她 key 會從0開始 , 而不是照著 categoryid , 所以先不用
-      // const categorydata=[...new Set(data.returnData.map(item=>item.categoryName))]
-
-      // 這個則是指對純數值有效 , 也沒法用
-      // category.value=data.returnData.filter((item,index)=>data.returnData.indexOf(item)===index).map(item=>({key:String(item.categoryId),label:item.categoryName}))
-
-      //最後選擇 set + filter的方法 , 保留索引並去重
+      ledger.value = data.returnData;
+      /*
+         這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
+         但是 Set 沒有索引所以她 key 會從0開始 , 而不是照著 categoryid , 所以先不用
+         const categorydata=[...new Set(data.returnData.map(item=>item.categoryName))]
+      */
+      /*
+         這個則是指對純數值有效 , 也沒法用
+         category.value=data.returnData.filter((item,index)=>data.returnData.indexOf(item)===index).map(item=>({key:String(item.categoryId),label:item.categoryName}))
+      */
+      /*
+         最後選擇 set + filter的方法 , 保留索引並去重
+      */
       if (!selectdate && !cateId) {
         const seen = new Set();
         category.value = data.returnData
@@ -113,7 +144,10 @@ const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
     console.error('搜尋資料錯誤 ', error.response);
   }
 };
-// 刪除 (刪除所有軟刪除狀態項目)
+
+/*
+   呼叫刪除所有軟刪除狀態帳本 API
+*/
 const deleteAll = async () => {
   try {
     const res = await deleteAllSoftDeleteLedger();
@@ -125,25 +159,10 @@ const deleteAll = async () => {
     console.error('帳本刪除錯誤 ', error.response);
   }
 };
-
-// 一次監聽兩個 日期跟類別 , 一起塞進 url
-watch([date, selectedValue], ([newDate, newVal]) => {
-  const ids = newVal ? Object.keys(newVal).map(Number) : null;
-  ItemData(newDate ?? null, ids);
-});
-
-onMounted(async () => {
-  await ItemData();
-
-  if (products.value.length === 0) {
-    isItem.value = false;
-  }
-});
 </script>
 
 <template>
   <!-- 主區域 -->
-
   <div v-if="isItem" class="w-full mx-auto max-w-screen-2xl">
     <div class="container mx-auto text-xl mt-10 mb-auto">
       <div class="justify-items-end pe-50 pt-10">
@@ -151,9 +170,6 @@ onMounted(async () => {
           <Button class="bg-red-500" @click="deleteAll">刪除所有已刪除狀態項目</Button>
         </div>
       </div>
-
-      <!-- 金額 -->
-
       <div class="flex justify-center items-center gap-10 mt-10">
         <!-- 選擇顯示項目 -->
         <div class="card">
@@ -167,6 +183,7 @@ onMounted(async () => {
             showClear
           />
         </div>
+        <!-- 選擇顯示日期 -->
         <div>
           <DatePicker
             v-model="date"
@@ -178,30 +195,26 @@ onMounted(async () => {
           />
         </div>
       </div>
-      <!-- 顯示所有帳目 -->
+      <!-- 顯示所有帳本 -->
       <div style="margin-top: 50px">
         <div class="card max-w-6xl mx-auto px-10">
-          <DataTable :value="products" scrollable scrollHeight="430px" size="large">
+          <DataTable :value="ledger" scrollable scrollHeight="430px" size="large">
             <Column field="itemId" header="編號"></Column>
             <Column field="itemName" header="項目名稱"></Column>
             <Column field="categoryName" header="類別"></Column>
-            <Column field="itemCost" header="花費"
-              ><template #body="slotProps">
+            <Column field="itemCost" header="花費">
+              <template #body="slotProps">
                 {{ slotProps.data.itemCost ? slotProps.data.itemCost : 0 }}
-              </template></Column
-            >
-            <Column
-              field="
-itemCreateDate
-"
-              header="建立日期"
-              ><template #body="slotProps">
+              </template>
+            </Column>
+            <Column field="itemCreateDate" header="建立日期">
+              <template #body="slotProps">
                 {{
                   slotProps.data.itemCreateDate ? slotProps.data.itemCreateDate.split('T')[0] : ''
                 }}
-              </template></Column
-            >
-
+              </template>
+            </Column>
+            <!-- 按鈕區 -->
             <Column
               ><template #body="slotProps">
                 <div class="flex justify-start gap-3 ml-10">

@@ -5,7 +5,19 @@ import { useAuthStore } from '@/stores/auth';
 import { loginApi } from '@/api/account-api';
 
 import Swal from 'sweetalert2';
-// 引入 pinia 的 useAuthStore 來管理登入狀態
+
+/*
+   變數名稱代表意義
+   authStore : pinia 注入
+   route : 獲取路由資訊
+   account : 帳號
+   password : 密碼
+   errorAccount : 帳號錯誤警告
+   errorPassword :　密碼錯誤警告
+   tooglePassword　：　切換密碼顯示或隱藏
+   emailPattern : 帳號格式正規範
+   passwordPattern : 密碼格式正規範
+*/
 const authStore = useAuthStore();
 const route = useRouter();
 const account = ref(null);
@@ -14,9 +26,13 @@ const password = ref(null);
 let errorAccount = ref();
 let errorPassword = ref();
 const tooglePassword = ref(true);
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
 
+/*
+  驗證帳號格式
+*/
 const validateAccount = () => {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!account.value) {
     errorAccount.value = '名稱不能為空!';
   } else if (!emailPattern.test(account.value)) {
@@ -26,8 +42,10 @@ const validateAccount = () => {
   }
 };
 
+/*
+  驗證密碼格式
+*/
 const validatePassword = () => {
-  const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
   if (!password.value) {
     errorPassword.value = '名稱不能為空!';
   } else if (!passwordPattern.test(password.value)) {
@@ -37,12 +55,17 @@ const validatePassword = () => {
   }
 };
 
-// 測試用帳號
+/*
+  測試用帳號
+*/
 const testUser = () => {
   account.value = 'andy@gmail.com';
   password.value = 'Andy1111';
 };
 
+/*
+  呼叫登入使用者 API
+*/
 const userLogin = async () => {
   try {
     const userlogin = { userAccount: account.value, userPassword: password.value };
@@ -72,7 +95,7 @@ const userLogin = async () => {
   <div class="container mx-auto p-10">
     <p class="text-center mb-10 text-3xl font-bold">登入帳號</p>
 
-    <!-- 帳號欄位 -->
+    <!-- 帳號跟密碼欄位 -->
     <div class="card grid grid-cols-1 gap-4 gap-y-10">
       <InputGroup>
         <InputGroupAddon>
@@ -100,7 +123,7 @@ const userLogin = async () => {
         errorPassword
       }}</span>
     </div>
-
+    <!-- 按鈕區 -->
     <div class="justify-end flex mt-5">
       <button
         @click="testUser"

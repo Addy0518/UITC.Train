@@ -3,17 +3,23 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
+/*
+   變數名稱代表意義
+   authStore : pinia 注入
+   route : 獲取路由資訊
+   isLogin && isRegister : 判斷註冊還是登入 , 改變按鈕樣式
+*/
 const authStore = useAuthStore();
-
 const route = useRoute();
-// 首頁清空登入狀態
+const isLogin = computed(() => route.name === 'login' || route.name === 'home');
+const isRegister = computed(() => route.name === 'createaccount');
+
+/*
+   首頁清空登入狀態
+*/
 onMounted(() => {
   authStore.clearAuth();
 });
-// 預設在主頁也是顯示登入
-const isLogin = computed(() => route.name === 'login' || route.name === 'home');
-// 註冊
-const isRegister = computed(() => route.name === 'createaccount');
 </script>
 <template>
   <div

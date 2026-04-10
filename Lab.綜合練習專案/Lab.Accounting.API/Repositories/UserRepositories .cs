@@ -61,5 +61,46 @@ namespace Lab.Accounting.API.Repositories
                 new { UserAccount = userInformation.UserAccount }
             );
         }
+
+        /// <summary>
+        /// 使用者大頭照上傳
+        /// </summary>
+        /// <param name="userHeadShot">使用者大頭照</param>
+        /// <param name="userId">使用者 ID </param>
+        /// <returns>影響列數</returns>
+        public async Task<int> UserHeadShotUpload(string userHeadShot, int userId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Update 
+                  [User] 
+                Set 
+                  UserHeadShot = COALESCE(@UserHeadShot, UserHeadShot)
+                where 
+                  UserId = @UserId";
+
+            return await conn.ExecuteAsync(
+                sql,
+                new { UserHeadShot = userHeadShot, UserId = userId }
+            );
+        }
+
+        /// <summary>
+        /// 取得使用者資訊
+        /// </summary>
+        /// <param name="userId">使用者 ID </param>
+        /// <returns>使用者資訊</returns>
+        public async Task<UserResponse> GetUser(int userId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Select UserId,UserName,UserHeadShot From [User]
+                where 
+                  UserId = @UserId";
+
+            return await conn.QueryFirstOrDefaultAsync<UserResponse>(sql, new { UserId = userId });
+        }
     }
 }

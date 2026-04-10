@@ -20,5 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\NewFolder\" />
+    <Folder Include="wwwroot\UserHeadShot\" />
   </ItemGroup>
 </Project>

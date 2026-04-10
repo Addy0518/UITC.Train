@@ -2,6 +2,7 @@
 using Lab.Accounting.API.Common.Helpers;
 using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
+using Microsoft.AspNetCore.Identity.Data;
 using Serilog.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -11,7 +12,8 @@ namespace Lab.Accounting.API.Services
         IUserRepositories userrepo,
         TokenHelper tokenHelper,
         PasswordSecureHelper passwordSecureHelper,
-        ITokenBlacklistRepositories tokenBlacklistRepositories
+        ITokenBlacklistRepositories tokenBlacklistRepositories,
+        IWebHostEnvironment env
     ) : IUserService
     {
         /// <summary>
@@ -129,6 +131,47 @@ namespace Lab.Accounting.API.Services
             await tokenBlacklistRepositories.AddToken(jit, expiresAt);
 
             return ApiResponseHelper.Success<string>("登出成功,以新增至黑名單");
+        }
+
+        /// <summary>
+        /// 使用者大頭照上傳
+        /// </summary>
+        /// <param name="userId">使用者 ID </param>
+        /// <param name="userFile">使用者大頭照檔案 </param>
+        /// <returns>使用者資訊</returns>
+        public async Task<ApiResponse<UserResponse>> UserHeadShotUpload(
+            IFormFile userFile,
+            int userId
+        )
+        {
+            var target = await userrepo.GetUser(userId);
+            var existFile = await ExistFile(userFile, target.UserHeadshot, "UserHeadShot");
+
+            var result = await userrepo.UserHeadShotUpload(existFile, userId);
+            var lastresult = await userrepo.GetUser(userId);
+            return ApiResponseHelper.Success<UserResponse>(lastresult, "成功");
+        }
+
+        /// <summary>
+        /// 私有方法判斷文件是否存在
+        /// </summary>
+        /// <param name="newFile">新的檔案</param>
+        /// <param name="oldPath">舊的檔案路徑</param>
+        /// <param name="folder">檔案存放的資料夾</param>
+        /// <returns>檔案路徑</returns>
+        private async Task<string?> ExistFile(IFormFile? newFile, string? oldPath, string folder)
+        {
+            //沒更新就回傳舊檔案路徑
+            if (newFile == null)
+                return oldPath;
+
+            //更新的話刪除舊檔案
+            if (!string.IsNullOrEmpty(oldPath))
+            {
+                FileUploadHelper.DeleteFile(env.WebRootPath, folder, oldPath);
+            }
+            //不管怎樣都要儲存檔案
+            return await FileUploadHelper.SaveFileAsync(newFile, env.WebRootPath, folder);
         }
     }
 }

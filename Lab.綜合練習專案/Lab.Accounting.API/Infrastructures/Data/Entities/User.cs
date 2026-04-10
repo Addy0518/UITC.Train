@@ -26,5 +26,10 @@
         /// 使用者電話
         /// </summary>
         public int? UserPhone { get; set; }
+
+        /// <summary>
+        /// 使用者大頭照
+        /// </summary>
+        public string? UserHeadshot { get; set; }
     }
 }

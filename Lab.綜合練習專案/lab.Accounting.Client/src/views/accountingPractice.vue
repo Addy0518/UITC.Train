@@ -1,17 +1,54 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-
 import { getAllLedger, deleteLedger } from '@/api/account-api';
 
-//所設立的類別
+/*
+   變數名稱代表意義
+   ledger : 所有帳本項目
+   category : 帳本類別
+   date : datePicker 選擇的日期
+  selectedValue : treeSelect 選擇的類別
+*/
+const ledger = ref([]);
 const category = ref([]);
-// 監聽 datepicker 選擇的日期並呼叫 api
 const date = ref();
 const selectedValue = ref(null);
-// 所有項目
-const products = ref([]);
 
-// 刪除 (判斷 isDelete 欄位決定是否真的刪除)
+onMounted(() => {
+  ItemData();
+});
+
+/*
+   總花費變動偵測
+*/
+const spend = computed(() => {
+  let total = 0;
+  for (let i = 0; i < ledger.value.length; i++) {
+    if (!ledger.value[i].isDelete) {
+      total += ledger.value[i].itemCost || 0;
+    }
+  }
+  return total;
+});
+
+/*
+   一次監聽兩個 日期跟類別 , 一起塞進 url
+*/
+watch([date, selectedValue], ([newDate, newVal]) => {
+  const ids = newVal ? Object.keys(newVal).map(Number) : null;
+  ItemData(newDate ?? null, ids);
+});
+
+/*
+   偵測所有帳本資料並篩選出軟刪除狀態的帳本
+*/
+const visible = computed(() => {
+  return ledger.value.filter((m) => !m.isDelete);
+});
+
+/*
+   呼叫刪除帳本 API
+*/
 const deleteChange = async (id) => {
   try {
     if (!id) return;
@@ -26,9 +63,9 @@ const deleteChange = async (id) => {
   }
 };
 
-
-
-// 初始時抓取所有資料
+/*
+   呼叫查看全部帳本 API
+*/
 const ItemData = async (selectdate = null, cateId = null) => {
   try {
     let querystring = '';
@@ -36,8 +73,9 @@ const ItemData = async (selectdate = null, cateId = null) => {
       querystring += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
     }
     if (selectdate) {
-      // 如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
-
+      /*
+         如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
+      */
       const datestring = selectdate.toLocaleDateString('en-CA');
       querystring += (querystring.includes('?') ? '&' : '?') + `date=${datestring}`;
     }
@@ -46,15 +84,19 @@ const ItemData = async (selectdate = null, cateId = null) => {
 
     const { data } = res;
     if (data.codeStatus === 2000) {
-      products.value = data.returnData;
-      // 這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
-      // 但是 Set 沒有索引所以她 key 會從0開始 , 而不是照著 categoryid , 所以先不用
-      // const categorydata=[...new Set(data.returnData.map(item=>item.categoryName))]
-
-      // 這個則是指對純數值有效 , 也沒法用
-      // category.value=data.returnData.filter((item,index)=>data.returnData.indexOf(item)===index).map(item=>({key:String(item.categoryId),label:item.categoryName}))
-
-      //最後選擇 set + filter的方法 , 保留索引並去重
+      ledger.value = data.returnData;
+      /*
+         這裡用 Set 來去除重複的類別名稱 , 因為 Set 集合內沒有索引 , 所以它會自動選重複的
+         但是 Set 沒有索引所以她 key 會從0開始 , 而不是照著 categoryid , 所以先不用
+         const categorydata=[...new Set(data.returnData.map(item=>item.categoryName))]
+      */
+      /*
+         這個則是指對純數值有效 , 也沒法用
+         category.value=data.returnData.filter((item,index)=>data.returnData.indexOf(item)===index).map(item=>({key:String(item.categoryId),label:item.categoryName}))
+      */
+      /*
+         最後選擇 set + filter的方法 , 保留索引並去重
+      */
       if (!selectdate && !cateId) {
         const seen = new Set();
         category.value = data.returnData
@@ -73,31 +115,6 @@ const ItemData = async (selectdate = null, cateId = null) => {
     console.error('搜尋資料錯誤 ', error.response);
   }
 };
-
-// 總花費
-const spend = computed(() => {
-  let total = 0;
-  for (let i = 0; i < products.value.length; i++) {
-    if (!products.value[i].isDelete) {
-      total += products.value[i].itemCost || 0;
-    }
-  }
-  return total;
-});
-
-// 一次監聽兩個 日期跟類別 , 一起塞進 url
-watch([date, selectedValue], ([newDate, newVal]) => {
-  const ids = newVal ? Object.keys(newVal).map(Number) : null;
-  ItemData(newDate ?? null, ids);
-});
-
-const visible = computed(() => {
-  return products.value.filter((m) => !m.isDelete);
-});
-
-onMounted(() => {
-  ItemData();
-});
 </script>
 
 <template>

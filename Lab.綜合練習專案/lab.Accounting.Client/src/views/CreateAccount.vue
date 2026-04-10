@@ -2,9 +2,24 @@
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { registerApi } from '@/api/account-api';
-
 import Swal from 'sweetalert2';
 
+/*
+   變數名稱代表意義
+   route : 獲取路由資訊
+   account : 帳號
+   password : 密碼
+   name : 名稱
+   phone : 電話
+   errorName : 名稱錯誤警告
+   errorPhone : 電話錯誤警告
+   errorAccount : 帳號錯誤警告
+   errorPassword :　密碼錯誤警告
+   tooglePassword　：　切換密碼顯示或隱藏
+   emailPattern : 帳號格式正規範
+   passwordPattern : 密碼格式正規範
+   phonePattern : 電話格式正規範
+*/
 const route = useRouter();
 const account = ref();
 const password = ref();
@@ -16,8 +31,15 @@ let errorPhone = ref();
 let errorAccount = ref();
 let errorPassword = ref();
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
+const phonePattern = /^[0-9]$/;
+
 const tooglePassword = ref(true);
 
+/*
+  驗證名稱格式
+*/
 const validateUserName = () => {
   if (!name.value) {
     errorName.value = '名稱不能為空!';
@@ -26,8 +48,10 @@ const validateUserName = () => {
   }
 };
 
+/*
+  驗證帳號格式
+*/
 const validateAccount = () => {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!account.value) {
     errorAccount.value = '名稱不能為空!';
   } else if (!emailPattern.test(account.value)) {
@@ -37,8 +61,10 @@ const validateAccount = () => {
   }
 };
 
+/*
+  驗證密碼格式
+*/
 const validatePassword = () => {
-  const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
   if (!password.value) {
     errorPassword.value = '名稱不能為空!';
   } else if (!passwordPattern.test(password.value)) {
@@ -48,8 +74,10 @@ const validatePassword = () => {
   }
 };
 
+/*
+  驗證電話格式
+*/
 const validatePhone = () => {
-  const phonePattern = /^[0-9]$/;
   if (!phonePattern.test(phone.value)) {
     errorPhone.value = '只能輸入數字!';
   } else {
@@ -57,15 +85,17 @@ const validatePhone = () => {
   }
 };
 
+/*
+  呼叫註冊使用者 API
+*/
 const userRegister = async () => {
-  const userRegisterData = {
-    userAccount: account.value,
-    userPassword: password.value,
-    userName: name.value,
-    userPhone: phone.value,
-  };
-
   try {
+    const userRegisterData = {
+      userAccount: account.value,
+      userPassword: password.value,
+      userName: name.value,
+      userPhone: phone.value,
+    };
     const res = await registerApi(userRegisterData);
     const { data } = res;
     if (data.codeStatus === 2000) {
@@ -74,9 +104,7 @@ const userRegister = async () => {
         title: '註冊成功!',
       });
       route.push('/login');
-    }
-    // 帳號重複註冊
-    else if (data.codeStatus === 4000) {
+    } else if (data.codeStatus === 4000) {
       const errorMsg = data.error400.UserAccount;
       Swal.fire({
         icon: 'error',
@@ -98,8 +126,9 @@ const userRegister = async () => {
   <div class="container mx-auto p-10">
     <p class="text-center mb-10 text-3xl font-bold">註冊帳號</p>
 
-    <!-- 帳號欄位 -->
+    <!-- 欄位區 -->
     <div class="card grid grid-cols-1 gap-4 gap-y-5">
+      <!-- 帳號跟密碼 -->
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-user"></i>
@@ -124,6 +153,7 @@ const userRegister = async () => {
       <span v-if="errorPassword" class="text-red-700 font-semibold text-lg">{{
         errorPassword
       }}</span>
+      <!-- 名稱跟電話 -->
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-id-card"></i>
