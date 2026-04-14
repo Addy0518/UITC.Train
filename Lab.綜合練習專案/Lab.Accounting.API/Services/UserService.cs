@@ -34,21 +34,14 @@ namespace Lab.Accounting.API.Services
 
             if (exist == true)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "UserAccount", new[] { "該帳號已被註冊!" } },
-                };
+                var errors = new Dictionary<string, string[]> { { "UserAccount", new[] { "該帳號已被註冊!" } } };
 
                 return ApiResponseHelper.RequestError<UserResponse>(errors);
             }
 
             var result = await userrepo.Register(user);
 
-            var userresult = new UserResponse
-            {
-                UserId = result.UserId,
-                UserName = result.UserName,
-            };
+            var userresult = new UserResponse { UserId = result.UserId, UserName = result.UserName };
 
             return ApiResponseHelper.Success<UserResponse>(userresult, "成功!");
         }
@@ -69,23 +62,24 @@ namespace Lab.Accounting.API.Services
                 return ApiResponseHelper.NotFound<UserResponse>();
             }
 
-            bool isValid = passwordSecureHelper.VerifyPassword(
-                loginRequest.UserPassword,
-                dbuser.UserPassword
-            );
+            bool isValid = passwordSecureHelper.VerifyPassword(loginRequest.UserPassword, dbuser.UserPassword);
 
             if (isValid == false)
                 return ApiResponseHelper.NotFound<UserResponse>();
 
             dbuser.UserPassword = null;
 
-            var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName);
+            var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName, dbuser.UserRole);
+
+            var userheadshot = await userrepo.GetUser(dbuser.UserId);
 
             var userresponse = new UserResponse
             {
                 Token = token,
                 UserId = dbuser.UserId,
                 UserName = dbuser.UserName,
+                UserHeadshot = userheadshot.UserHeadshot,
+                UserRole = dbuser.UserRole,
             };
 
             return ApiResponseHelper.Success(userresponse, "成功");
@@ -104,10 +98,7 @@ namespace Lab.Accounting.API.Services
             // 如果解析不了就退回
             if (!tokenHandler.CanReadToken(Token))
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "Token", new[] { "無效的 Token !" } },
-                };
+                var errors = new Dictionary<string, string[]> { { "Token", new[] { "無效的 Token !" } } };
 
                 return ApiResponseHelper.RequestError<string>(errors);
             }
@@ -139,10 +130,7 @@ namespace Lab.Accounting.API.Services
         /// <param name="userId">使用者 ID </param>
         /// <param name="userFile">使用者大頭照檔案 </param>
         /// <returns>使用者資訊</returns>
-        public async Task<ApiResponse<UserResponse>> UserHeadShotUpload(
-            IFormFile userFile,
-            int userId
-        )
+        public async Task<ApiResponse<UserResponse>> UserHeadShotUpload(IFormFile userFile, int userId)
         {
             var target = await userrepo.GetUser(userId);
             var existFile = await ExistFile(userFile, target.UserHeadshot, "UserHeadShot");

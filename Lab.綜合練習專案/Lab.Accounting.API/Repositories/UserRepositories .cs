@@ -53,13 +53,9 @@ namespace Lab.Accounting.API.Repositories
         {
             using var conn = connecting.CreateConnecting();
 
-            var sql =
-                @"Select UserId,UserName,UserPassword From [User] Where UserAccount=@UserAccount";
+            var sql = @"Select UserId,UserName,UserRole,UserPassword From [User] Where UserAccount=@UserAccount";
 
-            return await conn.QueryFirstOrDefaultAsync<User>(
-                sql,
-                new { UserAccount = userInformation.UserAccount }
-            );
+            return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserAccount = userInformation.UserAccount });
         }
 
         /// <summary>
@@ -80,10 +76,7 @@ namespace Lab.Accounting.API.Repositories
                 where 
                   UserId = @UserId";
 
-            return await conn.ExecuteAsync(
-                sql,
-                new { UserHeadShot = userHeadShot, UserId = userId }
-            );
+            return await conn.ExecuteAsync(sql, new { UserHeadShot = userHeadShot, UserId = userId });
         }
 
         /// <summary>

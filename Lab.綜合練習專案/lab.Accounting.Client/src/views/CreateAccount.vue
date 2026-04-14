@@ -33,7 +33,7 @@ let errorPassword = ref();
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
-const phonePattern = /^[0-9]$/;
+const phonePattern = /^\d{1,12}$/;
 
 const tooglePassword = ref(true);
 
@@ -79,7 +79,7 @@ const validatePassword = () => {
 */
 const validatePhone = () => {
   if (!phonePattern.test(phone.value)) {
-    errorPhone.value = '只能輸入數字!';
+    errorPhone.value = '只能輸入數字,且不能超過十二位數字!';
   } else {
     errorPhone.value = '';
   }

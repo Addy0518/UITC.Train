@@ -1,4 +1,6 @@
-﻿using Serilog.Exceptions;
+﻿using NPOI.SS.Formula.Functions;
+using Serilog.Exceptions;
+using Serilog.Sinks.MSSqlServer;
 
 namespace Lab.Accounting.API.Infrastructures.Logging
 {
@@ -6,6 +8,30 @@ namespace Lab.Accounting.API.Infrastructures.Logging
     {
         public static void AddSerilLog()
         {
+            var columnOptions = new Serilog.Sinks.MSSqlServer.ColumnOptions();
+
+            columnOptions.AdditionalColumns = new List<SqlColumn>
+            {
+                new SqlColumn
+                {
+                    ColumnName = "RequestBody",
+                    DataType = SqlDbType.NVarChar,
+                    DataLength = -1,
+                },
+                new SqlColumn
+                {
+                    ColumnName = "ResponseBody",
+                    DataType = SqlDbType.NVarChar,
+                    DataLength = -1,
+                },
+                new SqlColumn
+                {
+                    ColumnName = "RemoteIp",
+                    DataType = SqlDbType.NVarChar,
+                    DataLength = 50,
+                },
+            };
+
             // ========================================================
             // 【LoggerConfiguration 是什麼？】
             // Serilog 的設定建構器，用 Fluent API（鏈式呼叫）來設定
@@ -48,6 +74,17 @@ namespace Lab.Accounting.API.Infrastructures.Logging
                     // {Exception} → 例外資訊（如果有的話）
                     // ========================================================
                     outputTemplate: "[{Timestamp:yyyy/MM/dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{RequestBody}{ResponseBody}{NewLine}{Exception}"
+                )
+                .WriteTo.MSSqlServer(
+                    connectionString: "Data Source=localhost\\SQLEXPRESS;Initial Catalog=AccountPractice;User ID=angey920518;Password=Andy920518;TrustServerCertificate=True;",
+                    sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+                    {
+                        TableName = "Logs",
+                        AutoCreateSqlDatabase = true,
+                        AutoCreateSqlTable = true,
+                    },
+                    columnOptions: columnOptions,
+                    restrictedToMinimumLevel: LogEventLevel.Error
                 );
 
             // ========================================================
@@ -57,7 +94,7 @@ namespace Lab.Accounting.API.Infrastructures.Logging
             // CreateLogger() 根據上面的設定建立實際的 Logger 物件
             // ========================================================
 
-            Log.Logger = loggerConfiguration.CreateLogger();
+            Serilog.Log.Logger = loggerConfiguration.CreateLogger();
         }
 
         // ========================================================

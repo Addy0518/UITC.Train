@@ -31,5 +31,10 @@
         /// 使用者大頭照
         /// </summary>
         public string? UserHeadshot { get; set; }
+
+        /// <summary>
+        /// 使用者權限
+        /// </summary>
+        public string? UserRole { get; set; }
     }
 }

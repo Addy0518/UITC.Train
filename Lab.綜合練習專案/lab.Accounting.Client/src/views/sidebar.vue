@@ -1,6 +1,7 @@
 <script setup>
 import { userHeadShot } from '@/api/account-api';
-import { ref, watch } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { onMounted, ref, watch } from 'vue';
 /*
    變數名稱代表意義
    imgUrl : 大頭照圖片路徑
@@ -8,6 +9,11 @@ import { ref, watch } from 'vue';
 */
 let imgUrl = ref();
 const baseUrl = 'https://localhost:7124';
+const authStore = useAuthStore();
+
+onMounted(() => {
+  imgUrl.value = `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
+});
 
 /*
    上傳檔案 ( 大頭照 ) 並在前端顯示
@@ -35,9 +41,9 @@ const uploadFile = async (event) => {
         :src="imgUrl"
         alt=""
         style="width: 200px; height: 200px"
-        class="container"
+        class="container w-50 h-50 mx-auto flex justify-items-center align-items-center"
       />
-      <InputText @change="uploadFile" type="file" placeholder="大頭照上傳" />
+      <InputText @change="uploadFile" type="file" placeholder="大頭照上傳" class="mx-auto w-50" />
       <RouterLink
         :to="{ name: 'accounting-practice' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"

@@ -8,7 +8,7 @@ namespace Lab.Accounting.API.Common.Helpers
     public class TokenHelper(IConfiguration _configuration)
     {
         // 創建 Token 方法
-        public string GeneratedToken(int userId, string username, int expireMinutes = 30)
+        public string GeneratedToken(int userId, string userName, string userRole, int expireMinutes = 30)
         {
             // 拿到設定檔的發行人跟鑰匙
             var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
@@ -30,7 +30,9 @@ namespace Lab.Accounting.API.Common.Helpers
             claims.Add(new Claim("UserId", userId.ToString()));
 
             // 加入使用者姓名 , Sub 是 jwt 的標準名稱 ( Subject ) , 代表這個 token 是屬於誰的 (這裡是 username) , 筆記裡有寫全套標準名稱
-            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, username));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userName));
+
+            claims.Add(new Claim("UserRole", userRole));
 
             // 加入  Guid.NewGuid().ToString() ( 唯一碼 ) 到 Jti 裡防止重複
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
@@ -50,10 +52,7 @@ namespace Lab.Accounting.API.Common.Helpers
 
             // 使用 HmacSha256 雜湊處理產生唯一的密鑰
             // HmacSha256Signature 把 Token 的 Header + Payload 用金鑰做雜湊運算，產生簽名
-            var signingCredentials = new SigningCredentials(
-                securitykey,
-                SecurityAlgorithms.HmacSha256Signature
-            );
+            var signingCredentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256Signature);
 
             // 建立完整 Token 內容
             var tokenDescriptor = new SecurityTokenDescriptor

@@ -21,5 +21,10 @@
         /// Token
         /// </summary>
         public string? Token { get; set; }
+
+        /// <summary>
+        /// 使用者權限
+        /// </summary>
+        public string? UserRole { get; set; }
     }
 }

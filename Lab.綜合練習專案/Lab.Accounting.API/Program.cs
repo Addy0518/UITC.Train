@@ -109,9 +109,7 @@ try
 
                 // 建立之前在 appsetting 設定的金鑰 , 用同一把金鑰加密跟解密
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(
-                        builder.Configuration.GetValue<string>("JwtSettings:SignKey")
-                    )
+                    Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtSettings:SignKey"))
                 ),
             };
         });
@@ -171,9 +169,7 @@ try
     //   ← ResponseRequestMiddleware（設定 ResponseBody）
     // ← Serilog（記錄 Log，此時 RequestBody 和 ResponseBody 都已設定好）
     // ========================================================
-    app.UseSerilogRequestLogging(opts =>
-        opts.EnrichDiagnosticContext = SerilogConfig.EnrichFromRequest
-    );
+    app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = SerilogConfig.EnrichFromRequest);
     // 加入 response 跟 request 讀取 middleware
     app.UseMiddleware<ResponseRequestMiddleware>();
     app.UseExceptionHandler();
