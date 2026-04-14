@@ -24,13 +24,12 @@ const logout = async () => {
 </script>
 
 <template>
-  <div class="w-full bg-black">
+  <div class="w-screen bg-black">
     <div class="container flex mx-auto h-20 items-center">
       <strong class="text-white text-2xl">記帳</strong>
       <div class="flex-1 flex items-center justify-end gap-6">
         <!-- 已登入：顯示用戶名跟登出 -->
         <template v-if="authStore.token">
-          <strong class="text-white text-2xl">歡迎 : {{ authStore.userName }}</strong>
           <Button @click="logout">
             <strong class="text-white text-2xl">登出</strong>
           </Button>

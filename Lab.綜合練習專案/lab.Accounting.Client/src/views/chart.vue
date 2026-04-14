@@ -7,6 +7,13 @@ const itemChartRef = ref(null);
 /*
   初始化時把資料帶入圖表 , 點選各類別又會再跳到細項圖表
 */
+/*
+  變數名稱代表意義
+  categoryPrice : 類別價格
+  itemPrice : 項目價格
+*/
+const chartData = ref([]);
+const chartData2 = ref([]);
 onMounted(async () => {
   /*
     變數名稱代表意義
@@ -42,11 +49,10 @@ onMounted(async () => {
     return acc;
   }, {});
 
-  const chartData = Object.entries(aggregatedData).map(([name, value]) => ({
+  chartData.value = Object.entries(aggregatedData).map(([name, value]) => ({
     name,
     value,
   }));
-
 
   let option = {
     title: {
@@ -57,7 +63,7 @@ onMounted(async () => {
     series: [
       {
         type: 'pie',
-        data: chartData,
+        data: chartData.value,
         radius: ['40%', '70%'],
       },
     ],
@@ -82,7 +88,7 @@ onMounted(async () => {
     */
     const filteCategory = data.returnData.filter((item) => item.categoryName === params.name);
 
-    const chartData2 = filteCategory.map((item) => ({
+    chartData2.value = filteCategory.map((item) => ({
       name: item.itemName,
       value: item.itemCost,
     }));
@@ -93,10 +99,11 @@ onMounted(async () => {
         left: 'center',
         top: 'center',
       },
+
       series: [
         {
           type: 'pie',
-          data: chartData2,
+          data: chartData2.value,
           radius: ['40%', '70%'],
         },
       ],
@@ -112,10 +119,56 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full">
-    <div class="container text-xl mt-10 flex">
-      <div ref="categoryChartRef"></div>
-      <div ref="itemChartRef"></div>
+  <div class="w-screen p-5">
+    <!-- 使用 flex 並設為項目置頂對齊 -->
+    <div class="flex items-start gap-10">
+      <!-- 左側第一組：類別金額統計 -->
+      <div class="w-1/2 border-r border-gray-100">
+        <h3 class="text-lg font-bold mb-4 text-center">類別統計</h3>
+        <div class="flex flex-col items-center">
+          <!-- 圖表 -->
+          <div ref="categoryChartRef" style="width: 100%; height: 350px"></div>
+          <!-- 數據清單 -->
+          <div class="mt-40 w-100 bg-gray-50 p-5 rounded-lg shadow-sm">
+            <div class="flex justify-between mb-2 border-b border-gray-200 pb-1">
+              <span class="text-gray-600"> 類別</span>
+              <span class="text-gray-600"> 價格</span>
+            </div>
+            <div
+              v-for="item in chartData"
+              :key="item.name"
+              class="flex justify-between mb-2 border-b border-gray-200 pb-1"
+            >
+              <span class="text-gray-600"> {{ item.name }}</span>
+              <span class="font-bold text-blue-600">${{ item.value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側第二組：細項金額統計 -->
+      <div class="w-1/2">
+        <h3 class="text-lg font-bold mb-4 text-center">細項統計</h3>
+        <div class="flex flex-col items-center">
+          <!-- 圖表 -->
+          <div ref="itemChartRef" style="width: 100%; height: 350px"></div>
+          <!-- 數據清單 -->
+          <div class="mt-40 w-100 bg-gray-50 p-5 rounded-lg shadow-sm">
+            <div class="flex justify-between mb-2 border-b border-gray-200 pb-1">
+              <span class="text-gray-600"> 項目</span>
+              <span class="text-gray-600"> 價格</span>
+            </div>
+            <div
+              v-for="item in chartData2"
+              :key="item.name"
+              class="flex justify-between mb-2 border-b border-gray-200 pb-1"
+            >
+              <span class="text-gray-600">{{ item.name }}</span>
+              <span class="font-bold text-blue-600">${{ item.value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

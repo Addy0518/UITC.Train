@@ -36,14 +36,33 @@ const uploadFile = async (event) => {
 <template>
   <div class="w-80">
     <div class="w-80 h-full shadow-xl">
-      <img
-        v-if="imgUrl"
-        :src="imgUrl"
-        alt=""
-        style="width: 200px; height: 200px"
-        class="container w-50 h-50 mx-auto flex justify-items-center align-items-center"
-      />
-      <InputText @change="uploadFile" type="file" placeholder="大頭照上傳" class="mx-auto w-50" />
+      <label class="relative cursor-pointer group flex justify-center pt-10 pb-5">
+        <!-- 顯示照片 -->
+        <img
+          v-if="imgUrl"
+          :src="imgUrl"
+          alt="User Avatar"
+          class="w-50 h-50 rounded-full object-cover border-2 border-gray-200 group-hover:opacity-75 transition-opacity"
+        />
+        <!-- 預設占位圖 (若無照片時) -->
+        <div v-else class="w-50 h-50 rounded-full bg-gray-200 flex items-center justify-center">
+          <i class="pi pi-user text-3xl text-gray-400"></i>
+        </div>
+
+        <!-- 提示文字 (選用：滑鼠移入時顯示「更換照片」) -->
+        <div
+          class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">更換照片</span>
+        </div>
+
+        <!-- 隱藏的檔案輸入框 -->
+        <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
+      </label>
+      <strong class="text-black text-2xl flex justify-center mb-5 mt-5"
+        >歡迎 , {{ authStore.userName }} !</strong
+      >
+
       <RouterLink
         :to="{ name: 'accounting-practice' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
