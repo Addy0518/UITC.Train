@@ -1,4 +1,4 @@
-﻿namespace Lab.Accounting.API.Repositories
+﻿namespace Lab.Accounting.API.Repositories.Interface
 {
     public interface ITokenBlacklistRepositories
     {

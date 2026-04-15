@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using Lab.Accounting.API.Repositories.Interface;
 
 namespace Lab.Accounting.API.Infrastructures.Jwt
 {
@@ -11,10 +12,7 @@ namespace Lab.Accounting.API.Infrastructures.Jwt
             _next = next;
         }
 
-        public async Task Invoke(
-            HttpContext context,
-            ITokenBlacklistRepositories tokenBlacklistRepositories
-        )
+        public async Task Invoke(HttpContext context, ITokenBlacklistRepositories tokenBlacklistRepositories)
         {
             // 取得 HTTP 請求的 Authorization Header 格式：Authorization: Bearer eyJhbGci... , 把 Bearer 跟後面空白去掉 , 拿 Token 的部分
             var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -35,9 +33,7 @@ namespace Lab.Accounting.API.Infrastructures.Jwt
                     {
                         context.Response.StatusCode = 401;
                         // 把物件序列化成 JSON 並寫入 Response Body
-                        await context.Response.WriteAsJsonAsync(
-                            new { message = "Token 已失效，請重新登入" }
-                        );
+                        await context.Response.WriteAsJsonAsync(new { message = "Token 已失效，請重新登入" });
                         return;
                     }
                 }

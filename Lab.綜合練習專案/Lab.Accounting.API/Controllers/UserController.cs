@@ -1,5 +1,5 @@
 ﻿using Lab.Accounting.API.Common.Requests;
-using Lab.Accounting.API.Services;
+using Lab.Accounting.API.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 
@@ -7,14 +7,8 @@ namespace Lab.Accounting.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [ProducesResponseType(
-        StatusCodes.Status500InternalServerError,
-        Type = typeof(ApiResponse<ProblemDetails>)
-    )]
-    [ProducesResponseType(
-        StatusCodes.Status400BadRequest,
-        Type = typeof(ApiResponse<Dictionary<string, string[]>>)
-    )]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
     public class UserController(IUserService userserivce) : ControllerBase
     {
         // 私有方法 : 從 Token 取出 UserId

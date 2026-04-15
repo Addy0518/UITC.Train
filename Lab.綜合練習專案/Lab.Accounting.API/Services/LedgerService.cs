@@ -1,4 +1,6 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using Lab.Accounting.API.Repositories.Interface;
+using Lab.Accounting.API.Services.Interface;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lab.Accounting.API.Services
 {
@@ -37,10 +39,7 @@ namespace Lab.Accounting.API.Services
         /// <param name="ledgerId">項目名稱</param>
         /// <param name="userId">使用者 ID</param>
         /// <returns>單筆項目</returns>
-        public async Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(
-            int ledgerId,
-            int userId
-        )
+        public async Task<ApiResponse<LedgerItemJoinCategoryView>> GetLedger(int ledgerId, int userId)
         {
             var target = await accountrepo.GetLedger(ledgerId, userId);
             if (target == null)
@@ -172,9 +171,7 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="userId">使用者 ID</param>
         /// <returns>所有被刪除的項目</returns>
-        public async Task<ApiResponse<IEnumerable<LedgerItem>>> DeleteAllSoftDeleteLedger(
-            int userId
-        )
+        public async Task<ApiResponse<IEnumerable<LedgerItem>>> DeleteAllSoftDeleteLedger(int userId)
         {
             var deletetarget = await accountrepo.DeleteAllSoftDeleteLedger(userId);
 

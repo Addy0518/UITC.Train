@@ -1,4 +1,5 @@
 ﻿using Lab.Accounting.API.Common.Responses;
+using Lab.Accounting.API.Repositories.Interface;
 
 namespace Lab.Accounting.API.Repositories
 {

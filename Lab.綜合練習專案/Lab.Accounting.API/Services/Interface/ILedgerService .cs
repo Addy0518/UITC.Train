@@ -1,7 +1,7 @@
 ﻿using Lab.Accounting.API.Infrastructures.Data.Views;
 using Lab.API.TODO.Common.Requests;
 
-namespace Lab.Accounting.API.Services
+namespace Lab.Accounting.API.Services.Interface
 {
     public interface ILedgerService
     {

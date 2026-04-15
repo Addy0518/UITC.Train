@@ -1,7 +1,7 @@
 ﻿using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
 
-namespace Lab.Accounting.API.Services
+namespace Lab.Accounting.API.Services.Interface
 {
     public interface IUserService
     {

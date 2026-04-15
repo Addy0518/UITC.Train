@@ -3,11 +3,7 @@
     public class FileUploadHelper
     {
         // 儲存檔案 , 需要放進實體檔案 , 檔案路徑 , 要放在哪個資料夾
-        public static async Task<string> SaveFileAsync(
-            IFormFile file,
-            string rootPath,
-            string folder
-        )
+        public static async Task<string> SaveFileAsync(IFormFile file, string rootPath, string folder)
         {
             if (file == null || file.Length == 0)
                 return null;

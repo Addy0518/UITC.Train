@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\NewFolder\" />
+    <Folder Include="wwwroot\ProductsImg\" />
     <Folder Include="wwwroot\UserHeadShot\" />
   </ItemGroup>
 </Project>

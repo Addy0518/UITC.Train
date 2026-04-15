@@ -1,7 +1,8 @@
-﻿namespace Lab.Accounting.API.Repositories;
+﻿using Lab.Accounting.API.Repositories.Interface;
 
-public class LedgerItemCategoryRepositories(DBConnecting connecting)
-    : ILedgerItemCategoryRepositories
+namespace Lab.Accounting.API.Repositories;
+
+public class LedgerItemCategoryRepositories(DBConnecting connecting) : ILedgerItemCategoryRepositories
 {
     /// <summary>
     /// 查看帳本類別
@@ -20,10 +21,7 @@ public class LedgerItemCategoryRepositories(DBConnecting connecting)
                         Where 
                           CategoryName = @categoryname";
 
-            return await conn.QueryFirstOrDefaultAsync<int>(
-                sql,
-                new { CategoryName = categoryname }
-            );
+            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { CategoryName = categoryname });
         }
     }
 

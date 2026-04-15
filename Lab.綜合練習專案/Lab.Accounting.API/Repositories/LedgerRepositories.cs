@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
 using Lab.Accounting.API.Infrastructures.Entities;
+using Lab.Accounting.API.Repositories.Interface;
 using Serilog.Core;
 
 namespace Lab.Accounting.API.Repositories;
 
-public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> logger)
-    : ILedgerRepositories
+public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> logger) : ILedgerRepositories
 {
     /// <summary>
     /// 查看單一帳本項目

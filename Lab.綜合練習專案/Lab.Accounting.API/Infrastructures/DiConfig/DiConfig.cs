@@ -1,4 +1,6 @@
 ﻿using Lab.Accounting.API.Common.Helpers;
+using Lab.Accounting.API.Repositories.Interface;
+using Lab.Accounting.API.Services.Interface;
 
 namespace Lab.Accounting.API.Infrastructures.DiConfig
 {
@@ -15,6 +17,12 @@ namespace Lab.Accounting.API.Infrastructures.DiConfig
 
             services.AddScoped<IUserRepositories, UserRepositories>();
 
+            services.AddScoped<IProductsRepositories, ProductsRepositories>();
+
+            services.AddScoped<IProductsCategoryRepositories, ProductsCategoryRepositories>();
+
+            services.AddScoped<IProductsImgRepository, ProductsImgRepository>();
+
             services.AddScoped<ITokenBlacklistRepositories, TokenBlacklistRepositories>();
 
             services.AddScoped<ILedgerItemCategoryRepositories, LedgerItemCategoryRepositories>();
@@ -22,6 +30,8 @@ namespace Lab.Accounting.API.Infrastructures.DiConfig
             services.AddScoped<ILedgerService, LedgerService>();
 
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IMallService, MallService>();
 
             services.AddScoped<PasswordSecureHelper>();
         }

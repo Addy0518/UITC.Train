@@ -131,6 +131,28 @@ const router = createRouter({
           },
           component: () => import('@/views/mall.vue'),
         },
+        {
+          /*
+            新增商品
+          */
+          path: 'add-product',
+          name: 'add-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/commandProducts.vue'),
+        },
+        {
+          /*
+            編輯商品
+          */
+          path: 'edit-product/:id',
+          name: 'edit-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/commandProducts.vue'),
+        },
       ],
     },
     /*

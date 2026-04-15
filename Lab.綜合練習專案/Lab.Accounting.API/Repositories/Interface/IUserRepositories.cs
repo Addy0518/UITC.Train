@@ -1,6 +1,6 @@
 ﻿using Lab.Accounting.API.Common.Responses;
 
-namespace Lab.Accounting.API.Repositories
+namespace Lab.Accounting.API.Repositories.Interface
 {
     public interface IUserRepositories
     {

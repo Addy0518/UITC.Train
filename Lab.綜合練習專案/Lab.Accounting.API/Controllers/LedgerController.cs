@@ -1,4 +1,5 @@
 ﻿using Lab.Accounting.API.Infrastructures.Data.Views;
+using Lab.Accounting.API.Services.Interface;
 using Lab.API.TODO.Common.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,14 +11,8 @@ namespace Lab.Accounting.API.Controllers
     [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
-    [ProducesResponseType(
-        StatusCodes.Status500InternalServerError,
-        Type = typeof(ApiResponse<ProblemDetails>)
-    )]
-    [ProducesResponseType(
-        StatusCodes.Status400BadRequest,
-        Type = typeof(ApiResponse<Dictionary<string, string[]>>)
-    )]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
     public class LedgerController(ILedgerService service) : ControllerBase
     {
         // 私有方法 : 從 Token 取出 UserId
@@ -32,10 +27,7 @@ namespace Lab.Accounting.API.Controllers
         ///  <param name="isDelete">刪除狀態</param>
         /// <returns>單筆或多筆項目</returns>
         [HttpGet]
-        [ProducesResponseType(
-            StatusCodes.Status200OK,
-            Type = typeof(ApiResponse<List<LedgerItemJoinCategoryView>>)
-        )]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<List<LedgerItemJoinCategoryView>>))]
         public async Task<IActionResult> GetAllLedger(
             [FromQuery] List<int>? categoryId,
             [FromQuery] DateTime? date,
@@ -43,9 +35,7 @@ namespace Lab.Accounting.API.Controllers
             [FromQuery] bool? isDelete
         )
         {
-            return Ok(
-                await service.GetAllLedger(categoryId, date, itemname, isDelete, CurrentUserId)
-            );
+            return Ok(await service.GetAllLedger(categoryId, date, itemname, isDelete, CurrentUserId));
         }
 
         /// <summary>
@@ -54,10 +44,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="ledgerId">項目名稱</param>
         /// <returns>單筆項目</returns>
         [HttpGet]
-        [ProducesResponseType(
-            StatusCodes.Status200OK,
-            Type = typeof(ApiResponse<LedgerItemJoinCategoryView>)
-        )]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItemJoinCategoryView>))]
         public async Task<IActionResult> GetLedger([FromQuery] int ledgerId)
         {
             return Ok(await service.GetLedger(ledgerId, CurrentUserId));
