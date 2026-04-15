@@ -120,6 +120,17 @@ const router = createRouter({
           },
           component: () => import('@/views/commandLedger.vue'),
         },
+        {
+          /*
+            商城
+          */
+          path: 'mall',
+          name: 'mall',
+          meta: {
+            isPermissionVerification: false,
+          },
+          component: () => import('@/views/mall.vue'),
+        },
       ],
     },
     /*

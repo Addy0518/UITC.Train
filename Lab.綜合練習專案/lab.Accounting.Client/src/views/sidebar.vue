@@ -62,11 +62,15 @@ const uploadFile = async (event) => {
       <strong class="text-black text-2xl flex justify-center mb-5 mt-5"
         >歡迎 , {{ authStore.userName }} !</strong
       >
-
+      <RouterLink
+        :to="{ name: 'mall' }"
+        class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+        ><i class="pi pi-shopping-cart px-5 ps-5"></i>商城</RouterLink
+      >
       <RouterLink
         :to="{ name: 'accounting-practice' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-        ><i class="pi pi-home px-5 ps-5"></i>首頁</RouterLink
+        ><i class="pi pi-dollar px-5 ps-5"></i>記帳</RouterLink
       >
       <RouterLink
         :to="{ name: 'add-ledger' }"
@@ -78,11 +82,7 @@ const uploadFile = async (event) => {
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-wallet px-5 ps-5"></i>帳本統計圖表</RouterLink
       >
-      <!-- <RouterLink
-        :to="{ name: '' }"
-        class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-        ><i class="pi pi-dollar px-5 ps-5"></i>實時金融資訊</RouterLink
-      > -->
+
       <RouterLink
         :to="{ name: 'recyclingBin' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
