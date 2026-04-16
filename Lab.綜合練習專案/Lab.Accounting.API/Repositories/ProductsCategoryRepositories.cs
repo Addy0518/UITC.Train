@@ -16,7 +16,7 @@ namespace Lab.Accounting.API.Repositories
 
             var sql =
                 @"Select ProductCategoryId From mallproductcategory Where ProductCategoryName = @ProductCategoryName";
-            return await conn.QuerySingleAsync<int>(sql, new { ProductCategoryName = productcategory });
+            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { ProductCategoryName = productcategory });
         }
 
         /// <summary>

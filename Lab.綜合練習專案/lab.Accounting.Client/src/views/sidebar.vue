@@ -6,6 +6,7 @@ import { onMounted, ref, watch } from 'vue';
    變數名稱代表意義
    imgUrl : 大頭照圖片路徑
    baseUrl : 基底位址
+   authStore : localstorage
 */
 let imgUrl = ref();
 const baseUrl = 'https://localhost:7124';

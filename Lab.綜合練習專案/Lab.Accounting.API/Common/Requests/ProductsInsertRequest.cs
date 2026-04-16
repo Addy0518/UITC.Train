@@ -14,7 +14,7 @@
         /// </summary>
         [Display(Name = "商品類別名稱")]
         [Required(ErrorMessage = "{0} 必輸")]
-        public string ProductCategoryName { get; set; }
+        public string[] ProductCategoryName { get; set; }
 
         /// <summary>
         /// 商品名稱

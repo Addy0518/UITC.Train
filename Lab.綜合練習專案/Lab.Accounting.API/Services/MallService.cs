@@ -75,13 +75,14 @@ namespace Lab.Accounting.API.Services
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var target = await productsRepositories.CreateProducts(product);
-
-                var productTarget = await ExistsCategory(productsInsertRequest.ProductCategoryName);
-
-                var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
-                    target,
-                    productTarget
-                );
+                foreach (var category in productsInsertRequest.ProductCategoryName)
+                {
+                    var productTarget = await ExistsCategory(category);
+                    var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
+                        target,
+                        productTarget
+                    );
+                }
 
                 trxScope.Complete();
                 return ApiResponseHelper.Success(target);

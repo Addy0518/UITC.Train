@@ -20,7 +20,7 @@ import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Password from 'primevue/password';
-
+import Chip from 'primevue/chip';
 
 const app = createApp(App);
 
@@ -54,5 +54,6 @@ app.component('Button', Button);
 app.component('DatePicker', DatePicker);
 app.component('Dialog', Dialog);
 app.component('Password', Password);
+app.component('Chip', Chip);
 
 app.mount('#app');

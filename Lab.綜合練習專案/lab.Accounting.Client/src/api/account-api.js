@@ -1,7 +1,11 @@
 import accountApiInstance from '@/api/accountInstance.js';
+import { da } from 'zod/v4/locales';
 
 /*
    從 accountInstance 匯入 axios 設定 , 開始串接後端 api
+*/
+/*
+   使用者相關 API ===========================================================
 */
 // 使用者註冊
 export const registerApi = (userRegister) =>
@@ -14,6 +18,10 @@ export const logoutApi = () => accountApiInstance.post(`/User/Logout`);
 // 使用者大頭照新增編輯
 export const userHeadShot = (userFile) =>
   accountApiInstance.post(`/User/UserHeadShotUpload`, userFile);
+
+/*
+   帳本相關 API ===========================================================
+*/
 // 搜尋全部帳本
 export const getAllLedger = (queryString = '') =>
   accountApiInstance.get(`/Ledger/GetAllLedger${queryString}`);
@@ -33,34 +41,20 @@ export const deleteLedger = (ledgerDelete = null) =>
 export const deleteAllSoftDeleteLedger = () =>
   accountApiInstance.delete(`Ledger/DeleteAllSoftDeleteLedger`);
 
-// export const getAllLedger2 = async (cateId = [], selectdate = null) => {
-//   let queryString = '';
-//   if (cateId && cateId.length > 0) {
-//     queryString += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
-//   }
-//   if (selectdate) {
-//     // 如果用 toString 的話怕格式會不一樣 , 而用 ISO 再把 t 後面的時間去掉也不行 , 因為時區傳患的關係 , 所以用 英文格式 en-CA 轉成 1990-01-01 的格式
-
-//     const datestring = selectdate.toLocaleDateString('en-CA');
-//     queryString += (url.includes('?') ? '&' : '?') + `date=${datestring}`;
-//   }
-
-//   const result = {
-//     isSuccess: true,
-//     data: null,
-//     message: '',
-//   };
-
-//   try {
-//     const response = await todoApiInstance.get(`/Ledger/GetAllLedger${queryString}`);
-//     result.isSuccess = true;
-//     result.data = response.data;
-//     response.message = '';
-//   } catch (error) {
-//     console.log(error);
-//     result.isSuccess = false;
-//     result.data = error.response.data;
-//   }
-
-//   return result;
-// };
+/*
+   商城相關 API ===========================================================
+*/
+// 查看指定商品
+export const getProduct = (productId) =>
+  accountApiInstance.get(`Mall/GetProducts?productId=${productId}`);
+// 查看所有商品
+export const getAllProduct = (pageIndex = 0, pageSize = 10) =>
+  accountApiInstance.get(`Mall/GetAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+// 新增單一商品 + 類別
+export const createProducts = (product) => accountApiInstance.post(`Mall/CreateProducts`, product);
+// 商品圖片上傳
+export const productsImgUpload = (ImgData) =>
+  accountApiInstance.post(`Mall/ProductsImgUpload`, ImgData);
+// 商品圖片刪除
+export const productsImgDelete = (productsImgId) =>
+  accountApiInstance.delete(`Mall/ProductsImgDelete?productsImgId=${productsImgId}`);

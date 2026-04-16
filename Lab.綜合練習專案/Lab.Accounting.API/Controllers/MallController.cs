@@ -66,7 +66,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <returns>影響列數</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> ProductsImgUpload(IFormFile productsImgsFiles, int productId)
+    public async Task<IActionResult> ProductsImgUpload([FromForm] IFormFile productsImgsFiles, [FromForm] int productId)
     {
         return Ok(await mallService.ProductsImgUpload(productsImgsFiles, productId));
     }
