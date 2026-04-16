@@ -25,7 +25,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItemJoinCategoryView>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> GetProducts([FromQuery] int productId)
     {
         return Ok(await mallService.GetProducts(productId, CurrentUserId));
@@ -39,7 +39,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <returns>商品列表</returns>
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItemJoinCategoryView>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
     public async Task<IActionResult> GetAllProducts([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
     {
         return Ok(await mallService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10));
@@ -48,14 +48,38 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <summary>
     /// 新增單一商品 + 類別
     /// </summary>
-    /// <param name="products">商品資訊</param>
-    /// <param name="productcategory">商品類別</param>
-    /// <returns>影響列數</returns>
+    /// <param name="productsInsertRequest">新增商品資訊</param>
+    /// <returns>商品資訊</returns>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LedgerItemJoinCategoryView>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> CreateProducts(ProductsInsertRequest productsInsertRequest)
     {
         productsInsertRequest.UserId = CurrentUserId;
         return Ok(await mallService.CreateProducts(productsInsertRequest));
+    }
+
+    /// <summary>
+    /// 商品圖片上傳
+    /// </summary>
+    /// <param name="productsImgsFiles">商品圖片檔案</param>
+    /// <param name="productId">商品 Id</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> ProductsImgUpload(IFormFile productsImgsFiles, int productId)
+    {
+        return Ok(await mallService.ProductsImgUpload(productsImgsFiles, productId));
+    }
+
+    /// <summary>
+    /// 商品圖片刪除
+    /// </summary>
+    /// <param name="productsImgId">商品圖片 ID</param>
+    /// <returns>影響列數</returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> ProductsImgDelete(int productsImgId)
+    {
+        return Ok(await mallService.ProductsImgDelete(productsImgId));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Lab.Accounting.API.Common.Requests;
+using Lab.Accounting.API.Common.Responses;
 using Lab.Accounting.API.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
@@ -20,6 +21,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="registerRequest">使用者註冊資訊</param>
         /// <returns>註冊成功</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequest registerRequest)
         {
             return Ok(await userserivce.Register(registerRequest));
@@ -31,6 +33,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="loginRequest">使用者登入資訊</param>
         /// <returns>登入成功</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest loginRequest)
         {
             return Ok(await userserivce.Login(loginRequest));
@@ -43,6 +46,7 @@ namespace Lab.Accounting.API.Controllers
         /// <returns>是否成功登出</returns>
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> Logout()
         {
             var Token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -57,6 +61,7 @@ namespace Lab.Accounting.API.Controllers
         /// <returns>使用者資訊</returns>
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
         public async Task<IActionResult> UserHeadShotUpload(IFormFile userFile)
         {
             return Ok(await userserivce.UserHeadShotUpload(userFile, CurrentUserId));

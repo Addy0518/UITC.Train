@@ -28,5 +28,20 @@ namespace Lab.Accounting.API.Services.Interface
         /// <param name="productsInsertRequest">商品資訊</param>
         /// <returns>影響列數</returns>
         Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest);
+
+        /// <summary>
+        /// 商品圖片上傳
+        /// </summary>
+        /// <param name="productsImgsFiles">商品圖片檔案</param>
+        /// <param name="productId">商品 Id</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<IEnumerable<ProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
+
+        /// <summary>
+        /// 商品圖片刪除
+        /// </summary>
+        /// <param name="productsImgId">商品圖片 ID</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> ProductsImgDelete(int productsImgId);
     }
 }

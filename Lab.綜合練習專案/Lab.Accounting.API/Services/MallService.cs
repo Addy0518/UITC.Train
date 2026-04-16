@@ -6,6 +6,7 @@ using Lab.Accounting.API.Repositories.Interface;
 using Lab.Accounting.API.Services.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NPOI.SS.Formula.Functions;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace Lab.Accounting.API.Services
 {
@@ -25,10 +26,12 @@ namespace Lab.Accounting.API.Services
         public async Task<ApiResponse<ProductsResponse>> GetProducts(int productId, int userId)
         {
             var target = await productsRepositories.GetProducts(productId, userId);
+            var imgs = await productsImgRepository.GetProductsAllImg(productId);
             if (target == null)
             {
                 return ApiResponseHelper.NotFound<ProductsResponse>();
             }
+            target.ProductsImgs = imgs;
             return ApiResponseHelper.Success(target);
         }
 
@@ -40,12 +43,20 @@ namespace Lab.Accounting.API.Services
         /// <returns>商品列表</returns>
         public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(int pageIndex, int pageSize)
         {
-            var target = await productsRepositories.GetAllProducts(pageIndex, pageSize);
-            if (target == null)
+            var products = await productsRepositories.GetAllProducts(pageIndex, pageSize);
+
+            if (products == null)
             {
                 return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
             }
-            return ApiResponseHelper.Success(target);
+
+            foreach (var product in products)
+            {
+                var imgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
+                product.ProductsImgs = imgs;
+            }
+
+            return ApiResponseHelper.Success(products);
         }
 
         /// <summary>
@@ -80,24 +91,38 @@ namespace Lab.Accounting.API.Services
         /// <summary>
         /// 商品圖片上傳
         /// </summary>
-        /// <param name="productImgs">多個商品圖片檔案</param>
+        /// <param name="productsImgsFiles">商品圖片檔案</param>
+        /// <param name="productId">商品 Id</param>
         /// <returns>影響列數</returns>
-        //public async Task<int> ProductsImgUpload(IFormFile[] productsImg, int productId)
-        //{
-        //    var imgTarget = new List<ProductImg>();
-        //    var oldimg = await productsImgRepository.GetProductsImg(productId);
-        //    foreach (var img in productsImg)
-        //    {
-        //        string fileUrl = await ExistFile(img, oldimg, "ProductsImg");
+        public async Task<ApiResponse<IEnumerable<ProductImg>>> ProductsImgUpload(
+            IFormFile productsImgsFiles,
+            int productId
+        )
+        {
+            var result = await FileUploadHelper.SaveFileAsync(productsImgsFiles, env.WebRootPath, "ProductsImg");
+            await productsImgRepository.ProductsImgUpload(productId, result);
+            var newtarget = await productsImgRepository.GetProductsAllImg(productId);
+            return ApiResponseHelper.Success(newtarget);
+        }
 
-        //        imgTarget.Add(new ProductImg { ProductsId = productId, ProductsImg = fileUrl });
-        //    }
+        /// <summary>
+        /// 商品圖片刪除
+        /// </summa ry>
+        /// <param name="productsImgId">商品圖片 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> ProductsImgDelete(int productsImgId)
+        {
+            var target = await productsImgRepository.GetProductsImg(productsImgId);
 
-        //    if (imgTarget.Count > 0)
-        //    {
-        //        await productsImgRepository.ProductsImgUpload(imgTarget);
-        //    }
-        //}
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+
+            FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", target.ProductsImg);
+            int rows = await productsImgRepository.DeleteProductsImg(productsImgId);
+            return ApiResponseHelper.Success(rows);
+        }
 
         /// <summary>
         /// 私有方法 , 檢查商品類別是否存在
@@ -126,29 +151,6 @@ namespace Lab.Accounting.API.Services
             }
 
             return productcategoryId;
-        }
-
-        /// <summary>
-        /// 私有方法判斷文件是否存在
-        /// </summary>
-        /// <param name="newFile">新的檔案</param>
-        /// <param name="oldPath">舊的檔案路徑</param>
-        /// <param name="folder">檔案存放的資料夾</param>
-        /// <returns>檔案路徑</returns>
-        private async Task<string?> ExistFile(IFormFile? newFile, string? oldPath, string folder)
-        {
-            //沒更新就回傳舊檔案路徑
-            if (newFile == null)
-                return oldPath;
-
-            //更新的話刪除舊檔案
-            if (!string.IsNullOrEmpty(oldPath))
-            {
-                FileUploadHelper.DeleteFile(env.WebRootPath, folder, oldPath);
-            }
-
-            //不管怎樣都要儲存檔案
-            return await FileUploadHelper.SaveFileAsync(newFile, env.WebRootPath, folder);
         }
     }
 }

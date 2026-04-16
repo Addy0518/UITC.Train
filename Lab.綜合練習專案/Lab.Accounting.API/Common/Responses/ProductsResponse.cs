@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Common.Responses
+﻿using Lab.Accounting.API.Infrastructures.Data.Entities;
+
+namespace Lab.Accounting.API.Common.Responses
 {
     public class ProductsResponse
     {
@@ -26,5 +28,10 @@
         /// 商品價格
         /// </summary>
         public decimal ProductsPrice { get; set; }
+
+        /// <summary>
+        /// 商品圖片 URL
+        /// </summary>
+        public IEnumerable<ProductImg>? ProductsImgs { get; set; }
     }
 }

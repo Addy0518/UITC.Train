@@ -7,15 +7,30 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <summary>
         /// 商品圖片上傳
         /// </summary>
-        /// <param name="productImgs">多個商品圖片檔案</param>
+        /// <param name="productsImgs">圖片</param>
+        /// <param name="productId">商品 ID</param>
         /// <returns>影響列數</returns>
-        Task<int> ProductsImgUpload(IEnumerable<ProductImg> productImgs);
+        Task<int> ProductsImgUpload(int productId, string productsImgs);
+
+        /// <summary>
+        /// 查看商品所有圖片
+        /// </summary>
+        /// <param name="productsId">商品 ID </param>
+        /// <returns>商品圖片 URL</returns>
+        Task<IEnumerable<ProductImg>> GetProductsAllImg(int productsId);
 
         /// <summary>
         /// 查看商品圖片
         /// </summary>
-        /// <param name="productsId">商品 ID </param>
+        /// <param name="productsImgId">商品圖片 ID</param>
         /// <returns>商品圖片 URL</returns>
-        Task<IEnumerable<string>> GetProductsImg(int productsId);
+        Task<ProductImg> GetProductsImg(int productsImgId);
+
+        /// <summary>
+        /// 刪除商品圖片
+        /// </summary>
+        /// <param name="productsId">商品 ID </param>
+        /// <returns>影響列數</returns>
+        Task<int> DeleteProductsImg(int productsId);
     }
 }
