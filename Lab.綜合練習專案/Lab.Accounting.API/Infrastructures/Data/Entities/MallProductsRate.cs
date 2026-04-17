@@ -1,11 +1,11 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities
 {
-    public class MallProducts
+    public class MallProductsRate
     {
         /// <summary>
-        /// 商品 ID
+        /// 項目 ID
         /// </summary>
-        public int ProductsId { get; set; }
+        public int ProductsRateId { get; set; }
 
         /// <summary>
         /// 使用者 ID
@@ -13,23 +13,23 @@
         public int UserId { get; set; }
 
         /// <summary>
-        /// 商品名稱
+        /// 商品 ID
         /// </summary>
-        public string ProductsName { get; set; }
+        public int ProductsId { get; set; }
 
         /// <summary>
-        /// 商品價格
+        /// 評分
         /// </summary>
-        public decimal ProductsPrice { get; set; }
+        public double Rating { get; set; }
 
         /// <summary>
-        /// 商品庫存數量
+        /// 評論
         /// </summary>
-        public int ProductsStock { get; set; }
+        public string? Comment { get; set; }
 
         /// <summary>
-        /// 商品購買人
+        /// 發表時間
         /// </summary>
-        public int ProductsPurchasedUser { get; set; }
+        public DateTime CreateTime { get; set; }
     }
 }

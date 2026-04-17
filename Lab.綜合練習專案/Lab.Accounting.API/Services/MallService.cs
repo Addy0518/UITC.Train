@@ -14,6 +14,8 @@ namespace Lab.Accounting.API.Services
         IProductsRepositories productsRepositories,
         IProductsCategoryRepositories productsCategoryRepositories,
         IProductsImgRepository productsImgRepository,
+        IProductsRateRepositories productsRateRepositories,
+        IProductsShoppingCarRepositories productsShoppingCarRepositories,
         IWebHostEnvironment env
     ) : IMallService
     {
@@ -26,12 +28,17 @@ namespace Lab.Accounting.API.Services
         public async Task<ApiResponse<ProductsResponse>> GetProducts(int productId, int userId)
         {
             var target = await productsRepositories.GetProducts(productId, userId);
-            var imgs = await productsImgRepository.GetProductsAllImg(productId);
+
             if (target == null)
             {
                 return ApiResponseHelper.NotFound<ProductsResponse>();
             }
+            var imgs = await productsImgRepository.GetProductsAllImg(productId);
             target.ProductsImgs = imgs;
+
+            var avgRating = await productsRateRepositories.CountAVGProductRate(productId);
+            target.ProductsRate = avgRating;
+
             return ApiResponseHelper.Success(target);
         }
 
@@ -52,6 +59,8 @@ namespace Lab.Accounting.API.Services
 
             foreach (var product in products)
             {
+                var avgRating = await productsRateRepositories.CountAVGProductRate(product.ProductsId);
+                product.ProductsRate = avgRating;
                 var imgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
                 product.ProductsImgs = imgs;
             }
@@ -70,6 +79,7 @@ namespace Lab.Accounting.API.Services
             {
                 ProductsName = productsInsertRequest.ProductsName,
                 ProductsPrice = productsInsertRequest.ProductsPrice,
+                ProductsStock = productsInsertRequest.ProductsStock,
                 UserId = productsInsertRequest.UserId,
             };
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -83,6 +93,15 @@ namespace Lab.Accounting.API.Services
                         productTarget
                     );
                 }
+                var Insertrate = new MallProductsRate
+                {
+                    ProductsId = target,
+                    UserId = productsInsertRequest.UserId,
+                    Comment = null,
+                    CreateTime = DateTime.UtcNow,
+                    Rating = 3,
+                };
+                var rating = await productsRateRepositories.CreateProductRate(Insertrate);
 
                 trxScope.Complete();
                 return ApiResponseHelper.Success(target);
@@ -95,7 +114,7 @@ namespace Lab.Accounting.API.Services
         /// <param name="productsImgsFiles">商品圖片檔案</param>
         /// <param name="productId">商品 Id</param>
         /// <returns>影響列數</returns>
-        public async Task<ApiResponse<IEnumerable<ProductImg>>> ProductsImgUpload(
+        public async Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(
             IFormFile productsImgsFiles,
             int productId
         )
@@ -123,6 +142,59 @@ namespace Lab.Accounting.API.Services
             FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", target.ProductsImg);
             int rows = await productsImgRepository.DeleteProductsImg(productsImgId);
             return ApiResponseHelper.Success(rows);
+        }
+
+        /// <summary>
+        /// 使用者購買商品並評分
+        /// </summary>
+        /// <param name="Request">商品購買資訊 </param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> UserBuyProductAndRate(ProductsBuyRequest Request)
+        {
+            var target = await productsRepositories.GetProducts(Request.ProductsId, Request.UserId);
+
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var buytarget = await productsRepositories.BuyProducts(Request.ProductsId, Request.UserId);
+
+                var remainStock = target.ProductsStock - Request.PurchaseQuantity;
+
+                var stocktarget = await productsRepositories.SetStock(Request.ProductsId, remainStock, Request.UserId);
+
+                var Insertrate = new MallProductsRate
+                {
+                    ProductsId = Request.ProductsId,
+                    UserId = Request.UserId,
+                    Comment = Request.Comment,
+                    CreateTime = DateTime.UtcNow,
+                    Rating = Request.Rating,
+                };
+
+                var ratetarget = await productsRateRepositories.CreateProductRate(Insertrate);
+
+                trxScope.Complete();
+
+                return ApiResponseHelper.Success(ratetarget);
+            }
+        }
+
+        /// <summary>
+        /// 查看購物車中的所有商品
+        /// </summary>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>購物車中的所有商品</returns>
+        public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProductsInShoppingCar(int userId)
+        {
+            var alltarget = await productsShoppingCarRepositories.GetAllProductsInShoppingCar(userId);
+            if (alltarget == null || !alltarget.Any())
+            {
+                return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
+            }
+            return ApiResponseHelper.Success<IEnumerable<ProductsResponse>>(alltarget);
         }
 
         /// <summary>

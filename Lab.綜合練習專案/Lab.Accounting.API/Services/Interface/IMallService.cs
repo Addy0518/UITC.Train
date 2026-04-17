@@ -35,7 +35,7 @@ namespace Lab.Accounting.API.Services.Interface
         /// <param name="productsImgsFiles">商品圖片檔案</param>
         /// <param name="productId">商品 Id</param>
         /// <returns>影響列數</returns>
-        Task<ApiResponse<IEnumerable<ProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
+        Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
 
         /// <summary>
         /// 商品圖片刪除
@@ -43,5 +43,19 @@ namespace Lab.Accounting.API.Services.Interface
         /// <param name="productsImgId">商品圖片 ID</param>
         /// <returns>影響列數</returns>
         Task<ApiResponse<int>> ProductsImgDelete(int productsImgId);
+
+        /// <summary>
+        /// 使用者購買商品並評分
+        /// </summary>
+        /// <param name="Request">商品購買資訊 </param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> UserBuyProductAndRate(ProductsBuyRequest Request);
+
+        /// <summary>
+        /// 查看購物車中的所有商品
+        /// </summary>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>購物車中的所有商品</returns>
+        Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProductsInShoppingCar(int userId);
     }
 }

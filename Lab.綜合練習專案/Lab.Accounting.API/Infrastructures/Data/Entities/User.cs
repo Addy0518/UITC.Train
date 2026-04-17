@@ -36,5 +36,10 @@
         /// 使用者權限
         /// </summary>
         public string? UserRole { get; set; }
+
+        /// <summary>
+        /// 購物車 ID
+        /// </summary>
+        public int ShoppingCarId { get; set; }
     }
 }

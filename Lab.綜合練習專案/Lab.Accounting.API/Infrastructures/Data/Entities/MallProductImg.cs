@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities
 {
-    public class ProductImg
+    public class MallProductImg
     {
         /// <summary>
         /// 商品圖片 ID

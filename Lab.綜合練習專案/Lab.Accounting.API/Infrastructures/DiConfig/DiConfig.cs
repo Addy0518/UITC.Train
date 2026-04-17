@@ -23,9 +23,13 @@ namespace Lab.Accounting.API.Infrastructures.DiConfig
 
             services.AddScoped<IProductsImgRepository, ProductsImgRepository>();
 
+            services.AddScoped<IProductsRateRepositories, ProductsRateRepositories>();
+
             services.AddScoped<ITokenBlacklistRepositories, TokenBlacklistRepositories>();
 
             services.AddScoped<ILedgerItemCategoryRepositories, LedgerItemCategoryRepositories>();
+
+            services.AddScoped<IProductsShoppingCarRepositories, ProductsShoppingCarRepositories>();
 
             services.AddScoped<ILedgerService, LedgerService>();
 

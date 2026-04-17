@@ -31,7 +31,7 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="productsId">商品 ID </param>
         /// <returns>商品圖片 URL</returns>
-        public async Task<IEnumerable<ProductImg>> GetProductsAllImg(int productsId)
+        public async Task<IEnumerable<MallProductImg>> GetProductsAllImg(int productsId)
         {
             using var conn = connecting.CreateConnecting();
 
@@ -40,7 +40,7 @@ namespace Lab.Accounting.API.Repositories
                 FROM   ProductImg
                 WHERE  ProductsId = @ProductsId ";
 
-            return await conn.QueryAsync<ProductImg>(sql, new { ProductsId = productsId });
+            return await conn.QueryAsync<MallProductImg>(sql, new { ProductsId = productsId });
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="productsImgId">商品圖片 ID</param>
         /// <returns>商品圖片 URL</returns>
-        public async Task<ProductImg> GetProductsImg(int productsImgId)
+        public async Task<MallProductImg> GetProductsImg(int productsImgId)
         {
             using var conn = connecting.CreateConnecting();
 
@@ -57,7 +57,7 @@ namespace Lab.Accounting.API.Repositories
                 FROM   ProductImg
                 WHERE  productsImgId = @productsImgId ";
 
-            return await conn.QueryFirstOrDefaultAsync<ProductImg>(sql, new { productsImgId = productsImgId });
+            return await conn.QueryFirstOrDefaultAsync<MallProductImg>(sql, new { productsImgId = productsImgId });
         }
 
         /// <summary>

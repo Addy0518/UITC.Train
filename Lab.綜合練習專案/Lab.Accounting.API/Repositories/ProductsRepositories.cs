@@ -23,6 +23,8 @@ namespace Lab.Accounting.API.Repositories
                                  m.userid,
                                  m.productsname,
                                  m.productsprice,
+                                 m.ProductsStock,
+                                 m.productsRate,
                                  c.productcategoryname
                         FROM     mallproducts m
                         JOIN     productcategory p
@@ -50,14 +52,16 @@ namespace Lab.Accounting.API.Repositories
                                m.userid,
                                m.productsname,
                                m.productsprice,
+                               m.ProductsStock,
+                               m.productsRate,
                                c.productcategoryname
                         FROM   mallproducts m
-                               JOIN productcategory p
+                               left JOIN productcategory p
                                  ON m.productsid = p.productsid
-                               JOIN mallproductcategory c
+                               left JOIN mallproductcategory c
                                  ON c.productcategoryid = p.productcategoryid
-                        WHERE  m.productsid = @ProductsId
-                               AND m.userid = @UserId ";
+                        WHERE  m.ProductsId = @ProductsId
+                               AND m.UserId = @UserId ";
 
             var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(
                 sql,
@@ -80,21 +84,110 @@ namespace Lab.Accounting.API.Repositories
                 @"INSERT INTO mallproducts
                                     (userid,
                                      productsname,
-                                     productsprice)
+                                     productsprice,
+                                     ProductsStock,
+                                     )
                         VALUES      (@UserId,
                                      @ProductsName,
-                                     @ProductsPrice) 
+                                     @ProductsPrice,
+                                     @ProductsStock,
+                                     @ProductsRate) 
                         Select 
                                     Cast(
                                     Scope_Identity() as int
                                     );";
-            return await conn.QuerySingleAsync<int>(
+            return await conn.QuerySingleAsync<int>(sql, products);
+        }
+
+        /// <summary>
+        /// 更新單一商品
+        /// </summary>
+        /// <param name="products">商品資訊</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> UpdateProducts(MallProducts products)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"UPDATE mallproducts
+                        SET      
+                                 productsname = @ProductsName,
+                                 productsprice = @ProductsPrice,
+                                 ProductsStock = @ProductsStock,
+                        WHERE    productsid = @ProductsId and userId=@UserId;";
+            return await conn.ExecuteAsync(sql, products);
+        }
+
+        /// <summary>
+        /// 刪除單一商品
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> DeleteProducts(int productsId, int userId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Delete From MallProducts
+                Where productsid = @ProductsId and userid = @UserId";
+
+            return await conn.ExecuteAsync(sql, new { ProductsId = productsId, UserId = userId });
+        }
+
+        /// <summary>
+        /// 設定商品庫存
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="purchaseQuantity">購買數量</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> SetStock(int productsId, int purchaseQuantity, int userId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Update mallproducts
+                    SET ProductsStock = @purchaseQuantity
+                    WHERE ProductsId = @productsId and UserId = @UserId";
+
+            return await conn.ExecuteAsync(
                 sql,
                 new
                 {
-                    UserId = products.UserId,
-                    ProductsName = products.ProductsName,
-                    ProductsPrice = products.ProductsPrice,
+                    productsId,
+                    purchaseQuantity,
+                    userId,
+                }
+            );
+        }
+
+        /// <summary>
+        /// 購買商品
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> BuyProducts(int productsId, int userId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var addBoughtProductsql =
+                @"INSERT INTO MallBoughtProducts
+                            (userid,
+                            productsid,
+                            BoughtTIme)
+                VALUES     (@UserId,
+                            @ProductsId,
+                            @BoughtTIme)";
+
+            return await conn.ExecuteAsync(
+                addBoughtProductsql,
+                new
+                {
+                    UserId = userId,
+                    ProductsId = productsId,
+                    BoughtTIme = DateTime.Now,
                 }
             );
         }

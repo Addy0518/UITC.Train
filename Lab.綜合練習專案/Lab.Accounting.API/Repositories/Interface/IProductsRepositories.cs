@@ -27,5 +27,37 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <param name="products">商品資訊</param>
         /// <returns>影響列數</returns>
         Task<int> CreateProducts(MallProducts products);
+
+        /// <summary>
+        /// 更新單一商品
+        /// </summary>
+        /// <param name="products">商品資訊</param>
+        /// <returns>影響列數</returns>
+        Task<int> UpdateProducts(MallProducts products);
+
+        /// <summary>
+        /// 刪除單一商品
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        Task<int> DeleteProducts(int productsId, int userId);
+
+        /// <summary>
+        /// 設定商品庫存
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="purchaseQuantity">購買數量</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        Task<int> SetStock(int productsId, int purchaseQuantity, int userId);
+
+        /// <summary>
+        /// 購買商品
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        Task<int> BuyProducts(int productsId, int userId);
     }
 }

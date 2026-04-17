@@ -30,8 +30,18 @@ namespace Lab.Accounting.API.Common.Responses
         public decimal ProductsPrice { get; set; }
 
         /// <summary>
+        /// 商品庫存數量
+        /// </summary>
+        public int ProductsStock { get; set; }
+
+        /// <summary>
+        /// 商品評分
+        /// </summary>
+        public decimal ProductsRate { get; set; }
+
+        /// <summary>
         /// 商品圖片 URL
         /// </summary>
-        public IEnumerable<ProductImg>? ProductsImgs { get; set; }
+        public IEnumerable<MallProductImg>? ProductsImgs { get; set; }
     }
 }

@@ -17,14 +17,14 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// </summary>
         /// <param name="productsId">商品 ID </param>
         /// <returns>商品圖片 URL</returns>
-        Task<IEnumerable<ProductImg>> GetProductsAllImg(int productsId);
+        Task<IEnumerable<MallProductImg>> GetProductsAllImg(int productsId);
 
         /// <summary>
         /// 查看商品圖片
         /// </summary>
         /// <param name="productsImgId">商品圖片 ID</param>
         /// <returns>商品圖片 URL</returns>
-        Task<ProductImg> GetProductsImg(int productsImgId);
+        Task<MallProductImg> GetProductsImg(int productsImgId);
 
         /// <summary>
         /// 刪除商品圖片
