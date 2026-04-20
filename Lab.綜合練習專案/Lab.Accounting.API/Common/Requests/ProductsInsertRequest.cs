@@ -36,11 +36,5 @@
         [Display(Name = "商品庫存數量")]
         [Required(ErrorMessage = "{0} 必輸")]
         public int ProductsStock { get; set; }
-
-        /// <summary>
-        /// 商品評分
-        /// </summary>
-        [Display(Name = "商品評分")]
-        public decimal ProductsRate { get; set; }
     }
 }

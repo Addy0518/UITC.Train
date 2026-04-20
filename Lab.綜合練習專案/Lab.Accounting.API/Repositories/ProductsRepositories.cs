@@ -24,14 +24,19 @@ namespace Lab.Accounting.API.Repositories
                                  m.productsname,
                                  m.productsprice,
                                  m.ProductsStock,
-                                 m.productsRate,
-                                 c.productcategoryname
+                                 STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM     mallproducts m
                         JOIN     productcategory p
                         ON       m.productsid=p.productsid
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid=p.productcategoryid
-                        ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
+                        GROUP BY 
+                               m.productsid,
+                               m.userid,
+                               m.productsname,
+                               m.productsprice,
+                               m.ProductsStock
+                        ORDER BY productsid offset 0 rows FETCH next 10 rows only";
 
             var result = await conn.QueryAsync<ProductsResponse>(sql, new { offset = offset, pageSize = pageSize });
             return result;
@@ -53,15 +58,20 @@ namespace Lab.Accounting.API.Repositories
                                m.productsname,
                                m.productsprice,
                                m.ProductsStock,
-                               m.productsRate,
-                               c.productcategoryname
+                               STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM   mallproducts m
                                left JOIN productcategory p
                                  ON m.productsid = p.productsid
                                left JOIN mallproductcategory c
                                  ON c.productcategoryid = p.productcategoryid
                         WHERE  m.ProductsId = @ProductsId
-                               AND m.UserId = @UserId ";
+                               AND m.UserId = @UserId
+                        GROUP BY 
+                               m.productsid,
+                               m.userid,
+                               m.productsname,
+                               m.productsprice,
+                               m.ProductsStock";
 
             var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(
                 sql,
@@ -85,13 +95,13 @@ namespace Lab.Accounting.API.Repositories
                                     (userid,
                                      productsname,
                                      productsprice,
-                                     ProductsStock,
+                                     ProductsStock
                                      )
                         VALUES      (@UserId,
                                      @ProductsName,
                                      @ProductsPrice,
-                                     @ProductsStock,
-                                     @ProductsRate) 
+                                     @ProductsStock
+                                     ) 
                         Select 
                                     Cast(
                                     Scope_Identity() as int

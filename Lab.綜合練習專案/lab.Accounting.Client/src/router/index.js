@@ -133,6 +133,17 @@ const router = createRouter({
         },
         {
           /*
+             商品詳細
+          */
+          path: 'product-detail/:id',
+          name: 'product-detail',
+          meta: {
+            isPermissionVerification: false,
+          },
+          component: () => import('@/views/productDetail.vue'),
+        },
+        {
+          /*
             新增商品
           */
           path: 'add-product',
@@ -152,6 +163,17 @@ const router = createRouter({
             isPermissionVerification: true,
           },
           component: () => import('@/views/commandProducts.vue'),
+        },
+        {
+          /*
+            購物車
+          */
+          path: 'shopping-car',
+          name: 'shopping-car',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/shoppingCar.vue'),
         },
       ],
     },

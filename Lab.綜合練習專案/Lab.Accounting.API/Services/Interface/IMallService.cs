@@ -57,5 +57,21 @@ namespace Lab.Accounting.API.Services.Interface
         /// <param name="userId">使用者 Id</param>
         /// <returns>購物車中的所有商品</returns>
         Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProductsInShoppingCar(int userId);
+
+        /// <summary>
+        /// 新增單一商品到購物車
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId);
+
+        /// <summary>
+        /// 刪除單一商品從購物車
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> DeleteProductsInShoppingCar(int productsId, int userId);
     }
 }

@@ -82,7 +82,7 @@ namespace Lab.Accounting.API.Repositories.Interface
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"SELECT Avg(rating)
+                @"SELECT Round(Avg(rating),1)
                 FROM   mallproductsrate
                 WHERE  productsid = @productsId ";
 

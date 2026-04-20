@@ -58,3 +58,12 @@ export const productsImgUpload = (ImgData) =>
 // 商品圖片刪除
 export const productsImgDelete = (productsImgId) =>
   accountApiInstance.delete(`Mall/ProductsImgDelete?productsImgId=${productsImgId}`);
+// 查看購物車裡的商品
+export const getAllProductsInShoppingCar = () =>
+  accountApiInstance.get(`Mall/GetAllProductsInShoppingCar`);
+//新增購物車商品
+export const addProductsInShoppingCar = (productsId) =>
+  accountApiInstance.post(`Mall/AddProductsInShoppingCar?productsId=${productsId}`);
+// 刪除購物車商品
+export const deleteProductsInShoppingCar = (productsId) =>
+  accountApiInstance.delete(`Mall/DeleteProductsInShoppingCar?productsId=${productsId}`);

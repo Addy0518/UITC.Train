@@ -77,7 +77,7 @@ const userLogin = async () => {
         icon: 'success',
         title: '登入成功!',
       });
-      route.push('accounting-practice');
+      route.push('mall');
     }
     if (data.codeStatus === 4001) {
       Swal.fire({

@@ -66,7 +66,7 @@ const uploadFile = async (event) => {
       <RouterLink
         :to="{ name: 'mall' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-        ><i class="pi pi-shopping-cart px-5 ps-5"></i>商城</RouterLink
+        ><i class="pi pi-shop px-5 ps-5"></i>商城</RouterLink
       >
       <RouterLink
         :to="{ name: 'accounting-practice' }"
@@ -82,6 +82,11 @@ const uploadFile = async (event) => {
         :to="{ name: 'add-product' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-plus px-5 ps-5"></i>新增商品</RouterLink
+      >
+      <RouterLink
+        :to="{ name: 'shopping-car' }"
+        class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+        ><i class="pi pi-shopping-cart px-5 ps-5"></i>購物車</RouterLink
       >
       <RouterLink
         :to="{ name: 'chart' }"

@@ -2,22 +2,30 @@
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref, watch } from 'vue';
 import { productsImgUpload, productsImgDelete, createProducts } from '@/api/account-api';
+import { useRouter } from 'vue-router';
 import { id } from 'zod/v4/locales';
 import Chips from 'primevue/chips';
 import { url } from 'zod';
+import Swal from 'sweetalert2';
 /*
    變數名稱代表意義
    imgUrl : 大頭照圖片路徑
    baseUrl : 基底位址
+   route : 獲取路由資訊
    authStore : localstorage
+   productCategoryName : 商品類型名稱
+   productName : 商品名稱
+   productPrice : 商品價格
+   productStock : 商品庫存
 */
 let imgs = ref([]);
 const baseUrl = 'https://localhost:7124';
 const authStore = useAuthStore();
-let formData = ref();
+const route = useRouter();
 const productCategoryName = ref([]);
 const productName = ref();
 const productPrice = ref();
+const productStock = ref();
 /*
    新增商品
 */
@@ -26,6 +34,7 @@ const createProduct = async () => {
     productCategoryName: productCategoryName.value,
     productsName: productName.value,
     productsPrice: productPrice.value,
+    productStock: productStock.value,
   };
 
   const res = await createProducts(createData);
@@ -37,6 +46,11 @@ const createProduct = async () => {
       fd.append('productId', data.returnData);
       await productsImgUpload(fd);
     }
+    Swal.fire({
+      icon: 'success',
+      title: '上架商品成功!',
+    });
+    route.push('mall');
   }
 };
 
@@ -106,6 +120,12 @@ const removeImage = (index) => {
       </InputGroupAddon>
       <InputNumber v-model="productPrice" placeholder="商品價格" />
       <InputGroupAddon>.00</InputGroupAddon>
+    </InputGroup>
+    <InputGroup>
+      <InputGroupAddon>
+        <!-- <i class="pi pi-user"></i> -->
+      </InputGroupAddon>
+      <InputNumber v-model="productStock" placeholder="商品庫存" />
     </InputGroup>
     <!-- 按鈕區 -->
     <div class="justify-end flex mt-5">

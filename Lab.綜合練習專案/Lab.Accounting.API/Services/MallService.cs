@@ -161,7 +161,17 @@ namespace Lab.Accounting.API.Services
             {
                 var buytarget = await productsRepositories.BuyProducts(Request.ProductsId, Request.UserId);
 
-                var remainStock = target.ProductsStock - Request.PurchaseQuantity;
+                var remainStock = 0;
+                if (target.ProductsStock >= Request.PurchaseQuantity)
+                {
+                    remainStock = target.ProductsStock - Request.PurchaseQuantity;
+                }
+                else
+                {
+                    var errors = new Dictionary<string, string[]> { { "ProductsStock", new[] { "庫存不足!" } } };
+
+                    return ApiResponseHelper.RequestError<int>(errors);
+                }
 
                 var stocktarget = await productsRepositories.SetStock(Request.ProductsId, remainStock, Request.UserId);
 
@@ -194,7 +204,40 @@ namespace Lab.Accounting.API.Services
             {
                 return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
             }
+            foreach (var target in alltarget)
+            {
+                var imgs = await productsImgRepository.GetProductsAllImg(target.ProductsId);
+                target.ProductsImgs = imgs;
+            }
             return ApiResponseHelper.Success<IEnumerable<ProductsResponse>>(alltarget);
+        }
+
+        /// <summary>
+        /// 新增單一商品到購物車
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId)
+        {
+            var target = await productsShoppingCarRepositories.AddProductsInShoppingCar(productsId, userId);
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
+        /// 刪除單一商品從購物車
+        /// </summary>
+        /// <param name="productsId">商品 Id</param>
+        /// <param name="userId">使用者 Id</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> DeleteProductsInShoppingCar(int productsId, int userId)
+        {
+            var target = await productsShoppingCarRepositories.DeleteProductsInShoppingCar(productsId, userId);
+            if (target == 0)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+            return ApiResponseHelper.Success(target);
         }
 
         /// <summary>

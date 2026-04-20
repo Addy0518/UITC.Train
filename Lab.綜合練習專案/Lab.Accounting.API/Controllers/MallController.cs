@@ -104,7 +104,30 @@ public class MallController(IMallService mallService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallShoppingCar>>))]
     public async Task<IActionResult> GetAllProductsInShoppingCar()
     {
-        var userId = CurrentUserId;
-        return Ok(await mallService.GetAllProductsInShoppingCar(userId));
+        return Ok(await mallService.GetAllProductsInShoppingCar(CurrentUserId));
+    }
+
+    /// <summary>
+    /// 新增單一商品到購物車
+    /// </summary>
+    /// <param name="productsId">商品 Id</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> AddProductsInShoppingCar(int productsId)
+    {
+        return Ok(await mallService.AddProductsInShoppingCar(productsId, CurrentUserId));
+    }
+
+    /// <summary>
+    /// 刪除單一商品從購物車
+    /// </summary>
+    /// <param name="productsId">商品 Id</param>
+    /// <returns>影響列數</returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> DeleteProductsInShoppingCar(int productsId)
+    {
+        return Ok(await mallService.DeleteProductsInShoppingCar(productsId, CurrentUserId));
     }
 }
