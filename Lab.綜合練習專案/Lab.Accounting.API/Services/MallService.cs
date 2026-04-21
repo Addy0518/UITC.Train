@@ -196,8 +196,11 @@ namespace Lab.Accounting.API.Services
             }
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var buytarget = await productsRepositories.BuyProducts(Request.ProductsId, Request.UserId);
-
+                var buytarget = await productsRepositories.BuyProducts(
+                    Request.ProductsId,
+                    Request.UserId,
+                    Request.PurchaseQuantity
+                );
                 var remainStock = 0;
                 if (target.ProductsStock >= Request.PurchaseQuantity)
                 {

@@ -13,6 +13,11 @@
         public int ProductsId { get; set; }
 
         /// <summary>
+        /// 購買數量
+        /// </summary>
+        public int BoughtQuantity { get; set; }
+
+        /// <summary>
         /// 購買時間
         /// </summary>
         public DateTime BoughtTime { get; set; }

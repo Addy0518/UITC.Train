@@ -185,8 +185,9 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="productsId">商品 Id</param>
         /// <param name="userId">使用者 Id</param>
+        /// <param name="boughtQuantity">購買數量</param>
         /// <returns>影響列數</returns>
-        public async Task<int> BuyProducts(int productsId, int userId)
+        public async Task<int> BuyProducts(int productsId, int userId, int boughtQuantity)
         {
             using var conn = connecting.CreateConnecting();
 
@@ -194,9 +195,11 @@ namespace Lab.Accounting.API.Repositories
                 @"INSERT INTO MallBoughtProducts
                             (userid,
                             productsid,
+                            BoughtQuantity,
                             BoughtTIme)
                 VALUES     (@UserId,
                             @ProductsId,
+                            @BoughtQuantity,
                             @BoughtTIme)";
 
             return await conn.ExecuteAsync(
@@ -205,6 +208,7 @@ namespace Lab.Accounting.API.Repositories
                 {
                     UserId = userId,
                     ProductsId = productsId,
+                    BoughtQuantity = boughtQuantity,
                     BoughtTIme = DateTime.Now,
                 }
             );
