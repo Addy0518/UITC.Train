@@ -45,12 +45,11 @@ namespace Lab.Accounting.API.Repositories
         }
 
         /// <summary>
-        /// 查看單一商品
+        /// 賣家查看商品
         /// </summary>
         /// <param name="productId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
         /// <returns>商品資訊</returns>
-        public async Task<ProductsResponse> GetProducts(int productId, int userId)
+        public async Task<ProductsResponse> GetProducts(int productId)
         {
             using var conn = connecting.CreateConnecting();
 
@@ -68,7 +67,6 @@ namespace Lab.Accounting.API.Repositories
                                left JOIN mallproductcategory c
                                  ON c.productcategoryid = p.productcategoryid
                         WHERE  m.ProductsId = @ProductsId
-                               AND m.UserId = @UserId
                         GROUP BY 
                                m.productsid,
                                m.userid,
@@ -77,10 +75,7 @@ namespace Lab.Accounting.API.Repositories
                                m.isDelete,
                                m.ProductsStock";
 
-            var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(
-                sql,
-                new { ProductsId = productId, UserId = userId }
-            );
+            var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(sql, new { ProductsId = productId });
 
             return result;
         }

@@ -17,9 +17,8 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// 查看單一商品
         /// </summary>
         /// <param name="productId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
         /// <returns>商品資訊</returns>
-        Task<ProductsResponse> GetProducts(int productId, int userId);
+        Task<ProductsResponse> GetProducts(int productId);
 
         /// <summary>
         /// 新增單一商品

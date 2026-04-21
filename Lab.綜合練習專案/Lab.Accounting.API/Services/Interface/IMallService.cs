@@ -7,12 +7,11 @@ namespace Lab.Accounting.API.Services.Interface
     public interface IMallService
     {
         /// <summary>
-        /// 查看單一商品
+        /// 查看商品
         /// </summary>
         /// <param name="productId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
         /// <returns>商品資訊</returns>
-        Task<ApiResponse<ProductsResponse>> GetProducts(int productId, int userId);
+        Task<ApiResponse<ProductsResponse>> GetProducts(int productId);
 
         /// <summary>
         /// 查看所有商品 ( 分頁 )

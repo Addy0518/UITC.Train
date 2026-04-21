@@ -20,14 +20,14 @@ namespace Lab.Accounting.API.Services
     ) : IMallService
     {
         /// <summary>
-        /// 查看單一商品
+        /// 賣家查看商品
         /// </summary>
         /// <param name="productId">商品 Id</param>
         /// <param name="userId">使用者 Id</param>
         /// <returns>商品資訊</returns>
-        public async Task<ApiResponse<ProductsResponse>> GetProducts(int productId, int userId)
+        public async Task<ApiResponse<ProductsResponse>> GetProducts(int productId)
         {
-            var target = await productsRepositories.GetProducts(productId, userId);
+            var target = await productsRepositories.GetProducts(productId);
 
             if (target == null)
             {
@@ -119,8 +119,8 @@ namespace Lab.Accounting.API.Services
         {
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var target = await productsRepositories.GetProducts(productsId, userId);
-                if (target == null)
+                var target = await productsRepositories.GetProducts(productsId);
+                if (target == null || target.UserId != userId)
                 {
                     return ApiResponseHelper.NotFound<int>();
                 }
@@ -188,7 +188,7 @@ namespace Lab.Accounting.API.Services
         /// <returns>影響列數</returns>
         public async Task<ApiResponse<int>> UserBuyProductAndRate(ProductsBuyRequest Request)
         {
-            var target = await productsRepositories.GetProducts(Request.ProductsId, Request.UserId);
+            var target = await productsRepositories.GetProducts(Request.ProductsId);
 
             if (target == null)
             {

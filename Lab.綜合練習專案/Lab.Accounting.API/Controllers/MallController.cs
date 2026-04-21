@@ -25,10 +25,11 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> GetProducts([FromQuery] int productId)
     {
-        return Ok(await mallService.GetProducts(productId, CurrentUserId));
+        return Ok(await mallService.GetProducts(productId));
     }
 
     /// <summary>
@@ -68,17 +69,6 @@ public class MallController(IMallService mallService) : ControllerBase
     public async Task<IActionResult> DeleteProducts([FromQuery] int productsId)
     {
         return Ok(await mallService.DeleteProducts(productsId, CurrentUserId));
-    }
-
-    /// <summary>
-    /// 刪除所有已軟刪除的商品
-    /// </summary>
-    /// <returns>影響列數</returns>
-    [HttpDelete]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
-    public async Task<IActionResult> DeleteAllSoftDeleteProducts()
-    {
-        return Ok(await mallService.DeleteAllSoftDeleteProducts(CurrentUserId));
     }
 
     /// <summary>
