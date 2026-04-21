@@ -67,3 +67,6 @@ export const addProductsInShoppingCar = (productsId) =>
 // 刪除購物車商品
 export const deleteProductsInShoppingCar = (productsId) =>
   accountApiInstance.delete(`Mall/DeleteProductsInShoppingCar?productsId=${productsId}`);
+// 使用者購買商品並評分
+export const userBuyProductAndRate = (buyRequest) =>
+  accountApiInstance.post(`Mall/UserBuyProductAndRate`, buyRequest);

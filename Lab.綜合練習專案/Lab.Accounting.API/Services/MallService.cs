@@ -81,6 +81,7 @@ namespace Lab.Accounting.API.Services
                 ProductsPrice = productsInsertRequest.ProductsPrice,
                 ProductsStock = productsInsertRequest.ProductsStock,
                 UserId = productsInsertRequest.UserId,
+                IsDelete = false,
             };
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -105,6 +106,42 @@ namespace Lab.Accounting.API.Services
 
                 trxScope.Complete();
                 return ApiResponseHelper.Success(target);
+            }
+        }
+
+        /// <summary>
+        /// 軟刪除或硬刪除單一商品
+        /// </summary>
+        /// <param name="productsId">商品 ID</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> DeleteProducts(int productsId, int userId)
+        {
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var target = await productsRepositories.GetProducts(productsId, userId);
+                if (target == null)
+                {
+                    return ApiResponseHelper.NotFound<int>();
+                }
+
+                IEnumerable<MallProductImg> imgs = new List<MallProductImg>();
+                if (target.IsDelete == true)
+                {
+                    imgs = await productsImgRepository.GetProductsAllImg(productsId);
+                }
+
+                var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, userId);
+                if (target.IsDelete == true && deletetarget != null)
+                {
+                    foreach (var img in imgs)
+                    {
+                        FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", img.ProductsImg);
+                    }
+                }
+
+                trxScope.Complete();
+                return ApiResponseHelper.Success<int>(deletetarget);
             }
         }
 

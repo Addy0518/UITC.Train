@@ -35,13 +35,13 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <returns>影響列數</returns>
         Task<int> UpdateProducts(MallProducts products);
 
-        /// <summary>
-        /// 刪除單一商品
-        /// </summary>
-        /// <param name="productsId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
-        /// <returns>影響列數</returns>
-        Task<int> DeleteProducts(int productsId, int userId);
+        ///// <summary>
+        ///// 刪除單一商品
+        ///// </summary>
+        ///// <param name="productsId">商品 Id</param>
+        ///// <param name="userId">使用者 Id</param>
+        ///// <returns>影響列數</returns>
+        //Task<int> DeleteProducts(int productsId, int userId);
 
         /// <summary>
         /// 設定商品庫存
@@ -59,5 +59,14 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <param name="userId">使用者 Id</param>
         /// <returns>影響列數</returns>
         Task<int> BuyProducts(int productsId, int userId);
+
+        /// <summary>
+        /// 軟刪除或硬刪除單一商品
+        /// </summary>
+        /// <param name="productsId">商品 ID</param>
+        /// <param name="isDelete">刪除狀態</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>影響列數</returns>
+        Task<int> DeleteProducts(int productsId, bool isDelete, int userId);
     }
 }

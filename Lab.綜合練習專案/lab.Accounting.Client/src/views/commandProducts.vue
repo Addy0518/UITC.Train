@@ -34,7 +34,7 @@ const createProduct = async () => {
     productCategoryName: productCategoryName.value,
     productsName: productName.value,
     productsPrice: productPrice.value,
-    productStock: productStock.value,
+    productsStock: productStock.value,
   };
 
   const res = await createProducts(createData);

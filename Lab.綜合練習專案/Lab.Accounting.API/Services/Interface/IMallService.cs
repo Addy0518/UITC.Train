@@ -30,6 +30,14 @@ namespace Lab.Accounting.API.Services.Interface
         Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest);
 
         /// <summary>
+        /// 軟刪除單一商品
+        /// </summary>
+        /// <param name="productsId">商品 ID</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> DeleteProducts(int productsId, int userId);
+
+        /// <summary>
         /// 商品圖片上傳
         /// </summary>
         /// <param name="productsImgsFiles">商品圖片檔案</param>

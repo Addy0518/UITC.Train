@@ -2,15 +2,16 @@
 import { ref, onMounted, compile, computed, watch } from 'vue';
 import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/account-api';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import { value } from 'valibot';
 /*
   變數名稱代表意義
-  rowData : 初始資料 ( 全部商品 )
+  allProductsRaw : 初始資料 ( 全部商品 )
   products : 全部商品
   baseUrl : 基底位址
 */
 
 const products = ref([]);
-const rowData = ref();
+const allProductsRaw = ref();
 const baseUrl = 'https://localhost:7124';
 
 /*
@@ -28,16 +29,25 @@ const loadproducts = async () => {
   const { data } = res;
 
   if (data.codeStatus === 2000) {
-    rowData.value = data.returnData;
+    allProductsRaw.value = data.returnData;
     /*
         在解構的陣列 products 裡面再建立一個陣列 [x.productCategoryName, x] , 為 key 跟 value
         用 map 去除重複的 key 再把陣列轉回 values 陣列
     */
-    products.value = [...new Map(rowData.value.map((x) => [x.productsName, x])).values()];
+    products.value = [...new Map(allProductsRaw.value.map((x) => [x.productsName, x])).values()];
   } else {
-    rowData.value = [];
+    allProductsRaw.value = [];
     products.value = [];
   }
+};
+
+/*
+  去除後端傳回類別重複
+*/
+const productscategory = (categories) => {
+  if (!categories) return [];
+
+  return [...new Set(categories.split(','))];
 };
 
 /*
@@ -70,12 +80,9 @@ const deleteProductsInCar = async (productId) => {
             <img :src="getProductsImg(product)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
             <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
             <span class="mt-3 ms-5 me-5">{{ product.productsPrice }}</span>
-            <!-- 篩選出同個商品的類別  -->
-            <div
-              v-for="data in rowData.filter((x) => x.productsName === product.productsName)"
-              :key="data.productsId"
-            >
-              <span class="mt-3 ms-5 me-5">{{ data.productCategoryName }}</span>
+            <!-- 依照原始資料篩選出同個商品的類別  -->
+            <div v-for="cate in productscategory(product.productCategoryName)" :key="cate">
+              <span class="mt-3 ms-5 me-5">{{ cate }}</span>
             </div>
             <button
               class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"

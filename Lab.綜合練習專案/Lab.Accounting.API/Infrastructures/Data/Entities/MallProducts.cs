@@ -31,5 +31,10 @@
         /// 商品購買人
         /// </summary>
         public int ProductsPurchasedUser { get; set; }
+
+        /// <summary>
+        /// 是否為刪除狀態
+        /// </summary>
+        public bool IsDelete { get; set; }
     }
 }

@@ -33,12 +33,16 @@ const loadproducts = async () => {
     products.value = data.returnData;
 
     /*
-       在解構的陣列 products 裡面再建立一個陣列 [x.productCategoryName, x] , 為 key 跟 value
-       用 map 去除重複的 key 再把陣列轉回 values 陣列
+       使用 flatmap 把後端的類別攤平去重 , 跟 map 的差別是
+       map 會把 ['男士,男士', '鞋子'] + split(',') 變成 [['男士', '男士'], ['鞋子']] （ 陣列裡面包陣列 ）, 系統就會分不出來
+       flatmap 則會 ['男士', '男士', '鞋子'] + split(',') 變成 ['男士', '男士', '鞋子'] ( 自動攤平成一個大陣列 ）, 這樣就能比對重複
     */
     const allNames = products.value.flatMap((x) =>
       x.productCategoryName ? x.productCategoryName.split(',') : [],
     );
+    /*
+       最後在用 new Set 把剛剛 flatmap 攤平的陣列去重複塞進類別
+    */
     categorys.value = [...new Set(allNames)];
   }
 };
@@ -52,6 +56,15 @@ const categoryFilter = (cate) => {
       (x) => x.productCategoryName && x.productCategoryName.split(',').includes(cate),
     );
   }
+};
+
+/*
+  去除後端傳回類別重複
+*/
+const productscategory = (categories) => {
+  if (!categories) return [];
+
+  return [...new Set(categories.split(','))];
 };
 
 /*
@@ -74,6 +87,8 @@ const addProductsInCar = async (productId) => {
     alert('加入成功!');
   }
 };
+
+
 </script>
 
 <template>
@@ -117,13 +132,11 @@ const addProductsInCar = async (productId) => {
                   <!-- 迴圈讀取商品類別並去重複 ( 因為這裡是拿沒去重複的 product 資料 , 所以類別會多重複一次 ) -->
 
                   <span
-                    v-for="cat in product.productCategoryName
-                      ? product.productCategoryName.split(',')
-                      : []"
-                    :key="cat"
+                    v-for="cate in productscategory(product.productCategoryName)"
+                    :key="cate"
                     class="mt-3 ms-2 me-2 text-sm text-gray-500"
                   >
-                    {{ cat }}
+                    {{ cate }}
                   </span>
                 </RouterLink>
                 <button

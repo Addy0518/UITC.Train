@@ -40,6 +40,11 @@ namespace Lab.Accounting.API.Common.Responses
         public decimal ProductsRate { get; set; }
 
         /// <summary>
+        /// 是否為刪除狀態
+        /// </summary>
+        public bool IsDelete { get; set; }
+
+        /// <summary>
         /// 商品圖片 URL
         /// </summary>
         public IEnumerable<MallProductImg>? ProductsImgs { get; set; }

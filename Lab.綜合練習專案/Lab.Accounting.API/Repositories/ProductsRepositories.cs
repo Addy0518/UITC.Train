@@ -24,6 +24,7 @@ namespace Lab.Accounting.API.Repositories
                                  m.productsname,
                                  m.productsprice,
                                  m.ProductsStock,
+                                 m.isDelete,
                                  STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM     mallproducts m
                         JOIN     productcategory p
@@ -35,6 +36,7 @@ namespace Lab.Accounting.API.Repositories
                                m.userid,
                                m.productsname,
                                m.productsprice,
+                               m.isDelete,
                                m.ProductsStock
                         ORDER BY productsid offset 0 rows FETCH next 10 rows only";
 
@@ -58,6 +60,7 @@ namespace Lab.Accounting.API.Repositories
                                m.productsname,
                                m.productsprice,
                                m.ProductsStock,
+                               m.isDelete,
                                STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM   mallproducts m
                                left JOIN productcategory p
@@ -71,6 +74,7 @@ namespace Lab.Accounting.API.Repositories
                                m.userid,
                                m.productsname,
                                m.productsprice,
+                               m.isDelete,
                                m.ProductsStock";
 
             var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(
@@ -95,12 +99,14 @@ namespace Lab.Accounting.API.Repositories
                                     (userid,
                                      productsname,
                                      productsprice,
-                                     ProductsStock
+                                     ProductsStock,
+                                     IsDelete
                                      )
                         VALUES      (@UserId,
                                      @ProductsName,
                                      @ProductsPrice,
-                                     @ProductsStock
+                                     @ProductsStock,
+                                     @IsDelete
                                      ) 
                         Select 
                                     Cast(
@@ -129,20 +135,27 @@ namespace Lab.Accounting.API.Repositories
         }
 
         /// <summary>
-        /// 刪除單一商品
+        /// 軟刪除或硬刪除單一商品
         /// </summary>
-        /// <param name="productsId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
+        /// <param name="productsId">商品 ID</param>
+        /// <param name="isDelete">刪除狀態</param>
+        /// <param name="userId">使用者 ID</param>
         /// <returns>影響列數</returns>
-        public async Task<int> DeleteProducts(int productsId, int userId)
+        public async Task<int> DeleteProducts(int productsId, bool isDelete, int userId)
         {
             using var conn = connecting.CreateConnecting();
+            //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
+            var deletesql = isDelete
+                ? @"
+                    Delete From ProductImg Where ProductsID=@productsId;
+                    Delete From MallProductsRate Where ProductsID=@productsId;
+                    Delete From MallShoppingCar Where ProductsID=@productsId;
+                    Delete From ProductCategory Where ProductsID=@productsId;
+                    Delete From MallProducts Where ProductsID=@productsId and UserId=@userId;"
+                : @"Update MallProducts Set IsDelete=1 Where ProductsID=@productsId and UserId=@userId;
+                    ";
 
-            var sql =
-                @"Delete From MallProducts
-                Where productsid = @ProductsId and userid = @UserId";
-
-            return await conn.ExecuteAsync(sql, new { ProductsId = productsId, UserId = userId });
+            return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = userId });
         }
 
         /// <summary>

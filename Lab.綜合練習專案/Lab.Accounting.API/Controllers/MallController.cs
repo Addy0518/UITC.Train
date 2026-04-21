@@ -59,6 +59,29 @@ public class MallController(IMallService mallService) : ControllerBase
     }
 
     /// <summary>
+    /// 軟刪除或硬刪除單一商品
+    /// </summary>
+    /// <param name="productsId">商品 ID</param>
+    /// <returns>影響列數</returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    public async Task<IActionResult> DeleteProducts([FromQuery] int productsId)
+    {
+        return Ok(await mallService.DeleteProducts(productsId, CurrentUserId));
+    }
+
+    /// <summary>
+    /// 刪除所有已軟刪除的商品
+    /// </summary>
+    /// <returns>影響列數</returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    public async Task<IActionResult> DeleteAllSoftDeleteProducts()
+    {
+        return Ok(await mallService.DeleteAllSoftDeleteProducts(CurrentUserId));
+    }
+
+    /// <summary>
     /// 商品圖片上傳
     /// </summary>
     /// <param name="productsImgsFiles">商品圖片檔案</param>

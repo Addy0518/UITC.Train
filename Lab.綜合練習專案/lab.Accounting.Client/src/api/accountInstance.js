@@ -58,8 +58,9 @@ instance.interceptors.response.use(
       });
     }
     if (status === 401) {
-      alert('登入時間過期 , 請重新登入 !');
-      router.push('/login');
+      alert('登入時間過期，請重新登入！');
+
+      router.push({ name: 'login' });
     }
     if (status === 500) {
       const errorMsg = `狀況 : ${data.message} \r\n Url : ${data.error500.instance} \r\n 錯誤訊息 : ${data.error500.title}`;
