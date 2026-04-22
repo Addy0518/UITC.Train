@@ -13,6 +13,15 @@ namespace Lab.Accounting.API.Repositories.Interface
         Task<int> ProductsImgUpload(int productId, string productsImgs);
 
         /// <summary>
+        /// 商品圖片更新
+        /// </summary>
+        /// <param name="productsImgs">圖片</param>
+        /// <param name="productImgId">商品圖片 ID</param>
+        /// <param name="productId">商品 ID</param>
+        /// <returns>影響列數</returns>
+        Task<int> ProductsImgUpdate(int productId, string productsImgs, int productImgId);
+
+        /// <summary>
         /// 查看商品所有圖片
         /// </summary>
         /// <param name="productsId">商品 ID </param>

@@ -20,12 +20,12 @@
         /// <summary>
         /// 商品價格
         /// </summary>
-        public decimal ProductsPrice { get; set; }
+        public decimal? ProductsPrice { get; set; }
 
         /// <summary>
         /// 商品庫存數量
         /// </summary>
-        public int ProductsStock { get; set; }
+        public int? ProductsStock { get; set; }
 
         /// <summary>
         /// 商品購買人

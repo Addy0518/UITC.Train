@@ -55,5 +55,21 @@ namespace Lab.Accounting.API.Repositories
                         VALUES      (@ProductsId,@ProductCategoryId) ";
             return await conn.ExecuteAsync(sql, new { ProductsId = productId, ProductCategoryId = productcategoryId });
         }
+
+        /// <summary>
+        /// 刪除商品跟類別關聯
+        /// </summary>
+        /// <param name="productId">商品 Id</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> DeleteProductsCategory(int productId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"DELETE FROM ProductCategory
+                  WHERE ProductsId = @ProductsId";
+
+            return await conn.ExecuteAsync(sql, new { ProductsId = productId });
+        }
     }
 }

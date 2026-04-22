@@ -6,7 +6,7 @@ namespace Lab.Accounting.API.Repositories.Interface
     public interface IProductsRepositories
     {
         /// <summary>
-        /// 查看所有商品 ( 分頁 )
+        /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>

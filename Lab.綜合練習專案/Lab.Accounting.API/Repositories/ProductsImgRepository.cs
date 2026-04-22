@@ -27,6 +27,36 @@ namespace Lab.Accounting.API.Repositories
         }
 
         /// <summary>
+        /// 商品圖片更新
+        /// </summary>
+        /// <param name="productsImgs">圖片</param>
+        /// <param name="productImgId">商品圖片 ID</param>
+        /// <param name="productId">商品 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> ProductsImgUpdate(int productId, string productsImgs, int productImgId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Update
+                    ProductImg
+                    Set ProductsId=COALESCE(@ProductsId, ProductsId),
+                    ProductsImg=COALESCE(@ProductsImg, ProductsImg)
+                    Where productsImgId=@productsImgId
+                ";
+
+            return await conn.ExecuteAsync(
+                sql,
+                new
+                {
+                    ProductsId = productId,
+                    ProductsImg = productsImgs,
+                    productsImgId = productImgId,
+                }
+            );
+        }
+
+        /// <summary>
         /// 查看商品所有圖片
         /// </summary>
         /// <param name="productsId">商品 ID </param>

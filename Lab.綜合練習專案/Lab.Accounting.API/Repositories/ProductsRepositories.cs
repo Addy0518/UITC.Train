@@ -7,7 +7,7 @@ namespace Lab.Accounting.API.Repositories
     public class ProductsRepositories(DBConnecting connecting) : IProductsRepositories
     {
         /// <summary>
-        /// 查看所有商品 ( 分頁 )
+        /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
@@ -56,7 +56,7 @@ namespace Lab.Accounting.API.Repositories
         }
 
         /// <summary>
-        /// 賣家查看商品
+        /// 查看單一商品
         /// </summary>
         /// <param name="productId">商品 Id</param>
         /// <returns>商品資訊</returns>
@@ -133,9 +133,9 @@ namespace Lab.Accounting.API.Repositories
             var sql =
                 @"UPDATE mallproducts
                         SET      
-                                 productsname = @ProductsName,
-                                 productsprice = @ProductsPrice,
-                                 ProductsStock = @ProductsStock,
+                                 productsname = COALESCE(@ProductsName, productsname),
+                                 productsprice = COALESCE(@ProductsPrice, productsprice),
+                                 ProductsStock = COALESCE(@ProductsStock, ProductsStock)
                         WHERE    productsid = @ProductsId and userId=@UserId;";
             return await conn.ExecuteAsync(sql, products);
         }

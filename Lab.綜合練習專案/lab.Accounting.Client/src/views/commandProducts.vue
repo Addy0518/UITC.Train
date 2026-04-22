@@ -9,18 +9,14 @@ import { url } from 'zod';
 import Swal from 'sweetalert2';
 /*
    變數名稱代表意義
-   imgUrl : 大頭照圖片路徑
-   baseUrl : 基底位址
    route : 獲取路由資訊
-   authStore : localstorage
    productCategoryName : 商品類型名稱
    productName : 商品名稱
    productPrice : 商品價格
    productStock : 商品庫存
 */
 let imgs = ref([]);
-const baseUrl = 'https://localhost:7124';
-const authStore = useAuthStore();
+
 const route = useRouter();
 const productCategoryName = ref([]);
 const productName = ref();
@@ -73,6 +69,9 @@ const uploadFile = async (event) => {
   event.target.value = '';
 };
 
+/*
+   移除圖片
+*/
 const removeImage = (index) => {
   imgs.value.splice(index, 1);
 };
@@ -81,7 +80,7 @@ const removeImage = (index) => {
 <template>
   <div>
     <div class="flex flex-wrap gap-4 p-5">
-      <!-- 1. 顯示已上傳的圖片預覽 -->
+      <!-- 顯示已上傳的圖片預覽 -->
       <div v-for="(img, index) in imgs" :key="index" class="relative w-100 h-100">
         <img :src="img.url" class="w-full h-full object-cover rounded-lg shadow" />
         <!-- 刪除按鈕 -->
@@ -93,7 +92,7 @@ const removeImage = (index) => {
         </button>
       </div>
 
-      <!-- 2. 上傳按鈕 (永遠在最後面) -->
+      <!-- 上傳按鈕 (永遠在最後面) -->
       <label
         class="w-100 h-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition"
       >

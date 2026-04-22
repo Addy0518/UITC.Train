@@ -23,5 +23,12 @@
         /// <param name="productcategoryId">商品類別 Id</param>
         /// <returns>影響列數</returns>
         Task<int> CreateProductsCategory(int productId, int productcategoryId);
+
+        /// <summary>
+        /// 刪除商品跟類別關聯
+        /// </summary>
+        /// <param name="productId">商品 Id</param>
+        /// <returns>影響列數</returns>
+        Task<int> DeleteProductsCategory(int productId);
     }
 }

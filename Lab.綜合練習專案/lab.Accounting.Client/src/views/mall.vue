@@ -7,12 +7,12 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
   categorys : 商品類別
   products : 全部商品
   allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
-  baseUrl : 基底位址
+  baseUrl : 環境變數裡的圖片基底位址
 */
 const categorys = ref();
 const products = ref([]);
 const allProductsRaw = ref([]);
-const baseUrl = 'https://localhost:7124';
+const baseUrl = import.meta.env.VITE_IMG_URL;
 
 /*
    初始化加載所有商品
@@ -25,7 +25,7 @@ onMounted(() => {
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
 */
 const loadproducts = async () => {
-  const res = await getAllProduct(0, 11);
+  const res = await getAllProduct();
   const { data } = res;
   console.log('data', data);
   if (data.codeStatus === 2000) {
@@ -87,8 +87,6 @@ const addProductsInCar = async (productId) => {
     alert('加入成功!');
   }
 };
-
-
 </script>
 
 <template>

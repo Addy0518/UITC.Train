@@ -8,15 +8,14 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    變數名稱代表意義
    route : 獲取路由資訊
    product : 商品資訊
-   productsId : 商品 ID
-   purchaseQuantity : 商品購買數量
+   baseUrl : 環境變數裡的圖片基底位址
    rating : 評分
    comment : 評論
    createTime : 現在時間
 */
 const route = useRoute();
 const product = ref(null);
-const baseUrl = 'https://localhost:7124';
+const baseUrl = import.meta.env.VITE_IMG_URL;
 const purchaseQuantity = ref();
 const rating = ref();
 const comment = ref();

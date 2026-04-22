@@ -14,7 +14,7 @@ namespace Lab.Accounting.API.Services.Interface
         Task<ApiResponse<ProductsResponse>> GetProducts(int productId);
 
         /// <summary>
-        /// 查看所有商品 ( 分頁 )
+        /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
@@ -34,6 +34,13 @@ namespace Lab.Accounting.API.Services.Interface
         Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest);
 
         /// <summary>
+        /// 更新單一商品
+        /// </summary>
+        /// <param name="productsUpdateRequest">商品更新資訊</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> UpdateProducts(ProductsUpdateRequest productsUpdateRequest);
+
+        /// <summary>
         /// 軟刪除單一商品
         /// </summary>
         /// <param name="productsId">商品 ID</param>
@@ -46,8 +53,21 @@ namespace Lab.Accounting.API.Services.Interface
         /// </summary>
         /// <param name="productsImgsFiles">商品圖片檔案</param>
         /// <param name="productId">商品 Id</param>
-        /// <returns>影響列數</returns>
+        /// <returns>新增成功的商品圖片</returns>
         Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
+
+        /// <summary>
+        /// 商品圖片更新
+        /// </summary>
+        /// <param name="productsImgsFiles">商品圖片檔案</param>
+        /// <param name="productImgId">商品圖片 ID</param>
+        /// <param name="productId">商品 ID</param>
+        /// <returns>更新成功的商品圖片</returns>
+        Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpdate(
+            IFormFile productsImgsFiles,
+            int productImgId,
+            int productId
+        );
 
         /// <summary>
         /// 商品圖片刪除

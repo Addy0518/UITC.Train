@@ -7,12 +7,12 @@ import { value } from 'valibot';
   變數名稱代表意義
   allProductsRaw : 初始資料 ( 全部商品 )
   products : 全部商品
-  baseUrl : 基底位址
+  baseUrl : 環境變數裡的圖片基底位址
 */
 
 const products = ref([]);
 const allProductsRaw = ref();
-const baseUrl = 'https://localhost:7124';
+const baseUrl = import.meta.env.VITE_IMG_URL;
 
 /*
    初始化時加載購物車商品
@@ -42,7 +42,7 @@ const loadproducts = async () => {
 };
 
 /*
-  去除後端傳回類別重複
+  把後端傳回類別分開
 */
 const productscategory = (categories) => {
   if (!categories) return [];

@@ -23,7 +23,6 @@ namespace Lab.Accounting.API.Services
         /// 賣家查看商品
         /// </summary>
         /// <param name="productId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
         /// <returns>商品資訊</returns>
         public async Task<ApiResponse<ProductsResponse>> GetProducts(int productId)
         {
@@ -43,7 +42,7 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 查看所有商品 ( 分頁 )
+        /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
@@ -117,9 +116,39 @@ namespace Lab.Accounting.API.Services
         /// <summary>
         /// 更新單一商品
         /// </summary>
-        /// <param name="products">商品資訊</param>
+        /// <param name="productsUpdateRequest">商品更新資訊</param>
         /// <returns>影響列數</returns>
-        //public async Task<ApiResponse<int>> UpdateProducts(MallProducts products) { }
+        public async Task<ApiResponse<int>> UpdateProducts(ProductsUpdateRequest productsUpdateRequest)
+        {
+            var updateTarget = new MallProducts
+            {
+                UserId = productsUpdateRequest.UserId,
+                ProductsId = productsUpdateRequest.ProductsId,
+                ProductsName = productsUpdateRequest.ProductsName,
+                ProductsPrice = productsUpdateRequest.ProductsPrice,
+                ProductsStock = productsUpdateRequest.ProductsStock,
+            };
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var target = await productsRepositories.GetProducts(productsUpdateRequest.ProductsId);
+                if (target == null || target.UserId != productsUpdateRequest.UserId)
+                {
+                    return ApiResponseHelper.NotFound<int>();
+                }
+                var result = await productsRepositories.UpdateProducts(updateTarget);
+                await productsCategoryRepositories.DeleteProductsCategory(productsUpdateRequest.ProductsId);
+                foreach (var category in productsUpdateRequest.ProductCategoryName)
+                {
+                    var productTarget = await ExistsCategory(category);
+                    var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
+                        productsUpdateRequest.ProductsId,
+                        productTarget
+                    );
+                }
+                trxScope.Complete();
+                return ApiResponseHelper.Success(result);
+            }
+        }
 
         /// <summary>
         /// 軟刪除或硬刪除單一商品
@@ -161,8 +190,8 @@ namespace Lab.Accounting.API.Services
         /// 商品圖片上傳
         /// </summary>
         /// <param name="productsImgsFiles">商品圖片檔案</param>
-        /// <param name="productId">商品 Id</param>
-        /// <returns>影響列數</returns>
+        /// <param name="productId">商品 ID</param>
+        /// <returns>新增成功的圖片</returns>
         public async Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(
             IFormFile productsImgsFiles,
             int productId
@@ -172,6 +201,25 @@ namespace Lab.Accounting.API.Services
             await productsImgRepository.ProductsImgUpload(productId, result);
             var newtarget = await productsImgRepository.GetProductsAllImg(productId);
             return ApiResponseHelper.Success(newtarget);
+        }
+
+        /// <summary>
+        /// 商品圖片更新
+        /// </summary>
+        /// <param name="productsImgsFiles">商品圖片檔案</param>
+        /// <param name="productImgId">商品圖片 ID</param>
+        /// <param name="productId">商品 ID</param>
+        /// <returns>更新成功的圖片</returns>
+        public async Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpdate(
+            IFormFile productsImgsFiles,
+            int productImgId,
+            int productId
+        )
+        {
+            var oldimg = await productsImgRepository.GetProductsImg(productImgId);
+            string updatePath = await ExistFile(productsImgsFiles, oldimg.ProductsImg, "ProductsImg");
+            await productsImgRepository.ProductsImgUpdate(productId, updatePath, productImgId);
+            return ApiResponseHelper.Success(await productsImgRepository.GetProductsAllImg(productId));
         }
 
         /// <summary>
@@ -277,7 +325,7 @@ namespace Lab.Accounting.API.Services
         /// 私有方法 , 檢查商品類別是否存在
         /// </summary>
         /// <param name="productcategory">商品類別</param>
-        /// <returns>影響列數</returns>
+        /// <returns>類別 ID</returns>
         private async Task<int> ExistsCategory(string productcategory)
         {
             int existcategory = 0;

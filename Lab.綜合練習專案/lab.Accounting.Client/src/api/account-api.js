@@ -50,8 +50,13 @@ export const getProduct = (productId) =>
 // 查看所有商品
 export const getAllProduct = (pageIndex = 0, pageSize = 10) =>
   accountApiInstance.get(`Mall/GetAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+// 查看賣家所有商品
+export const getSellerAllProduct = (pageIndex = 0, pageSize = 10) =>
+  accountApiInstance.get(`Mall/GetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
 // 新增單一商品 + 類別
 export const createProducts = (product) => accountApiInstance.post(`Mall/CreateProducts`, product);
+// 更新單一商品 + 類別
+export const updateProducts=(product)=>accountApiInstance.put(`Mall/UpdateProducts`, product)
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Mall/ProductsImgUpload`, ImgData);
