@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getSellerAllProduct, getProduct, updateProducts } from '@/api/account-api';
+import { getSellerAllProduct } from '@/api/account-api';
 import { ref } from 'vue';
 
 /*
@@ -51,8 +51,6 @@ const productscategory = (categories) => {
 
   return [...new Set(categories.split(','))];
 };
-
-
 </script>
 
 <template>

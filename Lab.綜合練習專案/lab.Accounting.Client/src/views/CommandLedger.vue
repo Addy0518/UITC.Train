@@ -55,10 +55,10 @@ const categoryData = async () => {
 /*
   呼叫查看單一帳本 API ( 讓編輯帳本時前端能看到原本資料 )
 */
-const updateData = async (id) => {
+const updateData = async (productId) => {
   try {
-    if (!id) return;
-    const res = await getLedger(id);
+    if (!productId) return;
+    const res = await getLedger(productId);
     const { data } = res;
     if (data.codeStatus === 2000) {
       const item = data.returnData;

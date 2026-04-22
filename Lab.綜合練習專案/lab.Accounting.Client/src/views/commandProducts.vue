@@ -1,52 +1,142 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth';
-import { onMounted, ref, watch } from 'vue';
-import { productsImgUpload, productsImgDelete, createProducts } from '@/api/account-api';
-import { useRouter } from 'vue-router';
+import { onMounted, ref, watch, computed } from 'vue';
+import {
+  productsImgUpload,
+  productsImgDelete,
+  createProducts,
+  getProduct,
+  updateProducts,
+  productsImgUpdate,
+} from '@/api/account-api';
+import { useRoute, useRouter } from 'vue-router';
 import { id } from 'zod/v4/locales';
 import Chips from 'primevue/chips';
 import { url } from 'zod';
 import Swal from 'sweetalert2';
 /*
    變數名稱代表意義
+   imgs : 商品圖片
    route : 獲取路由資訊
    productCategoryName : 商品類型名稱
    productName : 商品名稱
    productPrice : 商品價格
    productStock : 商品庫存
+   productsId : 商品 ID
+   isAdd : 路由判斷新增或刪除
+   baseUrl : 環境變數裡的圖片基底位址
 */
 let imgs = ref([]);
 
-const route = useRouter();
+const route = useRoute();
+const router = useRouter();
 const productCategoryName = ref([]);
 const productName = ref();
 const productPrice = ref();
 const productStock = ref();
-/*
-   新增商品
-*/
-const createProduct = async () => {
-  const createData = {
-    productCategoryName: productCategoryName.value,
-    productsName: productName.value,
-    productsPrice: productPrice.value,
-    productsStock: productStock.value,
-  };
+const productsId = ref();
+const isAdd = computed(() => router.name === 'add-product');
+const baseUrl = import.meta.env.VITE_IMG_URL;
 
-  const res = await createProducts(createData);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    for (const file of imgs.value) {
-      const fd = new FormData();
-      fd.append('productsImgsFiles', file.file);
-      fd.append('productId', data.returnData);
-      await productsImgUpload(fd);
+onMounted(() => {
+  if (route.params.id) {
+    updateData(route.params.id);
+  }
+});
+
+/*
+  查看單一商品 API ( 讓編輯帳本時前端能看到原本資料 )
+*/
+const updateData = async (productId) => {
+  try {
+    if (!productId) return;
+    const res = await getProduct(productId);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      const item = data.returnData;
+      productsId.value = item.productsId;
+      productName.value = item.productsName;
+      productPrice.value = item.productsPrice;
+      productStock.value = item.productsStock;
+
+      if (item.productCategoryName) {
+        productCategoryName.value = item.productCategoryName.split(',');
+      }
+
+      if (item.productsImgs) {
+        imgs.value = item.productsImgs.map((img) => ({
+          productsImgId: img.productsImgId,
+          url: `${baseUrl}/ProductsImg/${img.productsImg}`,
+          file: null,
+        }));
+      }
     }
-    Swal.fire({
-      icon: 'success',
-      title: '上架商品成功!',
-    });
-    route.push('mall');
+    if (data.codeStatus === 4001) {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error('編輯錯誤 ', error.response);
+  }
+};
+
+/*
+   新增或更新商品
+*/
+const createOrUpdateProduct = async () => {
+  if (isAdd.value) {
+    const createData = {
+      productCategoryName: productCategoryName.value,
+      productsName: productName.value,
+      productsPrice: productPrice.value,
+      productsStock: productStock.value,
+    };
+    const res = await createProducts(createData);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      for (const file of imgs.value) {
+        const fd = new FormData();
+        fd.append('productsImgsFiles', file.file);
+        fd.append('productId', data.returnData);
+        await productsImgUpload(fd);
+      }
+      Swal.fire({
+        icon: 'success',
+        title: '上架商品成功!',
+      });
+      router.push({ name: 'mall' });
+    }
+  } else if (!isAdd.value) {
+    const updateData = {
+      productsId: productsId.value,
+      productCategoryName: productCategoryName.value,
+      productsName: productName.value,
+      productsPrice: productPrice.value,
+      productsStock: productStock.value,
+    };
+    const res = await updateProducts(updateData);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      for (const img of imgs.value) {
+        const fd = new FormData();
+        fd.append('productsImgsFiles', img.file);
+        fd.append('productId', productsId.value);
+        /*
+           判斷圖片是新增還是更新
+        */
+        if (img.file && img.productsImgId) {
+          fd.append('productsImgId', img.productsImgId);
+          await productsImgUpdate(fd);
+        } else if (img.file && !img.productsImgId) {
+          await productsImgUpload(fd);
+        }
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: '更新商品成功!',
+      });
+      router.push({ name: 'mall' });
+    }
   }
 };
 
@@ -129,7 +219,7 @@ const removeImage = (index) => {
     <!-- 按鈕區 -->
     <div class="justify-end flex mt-5">
       <button
-        @click="createProduct()"
+        @click="createOrUpdateProduct()"
         class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer"
       >
         儲存

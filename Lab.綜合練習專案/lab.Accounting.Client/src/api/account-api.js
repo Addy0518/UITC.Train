@@ -56,10 +56,13 @@ export const getSellerAllProduct = (pageIndex = 0, pageSize = 10) =>
 // 新增單一商品 + 類別
 export const createProducts = (product) => accountApiInstance.post(`Mall/CreateProducts`, product);
 // 更新單一商品 + 類別
-export const updateProducts=(product)=>accountApiInstance.put(`Mall/UpdateProducts`, product)
+export const updateProducts = (product) => accountApiInstance.put(`Mall/UpdateProducts`, product);
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Mall/ProductsImgUpload`, ImgData);
+// 商品圖片更新
+export const productsImgUpdate = (ImgData) =>
+  accountApiInstance.put(`Mall/ProductsImgUpdate`, ImgData);
 // 商品圖片刪除
 export const productsImgDelete = (productsImgId) =>
   accountApiInstance.delete(`Mall/ProductsImgDelete?productsImgId=${productsImgId}`);
