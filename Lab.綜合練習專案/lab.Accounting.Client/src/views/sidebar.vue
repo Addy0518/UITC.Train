@@ -69,6 +69,11 @@ const uploadFile = async (event) => {
         ><i class="pi pi-shop px-5 ps-5"></i>商城</RouterLink
       >
       <RouterLink
+        :to="{ name: 'seller-centre' }"
+        class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+        ><i class="pi pi-shop px-5 ps-5"></i>賣家中心</RouterLink
+      >
+      <RouterLink
         :to="{ name: 'accounting-practice' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-dollar px-5 ps-5"></i>記帳</RouterLink

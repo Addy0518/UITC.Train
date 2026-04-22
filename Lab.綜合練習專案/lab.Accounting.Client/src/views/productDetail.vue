@@ -87,8 +87,11 @@ const productscategory = (categories) => {
           <div v-for="img in product.productsImgs">
             <img :src="getProductsImg(img)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
           </div>
-          <span class="mt-3">{{ product.productsName }}</span>
-          <span class="mt-3">{{ product.productsPrice }}</span>
+          <span class="mt-3">商品名稱 : {{ product.productsName }}</span>
+          <span class="mt-3">商品價格 : {{ product.productsPrice }}</span>
+          <span class="mt-3">商品評分 : {{ product.productsRate }}</span>
+          <span class="mt-3">商品庫存 : {{ product.productsStock }}</span>
+          <span class="mt-3">商品擁有者 ID : {{ product.userId }}</span>
           <InputGroup>
             <InputNumber v-model="purchaseQuantity" placeholder="購買數量" />
           </InputGroup>

@@ -10,8 +10,9 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
+        /// <param name="userId">使用者 Id</param>
         /// <returns>商品列表</returns>
-        Task<IEnumerable<ProductsResponse>> GetAllProducts(int pageIndex, int pageSize);
+        Task<IEnumerable<ProductsResponse>> GetAllProducts(int pageIndex, int pageSize, int? userId = null);
 
         /// <summary>
         /// 查看單一商品
@@ -47,9 +48,8 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// </summary>
         /// <param name="productsId">商品 Id</param>
         /// <param name="purchaseQuantity">購買數量</param>
-        /// <param name="userId">使用者 Id</param>
         /// <returns>影響列數</returns>
-        Task<int> SetStock(int productsId, int purchaseQuantity, int userId);
+        Task<int> SetStock(int productsId, int purchaseQuantity);
 
         /// <summary>
         /// 購買商品

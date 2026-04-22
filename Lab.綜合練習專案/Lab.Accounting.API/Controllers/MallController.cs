@@ -47,6 +47,19 @@ public class MallController(IMallService mallService) : ControllerBase
     }
 
     /// <summary>
+    /// 查看賣家所有商品 ( 分頁 )
+    /// </summary>
+    /// <param name="pageIndex">頁碼</param>
+    /// <param name="pageSize">每頁顯示數量</param>
+    /// <returns>商品列表</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
+    public async Task<IActionResult> GetSellerAllProducts([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
+    {
+        return Ok(await mallService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, CurrentUserId));
+    }
+
+    /// <summary>
     /// 新增單一商品 + 類別
     /// </summary>
     /// <param name="productsInsertRequest">新增商品資訊</param>
@@ -89,12 +102,12 @@ public class MallController(IMallService mallService) : ControllerBase
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>影響列數</returns>
-    [HttpDelete]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> ProductsImgDelete([FromQuery] int productsImgId)
-    {
-        return Ok(await mallService.ProductsImgDelete(productsImgId));
-    }
+    //[HttpDelete]
+    //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    //public async Task<IActionResult> ProductsImgDelete([FromQuery] int productsImgId)
+    //{
+    //    return Ok(await mallService.ProductsImgDelete(productsImgId));
+    //}
 
     /// <summary>
     /// 使用者購買商品並評分

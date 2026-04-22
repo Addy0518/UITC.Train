@@ -11,8 +11,9 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
+        /// <param name="userId">使用者 Id</param>
         /// <returns>商品列表</returns>
-        public async Task<IEnumerable<ProductsResponse>> GetAllProducts(int pageIndex, int pageSize)
+        public async Task<IEnumerable<ProductsResponse>> GetAllProducts(int pageIndex, int pageSize, int? userId = null)
         {
             using var conn = connecting.CreateConnecting();
 
@@ -31,6 +32,8 @@ namespace Lab.Accounting.API.Repositories
                         ON       m.productsid=p.productsid
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid=p.productcategoryid
+                        Where (@UserId is null or m.userId=@UserId) 
+                        and  m.isDelete=0
                         GROUP BY 
                                m.productsid,
                                m.userid,
@@ -38,9 +41,17 @@ namespace Lab.Accounting.API.Repositories
                                m.productsprice,
                                m.isDelete,
                                m.ProductsStock
-                        ORDER BY productsid offset 0 rows FETCH next 10 rows only";
+                        ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
-            var result = await conn.QueryAsync<ProductsResponse>(sql, new { offset = offset, pageSize = pageSize });
+            var result = await conn.QueryAsync<ProductsResponse>(
+                sql,
+                new
+                {
+                    offset = offset,
+                    pageSize = pageSize,
+                    UserId = (object)userId ?? DBNull.Value,
+                }
+            );
             return result;
         }
 
@@ -158,26 +169,17 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="productsId">商品 Id</param>
         /// <param name="purchaseQuantity">購買數量</param>
-        /// <param name="userId">使用者 Id</param>
         /// <returns>影響列數</returns>
-        public async Task<int> SetStock(int productsId, int purchaseQuantity, int userId)
+        public async Task<int> SetStock(int productsId, int purchaseQuantity)
         {
             using var conn = connecting.CreateConnecting();
 
             var sql =
                 @"Update mallproducts
                     SET ProductsStock = @purchaseQuantity
-                    WHERE ProductsId = @productsId and UserId = @UserId";
+                    WHERE ProductsId = @productsId ";
 
-            return await conn.ExecuteAsync(
-                sql,
-                new
-                {
-                    productsId,
-                    purchaseQuantity,
-                    userId,
-                }
-            );
+            return await conn.ExecuteAsync(sql, new { productsId, purchaseQuantity });
         }
 
         /// <summary>

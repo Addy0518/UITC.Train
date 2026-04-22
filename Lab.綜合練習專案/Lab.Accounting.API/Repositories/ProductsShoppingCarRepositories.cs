@@ -28,13 +28,12 @@ namespace Lab.Accounting.API.Repositories
                         ON       c.productcategoryid=p.productcategoryid                       
                         JOIN      mallshoppingcar s
                         ON       m.productsid = s.productsid
-                WHERE  m.userid = @UserId 
+                WHERE  s.userid = @UserId 
                 GROUP BY 
                                m.productsid,
                                m.userid,
                                m.productsname,
-                               m.productsprice,
-                               m.ProductsStock";
+                               m.productsprice";
 
             return await conn.QueryAsync<ProductsResponse>(sql, new { UserId = userId });
         }
@@ -53,10 +52,14 @@ namespace Lab.Accounting.API.Repositories
                 @"INSERT INTO mallshoppingcar
                             (userid,
                                 productsid)
-                VALUES     (@UserId,
-                            @ProductsId)
+                SELECT @userid,@productsid
+                        
+                WHERE  NOT EXISTS (SELECT 1
+                                    FROM   mallshoppingcar
+                                    WHERE  productsid = @productsid
+                                            AND userid = @userid)
 
-                SELECT Cast(Scope_identity() AS INT);";
+                SELECT Cast(@@RowCount AS INT) ;";
 
             return await conn.QuerySingleAsync<int>(sql, new { UserId = userId, ProductsId = productsId });
         }

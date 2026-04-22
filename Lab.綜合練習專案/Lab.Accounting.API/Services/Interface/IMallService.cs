@@ -18,8 +18,13 @@ namespace Lab.Accounting.API.Services.Interface
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
+        /// <param name="userId">使用者 Id</param>
         /// <returns>商品列表</returns>
-        Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(int pageIndex, int pageSize);
+        Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(
+            int pageIndex,
+            int pageSize,
+            int? userId = null
+        );
 
         /// <summary>
         /// 新增單一商品 + 類別
@@ -49,7 +54,7 @@ namespace Lab.Accounting.API.Services.Interface
         /// </summary>
         /// <param name="productsImgId">商品圖片 ID</param>
         /// <returns>影響列數</returns>
-        Task<ApiResponse<int>> ProductsImgDelete(int productsImgId);
+        //Task<ApiResponse<int>> ProductsImgDelete(int productsImgId);
 
         /// <summary>
         /// 使用者購買商品並評分

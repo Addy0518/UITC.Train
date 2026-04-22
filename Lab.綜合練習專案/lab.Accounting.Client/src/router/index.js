@@ -175,6 +175,17 @@ const router = createRouter({
           },
           component: () => import('@/views/shoppingCar.vue'),
         },
+        {
+          /*
+            賣家中心
+          */
+          path: 'seller-centre',
+          name: 'seller-centre',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/sellerCentre.vue'),
+        },
       ],
     },
     /*

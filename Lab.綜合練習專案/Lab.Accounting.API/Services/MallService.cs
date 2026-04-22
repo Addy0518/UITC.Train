@@ -47,10 +47,15 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
+        /// <param name="userId">使用者 Id</param>
         /// <returns>商品列表</returns>
-        public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(int pageIndex, int pageSize)
+        public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(
+            int pageIndex,
+            int pageSize,
+            int? userId = null
+        )
         {
-            var products = await productsRepositories.GetAllProducts(pageIndex, pageSize);
+            var products = await productsRepositories.GetAllProducts(pageIndex, pageSize, userId);
 
             if (products == null)
             {
@@ -110,6 +115,13 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
+        /// 更新單一商品
+        /// </summary>
+        /// <param name="products">商品資訊</param>
+        /// <returns>影響列數</returns>
+        //public async Task<ApiResponse<int>> UpdateProducts(MallProducts products) { }
+
+        /// <summary>
         /// 軟刪除或硬刪除單一商品
         /// </summary>
         /// <param name="productsId">商品 ID</param>
@@ -163,25 +175,6 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 商品圖片刪除
-        /// </summa ry>
-        /// <param name="productsImgId">商品圖片 ID</param>
-        /// <returns>影響列數</returns>
-        public async Task<ApiResponse<int>> ProductsImgDelete(int productsImgId)
-        {
-            var target = await productsImgRepository.GetProductsImg(productsImgId);
-
-            if (target == null)
-            {
-                return ApiResponseHelper.NotFound<int>();
-            }
-
-            FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", target.ProductsImg);
-            int rows = await productsImgRepository.DeleteProductsImg(productsImgId);
-            return ApiResponseHelper.Success(rows);
-        }
-
-        /// <summary>
         /// 使用者購買商品並評分
         /// </summary>
         /// <param name="Request">商品購買資訊 </param>
@@ -213,7 +206,7 @@ namespace Lab.Accounting.API.Services
                     return ApiResponseHelper.RequestError<int>(errors);
                 }
 
-                var stocktarget = await productsRepositories.SetStock(Request.ProductsId, remainStock, Request.UserId);
+                var stocktarget = await productsRepositories.SetStock(Request.ProductsId, remainStock);
 
                 var Insertrate = new MallProductsRate
                 {
@@ -307,6 +300,28 @@ namespace Lab.Accounting.API.Services
             }
 
             return productcategoryId;
+        }
+
+        /// <summary>
+        /// 私有方法判斷文件是否存在
+        /// </summary>
+        /// <param name="newFile">新的檔案</param>
+        /// <param name="oldPath">舊的檔案路徑</param>
+        /// <param name="folder">檔案存放的資料夾</param>
+        /// <returns>檔案路徑</returns>
+        private async Task<string?> ExistFile(IFormFile? newFile, string? oldPath, string folder)
+        {
+            //沒更新就回傳舊檔案路徑
+            if (newFile == null)
+                return oldPath;
+
+            //更新的話刪除舊檔案
+            if (!string.IsNullOrEmpty(oldPath))
+            {
+                FileUploadHelper.DeleteFile(env.WebRootPath, folder, oldPath);
+            }
+            //不管怎樣都要儲存檔案
+            return await FileUploadHelper.SaveFileAsync(newFile, env.WebRootPath, folder);
         }
     }
 }

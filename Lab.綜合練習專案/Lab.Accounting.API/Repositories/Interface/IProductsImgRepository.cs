@@ -5,7 +5,7 @@ namespace Lab.Accounting.API.Repositories.Interface
     public interface IProductsImgRepository
     {
         /// <summary>
-        /// 商品圖片上傳
+        /// 商品圖片上傳  ( 判斷是否已有照片 )
         /// </summary>
         /// <param name="productsImgs">圖片</param>
         /// <param name="productId">商品 ID</param>
