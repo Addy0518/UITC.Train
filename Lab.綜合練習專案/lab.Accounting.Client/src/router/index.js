@@ -68,12 +68,12 @@ const router = createRouter({
           /*
             帳本回收桶
           */
-          path: 'recyclingBin',
-          name: 'recyclingBin',
+          path: 'recycling-ledger',
+          name: 'recycling-ledger',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/recyclingBin.vue'),
+          component: () => import('@/views/recyclingLedger.vue'),
         },
         {
           /*
@@ -163,6 +163,17 @@ const router = createRouter({
             isPermissionVerification: true,
           },
           component: () => import('@/views/commandProducts.vue'),
+        },
+         {
+          /*
+            商品回收桶
+          */
+          path: 'recycling-products',
+          name: 'recycling-products',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/recyclingProducts.vue'),
         },
         {
           /*

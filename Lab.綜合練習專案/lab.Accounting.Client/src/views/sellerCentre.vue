@@ -1,10 +1,10 @@
 <script setup>
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getSellerAllProduct } from '@/api/account-api';
+import { getSellerAllProduct, deleteProducts } from '@/api/account-api';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-
+import Swal from 'sweetalert2';
 /*
    變數名稱代表意義
    allproduct : 賣家所有商品
@@ -14,6 +14,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
 const allproduct = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
+
 /*
    初始化時
 */
@@ -30,7 +31,6 @@ const getSellerProduct = async () => {
 
   if (data.codeStatus === 2000) {
     allproduct.value = data.returnData;
-    console.log('allproduct', allproduct.value);
   }
 };
 
@@ -52,12 +52,39 @@ const productscategory = (categories) => {
 
   return [...new Set(categories.split(','))];
 };
+
+const deleteProduct = async (productId) => {
+  const res = await deleteProducts(productId);
+  const { data } = res;
+  if (data.codeStatus === 2000) {
+    Swal.fire({
+      icon: 'success',
+      title: '已成功丟到回收桶!',
+    });
+  }
+  await getSellerProduct();
+};
 </script>
 
 <template>
   <div class="flex flex-col w-full">
     <div class="border-gray-200h-full flex flex-col items-center">
       <div class="mt-40 w-300 rounded-lg shadow-sm">
+        <div class="flex justify-end">
+          <button
+            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+            @click="router.push({ name: 'add-product' })"
+          >
+            新增商品
+          </button>
+          <button
+            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
+            @click="router.push({ name: 'recycling-products' })"
+          >
+            前往回收桶
+          </button>
+        </div>
+
         <div v-for="product in allproduct">
           <div
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
@@ -69,17 +96,18 @@ const productscategory = (categories) => {
             <div v-for="cate in productscategory(product.productCategoryName)" :key="cate">
               <span class="mt-3 ms-5 me-5">{{ cate }}</span>
             </div>
-            <button
-              class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-              @click="router.push({ name: 'add-product' })"
-            >
-              新增商品
-            </button>
+
             <button
               class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
               @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
             >
               編輯商品
+            </button>
+            <button
+              class="bg-red-800 text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
+              @click="deleteProduct(product.productsId)"
+            >
+              刪除
             </button>
           </div>
         </div>

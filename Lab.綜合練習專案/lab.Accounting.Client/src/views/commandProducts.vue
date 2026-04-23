@@ -35,7 +35,7 @@ const productName = ref();
 const productPrice = ref();
 const productStock = ref();
 const productsId = ref();
-const isAdd = computed(() => router.name === 'add-product');
+const isAdd = computed(() => route.name === 'add-product');
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
 onMounted(() => {
@@ -83,6 +83,7 @@ const updateData = async (productId) => {
    新增或更新商品
 */
 const createOrUpdateProduct = async () => {
+  console.log('isAdd.value', isAdd.value);
   if (isAdd.value) {
     const createData = {
       productCategoryName: productCategoryName.value,

@@ -57,6 +57,9 @@ export const getSellerAllProduct = (pageIndex = 0, pageSize = 10) =>
 export const createProducts = (product) => accountApiInstance.post(`Mall/CreateProducts`, product);
 // 更新單一商品 + 類別
 export const updateProducts = (product) => accountApiInstance.put(`Mall/UpdateProducts`, product);
+// 軟刪除或硬刪除單一商品
+export const deleteProducts = (productsId) =>
+  accountApiInstance.delete(`Mall/DeleteProducts?productsId=${productsId}`);
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Mall/ProductsImgUpload`, ImgData);

@@ -96,7 +96,7 @@ const uploadFile = async (event) => {
       >
 
       <RouterLink
-        :to="{ name: 'recyclingBin' }"
+        :to="{ name: 'recycling-ledger' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-trash px-5 ps-5"></i>資源回收桶</RouterLink
       >
