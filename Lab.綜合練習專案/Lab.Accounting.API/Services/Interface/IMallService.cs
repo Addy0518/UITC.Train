@@ -57,17 +57,11 @@ namespace Lab.Accounting.API.Services.Interface
         Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
 
         /// <summary>
-        /// 商品圖片更新
+        /// 刪除商品圖片
         /// </summary>
-        /// <param name="productsImgsFiles">商品圖片檔案</param>
-        /// <param name="productImgId">商品圖片 ID</param>
-        /// <param name="productId">商品 ID</param>
-        /// <returns>更新成功的商品圖片</returns>
-        Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpdate(
-            IFormFile productsImgsFiles,
-            int productImgId,
-            int productId
-        );
+        /// <param name="productsImgId">商品圖片 ID</param>
+        /// <returns>刪除的圖片</returns>
+        Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId);
 
         /// <summary>
         /// 商品圖片刪除

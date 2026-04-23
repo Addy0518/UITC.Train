@@ -204,22 +204,19 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 商品圖片更新
+        /// 刪除商品圖片
         /// </summary>
-        /// <param name="productsImgsFiles">商品圖片檔案</param>
-        /// <param name="productImgId">商品圖片 ID</param>
-        /// <param name="productId">商品 ID</param>
-        /// <returns>更新成功的圖片</returns>
-        public async Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpdate(
-            IFormFile productsImgsFiles,
-            int productImgId,
-            int productId
-        )
+        /// <param name="productsImgId">商品圖片 ID</param>
+        /// <returns>刪除的圖片</returns>
+        public async Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId)
         {
-            var oldimg = await productsImgRepository.GetProductsImg(productImgId);
-            string updatePath = await ExistFile(productsImgsFiles, oldimg.ProductsImg, "ProductsImg");
-            await productsImgRepository.ProductsImgUpdate(productId, updatePath, productImgId);
-            return ApiResponseHelper.Success(await productsImgRepository.GetProductsAllImg(productId));
+            var result = await productsImgRepository.DeleteProductsImg(productsImgId);
+            if (result == null)
+            {
+                return ApiResponseHelper.NotFound<MallProductImg>();
+            }
+            FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", result.ProductsImg);
+            return ApiResponseHelper.Success(result);
         }
 
         /// <summary>

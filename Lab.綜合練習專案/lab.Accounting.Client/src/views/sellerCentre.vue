@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getSellerAllProduct } from '@/api/account-api';
 import { ref } from 'vue';
+import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
 /*
    變數名稱代表意義

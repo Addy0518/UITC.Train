@@ -7,13 +7,13 @@ import {
   createProducts,
   getProduct,
   updateProducts,
-  productsImgUpdate,
 } from '@/api/account-api';
 import { useRoute, useRouter } from 'vue-router';
 import { id } from 'zod/v4/locales';
 import Chips from 'primevue/chips';
 import { url } from 'zod';
 import Swal from 'sweetalert2';
+
 /*
    變數名稱代表意義
    imgs : 商品圖片
@@ -93,11 +93,13 @@ const createOrUpdateProduct = async () => {
     const res = await createProducts(createData);
     const { data } = res;
     if (data.codeStatus === 2000) {
-      for (const file of imgs.value) {
-        const fd = new FormData();
-        fd.append('productsImgsFiles', file.file);
-        fd.append('productId', data.returnData);
-        await productsImgUpload(fd);
+      for (const img of imgs.value) {
+        if (img.file) {
+          const fd = new FormData();
+          fd.append('productsImgsFiles', img.file);
+          fd.append('productId', data.returnData);
+          await productsImgUpload(fd);
+        }
       }
       Swal.fire({
         icon: 'success',
@@ -117,16 +119,11 @@ const createOrUpdateProduct = async () => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       for (const img of imgs.value) {
-        const fd = new FormData();
-        fd.append('productsImgsFiles', img.file);
-        fd.append('productId', productsId.value);
-        /*
-           判斷圖片是新增還是更新
-        */
-        if (img.file && img.productsImgId) {
+        if (img.file) {
+          const fd = new FormData();
+          fd.append('productsImgsFiles', img.file);
+          fd.append('productId', productsId.value);
           fd.append('productsImgId', img.productsImgId);
-          await productsImgUpdate(fd);
-        } else if (img.file && !img.productsImgId) {
           await productsImgUpload(fd);
         }
       }
@@ -162,8 +159,36 @@ const uploadFile = async (event) => {
 /*
    移除圖片
 */
-const removeImage = (index) => {
-  imgs.value.splice(index, 1);
+const removeImage = async (index) => {
+  const targetImg = imgs.value[index];
+
+  if (targetImg.productsImgId) {
+    try {
+      const result = await Swal.fire({
+        title: '確定要刪除這張圖片嗎？',
+        text: '刪除後將無法復原！',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: '確定刪除',
+        cancelButtonText: '取消',
+      });
+
+      if (result.isConfirmed) {
+        const res = await productsImgDelete(targetImg.productsImgId);
+        const { data } = res;
+
+        if (data.codeStatus === 2000) {
+          imgs.value.splice(index, 1);
+        }
+      }
+    } catch (err) {
+      console.error('資料操作錯誤 ', error.response);
+    }
+  } else {
+    imgs.value.splice(index, 1);
+  }
 };
 </script>
 

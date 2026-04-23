@@ -38,8 +38,8 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <summary>
         /// 刪除商品圖片
         /// </summary>
-        /// <param name="productsId">商品 ID </param>
-        /// <returns>影響列數</returns>
-        Task<int> DeleteProductsImg(int productsId);
+        /// <param name="productsImgId">商品圖片 ID</param>
+        /// <returns>刪除的圖片</returns>
+        Task<MallProductImg> DeleteProductsImg(int productsImgId);
     }
 }

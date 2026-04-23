@@ -60,9 +60,6 @@ export const updateProducts = (product) => accountApiInstance.put(`Mall/UpdatePr
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Mall/ProductsImgUpload`, ImgData);
-// 商品圖片更新
-export const productsImgUpdate = (ImgData) =>
-  accountApiInstance.put(`Mall/ProductsImgUpdate`, ImgData);
 // 商品圖片刪除
 export const productsImgDelete = (productsImgId) =>
   accountApiInstance.delete(`Mall/ProductsImgDelete?productsImgId=${productsImgId}`);

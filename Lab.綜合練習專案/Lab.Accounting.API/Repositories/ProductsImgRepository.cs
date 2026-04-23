@@ -94,17 +94,18 @@ namespace Lab.Accounting.API.Repositories
         /// 刪除商品圖片
         /// </summary>
         /// <param name="productsImgId">商品圖片 ID</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> DeleteProductsImg(int productsImgId)
+        /// <returns>刪除的圖片</returns>
+        public async Task<MallProductImg> DeleteProductsImg(int productsImgId)
         {
             using var conn = connecting.CreateConnecting();
 
             var sql =
                 @"Delete 
-                FROM   ProductImg
+                FROM   ProductImg 
+                Output [DELETED].*
                 WHERE  ProductsImgId = @ProductsImgId ";
 
-            return await conn.ExecuteAsync(sql, new { ProductsImgId = productsImgId });
+            return await conn.QueryFirstAsync<MallProductImg>(sql, new { ProductsImgId = productsImgId });
         }
     }
 }

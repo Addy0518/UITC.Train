@@ -111,21 +111,15 @@ public class MallController(IMallService mallService) : ControllerBase
     }
 
     /// <summary>
-    /// 商品圖片更新
+    /// 刪除商品圖片
     /// </summary>
-    /// <param name="productsImgsFiles">商品圖片檔案</param>
-    /// <param name="productImgId">商品圖片 ID</param>
-    /// <param name="productId">商品 ID</param>
-    /// <returns>更新成功的商品圖片</returns>
-    [HttpPut]
+    /// <param name="productsImgId">商品圖片 ID</param>
+    /// <returns>刪除的圖片</returns>
+    [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> ProductsImgUpdate(
-        IFormFile productsImgsFiles,
-        [FromForm] int productImgId,
-        [FromForm] int productId
-    )
+    public async Task<IActionResult> ProductsImgDelete([FromQuery] int productsImgId)
     {
-        return Ok(await mallService.ProductsImgUpdate(productsImgsFiles, productImgId, productId));
+        return Ok(await mallService.DeleteProductsImg(productsImgId));
     }
 
     /// <summary>
