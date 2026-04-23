@@ -8,35 +8,21 @@ namespace Lab.Accounting.API.Repositories
         /// <summary>
         /// 查看商品類別
         /// </summary>
-        /// <param name="productcategory">商品類別</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> GetCategory(string productcategory)
+        /// <param name="productcategoryId">商品類別 ID</param>
+        /// <returns>商品類別 ID</returns>
+        public async Task<int> GetCategory(int? productcategoryId = null)
         {
             using var conn = connecting.CreateConnecting();
 
+            //  第一層 ProductCategoryId 跟 ProductParentId 為 null 的是最頂層的類別
+            //  第二層 ( 子 ) ProductParentId = ( 父 ) ProductCategoryId  的就是往下一層的類別
+            //  (衣服 => 短袖 , 長袖 => 男士短袖 , 女士短袖 ...)
             var sql =
-                @"Select ProductCategoryId From mallproductcategory Where ProductCategoryName = @ProductCategoryName";
-            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { ProductCategoryName = productcategory });
-        }
-
-        /// <summary>
-        /// 新增單一商品類別
-        /// </summary>
-        /// <param name="productcategory">商品類別</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> CreateCategory(string productcategory)
-        {
-            using var conn = connecting.CreateConnecting();
-
-            var sql =
-                @"INSERT INTO mallproductcategory
-                                    (productcategoryname)
-                        VALUES      (@ProductCategoryName) 
-                        Select 
-                                    Cast(
-                                    Scope_Identity() as int
-                                    );";
-            return await conn.QuerySingleAsync<int>(sql, new { ProductCategoryName = productcategory });
+                @"Select ProductCategoryId,ProductCategoryName,ProductParentId 
+                From mallproductcategory 
+                Where (@ProductCategoryId is null and ProductParentId is null) 
+                OR ProductParentId = @ProductCategoryId";
+            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { ProductCategoryId = productcategoryId });
         }
 
         /// <summary>

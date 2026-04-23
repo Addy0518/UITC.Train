@@ -92,12 +92,11 @@ namespace Lab.Accounting.API.Services
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var target = await productsRepositories.CreateProducts(product);
-                foreach (var category in productsInsertRequest.ProductCategoryName)
+                foreach (var categoryId in productsInsertRequest.ProductCategoryId)
                 {
-                    var productTarget = await ExistsCategory(category);
                     var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
                         target,
-                        productTarget
+                        categoryId
                     );
                 }
                 var Insertrate = new MallProductsRate
@@ -139,12 +138,11 @@ namespace Lab.Accounting.API.Services
                 }
                 var result = await productsRepositories.UpdateProducts(updateTarget);
                 await productsCategoryRepositories.DeleteProductsCategory(productsUpdateRequest.ProductsId);
-                foreach (var category in productsUpdateRequest.ProductCategoryName)
+                foreach (var categoryId in productsUpdateRequest.ProductCategoryId)
                 {
-                    var productTarget = await ExistsCategory(category);
                     var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
                         productsUpdateRequest.ProductsId,
-                        productTarget
+                        categoryId
                     );
                 }
                 trxScope.Complete();
@@ -334,57 +332,6 @@ namespace Lab.Accounting.API.Services
                 return ApiResponseHelper.NotFound<int>();
             }
             return ApiResponseHelper.Success(target);
-        }
-
-        /// <summary>
-        /// 私有方法 , 檢查商品類別是否存在
-        /// </summary>
-        /// <param name="productcategory">商品類別</param>
-        /// <returns>類別 ID</returns>
-        private async Task<int> ExistsCategory(string productcategory)
-        {
-            int existcategory = 0;
-            if (!string.IsNullOrWhiteSpace(productcategory))
-            {
-                // 查看類別是否存在
-                existcategory = await productsCategoryRepositories.GetCategory(productcategory);
-            }
-
-            int productcategoryId = 0;
-            // 存在就回傳 0 以上 , 直接塞 id
-            if (existcategory > 0)
-            {
-                productcategoryId = existcategory;
-            }
-            // 不存在就創一個新類別 , 一樣塞 id 回去
-            else
-            {
-                productcategoryId = await productsCategoryRepositories.CreateCategory(productcategory);
-            }
-
-            return productcategoryId;
-        }
-
-        /// <summary>
-        /// 私有方法判斷文件是否存在
-        /// </summary>
-        /// <param name="newFile">新的檔案</param>
-        /// <param name="oldPath">舊的檔案路徑</param>
-        /// <param name="folder">檔案存放的資料夾</param>
-        /// <returns>檔案路徑</returns>
-        private async Task<string?> ExistFile(IFormFile? newFile, string? oldPath, string folder)
-        {
-            //沒更新就回傳舊檔案路徑
-            if (newFile == null)
-                return oldPath;
-
-            //更新的話刪除舊檔案
-            if (!string.IsNullOrEmpty(oldPath))
-            {
-                FileUploadHelper.DeleteFile(env.WebRootPath, folder, oldPath);
-            }
-            //不管怎樣都要儲存檔案
-            return await FileUploadHelper.SaveFileAsync(newFile, env.WebRootPath, folder);
         }
     }
 }

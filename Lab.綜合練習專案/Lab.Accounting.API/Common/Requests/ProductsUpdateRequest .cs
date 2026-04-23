@@ -17,10 +17,10 @@
         public int UserId { get; set; }
 
         /// <summary>
-        /// 商品類別名稱
+        /// 商品類別 ID
         /// </summary>
-        [Display(Name = "商品類別名稱")]
-        public string[]? ProductCategoryName { get; set; }
+        [Display(Name = "商品類別 ID")]
+        public int[] ProductCategoryId { get; set; }
 
         /// <summary>
         /// 商品名稱

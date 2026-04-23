@@ -5,16 +5,9 @@
         /// <summary>
         /// 查看商品類別
         /// </summary>
-        /// <param name="productcategory">商品類別</param>
-        /// <returns>影響列數</returns>
-        Task<int> GetCategory(string productcategory);
-
-        /// <summary>
-        /// 新增單一商品類別
-        /// </summary>
-        /// <param name="productcategory">商品類別</param>
-        /// <returns>影響列數</returns>
-        Task<int> CreateCategory(string productcategory);
+        /// <param name="productcategoryId">商品類別 ID</param>
+        /// <returns>商品類別 ID</returns>
+        Task<int> GetCategory(int? productcategoryId = null);
 
         /// <summary>
         /// 新增商品跟類別關聯

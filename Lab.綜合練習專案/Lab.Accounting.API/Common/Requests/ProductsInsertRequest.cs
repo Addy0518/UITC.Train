@@ -10,11 +10,11 @@
         public int UserId { get; set; }
 
         /// <summary>
-        /// 商品類別名稱
+        /// 商品類別 ID
         /// </summary>
-        [Display(Name = "商品類別名稱")]
+        [Display(Name = "商品類別 ID")]
         [Required(ErrorMessage = "{0} 必輸")]
-        public string[] ProductCategoryName { get; set; }
+        public int[] ProductCategoryId { get; set; }
 
         /// <summary>
         /// 商品名稱
