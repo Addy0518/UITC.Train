@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Lab.Accounting.API.Infrastructures.Data.Entities;
 using Lab.Accounting.API.Repositories.Interface;
 
 namespace Lab.Accounting.API.Repositories
@@ -9,8 +10,8 @@ namespace Lab.Accounting.API.Repositories
         /// 查看商品類別
         /// </summary>
         /// <param name="productcategoryId">商品類別 ID</param>
-        /// <returns>商品類別 ID</returns>
-        public async Task<int> GetCategory(int? productcategoryId = null)
+        /// <returns>商品類別</returns>
+        public async Task<MallProductCategory> GetCategory(int? productcategoryId = null)
         {
             using var conn = connecting.CreateConnecting();
 
@@ -22,7 +23,10 @@ namespace Lab.Accounting.API.Repositories
                 From mallproductcategory 
                 Where (@ProductCategoryId is null and ProductParentId is null) 
                 OR ProductParentId = @ProductCategoryId";
-            return await conn.QueryFirstOrDefaultAsync<int>(sql, new { ProductCategoryId = productcategoryId });
+            return await conn.QueryFirstOrDefaultAsync<MallProductCategory>(
+                sql,
+                new { ProductCategoryId = productcategoryId }
+            );
         }
 
         /// <summary>

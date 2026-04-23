@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories.Interface
+﻿using Lab.Accounting.API.Infrastructures.Data.Entities;
+
+namespace Lab.Accounting.API.Repositories.Interface
 {
     public interface IProductsCategoryRepositories
     {
@@ -7,7 +9,7 @@
         /// </summary>
         /// <param name="productcategoryId">商品類別 ID</param>
         /// <returns>商品類別 ID</returns>
-        Task<int> GetCategory(int? productcategoryId = null);
+        Task<MallProductCategory> GetCategory(int? productcategoryId = null);
 
         /// <summary>
         /// 新增商品跟類別關聯
