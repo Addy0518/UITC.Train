@@ -51,8 +51,10 @@ export const getProduct = (productId) =>
 export const getAllProduct = (pageIndex = 0, pageSize = 10) =>
   accountApiInstance.get(`Mall/GetAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
 // 查看賣家所有商品
-export const getSellerAllProduct = (pageIndex = 0, pageSize = 10) =>
-  accountApiInstance.get(`Mall/GetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+export const getSellerAllProduct = (pageIndex = 0, pageSize = 10, isDelete = false) =>
+  accountApiInstance.get(
+    `Mall/GetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}&isDelete=${isDelete}`,
+  );
 // 新增單一商品 + 類別
 export const createProducts = (product) => accountApiInstance.post(`Mall/CreateProducts`, product);
 // 更新單一商品 + 類別
@@ -60,6 +62,9 @@ export const updateProducts = (product) => accountApiInstance.put(`Mall/UpdatePr
 // 軟刪除或硬刪除單一商品
 export const deleteProducts = (productsId) =>
   accountApiInstance.delete(`Mall/DeleteProducts?productsId=${productsId}`);
+// 復原單一或全部商品刪除狀態
+export const updateProductsDeleteStatus = (productsId) =>
+  accountApiInstance.put(`Mall/UpdateProductsDeleteStatus`, productsId);
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Mall/ProductsImgUpload`, ImgData);

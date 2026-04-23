@@ -53,16 +53,15 @@ const productscategory = (categories) => {
   return [...new Set(categories.split(','))];
 };
 
+/*
+  軟刪除
+*/
 const deleteProduct = async (productId) => {
   const res = await deleteProducts(productId);
   const { data } = res;
   if (data.codeStatus === 2000) {
-    Swal.fire({
-      icon: 'success',
-      title: '已成功丟到回收桶!',
-    });
+    await getSellerProduct();
   }
-  await getSellerProduct();
 };
 </script>
 

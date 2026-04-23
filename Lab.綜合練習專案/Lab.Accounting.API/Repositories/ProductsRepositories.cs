@@ -12,8 +12,14 @@ namespace Lab.Accounting.API.Repositories
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
         /// <param name="userId">使用者 Id</param>
+        /// <param name="isDelete">是否為刪除狀態</param>
         /// <returns>商品列表</returns>
-        public async Task<IEnumerable<ProductsResponse>> GetAllProducts(int pageIndex, int pageSize, int? userId = null)
+        public async Task<IEnumerable<ProductsResponse>> GetAllProducts(
+            int pageIndex,
+            int pageSize,
+            int? userId = null,
+            bool? isDelete = false
+        )
         {
             using var conn = connecting.CreateConnecting();
 
@@ -33,7 +39,7 @@ namespace Lab.Accounting.API.Repositories
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid=p.productcategoryid
                         Where (@UserId is null or m.userId=@UserId) 
-                        and  m.isDelete=0
+                        and  (@isDelete is null or m.isDelete=@isDelete)
                         GROUP BY 
                                m.productsid,
                                m.userid,
@@ -49,7 +55,8 @@ namespace Lab.Accounting.API.Repositories
                 {
                     offset = offset,
                     pageSize = pageSize,
-                    UserId = (object)userId ?? DBNull.Value,
+                    UserId = userId,
+                    isDelete = isDelete,
                 }
             );
             return result;
@@ -138,6 +145,24 @@ namespace Lab.Accounting.API.Repositories
                                  ProductsStock = COALESCE(@ProductsStock, ProductsStock)
                         WHERE    productsid = @ProductsId and userId=@UserId;";
             return await conn.ExecuteAsync(sql, products);
+        }
+
+        /// <summary>
+        /// 復原已選取的商品刪除狀態
+        /// </summary>
+        /// <param name="productId">選取的所有商品 Id</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"UPDATE mallproducts
+                        SET     IsDelete = 0                              
+                        WHERE   UserId = @UserId
+                        And     ProductsId in @ProductsId";
+            return await conn.ExecuteAsync(sql, new { ProductsId = productId, UserId = userId });
         }
 
         /// <summary>

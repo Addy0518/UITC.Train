@@ -51,12 +51,17 @@ public class MallController(IMallService mallService) : ControllerBase
     /// </summary>
     /// <param name="pageIndex">頁碼</param>
     /// <param name="pageSize">每頁顯示數量</param>
+    /// <param name="isDelete">是否為刪除狀態</param>
     /// <returns>商品列表</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
-    public async Task<IActionResult> GetSellerAllProducts([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetSellerAllProducts(
+        [FromQuery] int? pageIndex,
+        [FromQuery] int? pageSize,
+        [FromQuery] bool? isDelete = false
+    )
     {
-        return Ok(await mallService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, CurrentUserId));
+        return Ok(await mallService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, CurrentUserId, isDelete));
     }
 
     /// <summary>
@@ -83,6 +88,18 @@ public class MallController(IMallService mallService) : ControllerBase
     {
         productsUpdateRequest.UserId = CurrentUserId;
         return Ok(await mallService.UpdateProducts(productsUpdateRequest));
+    }
+
+    /// <summary>
+    /// 復原已選取的商品刪除狀態
+    /// </summary>
+    /// <param name="productId">選取的所有商品 Id</param>
+    /// <returns>影響列數</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    public async Task<IActionResult> UpdateProductsDeleteStatus([FromBody] IEnumerable<int> productId)
+    {
+        return Ok(await mallService.UpdateProductsDeleteStatus(CurrentUserId, productId));
     }
 
     /// <summary>

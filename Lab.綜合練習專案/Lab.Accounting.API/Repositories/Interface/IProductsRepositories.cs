@@ -11,8 +11,14 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <param name="pageIndex">頁碼</param>
         /// <param name="pageSize">每頁顯示數量</param>
         /// <param name="userId">使用者 Id</param>
+        /// <param name="isDelete">是否為刪除狀態</param>
         /// <returns>商品列表</returns>
-        Task<IEnumerable<ProductsResponse>> GetAllProducts(int pageIndex, int pageSize, int? userId = null);
+        Task<IEnumerable<ProductsResponse>> GetAllProducts(
+            int pageIndex,
+            int pageSize,
+            int? userId = null,
+            bool? isDelete = false
+        );
 
         /// <summary>
         /// 查看單一商品
@@ -35,13 +41,13 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <returns>影響列數</returns>
         Task<int> UpdateProducts(MallProducts products);
 
-        ///// <summary>
-        ///// 刪除單一商品
-        ///// </summary>
-        ///// <param name="productsId">商品 Id</param>
-        ///// <param name="userId">使用者 Id</param>
-        ///// <returns>影響列數</returns>
-        //Task<int> DeleteProducts(int productsId, int userId);
+        /// <summary>
+        /// 復原已選取的商品刪除狀態
+        /// </summary>
+        /// <param name="productId">選取的所有商品 Id</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>影響列數</returns>
+        Task<int> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId);
 
         /// <summary>
         /// 設定商品庫存
