@@ -81,18 +81,11 @@ namespace Lab.Accounting.API.Services.Interface
         Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId);
 
         /// <summary>
-        /// 商品圖片刪除
-        /// </summary>
-        /// <param name="productsImgId">商品圖片 ID</param>
-        /// <returns>影響列數</returns>
-        //Task<ApiResponse<int>> ProductsImgDelete(int productsImgId);
-
-        /// <summary>
-        /// 使用者購買商品並評分
+        /// 使用者購買商品並跳轉綠界界面
         /// </summary>
         /// <param name="Request">商品購買資訊 </param>
-        /// <returns>影響列數</returns>
-        Task<ApiResponse<int>> UserBuyProductAndRate(ProductsBuyRequest Request);
+        /// <returns>訂單 ID</returns>
+        Task<ApiResponse<int>> UserBuyProduct(ProductsBuyRequest Request);
 
         /// <summary>
         /// 查看購物車中的所有商品

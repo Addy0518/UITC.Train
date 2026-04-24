@@ -3,33 +3,38 @@
     public class ProductsBuyRequest
     {
         /// <summary>
-        /// 商品 ID
-        /// </summary>
-        public int ProductsId { get; set; }
-
-        /// <summary>
         /// 使用者 ID
         /// </summary>
+        [Display(Name = "使用者 ID ")]
+        [Required(ErrorMessage = "{0} 必輸")]
         public int UserId { get; set; }
 
         /// <summary>
-        /// 商品購買數量
+        /// 商品 ID
         /// </summary>
-        public int PurchaseQuantity { get; set; }
+        [Display(Name = "商品 ID")]
+        [Required(ErrorMessage = "{0} 必輸")]
+        public int ProductsId { get; set; }
 
         /// <summary>
-        /// 評分
+        /// 購買數量
         /// </summary>
-        public double Rating { get; set; }
+        [Display(Name = "購買數量")]
+        [Required(ErrorMessage = "{0} 必輸")]
+        public int BoughtQuantity { get; set; }
 
         /// <summary>
-        /// 評論
+        /// 購買時間
         /// </summary>
-        public string? Comment { get; set; }
+        [Display(Name = "購買時間")]
+        [Required(ErrorMessage = "{0} 必輸")]
+        public DateTime BoughtTime { get; set; }
 
         /// <summary>
-        /// 發表時間
+        /// 運送地址
         /// </summary>
-        public DateTime CreateTime { get; set; }
+        [Display(Name = "運送地址")]
+        [Required(ErrorMessage = "{0} 必輸")]
+        public string ShippingAddress { get; set; }
     }
 }

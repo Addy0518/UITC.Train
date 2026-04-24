@@ -152,16 +152,16 @@ public class MallController(IMallService mallService) : ControllerBase
     }
 
     /// <summary>
-    /// 使用者購買商品並評分
+    /// 使用者購買商品並跳轉綠界界面
     /// </summary>
     /// <param name="Request">商品購買資訊 </param>
-    /// <returns>影響列數</returns>
+    /// <returns>訂單 ID</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> UserBuyProductAndRate([FromBody] ProductsBuyRequest Request)
+    public async Task<IActionResult> UserBuyProduct([FromBody] ProductsBuyRequest Request)
     {
         Request.UserId = CurrentUserId;
-        return Ok(await mallService.UserBuyProductAndRate(Request));
+        return Ok(await mallService.UserBuyProduct(Request));
     }
 
     /// <summary>

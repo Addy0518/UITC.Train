@@ -228,39 +228,5 @@ namespace Lab.Accounting.API.Repositories
 
             return await conn.ExecuteAsync(sql, new { productsId, purchaseQuantity });
         }
-
-        /// <summary>
-        /// 購買商品
-        /// </summary>
-        /// <param name="productsId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
-        /// <param name="boughtQuantity">購買數量</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> BuyProducts(int productsId, int userId, int boughtQuantity)
-        {
-            using var conn = connecting.CreateConnecting();
-
-            var addBoughtProductsql =
-                @"INSERT INTO MallBoughtProducts
-                            (userid,
-                            productsid,
-                            BoughtQuantity,
-                            BoughtTIme)
-                VALUES     (@UserId,
-                            @ProductsId,
-                            @BoughtQuantity,
-                            @BoughtTIme)";
-
-            return await conn.ExecuteAsync(
-                addBoughtProductsql,
-                new
-                {
-                    UserId = userId,
-                    ProductsId = productsId,
-                    BoughtQuantity = boughtQuantity,
-                    BoughtTIme = DateTime.Now,
-                }
-            );
-        }
     }
 }

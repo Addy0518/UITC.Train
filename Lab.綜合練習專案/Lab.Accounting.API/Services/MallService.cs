@@ -7,6 +7,7 @@ using Lab.Accounting.API.Services.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NPOI.SS.Formula.Functions;
 using Org.BouncyCastle.Asn1.X509;
+using prjGonowWebApi.Areas.Company.Helper;
 
 namespace Lab.Accounting.API.Services
 {
@@ -15,6 +16,7 @@ namespace Lab.Accounting.API.Services
         IProductsImgRepository productsImgRepository,
         IProductsRateRepositories productsRateRepositories,
         IProductsShoppingCarRepositories productsShoppingCarRepositories,
+        IProductsBuyRepositories productsBuyRepositories,
         IWebHostEnvironment env
     ) : IMallService
     {
@@ -237,11 +239,11 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 使用者購買商品並評分
+        /// 使用者購買商品並跳轉綠界界面
         /// </summary>
         /// <param name="Request">商品購買資訊 </param>
-        /// <returns>影響列數</returns>
-        public async Task<ApiResponse<int>> UserBuyProductAndRate(ProductsBuyRequest Request)
+        /// <returns>訂單 ID</returns>
+        public async Task<ApiResponse<int>> UserBuyProduct(ProductsBuyRequest Request)
         {
             var target = await productsRepositories.GetProducts(Request.ProductsId);
 
@@ -249,42 +251,104 @@ namespace Lab.Accounting.API.Services
             {
                 return ApiResponseHelper.NotFound<int>();
             }
-            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+
+            if (target.ProductsStock < Request.BoughtQuantity)
             {
-                var buytarget = await productsRepositories.BuyProducts(
-                    Request.ProductsId,
-                    Request.UserId,
-                    Request.PurchaseQuantity
-                );
-                var remainStock = 0;
-                if (target.ProductsStock >= Request.PurchaseQuantity)
-                {
-                    remainStock = target.ProductsStock - Request.PurchaseQuantity;
-                }
-                else
-                {
-                    var errors = new Dictionary<string, string[]> { { "ProductsStock", new[] { "庫存不足!" } } };
+                var errors = new Dictionary<string, string[]> { { "ProductsStock", new[] { "庫存不足!" } } };
 
-                    return ApiResponseHelper.RequestError<int>(errors);
-                }
-
-                var stocktarget = await productsRepositories.SetStock(Request.ProductsId, remainStock);
-
-                var Insertrate = new MallProductsRate
-                {
-                    ProductsId = Request.ProductsId,
-                    UserId = Request.UserId,
-                    Comment = Request.Comment,
-                    CreateTime = DateTime.UtcNow,
-                    Rating = Request.Rating,
-                };
-
-                var ratetarget = await productsRateRepositories.CreateProductRate(Insertrate);
-
-                trxScope.Complete();
-
-                return ApiResponseHelper.Success(ratetarget);
+                return ApiResponseHelper.RequestError<int>(errors);
             }
+
+            //Guid是系統生成的"全球唯一識別碼",幾乎不會重複(像這樣=>550e8400-e29b-41d4-a716-446655440000)
+            //但因為Guid生成時中間會有"-"這種符號,而綠界的訂單編號不允許一些特殊符號,所以轉成字串後replace把它拿掉
+            //Substring切除剛剛的Guid碼,因為Guid字元會有32碼,太長了,所以只取前11碼
+            string merchantTradeNo = "GN" + Guid.NewGuid().ToString().Replace("-", "").Substring(0, 11);
+
+            var buytarget = new MallOrder
+            {
+                OrderNumber = merchantTradeNo,
+                UserId = Request.UserId,
+                ProductsId = Request.ProductsId,
+                BoughtQuantity = Request.BoughtQuantity,
+                UnitPrice = target.ProductsPrice,
+                BoughtTime = DateTime.Now,
+                ShippingAddress = Request.ShippingAddress,
+                ShippingStatus = (int)ShippingStatus.PendingPayment,
+            };
+            var order = await productsBuyRepositories.BuyProducts(buytarget);
+
+            return ApiResponseHelper.Success(order);
+        }
+
+        /// <summary>
+        /// 綠界訂單創建(新增)
+        /// </summary>
+        /// <param name="orderId">商品購買資訊 </param>
+        /// <param name="tunnelUrl">開發者通道網址</param>
+        /// <returns>跳轉綠界訂單</returns>
+        public async Task<ApiResponse<GreenPayResponse>> GetPaymentData(int orderId, int userId, string tunnelUrl)
+        {
+            var target = await productsBuyRepositories.GetOrder(orderId, userId);
+
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<GreenPayResponse>();
+            }
+
+            decimal totalAmount = target.UnitPrice * target.BoughtQuantity;
+            var ecpay = new Dictionary<string, string>
+            {
+                { "MerchantID", "3002607" }, //這是測試用的商店編號,固定的
+                { "MerchantTradeNo", target.OrderNumber },
+                { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") }, //交易當下時間
+                { "PaymentType", "aio" }, //付款類型=>全金流
+                { "TotalAmount", totalAmount.ToString() },
+                //先用int類型接收傳過來的變數,在轉成字串丟出去
+
+                { "TradeDesc", "商品購買" }, // 交易類型
+                { "ItemName", "商品名稱" }, // 交易名稱
+                { "ReturnURL", $"{tunnelUrl}/api/Mall/ecpayback" },
+                //交易完付款之後會呼叫的API(也就是我規定要呼叫哪個API,在下面)
+                //return也是最重要的,因為他的用意就是更改資料庫狀態改為以付款(改的方法就寫在這個API裡)
+
+                { "OrderResultURL", $"{tunnelUrl}/api/Mall/payment-callback" },
+                //而order跟return不一樣的是,他是負責處理使用者付款完會跳轉的頁面
+                //return是後端對後端,order是前端對前端
+
+                { "ChoosePayment", "ALL" },
+                //這是讓使用者有所有付款方式,當今天我想改成信用卡的話就寫"Credit"就好
+
+                { "EncryptType", "1" },
+                //這是固定寫法。代表我們要用 SHA256 方式加密（現在綠界強制規定都要用 1）
+            };
+
+            // 最後把這筆交易的檢查碼欄位加上我們建立的製作檢查方法
+            ecpay["CheckMacValue"] = ECPayHelper.GetCheckMacValue(ecpay);
+
+            // 回傳給 Angular，讓前端送出隱藏表單
+            //如果沒有用表單,那就會變成直接發送一堆資料,安全性差
+            //那為何要隱藏,因為我們只是借用html的表單提交功能跳轉,沒有要讓使用者還要填寫一個新表單
+            //所以我們在前端建立一個隱藏的form,把資料都放在裡面,再把這些資料連同頁面跳轉到對方頁面(actionUrl)
+
+            var result = new GreenPayResponse
+            {
+                FormData = ecpay,
+                ActionUrl = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5",
+            };
+
+            return ApiResponseHelper.Success(result);
+        }
+
+        /// <summary>
+        /// 商品付款
+        /// </summary>
+        /// <param name="shippingStatus">運送狀態</param>
+        /// <param name="accountPrice">最終金額</param>
+        /// <param name="paidTime">付款時間</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> PaidProducts(int shippingStatus, decimal accountPrice, DateTime paidTime)
+        {
+            return null;
         }
 
         /// <summary>

@@ -65,15 +65,6 @@ namespace Lab.Accounting.API.Repositories.Interface
         Task<int> SetStock(int productsId, int purchaseQuantity);
 
         /// <summary>
-        /// 購買商品
-        /// </summary>
-        /// <param name="productsId">商品 Id</param>
-        /// <param name="userId">使用者 Id</param>
-        /// <param name="boughtQuantity">購買數量</param>
-        /// <returns>影響列數</returns>
-        Task<int> BuyProducts(int productsId, int userId, int boughtQuantity);
-
-        /// <summary>
         /// 軟刪除或硬刪除單一商品
         /// </summary>
         /// <param name="productsId">商品 ID</param>

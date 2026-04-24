@@ -28,6 +28,11 @@
         public int? UserPhone { get; set; }
 
         /// <summary>
+        /// 使用者地址
+        /// </summary>
+        public string? UserAddress { get; set; }
+
+        /// <summary>
         /// 使用者大頭照
         /// </summary>
         public string? UserHeadshot { get; set; }
