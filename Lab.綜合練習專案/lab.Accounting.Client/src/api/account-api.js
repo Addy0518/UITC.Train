@@ -55,6 +55,9 @@ export const getSellerAllProduct = (pageIndex = 0, pageSize = 10, isDelete = fal
   accountApiInstance.get(
     `Mall/GetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}&isDelete=${isDelete}`,
   );
+// 查看類別
+export const getCategory = (categoryId = null) =>
+  accountApiInstance.get(`Mall/GetCategory`, { params: { productcategoryId: categoryId } });
 // 新增單一商品 + 類別
 export const createProducts = (product) => accountApiInstance.post(`Mall/CreateProducts`, product);
 // 更新單一商品 + 類別

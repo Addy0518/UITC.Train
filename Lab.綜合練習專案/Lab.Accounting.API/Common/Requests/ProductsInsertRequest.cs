@@ -14,7 +14,7 @@
         /// </summary>
         [Display(Name = "商品類別 ID")]
         [Required(ErrorMessage = "{0} 必輸")]
-        public int[] ProductCategoryId { get; set; }
+        public int ProductCategoryId { get; set; }
 
         /// <summary>
         /// 商品名稱

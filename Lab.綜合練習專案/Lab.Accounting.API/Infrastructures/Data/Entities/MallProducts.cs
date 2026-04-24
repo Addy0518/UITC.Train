@@ -28,9 +28,9 @@
         public int? ProductsStock { get; set; }
 
         /// <summary>
-        /// 商品購買人
+        /// 商品類別 ID
         /// </summary>
-        public int ProductsPurchasedUser { get; set; }
+        public int ProductCategoryId { get; set; }
 
         /// <summary>
         /// 是否為刪除狀態

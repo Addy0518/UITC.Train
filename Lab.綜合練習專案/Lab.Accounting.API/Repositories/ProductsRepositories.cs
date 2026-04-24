@@ -31,13 +31,12 @@ namespace Lab.Accounting.API.Repositories
                                  m.productsname,
                                  m.productsprice,
                                  m.ProductsStock,
+                                 m.ProductCategoryId,
                                  m.isDelete,
                                  STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM     mallproducts m
-                        JOIN     productcategory p
-                        ON       m.productsid=p.productsid
                         JOIN     mallproductcategory c
-                        ON       c.productcategoryid=p.productcategoryid
+                        ON       c.productcategoryid= m.ProductCategoryId
                         Where (@UserId is null or m.userId=@UserId) 
                         and  (@isDelete is null or m.isDelete=@isDelete)
                         GROUP BY 
@@ -46,6 +45,7 @@ namespace Lab.Accounting.API.Repositories
                                m.productsname,
                                m.productsprice,
                                m.isDelete,
+                               m.ProductCategoryId,
                                m.ProductsStock
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
@@ -77,13 +77,12 @@ namespace Lab.Accounting.API.Repositories
                                m.productsname,
                                m.productsprice,
                                m.ProductsStock,
+                               m.ProductCategoryId,
                                m.isDelete,
                                STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM   mallproducts m
-                               left JOIN productcategory p
-                                 ON m.productsid = p.productsid
                                left JOIN mallproductcategory c
-                                 ON c.productcategoryid = p.productcategoryid
+                                 ON c.productcategoryid =  m.ProductCategoryId
                         WHERE  m.ProductsId = @ProductsId
                         GROUP BY 
                                m.productsid,
@@ -91,11 +90,32 @@ namespace Lab.Accounting.API.Repositories
                                m.productsname,
                                m.productsprice,
                                m.isDelete,
+                               m.ProductCategoryId,
                                m.ProductsStock";
 
             var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(sql, new { ProductsId = productId });
 
             return result;
+        }
+
+        /// <summary>
+        /// 查看商品類別
+        /// </summary>
+        /// <param name="productcategoryId">商品類別 ID</param>
+        /// <returns>商品類別</returns>
+        public async Task<IEnumerable<MallProductCategory>> GetCategory(int? productcategoryId = null)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            //  第一層 ProductCategoryId 跟 ProductParentId 為 null 的是最頂層的類別
+            //  第二層 ( 子 ) ProductParentId = ( 父 ) ProductCategoryId  的就是往下一層的類別
+            //  (衣服 => 短袖 , 長袖 => 男士短袖 , 女士短袖 ...)
+            var sql =
+                @"Select ProductCategoryId,ProductCategoryName,ProductParentId 
+                From mallproductcategory 
+                Where (@ProductCategoryId is null and ProductParentId is null) 
+                OR ProductParentId = @ProductCategoryId";
+            return await conn.QueryAsync<MallProductCategory>(sql, new { ProductCategoryId = productcategoryId });
         }
 
         /// <summary>
@@ -113,12 +133,14 @@ namespace Lab.Accounting.API.Repositories
                                      productsname,
                                      productsprice,
                                      ProductsStock,
+                                     ProductCategoryId,
                                      IsDelete
                                      )
                         VALUES      (@UserId,
                                      @ProductsName,
                                      @ProductsPrice,
                                      @ProductsStock,
+                                     @ProductCategoryId,
                                      @IsDelete
                                      ) 
                         Select 
@@ -142,7 +164,8 @@ namespace Lab.Accounting.API.Repositories
                         SET      
                                  productsname = COALESCE(@ProductsName, productsname),
                                  productsprice = COALESCE(@ProductsPrice, productsprice),
-                                 ProductsStock = COALESCE(@ProductsStock, ProductsStock)
+                                 ProductsStock = COALESCE(@ProductsStock, ProductsStock),
+                                 ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId)
                         WHERE    productsid = @ProductsId and userId=@UserId;";
             return await conn.ExecuteAsync(sql, products);
         }
@@ -181,7 +204,6 @@ namespace Lab.Accounting.API.Repositories
                     Delete From ProductImg Where ProductsID=@productsId;
                     Delete From MallProductsRate Where ProductsID=@productsId;
                     Delete From MallShoppingCar Where ProductsID=@productsId;
-                    Delete From ProductCategory Where ProductsID=@productsId;
                     Delete From MallProducts Where ProductsID=@productsId and UserId=@userId;"
                 : @"Update MallProducts Set IsDelete=1 Where ProductsID=@productsId and UserId=@userId;
                     ";

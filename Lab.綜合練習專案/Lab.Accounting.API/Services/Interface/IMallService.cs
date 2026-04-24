@@ -59,6 +59,13 @@ namespace Lab.Accounting.API.Services.Interface
         Task<ApiResponse<int>> DeleteProducts(int productsId, int userId);
 
         /// <summary>
+        /// 查看商品類別
+        /// </summary>
+        /// <param name="productcategoryId">商品類別 ID</param>
+        /// <returns>商品類別</returns>
+        Task<ApiResponse<IEnumerable<MallProductCategory>>> GetCategory(int? productcategoryId = null);
+
+        /// <summary>
         /// 商品圖片上傳
         /// </summary>
         /// <param name="productsImgsFiles">商品圖片檔案</param>

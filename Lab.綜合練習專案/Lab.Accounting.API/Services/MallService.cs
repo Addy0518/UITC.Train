@@ -12,7 +12,6 @@ namespace Lab.Accounting.API.Services
 {
     public class MallService(
         IProductsRepositories productsRepositories,
-        IProductsCategoryRepositories productsCategoryRepositories,
         IProductsImgRepository productsImgRepository,
         IProductsRateRepositories productsRateRepositories,
         IProductsShoppingCarRepositories productsShoppingCarRepositories,
@@ -75,6 +74,22 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
+        /// 查看商品類別
+        /// </summary>
+        /// <param name="productcategoryId">商品類別 ID</param>
+        /// <returns>商品類別</returns>
+        public async Task<ApiResponse<IEnumerable<MallProductCategory>>> GetCategory(int? productcategoryId = null)
+        {
+            var target = await productsRepositories.GetCategory(productcategoryId);
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
         /// 新增單一商品 + 類別
         /// </summary>
         /// <param name="productsInsertRequest">商品資訊</param>
@@ -86,19 +101,14 @@ namespace Lab.Accounting.API.Services
                 ProductsName = productsInsertRequest.ProductsName,
                 ProductsPrice = productsInsertRequest.ProductsPrice,
                 ProductsStock = productsInsertRequest.ProductsStock,
+                ProductCategoryId = productsInsertRequest.ProductCategoryId,
                 UserId = productsInsertRequest.UserId,
                 IsDelete = false,
             };
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var target = await productsRepositories.CreateProducts(product);
-                foreach (var categoryId in productsInsertRequest.ProductCategoryId)
-                {
-                    var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
-                        target,
-                        categoryId
-                    );
-                }
+
                 var Insertrate = new MallProductsRate
                 {
                     ProductsId = target,
@@ -128,26 +138,17 @@ namespace Lab.Accounting.API.Services
                 ProductsName = productsUpdateRequest.ProductsName,
                 ProductsPrice = productsUpdateRequest.ProductsPrice,
                 ProductsStock = productsUpdateRequest.ProductsStock,
+                ProductCategoryId = productsUpdateRequest.ProductCategoryId,
             };
-            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+
+            var target = await productsRepositories.GetProducts(productsUpdateRequest.ProductsId);
+            if (target == null || target.UserId != productsUpdateRequest.UserId)
             {
-                var target = await productsRepositories.GetProducts(productsUpdateRequest.ProductsId);
-                if (target == null || target.UserId != productsUpdateRequest.UserId)
-                {
-                    return ApiResponseHelper.NotFound<int>();
-                }
-                var result = await productsRepositories.UpdateProducts(updateTarget);
-                await productsCategoryRepositories.DeleteProductsCategory(productsUpdateRequest.ProductsId);
-                foreach (var categoryId in productsUpdateRequest.ProductCategoryId)
-                {
-                    var productCategoryTarget = await productsCategoryRepositories.CreateProductsCategory(
-                        productsUpdateRequest.ProductsId,
-                        categoryId
-                    );
-                }
-                trxScope.Complete();
-                return ApiResponseHelper.Success(result);
+                return ApiResponseHelper.NotFound<int>();
             }
+            var result = await productsRepositories.UpdateProducts(updateTarget);
+
+            return ApiResponseHelper.Success(result);
         }
 
         /// <summary>

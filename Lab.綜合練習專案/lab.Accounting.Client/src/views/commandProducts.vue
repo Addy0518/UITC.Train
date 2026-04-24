@@ -7,6 +7,7 @@ import {
   createProducts,
   getProduct,
   updateProducts,
+  getCategory,
 } from '@/api/account-api';
 import { useRoute, useRouter } from 'vue-router';
 import { id } from 'zod/v4/locales';
@@ -31,6 +32,10 @@ let imgs = ref([]);
 const route = useRoute();
 const router = useRouter();
 const productCategoryName = ref([]);
+const parentCategory = ref([]);
+const selectParent = ref();
+const selectChild = ref();
+const childCategory = ref([]);
 const productName = ref();
 const productPrice = ref();
 const productStock = ref();
@@ -39,10 +44,38 @@ const isAdd = computed(() => route.name === 'add-product');
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
 onMounted(() => {
+  getCategories();
   if (route.params.id) {
     updateData(route.params.id);
   }
 });
+
+/*
+  依據階層查看類別
+*/
+const getCategories = async () => {
+  const res = await getCategory();
+  const { data } = res;
+  if (data.codeStatus === 2000) {
+    parentCategory.value = data.returnData;
+  }
+};
+
+/*
+  偵測父類別並改變子類別
+*/
+const changeCategory = async () => {
+  childCategory.value = [];
+  selectChild.value = null;
+
+  if (selectParent.value) {
+    const res = await getCategory(selectParent.value.productCategoryId);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      childCategory.value = data.returnData;
+    }
+  }
+};
 
 /*
   查看單一商品 API ( 讓編輯帳本時前端能看到原本資料 )
@@ -83,10 +116,17 @@ const updateData = async (productId) => {
    新增或更新商品
 */
 const createOrUpdateProduct = async () => {
-  console.log('isAdd.value', isAdd.value);
+  if (!selectChild.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: '請選擇類別!',
+    });
+    return;
+  }
+  console.log(selectChild.value.productCategoryId);
   if (isAdd.value) {
     const createData = {
-      productCategoryName: productCategoryName.value,
+      ProductCategoryId: selectChild.value.productCategoryId,
       productsName: productName.value,
       productsPrice: productPrice.value,
       productsStock: productStock.value,
@@ -111,7 +151,8 @@ const createOrUpdateProduct = async () => {
   } else if (!isAdd.value) {
     const updateData = {
       productsId: productsId.value,
-      productCategoryName: productCategoryName.value,
+      ProductCategoryId: selectChild.value.productCategoryId,
+
       productsName: productName.value,
       productsPrice: productPrice.value,
       productsStock: productStock.value,
@@ -228,6 +269,23 @@ const removeImage = async (index) => {
       <InputGroupAddon>類別</InputGroupAddon>
       <!-- 使用 Chips 元件，它會自動將內容存成陣列 -->
       <Chips v-model="productCategoryName" placeholder="輸入後按 Enter 分類" />
+    </InputGroup>
+    <InputGroup>
+      <Select
+        v-model="selectParent"
+        :options="parentCategory"
+        optionLabel="productCategoryName"
+        placeholder="類別"
+        @change="changeCategory()"
+      />
+    </InputGroup>
+    <InputGroup v-if="childCategory.length > 0">
+      <Select
+        v-model="selectChild"
+        :options="childCategory"
+        optionLabel="productCategoryName"
+        placeholder="子類別"
+      />
     </InputGroup>
     <InputGroup>
       <InputGroupAddon>

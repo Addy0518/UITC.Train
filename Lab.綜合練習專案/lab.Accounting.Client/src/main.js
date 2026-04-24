@@ -21,6 +21,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Password from 'primevue/password';
 import Chip from 'primevue/chip';
+import CascadeSelect from 'primevue/cascadeselect';
 
 const app = createApp(App);
 
@@ -55,5 +56,6 @@ app.component('DatePicker', DatePicker);
 app.component('Dialog', Dialog);
 app.component('Password', Password);
 app.component('Chip', Chip);
+app.component('CascadeSelect', CascadeSelect);
 
 app.mount('#app');

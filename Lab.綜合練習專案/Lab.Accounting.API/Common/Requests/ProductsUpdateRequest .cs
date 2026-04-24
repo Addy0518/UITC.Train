@@ -20,7 +20,7 @@
         /// 商品類別 ID
         /// </summary>
         [Display(Name = "商品類別 ID")]
-        public int[] ProductCategoryId { get; set; }
+        public int ProductCategoryId { get; set; }
 
         /// <summary>
         /// 商品名稱

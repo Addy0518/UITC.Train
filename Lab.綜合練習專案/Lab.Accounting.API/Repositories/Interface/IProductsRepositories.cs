@@ -28,6 +28,13 @@ namespace Lab.Accounting.API.Repositories.Interface
         Task<ProductsResponse> GetProducts(int productId);
 
         /// <summary>
+        /// 查看商品類別
+        /// </summary>
+        /// <param name="productcategoryId">商品類別 ID</param>
+        /// <returns>商品類別</returns>
+        Task<IEnumerable<MallProductCategory>> GetCategory(int? productcategoryId = null);
+
+        /// <summary>
         /// 新增單一商品
         /// </summary>
         /// <param name="products">商品資訊</param>

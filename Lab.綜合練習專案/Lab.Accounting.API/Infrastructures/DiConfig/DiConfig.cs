@@ -19,8 +19,6 @@ namespace Lab.Accounting.API.Infrastructures.DiConfig
 
             services.AddScoped<IProductsRepositories, ProductsRepositories>();
 
-            services.AddScoped<IProductsCategoryRepositories, ProductsCategoryRepositories>();
-
             services.AddScoped<IProductsImgRepository, ProductsImgRepository>();
 
             services.AddScoped<IProductsRateRepositories, ProductsRateRepositories>();
