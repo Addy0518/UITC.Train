@@ -20,12 +20,11 @@ namespace Lab.Accounting.API.Repositories
                                  m.userid,
                                  m.productsname,
                                  m.productsprice,
+                                 m.ProductCategoryId,
                                  STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM     mallproducts m
-                        JOIN     productcategory p
-                        ON       m.productsid=p.productsid
                         JOIN     mallproductcategory c
-                        ON       c.productcategoryid=p.productcategoryid                       
+                        ON       c.productcategoryid=m.ProductCategoryId                       
                         JOIN      mallshoppingcar s
                         ON       m.productsid = s.productsid
                 WHERE  s.userid = @UserId 
@@ -33,6 +32,7 @@ namespace Lab.Accounting.API.Repositories
                                m.productsid,
                                m.userid,
                                m.productsname,
+                               m.ProductCategoryId,
                                m.productsprice";
 
             return await conn.QueryAsync<ProductsResponse>(sql, new { UserId = userId });
