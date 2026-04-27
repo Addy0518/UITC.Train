@@ -164,7 +164,18 @@ const router = createRouter({
           },
           component: () => import('@/views/commandProducts.vue'),
         },
-         {
+        {
+          /*
+            編輯商品
+          */
+          path: 'purchase-records',
+          name: 'purchase-records',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/purchaseRecords.vue'),
+        },
+        {
           /*
             商品回收桶
           */

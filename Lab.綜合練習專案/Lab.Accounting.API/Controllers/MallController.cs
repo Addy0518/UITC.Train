@@ -16,6 +16,12 @@ namespace Lab.Accounting.API.Controllers;
 [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
 public class MallController(IMallService mallService) : ControllerBase
 {
+    // 公開網址基底給綠界呼叫
+    private string tuuneUrl = "https://localhost:7124";
+
+    // 前端網址基底
+    private string fronturl = "http://localhost:5173";
+
     // 私有方法 : 從 Token 取出 UserId
     private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");
 
@@ -161,7 +167,46 @@ public class MallController(IMallService mallService) : ControllerBase
     public async Task<IActionResult> UserBuyProduct([FromBody] ProductsBuyRequest Request)
     {
         Request.UserId = CurrentUserId;
-        return Ok(await mallService.UserBuyProduct(Request));
+        var target = await mallService.UserBuyProduct(Request);
+
+        int orderId = target.ReturnData;
+
+        var payment = await mallService.GetPaymentData(orderId, CurrentUserId, tuuneUrl);
+        return Ok(payment);
+    }
+
+    /// <summary>
+    /// 接收綠界回傳資料
+    /// </summary>
+    /// <param name="collection">綠界回傳的表單資料</param>
+    /// <returns>訂單 ID</returns>
+    [HttpPost]
+    //綠界傳回來的表單是傳統的表單格式,用這串來確定能接收
+    [Consumes("application/x-www-form-urlencoded")]
+    [AllowAnonymous]
+    public async Task<IActionResult> EcPayBack([FromForm] IFormCollection collection)
+    //IformCollection就是接收傳統表單資料的,formform是用來接收html的form提交資料
+    //而formbody則是接收Json資料的
+    {
+        //用serivice的設定訂單方法
+        var result = await mallService.SetPaymentData(collection);
+
+        return Content(result);
+    }
+
+    /// <summary>
+    /// 綠界回來之後再呼叫的API(這裡是中繼站)
+    /// </summary>
+    /// <param name="collection">綠界回傳的表單資料</param>
+    /// <returns>訂單 ID</returns>
+    [AllowAnonymous]
+    [HttpPost]
+    public IActionResult PaymentCallback([FromForm] IFormCollection collection)
+    {
+        var orderNo = collection["MerchantTradeNo"].ToString();
+
+        // 然後使用 Redirect 導回 Vue 的路由（這會變成 GET 請求，Angular 就能接收了）
+        return Content($"<script>window.location.href='{fronturl}/mall';</script>", "text/html");
     }
 
     /// <summary>

@@ -27,7 +27,7 @@ namespace Lab.Accounting.API.Repositories
                         ON       c.productcategoryid=m.ProductCategoryId                       
                         JOIN      mallshoppingcar s
                         ON       m.productsid = s.productsid
-                WHERE  s.userid = @UserId 
+                WHERE  s.userid = @UserId and m.IsDelete = 0
                 GROUP BY 
                                m.productsid,
                                m.userid,

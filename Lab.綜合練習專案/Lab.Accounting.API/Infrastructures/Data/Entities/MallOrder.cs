@@ -43,6 +43,11 @@
         public DateTime BoughtTime { get; set; }
 
         /// <summary>
+        /// 付款方式
+        /// </summary>
+        public string? PaidType { get; set; }
+
+        /// <summary>
         /// 付款時間
         /// </summary>
         public DateTime? PaidTime { get; set; }

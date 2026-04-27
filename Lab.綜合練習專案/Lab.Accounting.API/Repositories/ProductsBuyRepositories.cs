@@ -1,4 +1,5 @@
-﻿using Lab.Accounting.API.Infrastructures.Data.Entities;
+﻿using System.Diagnostics.Eventing.Reader;
+using Lab.Accounting.API.Infrastructures.Data.Entities;
 using Lab.Accounting.API.Repositories.Interface;
 
 namespace Lab.Accounting.API.Repositories
@@ -6,7 +7,7 @@ namespace Lab.Accounting.API.Repositories
     public class ProductsBuyRepositories(DBConnecting connecting) : IProductsBuyRepositories
     {
         /// <summary>
-        /// 查看單一訂單
+        /// 查看單一訂單 ( Id 查詢 )
         /// </summary>
         /// <param name="orderId">購買資訊</param>
         /// <param name="userId">使用者 ID</param>
@@ -23,6 +24,26 @@ namespace Lab.Accounting.API.Repositories
             return await conn.QueryFirstOrDefaultAsync<MallOrder>(
                 addBoughtProductsql,
                 new { OrderId = orderId, UserId = userId }
+            );
+        }
+
+        /// <summary>
+        /// 查看單一訂單 ( 訂單編號查詢 )
+        /// </summary>
+        /// <param name="orderNumber">訂單編號</param>
+        /// <returns>訂單資訊</returns>
+        public async Task<MallOrder> GetOrderByOrderNumber(string orderNumber)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var addBoughtProductsql =
+                @"Select * From MallOrder
+                  Where OrderNumber = @OrderNumber
+                 ";
+
+            return await conn.QueryFirstOrDefaultAsync<MallOrder>(
+                addBoughtProductsql,
+                new { OrderNumber = orderNumber }
             );
         }
 
@@ -59,17 +80,25 @@ namespace Lab.Accounting.API.Repositories
                             Scope_Identity() as int
                             );";
 
-            return await conn.ExecuteAsync(addBoughtProductsql, order);
+            return await conn.QuerySingleAsync<int>(addBoughtProductsql, order);
         }
 
         /// <summary>
         /// 商品付款
         /// </summary>
+        /// <param name="orderNumber">訂單編號</param>
         /// <param name="shippingStatus">運送狀態</param>
         /// <param name="accountPrice">最終金額</param>
+        /// <param name="paidType">付款方式</param>
         /// <param name="paidTime">付款時間</param>
         /// <returns>影響列數</returns>
-        public async Task<int> PaidProducts(int shippingStatus, decimal accountPrice, DateTime paidTime)
+        public async Task<int> PaidProducts(
+            string orderNumber,
+            int shippingStatus,
+            decimal accountPrice,
+            string paidType,
+            DateTime paidTime
+        )
         {
             using var conn = connecting.CreateConnecting();
 
@@ -77,15 +106,18 @@ namespace Lab.Accounting.API.Repositories
                 @"Update MallOrder
                   Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus),
                       AccountPrice = COALESCE(@AccountPrice, AccountPrice),
+                      PaidType = COALESCE(@PaidType, PaidType),
                       PaidTime = COALESCE(@PaidTime, PaidTime)
-                  Where OrderId = @OrderId";
+                  Where OrderNumber = @OrderNumber";
 
             return await conn.ExecuteAsync(
                 addBoughtProductsql,
                 new
                 {
+                    OrderNumber = orderNumber,
                     ShippingStatus = shippingStatus,
                     AccountPrice = accountPrice,
+                    PaidType = paidType,
                     PaidTime = paidTime,
                 }
             );
