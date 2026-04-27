@@ -313,11 +313,11 @@ namespace Lab.Accounting.API.Services
 
                 { "TradeDesc", "商品購買" }, // 交易類型
                 { "ItemName", "商品名稱" }, // 交易名稱
-                { "ReturnURL", $"{tunnelUrl}/api/Mall/ecpayback" },
+                { "ReturnURL", $"{tunnelUrl}/api/Mall/EcPayBack" },
                 //交易完付款之後會呼叫的API(也就是我規定要呼叫哪個API,在下面)
                 //return也是最重要的,因為他的用意就是更改資料庫狀態改為以付款(改的方法就寫在這個API裡)
 
-                { "OrderResultURL", $"{tunnelUrl}/api/Mall/payment-callback" },
+                { "OrderResultURL", $"{tunnelUrl}/api/Mall/PaymentCallback" },
                 //而order跟return不一樣的是,他是負責處理使用者付款完會跳轉的頁面
                 //return是後端對後端,order是前端對前端
 

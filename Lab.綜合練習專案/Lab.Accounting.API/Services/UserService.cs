@@ -71,7 +71,7 @@ namespace Lab.Accounting.API.Services
 
             dbuser.UserPassword = null;
 
-            var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName, dbuser.UserRole);
+            var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName, dbuser.UserRole, dbuser.UserAddress);
 
             var userheadshot = await userrepo.GetUser(dbuser.UserId);
 
@@ -82,6 +82,7 @@ namespace Lab.Accounting.API.Services
                 UserName = dbuser.UserName,
                 UserHeadshot = userheadshot.UserHeadshot,
                 UserRole = dbuser.UserRole,
+                UserAddress = dbuser.UserAddress,
             };
 
             return ApiResponseHelper.Success(userresponse, "成功");

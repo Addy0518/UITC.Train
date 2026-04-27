@@ -18,6 +18,11 @@
         public string? UserHeadshot { get; set; }
 
         /// <summary>
+        /// 使用者地址
+        /// </summary>
+        public string? UserAddress { get; set; }
+
+        /// <summary>
         /// Token
         /// </summary>
         public string? Token { get; set; }

@@ -130,8 +130,11 @@ try
     // Build() 之後才能開始設定 Middleware Pipeline
     var app = builder.Build();
 
-    // 強制 HTTP 請求重導到 HTTPS ( 加密安全 )
-    app.UseHttpsRedirection();
+    // 在非開發環境下強制 HTTP 請求重導到 HTTPS ( 加密安全 )
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHttpsRedirection();
+    }
 
     // 瀏覽靜態檔案
     app.UseStaticFiles();

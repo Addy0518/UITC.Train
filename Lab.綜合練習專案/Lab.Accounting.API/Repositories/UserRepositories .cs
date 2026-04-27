@@ -54,7 +54,8 @@ namespace Lab.Accounting.API.Repositories
         {
             using var conn = connecting.CreateConnecting();
 
-            var sql = @"Select UserId,UserName,UserRole,UserPassword From [User] Where UserAccount=@UserAccount";
+            var sql =
+                @"Select UserId,UserName,UserRole,UserPassword,UserAddress From [User] Where UserAccount=@UserAccount";
 
             return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserAccount = userInformation.UserAccount });
         }

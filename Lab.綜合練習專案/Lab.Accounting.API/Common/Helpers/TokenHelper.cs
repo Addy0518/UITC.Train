@@ -8,7 +8,13 @@ namespace Lab.Accounting.API.Common.Helpers
     public class TokenHelper(IConfiguration _configuration)
     {
         // 創建 Token 方法
-        public string GeneratedToken(int userId, string userName, string userRole, int expireMinutes = 30)
+        public string GeneratedToken(
+            int userId,
+            string userName,
+            string userRole,
+            string userAddress,
+            int expireMinutes = 30
+        )
         {
             // 拿到設定檔的發行人跟鑰匙
             var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
@@ -33,6 +39,8 @@ namespace Lab.Accounting.API.Common.Helpers
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userName));
 
             claims.Add(new Claim("UserRole", userRole));
+
+            claims.Add(new Claim("UserAddress", userAddress));
 
             // 加入  Guid.NewGuid().ToString() ( 唯一碼 ) 到 Jti 裡防止重複
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));

@@ -1,7 +1,8 @@
 <script setup>
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { getProduct, userBuyProductAndRate } from '@/api/account-api';
+import { getProduct, userBuyProduct } from '@/api/account-api';
+import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
@@ -9,16 +10,17 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    route : 獲取路由資訊
    product : 商品資訊
    baseUrl : 環境變數裡的圖片基底位址
-   rating : 評分
    comment : 評論
+   shippingAddress :
    createTime : 現在時間
 */
 const route = useRoute();
 const product = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
-const purchaseQuantity = ref();
-const rating = ref();
+const boughtQuantity = ref();
+const authStore = useAuthStore();
 const comment = ref();
+
 const createTime = Date.now;
 
 /*
@@ -55,16 +57,40 @@ const getProductsImg = (img) => {
 const userBuy = async () => {
   const bought = {
     productsId: Number(route.params.id),
-    purchaseQuantity: purchaseQuantity.value,
-    rating: rating.value,
+    boughtQuantity: boughtQuantity.value,
     comment: comment.value,
+    shippingAddress: authStore.userAddress,
     createTime: new Date().toLocaleDateString('en-CA'),
   };
 
-  const res = await userBuyProductAndRate(bought);
+  const res = await userBuyProduct(bought);
+  console.log('res', res);
   const { data } = res;
   if (data.codeStatus === 2000) {
-    alert('購買成功!');
+    try {
+      const ecpayData = data.returnData.formData;
+      const actionUrl = data.returnData.actionUrl;
+
+      // 建立一個隱藏的 Form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = actionUrl;
+
+      // 將所有綠界參數塞入 input 中
+      for (const key in ecpayData) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = ecpayData[key];
+        form.appendChild(input);
+      }
+
+      // 把表單加到 body 並送出 (這就會觸發頁面跳轉)
+      document.body.appendChild(form);
+      form.submit();
+    } catch (error) {
+      console.error('購買失敗 :', error.response);
+    }
   }
 };
 
@@ -92,11 +118,9 @@ const productscategory = (categories) => {
           <span class="mt-3">商品庫存 : {{ product.productsStock }}</span>
           <span class="mt-3">商品擁有者 ID : {{ product.userId }}</span>
           <InputGroup>
-            <InputNumber v-model="purchaseQuantity" placeholder="購買數量" />
+            <InputNumber v-model="boughtQuantity" placeholder="購買數量" />
           </InputGroup>
-          <InputGroup>
-            <InputNumber v-model="rating" placeholder="評分" />
-          </InputGroup>
+
           <InputGroup>
             <InputText v-model="comment" placeholder="評論" />
           </InputGroup>

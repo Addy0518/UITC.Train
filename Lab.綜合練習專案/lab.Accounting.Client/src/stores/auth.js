@@ -11,15 +11,18 @@ export const useAuthStore = defineStore(
     const userId = ref(null);
     const userName = ref(null);
     const userHeadshot = ref(null);
+    const userAddress = ref(null);
     const userRole = ref(null);
     /*
       登入時存入 token 資料
     */
     function setAuth(data) {
+      console.log('登入成功回傳的資料:', data);
       token.value = data.token;
       userId.value = data.userId;
       userName.value = data.userName;
       userHeadshot.value = data.userHeadshot;
+      userAddress.value = data.userAddress;
       userRole.value = data.userRole;
     }
     /*
@@ -30,12 +33,13 @@ export const useAuthStore = defineStore(
       userId.value = null;
       userName.value = null;
       userHeadshot.value = null;
+      userAddress.value = null;
       userRole.value = null;
     }
     /*
       重要 => 記得回傳這些資料並 export 傳出去 , 供其他地方使用
     */
-    return { token, userId, userName, userHeadshot, userRole, setAuth, clearAuth };
+    return { token, userId, userName, userHeadshot, userRole, userAddress, setAuth, clearAuth };
   },
   /*
     使用 pinia-plugin-persistedstate , 自動把 pinia 的資料存到 localstorage

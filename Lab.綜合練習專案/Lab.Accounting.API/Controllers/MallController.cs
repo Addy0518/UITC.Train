@@ -1,4 +1,5 @@
-﻿using Lab.Accounting.API.Common.Requests;
+﻿using System.Security.Claims;
+using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
 using Lab.Accounting.API.Infrastructures.Data.Entities;
 using Lab.Accounting.API.Services.Interface;
@@ -17,7 +18,7 @@ namespace Lab.Accounting.API.Controllers;
 public class MallController(IMallService mallService) : ControllerBase
 {
     // 公開網址基底給綠界呼叫
-    private string tuuneUrl = "https://localhost:7124";
+    private string tuuneUrl = "https://veneering-bannister-outlook.ngrok-free.dev";
 
     // 前端網址基底
     private string fronturl = "http://localhost:5173";

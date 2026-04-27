@@ -48,6 +48,22 @@ namespace Lab.Accounting.API.Repositories
         }
 
         /// <summary>
+        /// 查看使用者的所有訂單
+        /// </summary>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>所有訂單資訊</returns>
+        public async Task<IEnumerable<MallOrder>> GetUserAllOrder(int userId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var addBoughtProductsql =
+                @"Select * From MallOrder
+                  Where  UserId = @UserId";
+
+            return await conn.QueryAsync<MallOrder>(addBoughtProductsql, new { UserId = userId });
+        }
+
+        /// <summary>
         /// 商品購買
         /// </summary>
         /// <param name="order">購買資訊</param>
