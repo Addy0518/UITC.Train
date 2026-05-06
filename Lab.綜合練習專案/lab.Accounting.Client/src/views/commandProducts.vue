@@ -1,6 +1,5 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth';
-import { onMounted, ref, watch, computed } from 'vue';
+import { onMounted, ref, watch, computed, inject } from 'vue';
 import {
   productsImgUpload,
   productsImgDelete,
@@ -10,10 +9,10 @@ import {
   getCategory,
 } from '@/api/account-api';
 import { useRoute, useRouter } from 'vue-router';
-import { id } from 'zod/v4/locales';
-import Chips from 'primevue/chips';
-import { url } from 'zod';
 import Swal from 'sweetalert2';
+import { required, maxLength } from '@/validator/validators';
+import { useVuelidate } from '@vuelidate/core';
+import InValidErrorMessage from '../common/InValidErrorMessage.vue';
 
 /*
    變數名稱代表意義
@@ -43,6 +42,14 @@ const productsId = ref();
 const isAdd = computed(() => route.name === 'add-product');
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
 onMounted(() => {
   getCategories();
   if (route.params.id) {
@@ -50,15 +57,35 @@ onMounted(() => {
   }
 });
 
+// 加入已經寫好的驗證規則
+const rules = computed(() => ({
+  productName: { required, maxLength: maxLength(50) },
+  productPrice: { required },
+  productStock: { required },
+  selectChild: { required },
+}));
+
+// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
+// autoDirty => 一碰到欄位就開始驗證
+// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
+// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+const v$ = useVuelidate(
+  rules,
+  { productName, productPrice, productStock, selectChild },
+  { $autoDirty: true, $lazy: true, $scope: false },
+);
+
 /*
   依據階層查看類別
 */
 const getCategories = async () => {
+  showLoading();
   const res = await getCategory();
   const { data } = res;
   if (data.codeStatus === 2000) {
     parentCategory.value = data.returnData;
   }
+  hideLoading();
 };
 
 /*
@@ -83,6 +110,7 @@ const changeCategory = async () => {
 const updateData = async (productId) => {
   try {
     if (!productId) return;
+    showLoading();
     const res = await getProduct(productId);
     const { data } = res;
     if (data.codeStatus === 2000) {
@@ -105,10 +133,12 @@ const updateData = async (productId) => {
       }
     }
     if (data.codeStatus === 4001) {
-      alert(data.message);
+      showToastError('錯誤', data.message);
     }
   } catch (error) {
     console.error('編輯錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -116,65 +146,69 @@ const updateData = async (productId) => {
    新增或更新商品
 */
 const createOrUpdateProduct = async () => {
-  if (!selectChild.value) {
-    Swal.fire({
-      icon: 'warning',
-      title: '請選擇類別!',
-    });
-    return;
-  }
-  console.log(selectChild.value.productCategoryId);
+  const isFormCorrect = await v$.value.$validate();
+  if (!isFormCorrect) return;
+
   if (isAdd.value) {
-    const createData = {
-      ProductCategoryId: selectChild.value.productCategoryId,
-      productsName: productName.value,
-      productsPrice: productPrice.value,
-      productsStock: productStock.value,
-    };
-    const res = await createProducts(createData);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      for (const img of imgs.value) {
-        if (img.file) {
-          const fd = new FormData();
-          fd.append('productsImgsFiles', img.file);
-          fd.append('productId', data.returnData);
-          await productsImgUpload(fd);
+    showLoading();
+    try {
+      const createData = {
+        ProductCategoryId: selectChild.value.productCategoryId,
+        productsName: productName.value,
+        productsPrice: productPrice.value,
+        productsStock: productStock.value,
+      };
+      const res = await createProducts(createData);
+      const { data } = res;
+      if (data.codeStatus === 2000) {
+        for (const img of imgs.value) {
+          if (img.file) {
+            const fd = new FormData();
+            fd.append('productsImgsFiles', img.file);
+            fd.append('productId', data.returnData);
+            await productsImgUpload(fd);
+          }
         }
+
+        showToastSuccess('上架商品成功!');
+        router.push({ name: 'mall' });
       }
-      Swal.fire({
-        icon: 'success',
-        title: '上架商品成功!',
-      });
-      router.push({ name: 'mall' });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      hideLoading();
     }
   } else if (!isAdd.value) {
-    const updateData = {
-      productsId: productsId.value,
-      ProductCategoryId: selectChild.value.productCategoryId,
+    showLoading();
+    try {
+      const updateData = {
+        productsId: productsId.value,
+        ProductCategoryId: selectChild.value.productCategoryId,
 
-      productsName: productName.value,
-      productsPrice: productPrice.value,
-      productsStock: productStock.value,
-    };
-    const res = await updateProducts(updateData);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      for (const img of imgs.value) {
-        if (img.file) {
-          const fd = new FormData();
-          fd.append('productsImgsFiles', img.file);
-          fd.append('productId', productsId.value);
-          fd.append('productsImgId', img.productsImgId);
-          await productsImgUpload(fd);
+        productsName: productName.value,
+        productsPrice: productPrice.value,
+        productsStock: productStock.value,
+      };
+      const res = await updateProducts(updateData);
+      const { data } = res;
+      if (data.codeStatus === 2000) {
+        for (const img of imgs.value) {
+          if (img.file) {
+            const fd = new FormData();
+            fd.append('productsImgsFiles', img.file);
+            fd.append('productId', productsId.value);
+            fd.append('productsImgId', img.productsImgId);
+            await productsImgUpload(fd);
+          }
         }
-      }
+        showToastSuccess('更新商品成功!');
 
-      Swal.fire({
-        icon: 'success',
-        title: '更新商品成功!',
-      });
-      router.push({ name: 'mall' });
+        router.push({ name: 'mall' });
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      hideLoading();
     }
   }
 };
@@ -226,7 +260,7 @@ const removeImage = async (index) => {
         }
       }
     } catch (err) {
-      console.error('資料操作錯誤 ', error.response);
+      console.error('資料操作錯誤 ', err);
     }
   } else {
     imgs.value.splice(index, 1);
@@ -263,13 +297,10 @@ const removeImage = async (index) => {
       <InputGroupAddon>
         <!-- <i class="pi pi-user"></i> -->
       </InputGroupAddon>
-      <InputText v-model="productName" placeholder="商品名稱" />
+      <InputText v-model="productName" placeholder="商品名稱" :invalid="v$.productName.$error" />
     </InputGroup>
-    <InputGroup>
-      <InputGroupAddon>類別</InputGroupAddon>
-      <!-- 使用 Chips 元件，它會自動將內容存成陣列 -->
-      <Chips v-model="productCategoryName" placeholder="輸入後按 Enter 分類" />
-    </InputGroup>
+    <InValidErrorMessage :errorDto="v$.productName.$errors" vaildChiName="商品名稱" />
+
     <InputGroup>
       <Select
         v-model="selectParent"
@@ -287,19 +318,30 @@ const removeImage = async (index) => {
         placeholder="子類別"
       />
     </InputGroup>
+    <InValidErrorMessage :errorDto="v$.selectChild.$errors" vaildChiName="子類別" />
     <InputGroup>
       <InputGroupAddon>
         <!-- <i class="pi pi-user"></i> -->
       </InputGroupAddon>
-      <InputNumber v-model="productPrice" placeholder="商品價格" />
+      <InputNumber
+        v-model="productPrice"
+        placeholder="商品價格"
+        :invalid="v$.productPrice.$error"
+      />
       <InputGroupAddon>.00</InputGroupAddon>
     </InputGroup>
+    <InValidErrorMessage :errorDto="v$.productPrice.$errors" vaildChiName="商品價格" />
     <InputGroup>
       <InputGroupAddon>
         <!-- <i class="pi pi-user"></i> -->
       </InputGroupAddon>
-      <InputNumber v-model="productStock" placeholder="商品庫存" />
+      <InputNumber
+        v-model="productStock"
+        placeholder="商品庫存"
+        :invalid="v$.productStock.$error"
+      />
     </InputGroup>
+    <InValidErrorMessage :errorDto="v$.productStock.$errors" vaildChiName="商品庫存" />
     <!-- 按鈕區 -->
     <div class="justify-end flex mt-5">
       <button

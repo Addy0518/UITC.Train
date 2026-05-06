@@ -21,7 +21,7 @@ public class MallController(IMallService mallService) : ControllerBase
     private string tuuneUrl = "https://veneering-bannister-outlook.ngrok-free.dev";
 
     // 前端網址基底
-    private string fronturl = "http://localhost:5173";
+    private string fronturl = "http://localhost:5174";
 
     // 私有方法 : 從 Token 取出 UserId
     private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");

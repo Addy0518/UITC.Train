@@ -1,13 +1,12 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
-import Swal from 'sweetalert2';
-
+import { app } from '@/main';
 /*
-   創建一個 axios ( VITE_TODO_BASE_URL 是放在環境設定 ( env ) 的 url )
+   創建一個 axios ( VITE_BASE_URL 是放在環境設定 ( env ) 的 url )
 */
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_TODO_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
 });
 
 /*
@@ -43,33 +42,39 @@ instance.interceptors.response.use(
     return response;
   },
   function (error) {
+    // 取得全域的 toast
+    const toast = app.config.globalProperties.$toast;
+
+    // 網路完全斷線的情況
+    if (!error.response) {
+      toast.add({ severity: 'error', summary: '網路異常', detail: '請確認網路連線', life: 5000 });
+      return Promise.reject(error);
+    }
+
     const { status, data } = error.response;
-    if (status === 400) {
-      /*
-         這裡是看 return Promise.reject(error); 發現 驗證錯誤都在 data 的 errors 裡 , 分成好幾個物件
-         所以用 flatMap 把她攤平 (本來是 {[],[],[]}變成 "","","") , 再 join 串起來
-      */
-      const errorMsg = Object.values(data.errors)
-        .flatMap((x) => x)
-        .join('\r\n');
-      Swal.fire({
-        icon: 'error',
-        title: errorMsg,
-      });
-    }
-    if (status === 401) {
-      alert('登入時間過期，請重新登入！');
+    // 管理各種 api 錯誤
+    switch (status) {
+      case 400:
+        const errorMsg = Object.values(data.errors)
+          .flatMap((x) => x)
+          .join('\n');
+        toast.add({ severity: 'error', summary: '驗證錯誤', detail: errorMsg, life: 3000 });
+        break;
 
-      router.push({ name: 'login' });
-    }
-    if (status === 500) {
-      const errorMsg = `狀況 : ${data.message} \r\n Url : ${data.error500.instance} \r\n 錯誤訊息 : ${data.error500.title}`;
-      Swal.fire({
-        icon: 'error',
-        title: `連線錯誤 : ${errorMsg}`,
-      });
-    }
+      case 401:
+        toast.add({ severity: 'error', summary: '登入過期', detail: '請重新登入', life: 5000 });
+        router.push({ name: 'login' });
+        break;
 
+      case 500:
+        const msg = `${data.message} | ${data.error500?.title}`;
+        toast.add({ severity: 'error', summary: '伺服器錯誤', detail: msg, life: 5000 });
+        break;
+
+      default:
+        toast.add({ severity: 'error', summary: `未知錯誤 (${status})`, detail: '', life: 5000 });
+        break;
+    }
     return Promise.reject(error);
   },
 );

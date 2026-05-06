@@ -1,5 +1,4 @@
 import accountApiInstance from '@/api/accountInstance.js';
-import { da } from 'zod/v4/locales';
 
 /*
    從 accountInstance 匯入 axios 設定 , 開始串接後端 api
@@ -86,4 +85,3 @@ export const deleteProductsInShoppingCar = (productsId) =>
 // 使用者購買商品
 export const userBuyProduct = (buyRequest) =>
   accountApiInstance.post(`Mall/UserBuyProduct`, buyRequest);
-

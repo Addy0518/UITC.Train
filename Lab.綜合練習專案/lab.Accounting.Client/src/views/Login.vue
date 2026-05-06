@@ -1,10 +1,19 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { loginApi } from '@/api/account-api';
+import { required, vaildEmail, vaildLoginPassword } from '@/validator/validators';
+import { useVuelidate } from '@vuelidate/core';
+import InValidErrorMessage from '../common/InValidErrorMessage.vue';
 
-import Swal from 'sweetalert2';
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
 
 /*
    變數名稱代表意義
@@ -12,48 +21,33 @@ import Swal from 'sweetalert2';
    route : 獲取路由資訊
    account : 帳號
    password : 密碼
-   errorAccount : 帳號錯誤警告
-   errorPassword :　密碼錯誤警告
    tooglePassword　：　切換密碼顯示或隱藏
-   emailPattern : 帳號格式正規範
-   passwordPattern : 密碼格式正規範
+
 */
 const authStore = useAuthStore();
 const route = useRouter();
 const account = ref(null);
 const password = ref(null);
-
-let errorAccount = ref();
-let errorPassword = ref();
 const tooglePassword = ref(true);
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
 
 /*
   驗證帳號格式
 */
-const validateAccount = () => {
-  if (!account.value) {
-    errorAccount.value = '名稱不能為空!';
-  } else if (!emailPattern.test(account.value)) {
-    errorAccount.value = '帳號格式不對!';
-  } else {
-    errorAccount.value = '';
-  }
-};
+// 加入已經寫好的驗證規則
+const rules = computed(() => ({
+  account: { required, vaildEmail },
+  password: { required, vaildLoginPassword },
+}));
 
-/*
-  驗證密碼格式
-*/
-const validatePassword = () => {
-  if (!password.value) {
-    errorPassword.value = '名稱不能為空!';
-  } else if (!passwordPattern.test(password.value)) {
-    errorPassword.value = '總共 8 個字 , 只能輸入英文跟數字 , 第一個字要大寫';
-  } else {
-    errorPassword.value = '';
-  }
-};
+// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
+// autoDirty => 一碰到欄位就開始驗證
+// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
+// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+const v$ = useVuelidate(
+  rules,
+  { account, password },
+  { $autoDirty: true, $lazy: true, $scope: false },
+);
 
 /*
   測試用帳號
@@ -67,26 +61,27 @@ const testUser = () => {
   呼叫登入使用者 API
 */
 const userLogin = async () => {
+  // 要儲存前先驗證
+  const isFormCorrect = await v$.value.$validate();
+  if (!isFormCorrect) return;
+
   try {
+    showLoading();
     const userlogin = { userAccount: account.value, userPassword: password.value };
     const res = await loginApi(userlogin);
     const { data } = res;
     if (data.codeStatus === 2000) {
       authStore.setAuth(data.returnData);
-      Swal.fire({
-        icon: 'success',
-        title: '登入成功!',
-      });
+      showToastSuccess('登入成功 !');
       route.push('mall');
     }
     if (data.codeStatus === 4001) {
-      Swal.fire({
-        icon: 'error',
-        title: data.message,
-      });
+      showToastError('錯誤', data.message);
     }
   } catch (error) {
     console.error('使用者登入錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 </script>
@@ -101,10 +96,10 @@ const userLogin = async () => {
         <InputGroupAddon>
           <i class="pi pi-user"></i>
         </InputGroupAddon>
-        <InputText v-model="account" placeholder="帳號" @input="validateAccount" />
+        <InputText v-model="account" placeholder="帳號" :invalid="v$.account.$error" />
       </InputGroup>
-      <span v-if="errorAccount" class="text-red-700 font-semibold text-lg">{{ errorAccount }}</span>
-
+      <!-- 自訂的顯示錯誤訊息元件 -->
+      <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-unlock"></i>
@@ -113,15 +108,13 @@ const userLogin = async () => {
           :type="tooglePassword ? 'password' : 'text'"
           v-model="password"
           placeholder="密碼"
-          @input="validatePassword"
+          :invalid="v$.password.$error"
         />
         <InputGroupAddon class="cursor-pointer" @click="tooglePassword = !tooglePassword">
           <i :class="['pi', tooglePassword ? 'pi-eye' : 'pi-eye-slash']"></i>
         </InputGroupAddon>
       </InputGroup>
-      <span v-if="errorPassword" class="text-red-700 font-semibold text-lg">{{
-        errorPassword
-      }}</span>
+      <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
     </div>
     <!-- 按鈕區 -->
     <div class="justify-end flex mt-5">

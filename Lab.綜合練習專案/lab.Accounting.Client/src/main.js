@@ -22,6 +22,8 @@ import Dialog from 'primevue/dialog';
 import Password from 'primevue/password';
 import Chip from 'primevue/chip';
 import CascadeSelect from 'primevue/cascadeselect';
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
 
 const app = createApp(App);
 
@@ -57,5 +59,7 @@ app.component('Dialog', Dialog);
 app.component('Password', Password);
 app.component('Chip', Chip);
 app.component('CascadeSelect', CascadeSelect);
-
+app.component('Toast', Toast);
+app.use(ToastService);
 app.mount('#app');
+export { app };
