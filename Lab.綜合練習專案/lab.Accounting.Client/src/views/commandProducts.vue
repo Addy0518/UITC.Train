@@ -18,6 +18,7 @@ import InValidErrorMessage from '../common/InValidErrorMessage.vue';
    變數名稱代表意義
    imgs : 商品圖片
    route : 獲取路由資訊
+   router : 改變路由
    productCategoryName : 商品類型名稱
    productName : 商品名稱
    productPrice : 商品價格

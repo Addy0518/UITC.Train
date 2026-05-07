@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, compile, computed, watch } from 'vue';
+import { ref, onMounted, compile, computed, watch, inject } from 'vue';
 import { getAllProduct, addProductsInShoppingCar } from '@/api/account-api';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
@@ -15,6 +15,14 @@ const allProductsRaw = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
 /*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
+/*
    初始化加載所有商品
 */
 onMounted(() => {
@@ -25,25 +33,32 @@ onMounted(() => {
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
 */
 const loadproducts = async () => {
-  const res = await getAllProduct();
-  const { data } = res;
-  console.log('data', data);
-  if (data.codeStatus === 2000) {
-    allProductsRaw.value = data.returnData;
-    products.value = data.returnData;
+  try {
+    showLoading();
+    const res = await getAllProduct();
+    const { data } = res;
 
-    /*
+    if (data.codeStatus === 2000) {
+      allProductsRaw.value = data.returnData;
+      products.value = data.returnData;
+
+      /*
        使用 flatmap 把後端的類別攤平去重 , 跟 map 的差別是
        map 會把 ['男士,男士', '鞋子'] + split(',') 變成 [['男士', '男士'], ['鞋子']] （ 陣列裡面包陣列 ）, 系統就會分不出來
        flatmap 則會 ['男士', '男士', '鞋子'] + split(',') 變成 ['男士', '男士', '鞋子'] ( 自動攤平成一個大陣列 ）, 這樣就能比對重複
     */
-    const allNames = products.value.flatMap((x) =>
-      x.productCategoryName ? x.productCategoryName.split(',') : [],
-    );
-    /*
+      const allNames = products.value.flatMap((x) =>
+        x.productCategoryName ? x.productCategoryName.split(',') : [],
+      );
+      /*
        最後在用 new Set 把剛剛 flatmap 攤平的陣列去重複塞進類別
     */
-    categorys.value = [...new Set(allNames)];
+      categorys.value = [...new Set(allNames)];
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -81,10 +96,15 @@ const getProductsImg = (product) => {
   商品加入購物車
 */
 const addProductsInCar = async (productId) => {
-  var res = await addProductsInShoppingCar(productId);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    alert('加入成功!');
+  try {
+    var res = await addProductsInShoppingCar(productId);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      showToastSuccess('加入成功!');
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
   }
 };
 </script>

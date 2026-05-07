@@ -1,8 +1,10 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import { getAllLedger, getLedger, createLedger, updateLedger } from '@/api/account-api';
-
+import { required, maxLength } from '@/validator/validators';
+import { useVuelidate } from '@vuelidate/core';
+import InValidErrorMessage from '../common/InValidErrorMessage.vue';
 /*
    變數名稱代表意義
    route : 獲取路由資訊
@@ -25,12 +27,39 @@ const category = ref([]);
 const visible = ref(true);
 const isAdd = computed(() => route.name === 'add-ledger');
 
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
 onMounted(() => {
   categoryData();
   if (route.params.id) {
     updateData(route.params.id);
   }
 });
+
+// 加入已經寫好的驗證規則
+const rules = computed(() => ({
+  itemName: { required, maxLength: maxLength(200) },
+  itemIllustrate: { maxLength: maxLength(500) },
+  itemCost: { required },
+  itemDate: { required },
+  selectedCategory: { required },
+}));
+
+// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
+// autoDirty => 一碰到欄位就開始驗證
+// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
+// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+const v$ = useVuelidate(
+  rules,
+  { itemName, itemIllustrate, itemCost, itemDate, selectedCategory },
+  { $autoDirty: true, $lazy: true, $scope: false },
+);
 
 /*
   呼叫查看所有類別帳本 API
@@ -57,6 +86,7 @@ const categoryData = async () => {
 */
 const updateData = async (productId) => {
   try {
+    showLoading();
     if (!productId) return;
     const res = await getLedger(productId);
     const { data } = res;
@@ -70,10 +100,12 @@ const updateData = async (productId) => {
       selectedCategory.value = item.categoryName;
     }
     if (data.codeStatus === 4001) {
-      alert(data.message);
+      showToastError('錯誤', data.message);
     }
   } catch (error) {
     console.error('編輯錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -81,7 +113,11 @@ const updateData = async (productId) => {
   呼叫新增帳本 API
 */
 const addoreditledger = async (id = null) => {
+  const isFormCorrect = await v$.value.$validate();
+  if (!isFormCorrect) return;
+
   try {
+    showLoading();
     /*
        我後端已經寫了轉換類別的方法了 , 這裡就丟類別名稱回去就好
        但是因為儲存類別有兩個方法 , 一個是選現有的就會是物件 , 一個用輸入的就會是變數 , 所以要看他的型別來判斷
@@ -104,10 +140,11 @@ const addoreditledger = async (id = null) => {
       const res = await createLedger(createdata);
       const { data } = res;
       if (data.returnData > 0 && data.codeStatus === 2000) {
+        showToastSuccess('成功新增!');
         visible.value = false;
       }
       if (data.codeStatus === 4001) {
-        alert(data.message);
+        showToastError('錯誤', data.message);
       }
     } else if (!isAdd.value) {
       const updatedata = {
@@ -121,14 +158,17 @@ const addoreditledger = async (id = null) => {
       const res = await updateLedger(updatedata);
       const { data } = res;
       if (data.returnData > 0 && data.codeStatus === 2000) {
+        showToastSuccess('成功更新!');
         visible.value = false;
       }
       if (data.codeStatus === 4001) {
-        alert(data.message);
+        showToastError('錯誤', data.message);
       }
     }
   } catch (err) {
     console.error('資料操作錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 </script>
@@ -153,21 +193,27 @@ const addoreditledger = async (id = null) => {
           <InputGroupAddon>
             <i class="pi pi-user"></i>
           </InputGroupAddon>
-          <InputText v-model="itemName" placeholder="項目名稱" />
+          <InputText v-model="itemName" placeholder="項目名稱" :invalid="v$.itemName.$error" />
         </InputGroup>
-
+        <InValidErrorMessage :errorDto="v$.itemName.$errors" vaildChiName="項目名稱" />
         <InputGroup>
           <InputGroupAddon>$</InputGroupAddon>
-          <InputNumber v-model="itemCost" placeholder="花費" />
+          <InputNumber v-model="itemCost" placeholder="花費" :invalid="v$.itemCost.$error" />
           <InputGroupAddon>.00</InputGroupAddon>
         </InputGroup>
+        <InValidErrorMessage :errorDto="v$.itemCost.$errors" vaildChiName="花費" />
         <InputGroup v-if="isAdd">
           <InputGroupAddon>
             <i class="pi pi-calendar"></i>
           </InputGroupAddon>
-          <DatePicker v-model="itemDate" placeholder="日期" dateFormat="yy-mm-dd" />
+          <DatePicker
+            v-model="itemDate"
+            placeholder="日期"
+            dateFormat="yy-mm-dd"
+            :invalid="v$.itemDate.$error"
+          />
         </InputGroup>
-
+        <InValidErrorMessage :errorDto="v$.itemDate.$errors" vaildChiName="日期" />
         <InputGroup>
           <InputGroupAddon>
             <i class="pi pi-align-justify"></i>
@@ -178,13 +224,20 @@ const addoreditledger = async (id = null) => {
             editable
             optionLabel="name"
             placeholder="類別"
+            :invalid="v$.selectedCategory.$error"
           />
         </InputGroup>
-
+        <InValidErrorMessage :errorDto="v$.selectedCategory.$errors" vaildChiName="類別" />
         <InputGroup>
           <InputGroupAddon><i class="pi pi-book"></i></InputGroupAddon>
-          <Textarea v-model="itemIllustrate" placeholder="補充說明" class="w-full" />
+          <Textarea
+            v-model="itemIllustrate"
+            placeholder="補充說明"
+            class="w-full"
+            :invalid="v$.itemIllustrate.$error"
+          />
         </InputGroup>
+        <InValidErrorMessage :errorDto="v$.itemIllustrate.$errors" vaildChiName="補充說明" />
       </div>
       <!-- 按鈕區 -->
       <div class="justify-end flex mt-5">

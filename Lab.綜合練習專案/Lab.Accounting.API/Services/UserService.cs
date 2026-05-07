@@ -71,7 +71,12 @@ namespace Lab.Accounting.API.Services
 
             dbuser.UserPassword = null;
 
-            var token = tokenHelper.GeneratedToken(dbuser.UserId, dbuser.UserName, dbuser.UserRole, dbuser.UserAddress);
+            var token = tokenHelper.GeneratedToken(
+                dbuser.UserId,
+                dbuser.UserName,
+                dbuser.UserRole ?? "User",
+                dbuser.UserAddress ?? ""
+            );
 
             var userheadshot = await userrepo.GetUser(dbuser.UserId);
 

@@ -9,7 +9,7 @@ import { onMounted, ref, watch } from 'vue';
    authStore : localstorage
 */
 let imgUrl = ref();
-const baseUrl = 'https://localhost:7124';
+const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
 
 onMounted(() => {
@@ -26,9 +26,12 @@ const uploadFile = async (event) => {
   const formData = new FormData();
   formData.append('userFile', file);
   const res = await userHeadShot(formData);
+
   const { data } = res;
+
   if (data.codeStatus === 2000) {
     imgUrl.value = `${baseUrl}/UserHeadShot/${data.returnData.userHeadshot}`;
+    authStore.userHeadshot = data.returnData.userHeadshot;
   }
 };
 </script>
@@ -98,12 +101,6 @@ const uploadFile = async (event) => {
         :to="{ name: 'chart' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-wallet px-5 ps-5"></i>帳本統計圖表</RouterLink
-      >
-
-      <RouterLink
-        :to="{ name: 'recycling-ledger' }"
-        class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-        ><i class="pi pi-trash px-5 ps-5"></i>資源回收桶</RouterLink
       >
     </div>
   </div>

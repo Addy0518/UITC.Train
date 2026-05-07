@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { getSellerAllProduct, deleteProducts } from '@/api/account-api';
 import { ref } from 'vue';
@@ -16,6 +16,14 @@ const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
 
 /*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
+/*
    初始化時
 */
 onMounted(() => {
@@ -26,11 +34,16 @@ onMounted(() => {
    查看賣家所有商品
 */
 const getSellerProduct = async () => {
-  var res = await getSellerAllProduct();
-  const { data } = res;
+  try {
+    var res = await getSellerAllProduct();
+    const { data } = res;
 
-  if (data.codeStatus === 2000) {
-    allproduct.value = data.returnData;
+    if (data.codeStatus === 2000) {
+      allproduct.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
   }
 };
 
@@ -57,10 +70,16 @@ const productscategory = (categories) => {
   軟刪除
 */
 const deleteProduct = async (productId) => {
-  const res = await deleteProducts(productId);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    await getSellerProduct();
+  try {
+    const res = await deleteProducts(productId);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      showToastSuccess('成功加入回收桶!');
+      await getSellerProduct();
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
   }
 };
 </script>

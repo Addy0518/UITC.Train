@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, inject } from 'vue';
 import Swal from 'sweetalert2';
 import {
   deleteAllSoftDeleteLedger,
@@ -22,6 +22,16 @@ const category = ref([]);
 const date = ref();
 const selectedValue = ref(null);
 
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
+
+
 onMounted(async () => {
   await ItemData();
 
@@ -43,6 +53,7 @@ watch([date, selectedValue], ([newDate, newVal]) => {
 */
 const deleteChange = async (id) => {
   try {
+    showLoading();
     if (!id) return;
 
     const res = await deleteLedger(id);
@@ -53,8 +64,10 @@ const deleteChange = async (id) => {
         isItem.value = false;
       }
     }
-  } catch (error) {
-    console.error('帳本刪除錯誤 ', error.response);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -63,6 +76,7 @@ const deleteChange = async (id) => {
 */
 const reserve = async (item) => {
   try {
+    showLoading();
     if (!item) return;
     const updateData = {
       categoryname: item.categoryName || '',
@@ -83,8 +97,10 @@ const reserve = async (item) => {
         isItem.value = false;
       }
     }
-  } catch (error) {
-    console.error('帳本復原錯誤 ', error.response);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -93,6 +109,7 @@ const reserve = async (item) => {
 */
 const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
   try {
+    showLoading();
     let querystring = '';
     if (cateId && cateId.length > 0) {
       querystring += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
@@ -140,8 +157,10 @@ const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
           }));
       }
     }
-  } catch (error) {
-    console.error('搜尋資料錯誤 ', error.response);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -150,13 +169,16 @@ const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
 */
 const deleteAll = async () => {
   try {
+    showLoading();
     const res = await deleteAllSoftDeleteLedger();
     const { data } = res;
     if (data.codeStatus === 2000) {
       await ItemData();
     }
-  } catch (error) {
-    console.error('帳本刪除錯誤 ', error.response);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 </script>

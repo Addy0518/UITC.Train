@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, compile, computed, watch } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/account-api';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import { value } from 'valibot';
@@ -15,6 +15,14 @@ const allProductsRaw = ref();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
 /*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
+/*
    初始化時加載購物車商品
 */
 onMounted(() => {
@@ -25,19 +33,26 @@ onMounted(() => {
    初始化時加載購物車商品
 */
 const loadproducts = async () => {
-  const res = await getAllProductsInShoppingCar();
-  const { data } = res;
+  try {
+    showLoading();
+    const res = await getAllProductsInShoppingCar();
+    const { data } = res;
 
-  if (data.codeStatus === 2000) {
-    allProductsRaw.value = data.returnData;
-    /*
+    if (data.codeStatus === 2000) {
+      allProductsRaw.value = data.returnData;
+      /*
         在解構的陣列 products 裡面再建立一個陣列 [x.productCategoryName, x] , 為 key 跟 value
         用 map 去除重複的 key 再把陣列轉回 values 陣列
     */
-    products.value = [...new Map(allProductsRaw.value.map((x) => [x.productsName, x])).values()];
-  } else {
-    allProductsRaw.value = [];
-    products.value = [];
+      products.value = [...new Map(allProductsRaw.value.map((x) => [x.productsName, x])).values()];
+    } else {
+      allProductsRaw.value = [];
+      products.value = [];
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -64,8 +79,15 @@ const getProductsImg = (product) => {
   移除購物車
 */
 const deleteProductsInCar = async (productId) => {
-  await deleteProductsInShoppingCar(productId);
-  await loadproducts();
+  try {
+    showLoading();
+    await deleteProductsInShoppingCar(productId);
+    await loadproducts();
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
 };
 </script>
 

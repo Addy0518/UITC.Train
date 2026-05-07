@@ -17,7 +17,7 @@ export const useAuthStore = defineStore(
       登入時存入 token 資料
     */
     function setAuth(data) {
-      console.log('登入成功回傳的資料:', data);
+   
       token.value = data.token;
       userId.value = data.userId;
       userName.value = data.userName;

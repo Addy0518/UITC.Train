@@ -1,6 +1,6 @@
 <script setup>
 import { getSellerAllProduct, deleteProducts, updateProductsDeleteStatus } from '@/api/account-api';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, inject } from 'vue';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import Swal from 'sweetalert2';
@@ -14,6 +14,14 @@ const allproduct = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const selectIds = ref([]);
 
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
 onMounted(() => {
   getSellerProduct();
 });
@@ -22,10 +30,15 @@ onMounted(() => {
   拿到所有回收桶資料 ( isDelete === true 的)
 */
 const getSellerProduct = async () => {
-  const res = await getSellerAllProduct(0, 10, true);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    allproduct.value = data.returnData;
+  try {
+    const res = await getSellerAllProduct(0, 10, true);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      allproduct.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
   }
 };
 
@@ -71,15 +84,13 @@ const deleteProduct = async () => {
       }
       const { data } = res;
       if (data.codeStatus === 2000) {
-        Swal.fire({
-          icon: 'success',
-          title: '已成功刪除!',
-        });
+        showToastSuccess('已成功刪除!');
         selectIds.value = [];
         await getSellerProduct(0, 10, true);
       }
     } catch (err) {
-      console.error('刪除錯誤 ', error.response);
+      console.log(err);
+    } finally {
     }
   }
 };
@@ -90,20 +101,22 @@ const deleteProduct = async () => {
 const rollbackAll = async (target) => {
   // 確保進來的商品 ID 是陣列 ( Array ) , 再用解構把她轉成 js 的陣列 ( 正常要這樣 => [1,2]] ), 確保後端能接收到
   const productsId = Array.isArray(target) ? [...target] : [target];
+  try {
+    if (productsId.length === 0) {
+      showToastError('請先勾選商品!');
+      return;
+    }
+    const res = await updateProductsDeleteStatus(productsId);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      selectIds.value = [];
 
-  if (productsId.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: '請先勾選商品!',
-    });
-    return;
-  }
-  const res = await updateProductsDeleteStatus(productsId);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    selectIds.value = [];
-    Swal.fire({ icon: 'success', title: '商品已復原' });
-    await getSellerProduct(0, 10, true);
+      showToastSuccess('商品已復原');
+      await getSellerProduct(0, 10, true);
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
   }
 };
 </script>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { registerApi } from '@/api/account-api';
 import Swal from 'sweetalert2';
@@ -59,35 +59,31 @@ const showToastError = inject('showToastError');
   呼叫註冊使用者 API
 */
 const userRegister = async () => {
+  // 要儲存前先驗證
+  const isFormCorrect = await v$.value.$validate();
+  if (!isFormCorrect) return;
   try {
+    showLoading();
     const userRegisterData = {
       userAccount: account.value,
       userPassword: password.value,
       userName: name.value,
       userPhone: phone.value,
     };
+
     const res = await registerApi(userRegisterData);
     const { data } = res;
     if (data.codeStatus === 2000) {
-      Swal.fire({
-        icon: 'success',
-        title: '註冊成功!',
-      });
+      showToastSuccess('註冊成功!');
       route.push('/login');
     } else if (data.codeStatus === 4000) {
       const errorMsg = data.error400.UserAccount;
-      Swal.fire({
-        icon: 'error',
-        title: errorMsg,
-      });
-    } else {
-      Swal.fire({
-        icon: 'question',
-        title: `意外成功:${data.codeStatus}`,
-      });
+      showToastError('錯誤', errorMsg);
     }
   } catch (error) {
     console.error('使用者註冊錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 </script>

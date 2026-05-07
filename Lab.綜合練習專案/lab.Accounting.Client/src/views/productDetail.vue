@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import { getProduct, userBuyProduct } from '@/api/account-api';
 import { useAuthStore } from '@/stores/auth';
@@ -21,16 +21,30 @@ const boughtQuantity = ref();
 const authStore = useAuthStore();
 const comment = ref();
 
-const createTime = Date.now;
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
 
 /*
    查看商品細節資訊
 */
 const getProductDetail = async (id) => {
-  var res = await getProduct(id);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    product.value = data.returnData;
+  try {
+    showLoading();
+    var res = await getProduct(id);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      product.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -63,34 +77,41 @@ const userBuy = async () => {
     createTime: new Date().toLocaleDateString('en-CA'),
   };
 
-  const res = await userBuyProduct(bought);
-  console.log('res', res);
-  const { data } = res;
-  if (data.codeStatus === 2000) {
-    try {
-      const ecpayData = data.returnData.formData;
-      const actionUrl = data.returnData.actionUrl;
+  try {
+    showLoading();
+    const res = await userBuyProduct(bought);
 
-      // 建立一個隱藏的 Form
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = actionUrl;
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      try {
+        const ecpayData = data.returnData.formData;
+        const actionUrl = data.returnData.actionUrl;
 
-      // 將所有綠界參數塞入 input 中
-      for (const key in ecpayData) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = ecpayData[key];
-        form.appendChild(input);
+        // 建立一個隱藏的 Form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = actionUrl;
+
+        // 將所有綠界參數塞入 input 中
+        for (const key in ecpayData) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = ecpayData[key];
+          form.appendChild(input);
+        }
+
+        // 把表單加到 body 並送出 (這就會觸發頁面跳轉)
+        document.body.appendChild(form);
+        form.submit();
+      } catch (error) {
+        console.error('購買失敗 :', error.response);
       }
-
-      // 把表單加到 body 並送出 (這就會觸發頁面跳轉)
-      document.body.appendChild(form);
-      form.submit();
-    } catch (error) {
-      console.error('購買失敗 :', error.response);
     }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 

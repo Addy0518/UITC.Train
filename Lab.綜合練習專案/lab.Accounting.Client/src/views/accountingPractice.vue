@@ -1,18 +1,27 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, inject } from 'vue';
 import { getAllLedger, deleteLedger } from '@/api/account-api';
-
+import { useRoute, useRouter } from 'vue-router';
 /*
    變數名稱代表意義
    ledger : 所有帳本項目
    category : 帳本類別
    date : datePicker 選擇的日期
-  selectedValue : treeSelect 選擇的類別
+   selectedValue : treeSelect 選擇的類別
+   router : 改變路由
 */
 const ledger = ref([]);
 const category = ref([]);
 const date = ref();
 const selectedValue = ref(null);
+const router = useRouter();
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
 
 onMounted(() => {
   ItemData();
@@ -51,15 +60,19 @@ const visible = computed(() => {
 */
 const deleteChange = async (id) => {
   try {
+    showLoading();
     if (!id) return;
 
     const res = await deleteLedger(id);
 
     if (res.data.codeStatus === 2000) {
+      showToastSuccess('成功丟到回收桶!');
       await ItemData();
     }
   } catch (error) {
     console.error('帳本刪除錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -68,6 +81,7 @@ const deleteChange = async (id) => {
 */
 const ItemData = async (selectdate = null, cateId = null) => {
   try {
+    showLoading();
     let querystring = '';
     if (cateId && cateId.length > 0) {
       querystring += `?` + cateId.map((id) => `categoryId=${id}`).join(`&`);
@@ -113,6 +127,8 @@ const ItemData = async (selectdate = null, cateId = null) => {
     }
   } catch (error) {
     console.error('搜尋資料錯誤 ', error.response);
+  } finally {
+    hideLoading();
   }
 };
 </script>
@@ -148,6 +164,14 @@ const ItemData = async (selectdate = null, cateId = null) => {
             :placeholder="font - size"
             showClear
           />
+        </div>
+        <div>
+          <button
+            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+            @click="router.push({ name: 'recycling-ledger' })"
+          >
+            前往回收桶
+          </button>
         </div>
       </div>
       <!-- 顯示所有帳目 -->
