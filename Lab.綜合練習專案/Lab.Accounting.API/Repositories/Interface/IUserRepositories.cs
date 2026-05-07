@@ -1,4 +1,5 @@
-﻿using Lab.Accounting.API.Common.Responses;
+﻿using Lab.Accounting.API.Common.Requests;
+using Lab.Accounting.API.Common.Responses;
 
 namespace Lab.Accounting.API.Repositories.Interface
 {
@@ -39,5 +40,18 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <param name="userId">使用者 ID </param>
         /// <returns>使用者資訊</returns>
         Task<UserResponse> GetUser(int userId);
+
+        /// <summary>
+        /// 取得所有使用者資訊
+        /// </summary>
+        /// <returns>使用者資訊列表</returns>
+        Task<IEnumerable<UserResponse>> GetAllUser();
+
+        /// <summary>
+        /// 編輯使用者資訊
+        /// </summary>
+        /// <param name="request">使用者更新資訊</param>
+        /// <returns>影響列數</returns>
+        Task<int> UpdateUser(UserUpdateRequest request);
     }
 }

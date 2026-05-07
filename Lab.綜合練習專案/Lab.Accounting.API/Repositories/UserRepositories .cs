@@ -1,4 +1,5 @@
-﻿using Lab.Accounting.API.Common.Responses;
+﻿using Lab.Accounting.API.Common.Requests;
+using Lab.Accounting.API.Common.Responses;
 using Lab.Accounting.API.Repositories.Interface;
 
 namespace Lab.Accounting.API.Repositories
@@ -15,12 +16,12 @@ namespace Lab.Accounting.API.Repositories
             using var conn = connecting.CreateConnecting();
             var sql =
                 @"Insert Into [User] (
-                  UserName, UserAccount, UserPassword, UserPhone
+                  UserName, UserAccount, UserPassword, UserPhone,UserAddress
                 ) 
                 values 
                   (
                     @UserName, @UserAccount, @UserPassword, 
-                    @UserPhone
+                    @UserPhone,@UserAddress
                   );
                 Select 
                   Cast(
@@ -96,6 +97,42 @@ namespace Lab.Accounting.API.Repositories
                   UserId = @UserId";
 
             return await conn.QueryFirstOrDefaultAsync<UserResponse>(sql, new { UserId = userId });
+        }
+
+        /// <summary>
+        /// 取得所有使用者資訊
+        /// </summary>
+        /// <returns>使用者資訊列表</returns>
+        public async Task<IEnumerable<UserResponse>> GetAllUser()
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Select UserId,UserName,UserAccount,UserPhone,UserHeadShot,UserRole,UserAddress From [User]
+             ";
+
+            return await conn.QueryAsync<UserResponse>(sql);
+        }
+
+        /// <summary>
+        /// 編輯使用者資訊
+        /// </summary>
+        /// <param name="request">使用者更新資訊</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> UpdateUser(UserUpdateRequest request)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"UPDATE [User]
+                  SET
+                      UserName    = COALESCE(@UserName, UserName),
+                      UserAddress = COALESCE(@UserAddress, UserAddress),
+                      UserPhone   = COALESCE(@UserPhone, UserPhone),
+                      UserRole    = COALESCE(@UserRole, UserRole)
+                  WHERE UserId = @UserId";
+
+            return await conn.ExecuteAsync(sql, new { UserId = userId });
         }
     }
 }

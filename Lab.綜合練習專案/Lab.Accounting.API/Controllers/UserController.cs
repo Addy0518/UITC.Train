@@ -42,7 +42,6 @@ namespace Lab.Accounting.API.Controllers
         /// <summary>
         /// 使用者登出
         /// </summary>
-        /// <param name="Token">登出的 Token</param>
         /// <returns>是否成功登出</returns>
         [Authorize]
         [HttpPost]

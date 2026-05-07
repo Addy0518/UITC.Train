@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { inject } from 'vue';
 import AccountingLayout from '@/views/accountingLayout.vue';
-import Swal from 'sweetalert2';
 
+const showToastError = inject('showToastError');
 /*
     路由設定
 */
@@ -231,10 +232,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore();
   if (to.meta.isPermissionVerification && !authStore.token) {
-    Swal.fire({
-      icon: 'error',
-      title: '請先登入帳號!',
-    });
+    showToastError('請先登入帳號!');
     return { name: 'login' };
   }
 });

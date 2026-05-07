@@ -20,6 +20,7 @@ import InValidErrorMessage from '../common/InValidErrorMessage.vue';
    password : 密碼
    name : 名稱
    phone : 電話
+   address : 地址
    tooglePassword　：　切換密碼顯示或隱藏
 */
 const route = useRouter();
@@ -27,6 +28,7 @@ const account = ref();
 const password = ref();
 const name = ref();
 const phone = ref();
+const address = ref();
 const tooglePassword = ref(true);
 
 // 加入已經寫好的驗證規則
@@ -34,7 +36,8 @@ const rules = computed(() => ({
   account: { required, maxLength: maxLength(200), vaildEmail },
   password: { required, vaildLoginPassword },
   name: { required, maxLength: maxLength(50) },
-  phone: { required, vaildCellPhone },
+  phone: { vaildCellPhone },
+  address: {},
 }));
 
 // 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
@@ -43,7 +46,7 @@ const rules = computed(() => ({
 // scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
 const v$ = useVuelidate(
   rules,
-  { account, password, name, phone },
+  { account, password, name, phone, address },
   { $autoDirty: true, $lazy: true, $scope: false },
 );
 
@@ -69,6 +72,7 @@ const userRegister = async () => {
       userPassword: password.value,
       userName: name.value,
       userPhone: phone.value,
+      userAddress: address.value,
     };
 
     const res = await registerApi(userRegisterData);
@@ -133,6 +137,14 @@ const userRegister = async () => {
         <InputText v-model="phone" placeholder="電話" :invalid="v$.phone.$error" />
       </InputGroup>
       <InValidErrorMessage :errorDto="v$.phone.$errors" vaildChiName="電話" />
+
+      <InputGroup>
+        <InputGroupAddon>
+          <i class="pi pi-home"></i>
+        </InputGroupAddon>
+        <InputText v-model="address" placeholder="地址" :invalid="v$.address.$error" />
+      </InputGroup>
+      <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="地址" />
     </div>
 
     <div class="justify-end flex mt-5">

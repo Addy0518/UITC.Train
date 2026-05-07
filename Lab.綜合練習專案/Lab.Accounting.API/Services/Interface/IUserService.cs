@@ -33,5 +33,25 @@ namespace Lab.Accounting.API.Services.Interface
         /// <param name="userFile">使用者大頭照檔案 </param>
         /// <returns>使用者資訊</returns>
         Task<ApiResponse<UserResponse>> UserHeadShotUpload(IFormFile userFile, int userId);
+
+        /// <summary>
+        /// 取得使用者資訊
+        /// </summary>
+        /// <param name="userId">使用者 ID </param>
+        /// <returns>使用者資訊</returns>
+        Task<ApiResponse<UserResponse>> GetUser(int userId);
+
+        /// <summary>
+        /// 取得所有使用者資訊
+        /// </summary>
+        /// <returns>使用者資訊列表</returns>
+        Task<ApiResponse<IEnumerable<UserResponse>>> GetAllUser();
+
+        /// <summary>
+        /// 編輯使用者資訊
+        /// </summary>
+        /// <param name="request">使用者更新資訊</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> UpdateUser(UserUpdateRequest request);
     }
 }

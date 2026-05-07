@@ -26,6 +26,7 @@
         /// </summary>
         [Display(Name = "使用者名稱")]
         [Required(ErrorMessage = "{0} 不能為空!")]
+        [MaxLength(50, ErrorMessage = "{0} 不能超過 {1} 個字!")]
         public string UserName { get; set; }
 
         /// <summary>
@@ -33,5 +34,11 @@
         /// </summary>
         [Display(Name = "使用者電話")]
         public int? UserPhone { get; set; }
+
+        /// <summary>
+        /// 使用者電話
+        /// </summary>
+        [Display(Name = "使用者地址")]
+        public string? UserAddress { get; set; }
     }
 }

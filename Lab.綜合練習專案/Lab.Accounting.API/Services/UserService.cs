@@ -4,6 +4,7 @@ using Lab.Accounting.API.Common.Requests;
 using Lab.Accounting.API.Common.Responses;
 using Lab.Accounting.API.Repositories.Interface;
 using Lab.Accounting.API.Services.Interface;
+using MathNet.Numerics;
 using Microsoft.AspNetCore.Identity.Data;
 using Serilog.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -31,6 +32,7 @@ namespace Lab.Accounting.API.Services
                 UserAccount = registerRequest.UserAccount,
                 UserPhone = registerRequest.UserPhone,
                 UserPassword = passwordSecureHelper.HashPassword(registerRequest.UserPassword),
+                UserAddress = registerRequest.UserAddress,
             };
             var exist = await userrepo.ExistRegister(user);
 
@@ -168,6 +170,49 @@ namespace Lab.Accounting.API.Services
             }
             //不管怎樣都要儲存檔案
             return await FileUploadHelper.SaveFileAsync(newFile, env.WebRootPath, folder);
+        }
+
+        /// <summary>
+        /// 取得使用者資訊
+        /// </summary>
+        /// <param name="userId">使用者 ID </param>
+        /// <returns>使用者資訊</returns>
+        public async Task<ApiResponse<UserResponse>> GetUser(int userId)
+        {
+            var result = await userrepo.GetUser(userId);
+            if (result == null)
+            {
+                return ApiResponseHelper.NotFound<UserResponse>();
+            }
+
+            return ApiResponseHelper.Success<UserResponse>(result);
+        }
+
+        /// <summary>
+        /// 取得所有使用者資訊
+        /// </summary>
+        /// <returns>使用者資訊列表</returns>
+        public async Task<ApiResponse<IEnumerable<UserResponse>>> GetAllUser()
+        {
+            var result = await userrepo.GetAllUser();
+
+            return ApiResponseHelper.Success<IEnumerable<UserResponse>>(result);
+        }
+
+        /// <summary>
+        /// 編輯使用者資訊
+        /// </summary>
+        /// <param name="request">使用者更新資訊</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> UpdateUser(UserUpdateRequest request)
+        {
+            if (request.UserId <= 0)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+            var result = await userrepo.UpdateUser(request);
+
+            return ApiResponseHelper.Success<int>(result);
         }
     }
 }
