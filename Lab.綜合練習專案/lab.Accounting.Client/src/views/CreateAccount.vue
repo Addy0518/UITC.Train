@@ -3,6 +3,15 @@ import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { registerApi } from '@/api/account-api';
 import Swal from 'sweetalert2';
+import {
+  required,
+  maxLength,
+  vaildEmail,
+  vaildLoginPassword,
+  vaildCellPhone,
+} from '@/validator/validators';
+import { useVuelidate } from '@vuelidate/core';
+import InValidErrorMessage from '../common/InValidErrorMessage.vue';
 
 /*
    變數名稱代表意義
@@ -11,79 +20,40 @@ import Swal from 'sweetalert2';
    password : 密碼
    name : 名稱
    phone : 電話
-   errorName : 名稱錯誤警告
-   errorPhone : 電話錯誤警告
-   errorAccount : 帳號錯誤警告
-   errorPassword :　密碼錯誤警告
    tooglePassword　：　切換密碼顯示或隱藏
-   emailPattern : 帳號格式正規範
-   passwordPattern : 密碼格式正規範
-   phonePattern : 電話格式正規範
 */
 const route = useRouter();
 const account = ref();
 const password = ref();
 const name = ref();
 const phone = ref();
-
-let errorName = ref();
-let errorPhone = ref();
-let errorAccount = ref();
-let errorPassword = ref();
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordPattern = /^[A-Z][A-Za-z0-9]{7}$/;
-const phonePattern = /^\d{1,12}$/;
-
 const tooglePassword = ref(true);
 
-/*
-  驗證名稱格式
-*/
-const validateUserName = () => {
-  if (!name.value) {
-    errorName.value = '名稱不能為空!';
-  } else {
-    errorName.value = '';
-  }
-};
+// 加入已經寫好的驗證規則
+const rules = computed(() => ({
+  account: { required, maxLength: maxLength(200), vaildEmail },
+  password: { required, vaildLoginPassword },
+  name: { required, maxLength: maxLength(50) },
+  phone: { required, vaildCellPhone },
+}));
+
+// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
+// autoDirty => 一碰到欄位就開始驗證
+// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
+// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+const v$ = useVuelidate(
+  rules,
+  { account, password, name, phone },
+  { $autoDirty: true, $lazy: true, $scope: false },
+);
 
 /*
-  驗證帳號格式
+   注入 Loading 跟 Toast
 */
-const validateAccount = () => {
-  if (!account.value) {
-    errorAccount.value = '名稱不能為空!';
-  } else if (!emailPattern.test(account.value)) {
-    errorAccount.value = '帳號格式不對!';
-  } else {
-    errorAccount.value = '';
-  }
-};
-
-/*
-  驗證密碼格式
-*/
-const validatePassword = () => {
-  if (!password.value) {
-    errorPassword.value = '名稱不能為空!';
-  } else if (!passwordPattern.test(password.value)) {
-    errorPassword.value = '總共 8 個字 , 只能輸入英文跟數字 , 第一個字要大寫';
-  } else {
-    errorPassword.value = '';
-  }
-};
-
-/*
-  驗證電話格式
-*/
-const validatePhone = () => {
-  if (!phonePattern.test(phone.value)) {
-    errorPhone.value = '只能輸入數字,且不能超過十二位數字!';
-  } else {
-    errorPhone.value = '';
-  }
-};
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
 
 /*
   呼叫註冊使用者 API
@@ -133,9 +103,9 @@ const userRegister = async () => {
         <InputGroupAddon>
           <i class="pi pi-user"></i>
         </InputGroupAddon>
-        <InputText v-model="account" placeholder="帳號" @input="validateAccount" />
+        <InputText v-model="account" placeholder="帳號" :invalid="v$.account.$error" />
       </InputGroup>
-      <span v-if="errorAccount" class="text-red-700 font-semibold text-lg">{{ errorAccount }}</span>
+      <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-unlock"></i>
@@ -144,31 +114,29 @@ const userRegister = async () => {
           :type="tooglePassword ? 'password' : 'text'"
           v-model="password"
           placeholder="密碼"
-          @input="validatePassword"
+          :invalid="v$.password.$error"
         />
         <InputGroupAddon class="cursor-pointer" @click="tooglePassword = !tooglePassword">
           <i :class="['pi', tooglePassword ? 'pi-eye' : 'pi-eye-slash']"></i>
         </InputGroupAddon>
       </InputGroup>
-      <span v-if="errorPassword" class="text-red-700 font-semibold text-lg">{{
-        errorPassword
-      }}</span>
+      <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
       <!-- 名稱跟電話 -->
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-id-card"></i>
         </InputGroupAddon>
-        <InputText v-model="name" placeholder="姓名" @input="validateUserName" />
+        <InputText v-model="name" placeholder="姓名" :invalid="v$.name.$error" />
       </InputGroup>
-      <span v-if="errorName" class="text-red-700 font-semibold text-lg">{{ errorName }}</span>
+      <InValidErrorMessage :errorDto="v$.name.$errors" vaildChiName="名稱" />
 
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-phone"></i>
         </InputGroupAddon>
-        <InputText v-model="phone" placeholder="電話" @input="validatePhone" />
+        <InputText v-model="phone" placeholder="電話" :invalid="v$.phone.$error" />
       </InputGroup>
-      <span v-if="errorPhone" class="text-red-700 font-semibold text-lg">{{ errorPhone }}</span>
+      <InValidErrorMessage :errorDto="v$.phone.$errors" vaildChiName="電話" />
     </div>
 
     <div class="justify-end flex mt-5">

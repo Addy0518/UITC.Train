@@ -3,7 +3,7 @@ import { ref, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { loginApi } from '@/api/account-api';
-import { required, vaildEmail, vaildLoginPassword } from '@/validator/validators';
+import { required, vaildEmail, vaildLoginPassword, maxLength } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
 import InValidErrorMessage from '../common/InValidErrorMessage.vue';
 
@@ -35,7 +35,7 @@ const tooglePassword = ref(true);
 */
 // 加入已經寫好的驗證規則
 const rules = computed(() => ({
-  account: { required, vaildEmail },
+  account: { required, maxLength: maxLength(200), vaildEmail },
   password: { required, vaildLoginPassword },
 }));
 
@@ -68,6 +68,7 @@ const userLogin = async () => {
   try {
     showLoading();
     const userlogin = { userAccount: account.value, userPassword: password.value };
+    console.log('送出資料：', userlogin);
     const res = await loginApi(userlogin);
     const { data } = res;
     if (data.codeStatus === 2000) {

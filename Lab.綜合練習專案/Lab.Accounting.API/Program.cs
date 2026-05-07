@@ -20,7 +20,31 @@ try
     builder.Services.AddSerilog();
 
     // 註冊 Controller
-    builder.Services.AddControllers();
+    builder
+        .Services.AddControllers()
+        // ConfigureApiBehaviorOptions 是用來自訂 ASP.NET Core 預設的 ModelState 驗證失敗回應行為
+        // 這裡要把 requried , maxlength 這些驗證回傳訊息也統一成我自訂的 Apiresponse 格式
+        .ConfigureApiBehaviorOptions(options =>
+        {
+            // InvalidModelStateResponseFactory 自訂驗證訊息工廠
+            options.InvalidModelStateResponseFactory = context =>
+            {
+                var errors = context
+                    // ModelState 裡每個欄位，只取有錯誤的
+                    .ModelState.Where(e => e.Value?.Errors.Count > 0)
+                    // 把欄位名稱當作 key，錯誤訊息陣列當作 value，組成一個新的 Dictionary<string, string[]>
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+
+                var response = new ApiResponse<object>
+                {
+                    CodeStatus = CodeStatus.RequestError,
+                    Message = "驗證失敗",
+                    Error400 = errors,
+                };
+
+                return new BadRequestObjectResult(response);
+            };
+        });
 
     // NSwag 套件，產生 OpenAPI（Swagger）文件 , 會掃描所有 Controller 和 Action，自動產生 API 文件 , 就可以在 Swagger UI 上看到
     builder.Services.AddOpenApiDocument(options =>
