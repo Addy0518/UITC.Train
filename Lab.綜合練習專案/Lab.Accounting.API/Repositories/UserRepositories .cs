@@ -132,7 +132,7 @@ namespace Lab.Accounting.API.Repositories
                       UserRole    = COALESCE(@UserRole, UserRole)
                   WHERE UserId = @UserId";
 
-            return await conn.ExecuteAsync(sql, new { UserId = userId });
+            return await conn.ExecuteAsync(sql, request);
         }
     }
 }
