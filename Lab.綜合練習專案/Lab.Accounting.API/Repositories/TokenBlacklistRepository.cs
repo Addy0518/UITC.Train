@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class TokenBlacklistRepositories(DBConnecting connecting) : ITokenBlacklistRepositories
+public class TokenBlacklistRepository(DBConnecting connecting) : ITokenBlacklistRepository
 {
     /// <summary>
     /// 登出後把 token 加入黑名單

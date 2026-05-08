@@ -9,7 +9,7 @@ public class TokenBlackListMiddleware
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, ITokenBlacklistRepositories tokenBlacklistRepositories)
+    public async Task Invoke(HttpContext context, ITokenBlacklistRepository tokenBlacklistRepositories)
     {
         // 取得 HTTP 請求的 Authorization Header 格式：Authorization: Bearer eyJhbGci... , 把 Bearer 跟後面空白去掉 , 拿 Token 的部分
         var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");

@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class UserRepositories(DBConnecting connecting) : IUserRepositories
+public class UserRepository(DBConnecting connecting) : IUserRepository
 {
     /// <summary>
     /// 使用者註冊

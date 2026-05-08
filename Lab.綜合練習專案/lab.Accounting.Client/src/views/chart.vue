@@ -1,7 +1,7 @@
 <script setup>
 import * as echarts from 'echarts';
 import { ref, onMounted, compile, computed, watch } from 'vue';
-import { getAllLedger } from '@/api/account-api';
+import { getAllLedger } from '@/api/ledgerService';
 const categoryChartRef = ref(null);
 const itemChartRef = ref(null);
 /*

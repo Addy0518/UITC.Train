@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed, watch, inject } from 'vue';
-import { getAllLedger, deleteLedger } from '@/api/account-api';
+import { getAllLedger, deleteLedger } from '@/api/ledgerService';
 import { useRoute, useRouter } from 'vue-router';
 import { isDeleteEnum } from '../common/enum';
 /*

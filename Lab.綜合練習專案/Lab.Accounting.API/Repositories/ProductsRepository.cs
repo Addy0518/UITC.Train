@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class ProductsRepositories(DBConnecting connecting) : IProductsRepositories
+public class ProductsRepository(DBConnecting connecting) : IProductsRepository
 {
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
@@ -35,6 +35,7 @@ public class ProductsRepositories(DBConnecting connecting) : IProductsRepositori
                         ON       c.productcategoryid= m.ProductCategoryId
                         Where (@UserId is null or m.userId=@UserId) 
                         and  (@isDelete is null or m.isDelete=@isDelete)
+                        and  m.ProductsStock > 0
                         GROUP BY 
                                m.productsid,
                                m.userid,

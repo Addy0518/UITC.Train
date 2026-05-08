@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
-import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/account-api';
+import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import { value } from 'valibot';
 /*

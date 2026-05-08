@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface ILedgerItemCategoryRepositories
+public interface ILedgerItemCategoryRepository
 {
     /// <summary>
     /// 查看帳本類別是否存在資料庫

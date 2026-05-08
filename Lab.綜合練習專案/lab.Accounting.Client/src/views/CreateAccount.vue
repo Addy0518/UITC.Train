@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
-import { registerApi } from '@/api/account-api';
+import { registerApi } from '@/api/userService';
 import Swal from 'sweetalert2';
 import {
   required,

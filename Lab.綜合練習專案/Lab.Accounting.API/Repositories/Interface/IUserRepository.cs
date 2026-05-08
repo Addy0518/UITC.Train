@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface IUserRepositories
+public interface IUserRepository
 {
     /// <summary>
     /// 使用者註冊

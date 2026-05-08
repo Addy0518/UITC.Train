@@ -1,5 +1,5 @@
 <script setup>
-import { userHeadShot } from '@/api/account-api';
+import { userHeadShot } from '@/api/userService';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref, watch } from 'vue';
 /*

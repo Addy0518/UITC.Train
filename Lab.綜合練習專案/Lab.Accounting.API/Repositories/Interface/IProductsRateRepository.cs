@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface IProductsRateRepositories
+public interface IProductsRateRepository
 {
     /// <summary>
     /// 新增單一商品評價

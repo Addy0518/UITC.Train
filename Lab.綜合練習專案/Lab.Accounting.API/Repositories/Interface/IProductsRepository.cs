@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface IProductsRepositories
+public interface IProductsRepository
 {
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )

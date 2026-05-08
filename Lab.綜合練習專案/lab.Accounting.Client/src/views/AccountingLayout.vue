@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
-import { logoutApi } from '@/api/account-api';
+import { logoutApi } from '@/api/userService';
 import sidebar from '@/views/sidebar.vue';
 
 /*

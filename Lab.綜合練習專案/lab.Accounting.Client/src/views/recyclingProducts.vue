@@ -1,5 +1,9 @@
 <script setup>
-import { getSellerAllProduct, deleteProducts, updateProductsDeleteStatus } from '@/api/account-api';
+import {
+  getSellerAllProduct,
+  deleteProducts,
+  updateProductsDeleteStatus,
+} from '@/api/productsService';
 import { computed, onMounted, inject } from 'vue';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';

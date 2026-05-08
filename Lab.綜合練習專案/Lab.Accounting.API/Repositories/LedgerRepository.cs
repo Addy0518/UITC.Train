@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> logger) : ILedgerRepositories
+public class LedgerRepository(DBConnecting connecting, ILogger<LedgerService> logger) : ILedgerRepository
 {
     /// <summary>
     /// 查看單一帳本項目

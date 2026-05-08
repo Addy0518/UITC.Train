@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface ITokenBlacklistRepositories
+public interface ITokenBlacklistRepository
 {
     /// <summary>
     /// 登出後把 token 加入黑名單

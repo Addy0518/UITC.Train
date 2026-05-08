@@ -2,7 +2,7 @@
 import { ref, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import { loginApi } from '@/api/account-api';
+import { loginApi } from '@/api/userService';
 import { required, vaildEmail, vaildLoginPassword, maxLength } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
 import InValidErrorMessage from '../common/InValidErrorMessage.vue';

@@ -1,8 +1,8 @@
 ﻿namespace Lab.Accounting.API.Services;
 
 public class LedgerService(
-    ILedgerRepositories accountrepo,
-    ILedgerItemCategoryRepositories categoryrepo,
+    ILedgerRepository accountrepo,
+    ILedgerItemCategoryRepository categoryrepo,
     ILogger<LedgerService> logger
 ) : ILedgerService
 {

@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface ILedgerRepositories
+public interface ILedgerRepository
 {
     /// <summary>
     /// 查看單一帳本項目

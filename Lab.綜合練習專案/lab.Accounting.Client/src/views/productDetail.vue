@@ -1,7 +1,8 @@
 <script setup>
 import { computed, onMounted, inject } from 'vue';
 import { useRoute } from 'vue-router';
-import { getProduct, userBuyProduct } from '@/api/account-api';
+import { getProduct } from '@/api/productsService';
+import { userBuyProduct } from '@/api//orderService';
 import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
@@ -28,7 +29,6 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
-
 
 /*
    查看商品細節資訊
@@ -107,6 +107,9 @@ const userBuy = async () => {
       } catch (error) {
         console.error('購買失敗 :', error.response);
       }
+    }
+    if (data.codeStatus === 4000) {
+      showToastError('庫存不足!');
     }
   } catch (err) {
     console.log(err);

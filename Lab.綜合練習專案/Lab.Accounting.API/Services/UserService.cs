@@ -1,10 +1,10 @@
 ﻿namespace Lab.Accounting.API.Services;
 
 public class UserService(
-    IUserRepositories userrepo,
+    IUserRepository userrepo,
     TokenHelper tokenHelper,
     PasswordSecureHelper passwordSecureHelper,
-    ITokenBlacklistRepositories tokenBlacklistRepositories,
+    ITokenBlacklistRepository tokenBlacklistRepositories,
     IWebHostEnvironment env
 ) : IUserService
 {

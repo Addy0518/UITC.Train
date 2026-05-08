@@ -6,7 +6,7 @@ import {
   updateLedger,
   getAllLedger,
   deleteLedger,
-} from '@/api/account-api';
+} from '@/api/ledgerService';
 import { isDeleteEnum } from '../common/enum';
 /*
   變數名稱代表意義

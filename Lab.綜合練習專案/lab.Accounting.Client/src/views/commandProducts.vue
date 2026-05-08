@@ -7,7 +7,7 @@ import {
   getProduct,
   updateProducts,
   getCategory,
-} from '@/api/account-api';
+} from '@/api/productsService';
 import { useRoute, useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { required, maxLength } from '@/validator/validators';

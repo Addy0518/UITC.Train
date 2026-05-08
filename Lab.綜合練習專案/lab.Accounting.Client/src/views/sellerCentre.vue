@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, inject } from 'vue';
 import { useRouter } from 'vue-router';
-import { getSellerAllProduct, deleteProducts } from '@/api/account-api';
+import { getSellerAllProduct, deleteProducts } from '@/api/productsService';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import Swal from 'sweetalert2';

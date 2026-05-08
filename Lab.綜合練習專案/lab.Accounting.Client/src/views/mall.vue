@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, compile, computed, watch, inject } from 'vue';
-import { getAllProduct, addProductsInShoppingCar } from '@/api/account-api';
+import { getAllProduct } from '@/api/productsService';
+import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
   變數名稱代表意義

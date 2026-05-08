@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class ProductsShoppingCarRepositories(DBConnecting connecting) : IProductsShoppingCarRepositories
+public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsShoppingCarRepository
 {
     /// <summary>
     /// 查看購物車中的所有商品

@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class LedgerItemCategoryRepositories(DBConnecting connecting) : ILedgerItemCategoryRepositories
+public class LedgerItemCategoryRepository(DBConnecting connecting) : ILedgerItemCategoryRepository
 {
     /// <summary>
     /// 查看帳本類別

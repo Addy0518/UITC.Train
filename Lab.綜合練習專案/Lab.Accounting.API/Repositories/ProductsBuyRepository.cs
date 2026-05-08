@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class ProductsBuyRepositories(DBConnecting connecting) : IProductsBuyRepositories
+public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyRepository
 {
     /// <summary>
     /// 查看單一訂單 ( Id 查詢 )

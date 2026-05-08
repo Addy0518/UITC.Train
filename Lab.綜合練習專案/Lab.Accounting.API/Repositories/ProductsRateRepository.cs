@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public class ProductsRateRepositories(DBConnecting connecting) : IProductsRateRepositories
+public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepository
 {
     /// <summary>
     /// 新增單一商品評價

@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface IProductsBuyRepositories
+public interface IProductsBuyRepository
 {
     /// <summary>
     /// 查看單一訂單 ( Id 查詢 )

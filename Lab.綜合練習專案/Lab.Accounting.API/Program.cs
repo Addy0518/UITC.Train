@@ -7,7 +7,7 @@ SerilogConfig.AddSerilLog();
 try
 {
     // 紀錄 Information 級別的 Log ，包含環境名稱和 URL
-    Log.Information(
+    Serilog.Log.Information(
         $"啟動應用程式環境 : {builder.Environment.EnvironmentName} URL: {builder.Configuration["ASPNETCORE_URLS"]}"
     );
     // 開始註冊 DI 服務
@@ -208,12 +208,12 @@ catch (Exception ex)
 {
     // 記錄最高等級的錯誤：系統崩潰、無法繼續執行
     // 如果啟動過程發生未預期的例外，記錄下來方便排查
-    Log.Fatal(ex, "Application terminated unexpectedly");
+    Serilog.Log.Fatal(ex, "Application terminated unexpectedly");
 }
 finally
 {
     // 確保所有緩衝中的 Log 都被寫出去再關閉
     // 有些 Sink（例如寫檔案）是有緩衝的，直接結束程式可能會漏掉最後幾筆 Log
     // finally 確保無論正常結束還是例外，都會執行這行
-    Log.CloseAndFlush();
+    Serilog.Log.CloseAndFlush();
 }
