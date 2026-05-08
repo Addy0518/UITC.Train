@@ -1,32 +1,28 @@
-﻿using Lab.Accounting.API.Common.Responses;
-using Lab.Accounting.API.Infrastructures.Data.Entities;
-using Lab.Accounting.API.Repositories.Interface;
+﻿namespace Lab.Accounting.API.Repositories;
 
-namespace Lab.Accounting.API.Repositories
+public class ProductsRepositories(DBConnecting connecting) : IProductsRepositories
 {
-    public class ProductsRepositories(DBConnecting connecting) : IProductsRepositories
+    /// <summary>
+    /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
+    /// </summary>
+    /// <param name="pageIndex">頁碼</param>
+    /// <param name="pageSize">每頁顯示數量</param>
+    /// <param name="userId">使用者 Id</param>
+    /// <param name="isDelete">是否為刪除狀態</param>
+    /// <returns>商品列表</returns>
+    public async Task<IEnumerable<ProductsResponse>> GetAllProducts(
+        int pageIndex,
+        int pageSize,
+        int? userId = null,
+        IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
+    )
     {
-        /// <summary>
-        /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
-        /// </summary>
-        /// <param name="pageIndex">頁碼</param>
-        /// <param name="pageSize">每頁顯示數量</param>
-        /// <param name="userId">使用者 Id</param>
-        /// <param name="isDelete">是否為刪除狀態</param>
-        /// <returns>商品列表</returns>
-        public async Task<IEnumerable<ProductsResponse>> GetAllProducts(
-            int pageIndex,
-            int pageSize,
-            int? userId = null,
-            bool? isDelete = false
-        )
-        {
-            using var conn = connecting.CreateConnecting();
+        using var conn = connecting.CreateConnecting();
 
-            int offset = pageIndex * pageSize;
-            // Offset 代表要跳過的行數，Fetch Next 代表要取得的行數
-            var sql =
-                @"SELECT   m.productsid,
+        int offset = pageIndex * pageSize;
+        // Offset 代表要跳過的行數，Fetch Next 代表要取得的行數
+        var sql =
+            @"SELECT   m.productsid,
                                  m.userid,
                                  m.productsname,
                                  m.productsprice,
@@ -49,30 +45,30 @@ namespace Lab.Accounting.API.Repositories
                                m.ProductsStock
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
-            var result = await conn.QueryAsync<ProductsResponse>(
-                sql,
-                new
-                {
-                    offset = offset,
-                    pageSize = pageSize,
-                    UserId = userId,
-                    isDelete = isDelete,
-                }
-            );
-            return result;
-        }
+        var result = await conn.QueryAsync<ProductsResponse>(
+            sql,
+            new
+            {
+                offset = offset,
+                pageSize = pageSize,
+                UserId = userId,
+                isDelete = isDelete,
+            }
+        );
+        return result;
+    }
 
-        /// <summary>
-        /// 查看單一商品
-        /// </summary>
-        /// <param name="productId">商品 Id</param>
-        /// <returns>商品資訊</returns>
-        public async Task<ProductsResponse> GetProducts(int productId)
-        {
-            using var conn = connecting.CreateConnecting();
+    /// <summary>
+    /// 查看單一商品
+    /// </summary>
+    /// <param name="productId">商品 Id</param>
+    /// <returns>商品資訊</returns>
+    public async Task<ProductsResponse> GetProducts(int productId)
+    {
+        using var conn = connecting.CreateConnecting();
 
-            var sql =
-                @"SELECT m.productsid,
+        var sql =
+            @"SELECT m.productsid,
                                m.userid,
                                m.productsname,
                                m.productsprice,
@@ -93,42 +89,42 @@ namespace Lab.Accounting.API.Repositories
                                m.ProductCategoryId,
                                m.ProductsStock";
 
-            var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(sql, new { ProductsId = productId });
+        var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(sql, new { ProductsId = productId });
 
-            return result;
-        }
+        return result;
+    }
 
-        /// <summary>
-        /// 查看商品類別
-        /// </summary>
-        /// <param name="productcategoryId">商品類別 ID</param>
-        /// <returns>商品類別</returns>
-        public async Task<IEnumerable<MallProductCategory>> GetCategory(int? productcategoryId = null)
-        {
-            using var conn = connecting.CreateConnecting();
+    /// <summary>
+    /// 查看商品類別
+    /// </summary>
+    /// <param name="productcategoryId">商品類別 ID</param>
+    /// <returns>商品類別</returns>
+    public async Task<IEnumerable<MallProductCategory>> GetCategory(int? productcategoryId = null)
+    {
+        using var conn = connecting.CreateConnecting();
 
-            //  第一層 ProductCategoryId 跟 ProductParentId 為 null 的是最頂層的類別
-            //  第二層 ( 子 ) ProductParentId = ( 父 ) ProductCategoryId  的就是往下一層的類別
-            //  (衣服 => 短袖 , 長袖 => 男士短袖 , 女士短袖 ...)
-            var sql =
-                @"Select ProductCategoryId,ProductCategoryName,ProductParentId 
+        //  第一層 ProductCategoryId 跟 ProductParentId 為 null 的是最頂層的類別
+        //  第二層 ( 子 ) ProductParentId = ( 父 ) ProductCategoryId  的就是往下一層的類別
+        //  (衣服 => 短袖 , 長袖 => 男士短袖 , 女士短袖 ...)
+        var sql =
+            @"Select ProductCategoryId,ProductCategoryName,ProductParentId 
                 From mallproductcategory 
                 Where (@ProductCategoryId is null and ProductParentId is null) 
                 OR ProductParentId = @ProductCategoryId";
-            return await conn.QueryAsync<MallProductCategory>(sql, new { ProductCategoryId = productcategoryId });
-        }
+        return await conn.QueryAsync<MallProductCategory>(sql, new { ProductCategoryId = productcategoryId });
+    }
 
-        /// <summary>
-        /// 新增單一商品
-        /// </summary>
-        /// <param name="products">商品資訊</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> CreateProducts(MallProducts products)
-        {
-            using var conn = connecting.CreateConnecting();
+    /// <summary>
+    /// 新增單一商品
+    /// </summary>
+    /// <param name="products">商品資訊</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> CreateProducts(MallProducts products)
+    {
+        using var conn = connecting.CreateConnecting();
 
-            var sql =
-                @"INSERT INTO mallproducts
+        var sql =
+            @"INSERT INTO mallproducts
                                     (userid,
                                      productsname,
                                      productsprice,
@@ -147,59 +143,60 @@ namespace Lab.Accounting.API.Repositories
                                     Cast(
                                     Scope_Identity() as int
                                     );";
-            return await conn.QuerySingleAsync<int>(sql, products);
-        }
+        return await conn.QuerySingleAsync<int>(sql, products);
+    }
 
-        /// <summary>
-        /// 更新單一商品
-        /// </summary>
-        /// <param name="products">商品資訊</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> UpdateProducts(MallProducts products)
-        {
-            using var conn = connecting.CreateConnecting();
+    /// <summary>
+    /// 更新單一商品
+    /// </summary>
+    /// <param name="products">商品資訊</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateProducts(MallProducts products)
+    {
+        using var conn = connecting.CreateConnecting();
 
-            var sql =
-                @"UPDATE mallproducts
+        var sql =
+            @"UPDATE mallproducts
                         SET      
                                  productsname = COALESCE(@ProductsName, productsname),
                                  productsprice = COALESCE(@ProductsPrice, productsprice),
                                  ProductsStock = COALESCE(@ProductsStock, ProductsStock),
                                  ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId)
                         WHERE    productsid = @ProductsId and userId=@UserId;";
-            return await conn.ExecuteAsync(sql, products);
-        }
+        return await conn.ExecuteAsync(sql, products);
+    }
 
-        /// <summary>
-        /// 復原已選取的商品刪除狀態
-        /// </summary>
-        /// <param name="productId">選取的所有商品 Id</param>
-        /// <param name="userId">使用者 ID</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId)
-        {
-            using var conn = connecting.CreateConnecting();
+    /// <summary>
+    /// 復原已選取的商品刪除狀態
+    /// </summary>
+    /// <param name="productId">選取的所有商品 Id</param>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId)
+    {
+        using var conn = connecting.CreateConnecting();
 
-            var sql =
-                @"UPDATE mallproducts
+        var sql =
+            @"UPDATE mallproducts
                         SET     IsDelete = 0                              
                         WHERE   UserId = @UserId
                         And     ProductsId in @ProductsId";
-            return await conn.ExecuteAsync(sql, new { ProductsId = productId, UserId = userId });
-        }
+        return await conn.ExecuteAsync(sql, new { ProductsId = productId, UserId = userId });
+    }
 
-        /// <summary>
-        /// 軟刪除或硬刪除單一商品
-        /// </summary>
-        /// <param name="productsId">商品 ID</param>
-        /// <param name="isDelete">刪除狀態</param>
-        /// <param name="userId">使用者 ID</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> DeleteProducts(int productsId, bool isDelete, int userId)
-        {
-            using var conn = connecting.CreateConnecting();
-            //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
-            var deletesql = isDelete
+    /// <summary>
+    /// 軟刪除或硬刪除單一商品
+    /// </summary>
+    /// <param name="productsId">商品 ID</param>
+    /// <param name="isDelete">刪除狀態</param>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> DeleteProducts(int productsId, IsDeleteStatusEnum isDelete, int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+        //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
+        var deletesql =
+            isDelete == IsDeleteStatusEnum.Deleted
                 ? @"
                     Delete From ProductImg Where ProductsID=@productsId;
                     Delete From MallProductsRate Where ProductsID=@productsId;
@@ -208,25 +205,24 @@ namespace Lab.Accounting.API.Repositories
                 : @"Update MallProducts Set IsDelete=1 Where ProductsID=@productsId and UserId=@userId;
                     ";
 
-            return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = userId });
-        }
+        return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = userId });
+    }
 
-        /// <summary>
-        /// 設定商品庫存
-        /// </summary>
-        /// <param name="productsId">商品 Id</param>
-        /// <param name="purchaseQuantity">購買數量</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> SetStock(int productsId, int purchaseQuantity)
-        {
-            using var conn = connecting.CreateConnecting();
+    /// <summary>
+    /// 設定商品庫存
+    /// </summary>
+    /// <param name="productsId">商品 Id</param>
+    /// <param name="purchaseQuantity">購買數量</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> SetStock(int productsId, int purchaseQuantity)
+    {
+        using var conn = connecting.CreateConnecting();
 
-            var sql =
-                @"Update mallproducts
+        var sql =
+            @"Update mallproducts
                     SET ProductsStock = @purchaseQuantity
                     WHERE ProductsId = @productsId ";
 
-            return await conn.ExecuteAsync(sql, new { productsId, purchaseQuantity });
-        }
+        return await conn.ExecuteAsync(sql, new { productsId, purchaseQuantity });
     }
 }

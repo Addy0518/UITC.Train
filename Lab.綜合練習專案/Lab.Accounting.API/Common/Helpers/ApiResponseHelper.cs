@@ -1,5 +1,3 @@
-using NPOI.SS.Formula.Functions;
-
 namespace Lab.Accounting.API.Helpers;
 
 public static class ApiResponseHelper
@@ -12,7 +10,7 @@ public static class ApiResponseHelper
     {
         return new ApiResponse<T>
         {
-            CodeStatus = CodeStatus.Success,
+            CodeStatus = CodeStatusEnum.Success,
             ReturnData = data,
             Message = message,
         };
@@ -25,9 +23,9 @@ public static class ApiResponseHelper
     {
         return new ApiResponse<T>
         {
-            CodeStatus = CodeStatus.InternalException,
+            CodeStatus = CodeStatusEnum.InternalException,
             // 就把自訂的 codestatus 的描述訊息當作錯誤訊息回傳就好
-            Message = CodeStatus.InternalException.GetDescription(),
+            Message = CodeStatusEnum.InternalException.GetDescription(),
             Error500 = errors,
         };
     }
@@ -44,9 +42,9 @@ public static class ApiResponseHelper
     {
         return new ApiResponse<T>
         {
-            CodeStatus = CodeStatus.RequestError,
+            CodeStatus = CodeStatusEnum.RequestError,
             ReturnData = default,
-            Message = CodeStatus.RequestError.GetDescription(),
+            Message = CodeStatusEnum.RequestError.GetDescription(),
             Error400 = errors,
         };
     }
@@ -55,9 +53,9 @@ public static class ApiResponseHelper
     {
         return new ApiResponse<T>
         {
-            CodeStatus = CodeStatus.NotFound,
+            CodeStatus = CodeStatusEnum.NotFound,
             ReturnData = default,
-            Message = CodeStatus.NotFound.GetDescription(),
+            Message = CodeStatusEnum.NotFound.GetDescription(),
         };
     }
 }

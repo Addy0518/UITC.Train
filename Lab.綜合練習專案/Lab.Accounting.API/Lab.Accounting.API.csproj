@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
     <PackageReference Include="NPOI" Version="2.7.6" />
     <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="9.0.3" />

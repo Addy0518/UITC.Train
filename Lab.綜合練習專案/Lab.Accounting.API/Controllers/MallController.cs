@@ -1,12 +1,4 @@
-﻿using System.Security.Claims;
-using Lab.Accounting.API.Common.Requests;
-using Lab.Accounting.API.Common.Responses;
-using Lab.Accounting.API.Infrastructures.Data.Entities;
-using Lab.Accounting.API.Services.Interface;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NPOI.SS.Formula.Functions;
+﻿using UBOT_Domain.Models.Constants;
 
 namespace Lab.Accounting.API.Controllers;
 
@@ -61,11 +53,12 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="isDelete">是否為刪除狀態</param>
     /// <returns>商品列表</returns>
     [HttpGet]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
     public async Task<IActionResult> GetSellerAllProducts(
         [FromQuery] int? pageIndex,
         [FromQuery] int? pageSize,
-        [FromQuery] bool? isDelete = false
+        [FromQuery] IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
     )
     {
         return Ok(await mallService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, CurrentUserId, isDelete));
@@ -77,6 +70,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productcategoryId">商品類別 ID</param>
     /// <returns>商品類別</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
     public async Task<IActionResult> GetCategory([FromQuery] int? productcategoryId = null)
     {
@@ -89,6 +83,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productsInsertRequest">新增商品資訊</param>
     /// <returns>商品資訊</returns>
     [HttpPost]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> CreateProducts([FromBody] ProductsInsertRequest productsInsertRequest)
     {
@@ -102,6 +97,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productsUpdateRequest">商品更新資訊</param>
     /// <returns>影響列數</returns>
     [HttpPut]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> UpdateProducts(ProductsUpdateRequest productsUpdateRequest)
     {
@@ -115,6 +111,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productId">選取的所有商品 Id</param>
     /// <returns>影響列數</returns>
     [HttpPut]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> UpdateProductsDeleteStatus([FromBody] IEnumerable<int> productId)
     {
@@ -127,6 +124,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productsId">商品 ID</param>
     /// <returns>影響列數</returns>
     [HttpDelete]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> DeleteProducts([FromQuery] int productsId)
     {
@@ -140,6 +138,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productId">商品 Id</param>
     /// <returns>新增成功的圖片</returns>
     [HttpPost]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> ProductsImgUpload([FromForm] IFormFile productsImgsFiles, [FromForm] int productId)
     {
@@ -152,6 +151,7 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>刪除的圖片</returns>
     [HttpDelete]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> ProductsImgDelete([FromQuery] int productsImgId)
     {
@@ -182,9 +182,9 @@ public class MallController(IMallService mallService) : ControllerBase
     /// <param name="collection">綠界回傳的表單資料</param>
     /// <returns>訂單 ID</returns>
     [HttpPost]
+    [AllowAnonymous]
     //綠界傳回來的表單是傳統的表單格式,用這串來確定能接收
     [Consumes("application/x-www-form-urlencoded")]
-    [AllowAnonymous]
     public async Task<IActionResult> EcPayBack([FromForm] IFormCollection collection)
     //IformCollection就是接收傳統表單資料的,formform是用來接收html的form提交資料
     //而formbody則是接收Json資料的
@@ -200,8 +200,8 @@ public class MallController(IMallService mallService) : ControllerBase
     /// </summary>
     /// <param name="collection">綠界回傳的表單資料</param>
     /// <returns>訂單 ID</returns>
-    [AllowAnonymous]
     [HttpPost]
+    [AllowAnonymous]
     public IActionResult PaymentCallback([FromForm] IFormCollection collection)
     {
         var orderNo = collection["MerchantTradeNo"].ToString();

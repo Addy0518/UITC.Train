@@ -1,54 +1,51 @@
-﻿using Lab.Accounting.API.Infrastructures.Data.Entities;
+﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-namespace Lab.Accounting.API.Repositories.Interface
+public interface IProductsBuyRepositories
 {
-    public interface IProductsBuyRepositories
-    {
-        /// <summary>
-        /// 查看單一訂單 ( Id 查詢 )
-        /// </summary>
-        /// <param name="orderId">購買資訊</param>
-        /// <param name="userId">使用者 ID</param>
-        /// <returns>訂單資訊</returns>
-        Task<MallOrder> GetOrder(int orderId, int userId);
+    /// <summary>
+    /// 查看單一訂單 ( Id 查詢 )
+    /// </summary>
+    /// <param name="orderId">購買資訊</param>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>訂單資訊</returns>
+    Task<MallOrder> GetOrder(int orderId, int userId);
 
-        /// <summary>
-        /// 查看單一訂單 ( 訂單編號查詢 )
-        /// </summary>
-        /// <param name="orderNumber">訂單編號</param>
-        /// <param name="userId">使用者 ID</param>
-        /// <returns>訂單資訊</returns>
-        Task<MallOrder> GetOrderByOrderNumber(string orderNumber);
+    /// <summary>
+    /// 查看單一訂單 ( 訂單編號查詢 )
+    /// </summary>
+    /// <param name="orderNumber">訂單編號</param>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>訂單資訊</returns>
+    Task<MallOrder> GetOrderByOrderNumber(string orderNumber);
 
-        /// <summary>
-        /// 查看使用者的所有訂單
-        /// </summary>
-        /// <param name="userId">使用者 ID</param>
-        /// <returns>所有訂單資訊</returns>
-        Task<IEnumerable<MallOrder>> GetUserAllOrder(int userId);
+    /// <summary>
+    /// 查看使用者的所有訂單
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>所有訂單資訊</returns>
+    Task<IEnumerable<MallOrder>> GetUserAllOrder(int userId);
 
-        /// <summary>
-        /// 商品購買
-        /// </summary>
-        /// <param name="order">購買資訊</param>
-        /// <returns>訂單 ID</returns>
-        Task<int> BuyProducts(MallOrder order);
+    /// <summary>
+    /// 商品購買
+    /// </summary>
+    /// <param name="order">購買資訊</param>
+    /// <returns>訂單 ID</returns>
+    Task<int> BuyProducts(MallOrder order);
 
-        /// <summary>
-        /// 商品付款
-        /// </summary>
-        /// <param name="orderNumber">訂單編號</param>
-        /// <param name="shippingStatus">運送狀態</param>
-        /// <param name="accountPrice">最終金額</param>
-        /// <param name="paidType">付款方式</param>
-        /// <param name="paidTime">付款時間</param>
-        /// <returns>影響列數</returns>
-        Task<int> PaidProducts(
-            string orderNumber,
-            int shippingStatus,
-            decimal accountPrice,
-            string paidType,
-            DateTime paidTime
-        );
-    }
+    /// <summary>
+    /// 商品付款
+    /// </summary>
+    /// <param name="orderNumber">訂單編號</param>
+    /// <param name="shippingStatus">運送狀態</param>
+    /// <param name="accountPrice">最終金額</param>
+    /// <param name="paidType">付款方式</param>
+    /// <param name="paidTime">付款時間</param>
+    /// <returns>影響列數</returns>
+    Task<int> PaidProducts(
+        string orderNumber,
+        int shippingStatus,
+        decimal accountPrice,
+        string paidType,
+        DateTime paidTime
+    );
 }

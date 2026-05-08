@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
 import { app } from '@/main';
+import { httpCodeStatusEnum } from '../common/enum';
 /*
    創建一個 axios ( VITE_BASE_URL 是放在環境設定 ( env ) 的 url )
 */
@@ -54,21 +55,32 @@ instance.interceptors.response.use(
     const { status, data } = error.response;
     // 管理各種 api 錯誤
     switch (status) {
-      case 400:
+      case httpCodeStatusEnum.BadRequest:
         const errorMsg = Object.values(data.errors)
           .flatMap((x) => x)
           .join('\n');
         toast.add({ severity: 'error', summary: '驗證錯誤', detail: errorMsg, life: 3000 });
         break;
 
-      case 401:
+      case httpCodeStatusEnum.Unauthorized:
         toast.add({ severity: 'error', summary: '登入過期', detail: '請重新登入', life: 5000 });
         router.push({ name: 'login' });
         break;
+      case httpCodeStatusEnum.Forbidden:
+        toast.add({ severity: 'error', summary: '認證失敗', detail: '你沒有訪問權限', life: 5000 });
 
-      case 500:
+        break;
+      case httpCodeStatusEnum.InternalServerError:
         const msg = `${data.message} | ${data.error500?.title}`;
         toast.add({ severity: 'error', summary: '伺服器錯誤', detail: msg, life: 5000 });
+        break;
+      case httpCodeStatusEnum.ServiceUnavailable:
+        toast.add({
+          severity: 'error',
+          summary: '伺服器異常',
+          detail: '無法連線到伺服器',
+          life: 5000,
+        });
         break;
 
       default:

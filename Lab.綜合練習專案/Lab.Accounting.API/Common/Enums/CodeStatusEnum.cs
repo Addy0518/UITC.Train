@@ -1,11 +1,9 @@
 namespace Lab.Accounting.API.Common.Enums;
 
 // 狀態碼
-public enum CodeStatus
+public enum CodeStatusEnum
 {
-    /// <summary>
-    /// 成功
-    /// </summary>
+    [Description("成功")]
     Success = 2000,
 
     [Description("Request驗證失敗")]

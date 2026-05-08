@@ -1,4 +1,5 @@
 import accountApiInstance from '@/api/accountInstance.js';
+import { isDeleteEnum } from '../common/enum';
 
 /*
    從 accountInstance 匯入 axios 設定 , 開始串接後端 api
@@ -50,7 +51,11 @@ export const getProduct = (productId) =>
 export const getAllProduct = (pageIndex = 0, pageSize = 10) =>
   accountApiInstance.get(`Mall/GetAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
 // 查看賣家所有商品
-export const getSellerAllProduct = (pageIndex = 0, pageSize = 10, isDelete = false) =>
+export const getSellerAllProduct = (
+  pageIndex = 0,
+  pageSize = 10,
+  isDelete = isDeleteEnum.Normal.value,
+) =>
   accountApiInstance.get(
     `Mall/GetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}&isDelete=${isDelete}`,
   );

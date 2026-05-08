@@ -5,6 +5,7 @@ import { getSellerAllProduct, deleteProducts } from '@/api/account-api';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import Swal from 'sweetalert2';
+
 /*
    變數名稱代表意義
    allproduct : 賣家所有商品

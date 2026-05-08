@@ -7,7 +7,7 @@ import {
   getAllLedger,
   deleteLedger,
 } from '@/api/account-api';
-
+import { isDeleteEnum } from '../common/enum';
 /*
   變數名稱代表意義
   ledger : 所有帳本項目
@@ -29,8 +29,6 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
-
-
 
 onMounted(async () => {
   await ItemData();
@@ -85,7 +83,7 @@ const reserve = async (item) => {
       itemCost: item.itemCost,
       ItemIllustrate: item.ItemIllustrate || '',
       categoryId: item.categoryId ? String(item.categoryId) : null,
-      isDelete: false,
+      isDelete: isDeleteEnum.Normal.value,
       itemUpdateDate: new Date().toLocaleDateString('en-CA'),
     };
 
@@ -107,7 +105,7 @@ const reserve = async (item) => {
 /*
    呼叫查看所有帳本 API
 */
-const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
+const ItemData = async (selectdate = null, cateId = null, isDelete = isDeleteEnum.Delete.value) => {
   try {
     showLoading();
     let querystring = '';
@@ -122,7 +120,7 @@ const ItemData = async (selectdate = null, cateId = null, isDelete = true) => {
       querystring += (querystring.includes('?') ? '&' : '?') + `date=${datestring}`;
     }
 
-    if (isDelete) {
+    if (isDelete == isDeleteEnum.Delete.value) {
       querystring += (querystring.includes('?') ? '&' : '?') + `isDelete=${isDelete}`;
     }
 

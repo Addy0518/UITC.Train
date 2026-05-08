@@ -1,43 +1,34 @@
-﻿using Lab.Accounting.API.Common.Helpers;
-using Lab.Accounting.API.Repositories.Interface;
-using Lab.Accounting.API.Services.Interface;
+﻿namespace Lab.Accounting.API.Infrastructures.DiConfig;
 
-namespace Lab.Accounting.API.Infrastructures.DiConfig
+public static class DiConfig
 {
-    public static class DiConfig
+    //管理註冊
+    public static void AddDiConfig(this IServiceCollection services)
     {
-        //管理註冊
-        public static void AddDiConfig(this IServiceCollection services)
-        {
-            services.AddSingleton<TokenHelper>();
+        services.AddSingleton<TokenHelper>();
 
-            services.AddSingleton<DBConnecting>();
+        services.AddSingleton<DBConnecting>();
 
-            services.AddScoped<ILedgerRepositories, LedgerRepositories>();
+        services.AddScoped<PasswordSecureHelper>();
 
-            services.AddScoped<IUserRepositories, UserRepositories>();
+        //將Service結尾且生命週期相同的物件, 統一註冊
+        services.Scan(scan =>
+            scan.FromAssemblyOf<Program>() // 1.遍歷Program類別所在程序集中的所有類別
+                .AddClasses(classes => // 2.要自動註冊的類別,條件為Service結尾的類別
+                    classes.Where(t => t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
+                )
+                .AsImplementedInterfaces() // 3.註冊的類別有實作界面
+                .WithScopedLifetime() // 4.生命週期設定為Scoped
+        );
 
-            services.AddScoped<IProductsRepositories, ProductsRepositories>();
-
-            services.AddScoped<IProductsImgRepository, ProductsImgRepository>();
-
-            services.AddScoped<IProductsRateRepositories, ProductsRateRepositories>();
-
-            services.AddScoped<IProductsBuyRepositories, ProductsBuyRepositories>();
-
-            services.AddScoped<ITokenBlacklistRepositories, TokenBlacklistRepositories>();
-
-            services.AddScoped<ILedgerItemCategoryRepositories, LedgerItemCategoryRepositories>();
-
-            services.AddScoped<IProductsShoppingCarRepositories, ProductsShoppingCarRepositories>();
-
-            services.AddScoped<ILedgerService, LedgerService>();
-
-            services.AddScoped<IUserService, UserService>();
-
-            services.AddScoped<IMallService, MallService>();
-
-            services.AddScoped<PasswordSecureHelper>();
-        }
+        // 將Repository結尾且生命週期相同的物件,統一註冊
+        services.Scan(scan =>
+            scan.FromAssemblyOf<Program>() // 1.遍歷Program類別所在程序集中的所有類別
+                .AddClasses(classes => // 2.要自動註冊的類別,條件為Repository結尾的類別
+                    classes.Where(t => t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase))
+                )
+                .AsImplementedInterfaces() // 3.註冊的類別有實作界面
+                .WithScopedLifetime() // 4.生命週期設定為Scoped
+        );
     }
 }

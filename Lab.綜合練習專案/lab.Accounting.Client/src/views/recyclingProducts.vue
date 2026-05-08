@@ -4,6 +4,7 @@ import { computed, onMounted, inject } from 'vue';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import Swal from 'sweetalert2';
+import { isDeleteEnum } from '../common/enum';
 /*
    變數名稱代表意義
    allproduct : 賣家所有商品
@@ -31,7 +32,7 @@ onMounted(() => {
 */
 const getSellerProduct = async () => {
   try {
-    const res = await getSellerAllProduct(0, 10, true);
+    const res = await getSellerAllProduct(0, 10, isDeleteEnum.Delete.value);
     const { data } = res;
     if (data.codeStatus === 2000) {
       allproduct.value = data.returnData;
@@ -78,16 +79,16 @@ const deleteProduct = async () => {
 
   if (result.isConfirmed) {
     try {
-      let res = null;
       for (const select of selectIds.value) {
-        res = await deleteProducts(select);
+        const res = await deleteProducts(select);
+        if (res.data.codeStatus !== 2000) {
+          showToastError('部分商品刪除失敗');
+          return;
+        }
       }
-      const { data } = res;
-      if (data.codeStatus === 2000) {
-        showToastSuccess('已成功刪除!');
-        selectIds.value = [];
-        await getSellerProduct(0, 10, true);
-      }
+      showToastSuccess('已成功刪除!');
+      selectIds.value = [];
+      await getSellerProduct(0, 10, isDeleteEnum.Delete.value);
     } catch (err) {
       console.log(err);
     } finally {

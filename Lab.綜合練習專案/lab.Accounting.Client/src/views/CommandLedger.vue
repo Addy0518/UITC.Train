@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import { getAllLedger, getLedger, createLedger, updateLedger } from '@/api/account-api';
-import { required, maxLength } from '@/validator/validators';
+import { required, maxLength,vaildNumber} from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
 import InValidErrorMessage from '../common/InValidErrorMessage.vue';
 /*
@@ -46,7 +46,7 @@ onMounted(() => {
 const rules = computed(() => ({
   itemName: { required, maxLength: maxLength(200) },
   itemIllustrate: { maxLength: maxLength(500) },
-  itemCost: { required },
+  itemCost: { required,vaildNumber},
   itemDate: { required },
   selectedCategory: { required },
 }));

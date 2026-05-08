@@ -1,35 +1,34 @@
-﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities
+﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities;
+
+public class MallProductsRate
 {
-    public class MallProductsRate
-    {
-        /// <summary>
-        /// 項目 ID
-        /// </summary>
-        public int ProductsRateId { get; set; }
+    /// <summary>
+    /// 項目 ID
+    /// </summary>
+    public int ProductsRateId { get; set; }
 
-        /// <summary>
-        /// 使用者 ID
-        /// </summary>
-        public int UserId { get; set; }
+    /// <summary>
+    /// 使用者 ID
+    /// </summary>
+    public int UserId { get; set; }
 
-        /// <summary>
-        /// 商品 ID
-        /// </summary>
-        public int ProductsId { get; set; }
+    /// <summary>
+    /// 商品 ID
+    /// </summary>
+    public int ProductsId { get; set; }
 
-        /// <summary>
-        /// 評分
-        /// </summary>
-        public double Rating { get; set; }
+    /// <summary>
+    /// 評分
+    /// </summary>
+    public double Rating { get; set; }
 
-        /// <summary>
-        /// 評論
-        /// </summary>
-        public string? Comment { get; set; }
+    /// <summary>
+    /// 評論
+    /// </summary>
+    public string? Comment { get; set; }
 
-        /// <summary>
-        /// 發表時間
-        /// </summary>
-        public DateTime CreateTime { get; set; }
-    }
+    /// <summary>
+    /// 發表時間
+    /// </summary>
+    public DateTime CreateTime { get; set; }
 }

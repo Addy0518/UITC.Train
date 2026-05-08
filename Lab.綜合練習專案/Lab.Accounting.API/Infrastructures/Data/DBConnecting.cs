@@ -1,9 +1,7 @@
-﻿namespace Lab.Accounting.API.Infrastructures.Data
+﻿namespace Lab.Accounting.API.Infrastructures.Data;
+
+public class DBConnecting(IConfiguration configuration)
 {
-    public class DBConnecting(IConfiguration configuration)
-    {
-        //管理連線
-        public SqlConnection CreateConnecting() =>
-            new SqlConnection(configuration.GetConnectionString("DBConnecting"));
-    }
+    //管理連線
+    public SqlConnection CreateConnecting() => new SqlConnection(configuration.GetConnectionString("DBConnecting"));
 }

@@ -9,7 +9,7 @@ public class ApiResponse<T>
     /// <summary>
     /// 狀態碼
     /// </summary>
-    public CodeStatus CodeStatus { get; set; } = CodeStatus.Success;
+    public CodeStatusEnum CodeStatus { get; set; } = CodeStatusEnum.Success;
 
     /// <summary>
     /// 訊息

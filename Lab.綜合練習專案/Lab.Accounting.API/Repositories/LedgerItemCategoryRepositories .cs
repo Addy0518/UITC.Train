@@ -1,6 +1,4 @@
-﻿using Lab.Accounting.API.Repositories.Interface;
-
-namespace Lab.Accounting.API.Repositories;
+﻿namespace Lab.Accounting.API.Repositories;
 
 public class LedgerItemCategoryRepositories(DBConnecting connecting) : ILedgerItemCategoryRepositories
 {

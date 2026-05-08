@@ -23,7 +23,7 @@ public interface ILedgerRepositories
         List<int>? categoryId,
         DateTime? date,
         string? itemname,
-        bool? isDelete,
+        IsDeleteStatusEnum? isDelete,
         int userId
     );
 
@@ -48,7 +48,7 @@ public interface ILedgerRepositories
     /// <param name="isDelete">刪除狀態</param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>影響列數</returns>
-    Task<int> DeleteLedger(int ledgerId, bool isDelete, int userId);
+    Task<int> DeleteLedger(int ledgerId, IsDeleteStatusEnum isDelete, int userId);
 
     /// <summary>
     /// 刪除所有已軟刪除的帳本項目

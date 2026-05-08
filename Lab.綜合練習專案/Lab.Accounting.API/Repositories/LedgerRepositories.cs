@@ -1,9 +1,4 @@
-﻿using System.Text.Json;
-using Lab.Accounting.API.Infrastructures.Entities;
-using Lab.Accounting.API.Repositories.Interface;
-using Serilog.Core;
-
-namespace Lab.Accounting.API.Repositories;
+﻿namespace Lab.Accounting.API.Repositories;
 
 public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> logger) : ILedgerRepositories
 {
@@ -49,7 +44,7 @@ public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> 
         List<int>? categoryId,
         DateTime? date,
         string? itemname,
-        bool? isDelete,
+        IsDeleteStatusEnum? isDelete,
         int userId
     )
     {
@@ -153,13 +148,14 @@ public class LedgerRepositories(DBConnecting connecting, ILogger<LedgerService> 
     /// <param name="isDelete">刪除狀態</param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<int> DeleteLedger(int ledgerId, bool isDelete, int userId)
+    public async Task<int> DeleteLedger(int ledgerId, IsDeleteStatusEnum isDelete, int userId)
     {
         using var conn = connecting.CreateConnecting();
         //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
-        var deletesql = isDelete
-            ? @"Delete From LedgerItem Where ItemId=@ledgerId and UserId=@userId"
-            : @"Update LedgerItem Set IsDelete=1 Where ItemId=@ledgerId and UserId=@userId";
+        var deletesql =
+            isDelete == IsDeleteStatusEnum.Deleted
+                ? @"Delete From LedgerItem Where ItemId=@ledgerId and UserId=@userId"
+                : @"Update LedgerItem Set IsDelete=1 Where ItemId=@ledgerId and UserId=@userId";
 
         return await conn.ExecuteAsync(deletesql, new { ledgerId = ledgerId, userId = userId });
     }

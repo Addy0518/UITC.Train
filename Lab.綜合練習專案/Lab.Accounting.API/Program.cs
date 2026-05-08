@@ -1,8 +1,3 @@
-using Lab.Accounting.API.Infrastructures.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using NSwag.Generation.Processors.Security;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // 加入剛剛設定的 SerilogConfig , 在系統初始化時就先執行 Serilog , 確保系統沒啟動也能夠記錄起來
@@ -37,7 +32,7 @@ try
 
                 var response = new ApiResponse<object>
                 {
-                    CodeStatus = CodeStatus.RequestError,
+                    CodeStatus = CodeStatusEnum.RequestError,
                     Message = "驗證失敗",
                     Error400 = errors,
                 };

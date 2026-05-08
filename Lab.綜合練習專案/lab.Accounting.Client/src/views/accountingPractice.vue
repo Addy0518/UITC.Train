@@ -2,6 +2,7 @@
 import { ref, onMounted, computed, watch, inject } from 'vue';
 import { getAllLedger, deleteLedger } from '@/api/account-api';
 import { useRoute, useRouter } from 'vue-router';
+import { isDeleteEnum } from '../common/enum';
 /*
    變數名稱代表意義
    ledger : 所有帳本項目
@@ -52,7 +53,7 @@ watch([date, selectedValue], ([newDate, newVal]) => {
    偵測所有帳本資料並篩選出軟刪除狀態的帳本
 */
 const visible = computed(() => {
-  return ledger.value.filter((m) => !m.isDelete);
+  return ledger.value.filter((m) => m.isDelete == isDeleteEnum.Normal.value);
 });
 
 /*
