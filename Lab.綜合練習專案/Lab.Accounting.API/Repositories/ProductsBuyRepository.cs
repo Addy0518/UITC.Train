@@ -67,6 +67,26 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
     }
 
     /// <summary>
+    /// 改變運輸狀態
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>影響行數</returns>
+    public async Task<int> UpdateShippingStatus(int orderId, ShippingStatusEnum shippingStatus)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var addBoughtProductsql =
+            @"Update MallOrder Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus)
+      
+            WHERE  OrderId = @OrderId ";
+
+        return await conn.ExecuteAsync(
+            addBoughtProductsql,
+            new { OrderId = orderId, ShippingStatus = (int)shippingStatus }
+        );
+    }
+
+    /// <summary>
     /// 商品購買
     /// </summary>
     /// <param name="order">購買資訊</param>
