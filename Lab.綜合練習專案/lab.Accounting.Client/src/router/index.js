@@ -167,14 +167,14 @@ const router = createRouter({
         },
         {
           /*
-            編輯商品
+            購買紀錄
           */
-          path: 'purchase-records',
-          name: 'purchase-records',
+          path: 'purchase-orders',
+          name: 'purchase-orders',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/purchaseRecords.vue'),
+          component: () => import('@/views/purchaseOrders.vue'),
         },
         {
           /*

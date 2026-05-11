@@ -45,15 +45,19 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
     /// </summary>
     /// <param name="userId">使用者 ID</param>
     /// <returns>所有訂單資訊</returns>
-    public async Task<IEnumerable<MallOrder>> GetUserAllOrder(int userId)
+    public async Task<IEnumerable<OrderResponse>> GetUserAllOrder(int userId)
     {
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"Select * From MallOrder
-                  Where  UserId = @UserId";
+            @"SELECT m.*,
+                   (SELECT TOP 1 productsimg
+                    FROM   productimg i
+                    WHERE  i.productsid = m.productsid) as ProductsImg
+            FROM   mallorder m
+            WHERE  m.userid = @UserId ";
 
-        return await conn.QueryAsync<MallOrder>(addBoughtProductsql, new { UserId = userId });
+        return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });
     }
 
     /// <summary>

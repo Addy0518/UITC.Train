@@ -1,4 +1,5 @@
-﻿using UBOT_Domain.Models.Constants;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using UBOT_Domain.Models.Constants;
 
 namespace Lab.Accounting.API.Controllers;
 
@@ -17,6 +18,18 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
     // 私有方法 : 從 Token 取出 UserId
     private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+
+    /// <summary>
+    /// 查看使用者購買紀錄
+    /// </summary>
+    /// <returns>訂單 ID</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<OrderResponse>>))]
+    public async Task<IActionResult> GetUserOrder()
+    {
+        var target = await orderService.GetUserOrder(CurrentUserId);
+        return Ok(target);
+    }
 
     /// <summary>
     /// 使用者購買商品並跳轉綠界界面

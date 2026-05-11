@@ -8,6 +8,23 @@ public class OrderService(
 ) : IOrderService
 {
     /// <summary>
+    /// 查看使用者購買紀錄
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>訂單 ID</returns>
+    public async Task<ApiResponse<IEnumerable<OrderResponse>>> GetUserOrder(int userId)
+    {
+        var target = await productsBuyRepositories.GetUserAllOrder(userId);
+
+        if (target == null)
+        {
+            return ApiResponseHelper.NotFound<IEnumerable<OrderResponse>>();
+        }
+
+        return ApiResponseHelper.Success(target);
+    }
+
+    /// <summary>
     /// 使用者購買商品並跳轉綠界界面
     /// </summary>
     /// <param name="Request">商品購買資訊 </param>

@@ -14,7 +14,6 @@ public interface IProductsBuyRepository
     /// 查看單一訂單 ( 訂單編號查詢 )
     /// </summary>
     /// <param name="orderNumber">訂單編號</param>
-    /// <param name="userId">使用者 ID</param>
     /// <returns>訂單資訊</returns>
     Task<MallOrder> GetOrderByOrderNumber(string orderNumber);
 
@@ -23,7 +22,7 @@ public interface IProductsBuyRepository
     /// </summary>
     /// <param name="userId">使用者 ID</param>
     /// <returns>所有訂單資訊</returns>
-    Task<IEnumerable<MallOrder>> GetUserAllOrder(int userId);
+    Task<IEnumerable<OrderResponse>> GetUserAllOrder(int userId);
 
     /// <summary>
     /// 商品購買
