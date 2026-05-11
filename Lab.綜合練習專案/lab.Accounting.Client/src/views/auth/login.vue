@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth';
 import { loginApi } from '@/api/userService';
 import { required, vaildEmail, vaildLoginPassword, maxLength } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '../common/InValidErrorMessage.vue';
+import InValidErrorMessage from '/src/common/InValidErrorMessage.vue';
 
 /*
    注入 Loading 跟 Toast

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { logoutApi } from '@/api/userService';
-import sidebar from '@/views/sidebar.vue';
+import sidebar from '@/views/layout/sidebar.vue';
 
 /*
    變數名稱代表意義
@@ -37,7 +37,7 @@ const logout = async () => {
 
         <!-- 未登入：顯示註冊登入 -->
         <template v-else>
-          <RouterLink :to="{ name: 'createaccount' }">
+          <RouterLink :to="{ name: 'create-account' }">
             <strong class="text-white text-2xl">註冊</strong>
           </RouterLink>
           <RouterLink :to="{ name: 'login' }">

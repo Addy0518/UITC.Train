@@ -2,9 +2,9 @@
 import { computed, onMounted, ref, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import { getAllLedger, getLedger, createLedger, updateLedger } from '@/api/ledgerService';
-import { required, maxLength,vaildNumber} from '@/validator/validators';
+import { required, maxLength, vaildNumber } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '../common/InValidErrorMessage.vue';
+import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
 /*
    變數名稱代表意義
    route : 獲取路由資訊
@@ -46,7 +46,7 @@ onMounted(() => {
 const rules = computed(() => ({
   itemName: { required, maxLength: maxLength(200) },
   itemIllustrate: { maxLength: maxLength(500) },
-  itemCost: { required,vaildNumber},
+  itemCost: { required, vaildNumber },
   itemDate: { required },
   selectedCategory: { required },
 }));
@@ -178,7 +178,7 @@ const addoreditledger = async (id = null) => {
     v-model:visible="visible"
     header="帳本項目"
     :style="{ width: '40rem' }"
-    @hide="$router.push({ name: 'accounting-practice' })"
+    @hide="$router.push({ name: 'ledger' })"
   >
     <div class="container">
       <p class="text-center mb-10 text-3xl font-bold">{{ isAdd ? '新增' : '編輯' }}帳本項目</p>

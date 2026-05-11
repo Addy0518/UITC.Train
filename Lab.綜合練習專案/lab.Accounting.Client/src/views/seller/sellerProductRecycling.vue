@@ -8,7 +8,7 @@ import { computed, onMounted, inject } from 'vue';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import Swal from 'sweetalert2';
-import { isDeleteEnum } from '../common/enum';
+import { isDeleteEnum } from '../../common/enum';
 /*
    變數名稱代表意義
    allproduct : 賣家所有商品

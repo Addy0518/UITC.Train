@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { inject } from 'vue';
-import AccountingLayout from '@/views/accountingLayout.vue';
 
 const showToastError = inject('showToastError');
 /*
@@ -16,7 +15,7 @@ const router = createRouter({
       */
       path: '/',
       name: 'layout',
-      component: AccountingLayout,
+      component: () => import('@/views/layout/layout.vue'),
       children: [
         {
           /*
@@ -31,7 +30,7 @@ const router = createRouter({
               /*
                  登入
               */
-              path: '/Login',
+              path: '/login',
               name: 'login',
               /*
                  meta 自訂屬性 , 用來讓守衛知道誰要驗證 token
@@ -39,18 +38,18 @@ const router = createRouter({
               meta: {
                 isPermissionVerification: false,
               },
-              component: () => import('@/views/login.vue'),
+              component: () => import('@/views/auth/login.vue'),
             },
             {
               /*
                  註冊
               */
-              path: '/CreateAccount',
-              name: 'createaccount',
+              path: '/create-account',
+              name: 'create-account',
               meta: {
                 isPermissionVerification: false,
               },
-              component: () => import('@/views/createAccount.vue'),
+              component: () => import('@/views/auth/createAccount.vue'),
             },
           ],
         },
@@ -63,40 +62,43 @@ const router = createRouter({
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/sidebar.vue'),
+          component: () => import('@/views/layout/sidebar.vue'),
         },
+        /*
+            帳本區 ================================================================
+        */
         {
           /*
             帳本回收桶
           */
-          path: 'recycling-ledger',
-          name: 'recycling-ledger',
+          path: 'ledger-recycling',
+          name: 'ledger-recycling',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/recyclingLedger.vue'),
+          component: () => import('@/views/ledger/ledgerRecycling.vue'),
         },
         {
           /*
             帳本主畫面
           */
-          path: 'accounting-practice',
-          name: 'accounting-practice',
+          path: 'ledger',
+          name: 'ledger',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/accountingPractice.vue'),
+          component: () => import('@/views/ledger/ledger.vue'),
         },
         {
           /*
             帳本統計圖表
           */
-          path: 'chart',
-          name: 'chart',
+          path: 'ledger-chart',
+          name: 'ledger-chart',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/chart.vue'),
+          component: () => import('@/views/ledger/ledgerChart.vue'),
         },
 
         {
@@ -108,7 +110,7 @@ const router = createRouter({
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/commandLedger.vue'),
+          component: () => import('@/views/ledger/ledgerCommand.vue'),
         },
         {
           /*
@@ -119,8 +121,11 @@ const router = createRouter({
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/commandLedger.vue'),
+          component: () => import('@/views/ledger/ledgerCommand.vue'),
         },
+        /*
+            商城區 ================================================================
+        */
         {
           /*
             商城
@@ -130,62 +135,7 @@ const router = createRouter({
           meta: {
             isPermissionVerification: false,
           },
-          component: () => import('@/views/mall.vue'),
-        },
-        {
-          /*
-             商品詳細
-          */
-          path: 'product-detail/:id',
-          name: 'product-detail',
-          meta: {
-            isPermissionVerification: false,
-          },
-          component: () => import('@/views/productDetail.vue'),
-        },
-        {
-          /*
-            新增商品
-          */
-          path: 'add-product',
-          name: 'add-product',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/commandProducts.vue'),
-        },
-        {
-          /*
-            編輯商品
-          */
-          path: 'edit-product/:id',
-          name: 'edit-product',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/commandProducts.vue'),
-        },
-        {
-          /*
-            購買紀錄
-          */
-          path: 'purchase-orders',
-          name: 'purchase-orders',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/purchaseOrders.vue'),
-        },
-        {
-          /*
-            商品回收桶
-          */
-          path: 'recycling-products',
-          name: 'recycling-products',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/recyclingProducts.vue'),
+          component: () => import('@/views/mall/mall.vue'),
         },
         {
           /*
@@ -196,8 +146,70 @@ const router = createRouter({
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/shoppingCar.vue'),
+          component: () => import('@/views/mall/shoppingCar.vue'),
         },
+        /*
+            商品區 ================================================================
+        */
+        {
+          /*
+             商品詳細
+          */
+          path: 'product-detail/:id',
+          name: 'product-detail',
+          meta: {
+            isPermissionVerification: false,
+          },
+          component: () => import('@/views/product/productDetail.vue'),
+        },
+        {
+          /*
+            新增商品
+          */
+          path: 'add-product',
+          name: 'add-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerProductCommand.vue'),
+        },
+        {
+          /*
+            編輯商品
+          */
+          path: 'edit-product/:id',
+          name: 'edit-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerProductCommand.vue'),
+        },
+        {
+          /*
+            購買紀錄
+          */
+          path: 'purchase-orders',
+          name: 'purchase-orders',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/product/purchaseOrders.vue'),
+        },
+        {
+          /*
+            單一購買紀錄
+          */
+          path: 'purchase-orders-details/:id',
+          name: 'purchase-orders-details',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/product/purchaseOrderDetails.vue'),
+        },
+
+        /*
+            賣家區 ================================================================
+        */
         {
           /*
             賣家中心
@@ -207,7 +219,18 @@ const router = createRouter({
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/sellerCentre.vue'),
+          component: () => import('@/views/seller/sellerCentre.vue'),
+        },
+        {
+          /*
+            商品回收桶
+          */
+          path: 'seller-product-recycling',
+          name: 'seller-product-recycling',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerProductRecycling.vue'),
         },
       ],
     },

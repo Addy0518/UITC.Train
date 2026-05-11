@@ -2,7 +2,7 @@
 import { ref, onMounted, computed, watch, inject } from 'vue';
 import { getAllLedger, deleteLedger } from '@/api/ledgerService';
 import { useRoute, useRouter } from 'vue-router';
-import { isDeleteEnum } from '../common/enum';
+import { isDeleteEnum } from '../../common/enum';
 /*
    變數名稱代表意義
    ledger : 所有帳本項目

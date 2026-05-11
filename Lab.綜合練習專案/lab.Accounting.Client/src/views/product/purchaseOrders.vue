@@ -2,24 +2,20 @@
 import { ref, onMounted, computed, watch, inject } from 'vue';
 import { getUserOrder } from '@/api//orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { shippingEnum } from '../common/enum';
+import { shippingEnum, getEnumDescription } from '../../common/enum';
+import { useRouter } from 'vue-router';
 
 /*
    變數名稱代表意義
-   orders : 所有訂單
+   allOrders : 所有訂單
    baseUrl : 環境變數裡的圖片基底位址
    tableNow : 目前顯示的購買紀錄
+   router : 控制路由
 */
 const allOrders = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const tableNow = ref();
-
-const table = [
-  { label: '待付款', status: 0 },
-  { label: '待出貨', status: 1 },
-  { label: '運送中', status: 2 },
-  { label: '已抵達', status: 3 },
-];
+const router = useRouter();
 
 /*
    注入 Loading 跟 Toast
@@ -71,17 +67,17 @@ const getProductsImg = (product) => {
         <!-- Tab 列 -->
         <div class="flex border-b border-gray-200">
           <button
-            v-for="tab in table"
-            :key="tab.status"
-            @click="tableNow = tab.status"
+            v-for="tab in shippingEnum"
+            :key="tab.value"
+            @click="tableNow = tab.value"
             class="flex-1 py-3 text-center text-sm transition-colors cursor-pointer"
             :class="
-              tableNow === tab.status
+              tableNow === tab.value
                 ? 'border-b-2 border-orange-500 text-orange-500 font-medium'
                 : 'text-gray-500 hover:text-gray-700'
             "
           >
-            {{ tab.label }}
+            {{ tab.description }}
           </button>
         </div>
 
@@ -97,15 +93,13 @@ const getProductsImg = (product) => {
         <div v-for="order in filtTable">
           <div
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
+            @click="router.push({ name: 'purchase-orders-details', params: { id: order.orderId } })"
           >
             <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-            <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
+            <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
+            <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
             <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
-            <span class="mt-3 ms-5 me-5">訂單編號 : {{ order.orderNumber }}</span>
-            <span class="mt-3 ms-5 me-5">購買時間 : {{ order.paidTime }}</span>
-            <span class="mt-3 ms-5 me-5">付款方式 : {{ order.paidType }}</span>
-            <span class="mt-3 ms-5 me-5">寄送地址 : {{ order.shippingAddress }}</span>
-            <span class="mt-3 ms-5 me-5">運送狀態 : {{ order.shippingStatus }}</span>
+            <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
           </div>
         </div>
       </div>

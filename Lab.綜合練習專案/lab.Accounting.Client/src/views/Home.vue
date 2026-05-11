@@ -12,7 +12,7 @@ import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
 const route = useRoute();
 const isLogin = computed(() => route.name === 'login' || route.name === 'home');
-const isRegister = computed(() => route.name === 'createaccount');
+const isRegister = computed(() => route.name === 'create-Account');
 
 /*
    首頁清空登入狀態
@@ -48,7 +48,7 @@ onMounted(() => {
             </RouterLink>
 
             <RouterLink
-              :to="{ name: 'createaccount' }"
+              :to="{ name: 'create-account' }"
               :class="[
                 'flex-1 py-3 text-center transition-all',
                 isRegister ? 'border-b-4 border-black font-bold text-xl' : 'text-gray-400',

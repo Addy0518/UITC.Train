@@ -5,10 +5,10 @@ public interface IProductsBuyRepository
     /// <summary>
     /// 查看單一訂單 ( Id 查詢 )
     /// </summary>
-    /// <param name="orderId">購買資訊</param>
+    /// <param name="orderId">訂單 ID </param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>訂單資訊</returns>
-    Task<MallOrder> GetOrder(int orderId, int userId);
+    Task<OrderResponse> GetOrder(int orderId, int userId);
 
     /// <summary>
     /// 查看單一訂單 ( 訂單編號查詢 )

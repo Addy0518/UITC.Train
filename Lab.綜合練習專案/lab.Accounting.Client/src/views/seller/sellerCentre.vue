@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router';
 import { getSellerAllProduct, deleteProducts } from '@/api/productsService';
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import Swal from 'sweetalert2';
 
 /*
    變數名稱代表意義
@@ -98,7 +97,7 @@ const deleteProduct = async (productId) => {
           </button>
           <button
             class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
-            @click="router.push({ name: 'recycling-products' })"
+            @click="router.push({ name: 'seller-product-recycling' })"
           >
             前往回收桶
           </button>

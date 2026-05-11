@@ -77,7 +77,7 @@ const uploadFile = async (event) => {
         ><i class="pi pi-shop px-5 ps-5"></i>賣家中心</RouterLink
       >
       <RouterLink
-        :to="{ name: 'accounting-practice' }"
+        :to="{ name: 'ledger' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-dollar px-5 ps-5"></i>記帳</RouterLink
       >
@@ -98,7 +98,7 @@ const uploadFile = async (event) => {
         ><i class="pi pi-trash px-5 ps-5"></i>購買紀錄</RouterLink
       >
       <RouterLink
-        :to="{ name: 'chart' }"
+        :to="{ name: 'ledger-chart' }"
         class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
         ><i class="pi pi-wallet px-5 ps-5"></i>帳本統計圖表</RouterLink
       >

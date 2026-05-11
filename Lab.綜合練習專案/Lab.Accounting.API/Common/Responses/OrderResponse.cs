@@ -18,9 +18,24 @@
         public int ProductsId { get; set; }
 
         /// <summary>
+        /// 商品名稱
+        /// </summary>
+        public string ProductsName { get; set; }
+
+        /// <summary>
+        /// 商品類別 ID
+        /// </summary>
+        public int ProductCategoryId { get; set; }
+
+        /// <summary>
         /// 購買數量
         /// </summary>
         public int BoughtQuantity { get; set; }
+
+        /// <summary>
+        /// 原始價格
+        /// </summary>
+        public decimal UnitPrice { get; set; }
 
         /// <summary>
         /// 最終價格

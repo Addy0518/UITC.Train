@@ -11,7 +11,7 @@ import {
   vaildCellPhone,
 } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '../common/InValidErrorMessage.vue';
+import InValidErrorMessage from '/src/common/InValidErrorMessage.vue';
 
 /*
    變數名稱代表意義

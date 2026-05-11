@@ -32,6 +32,19 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     /// <summary>
+    /// 查看使用者單一購買紀錄
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <returns>訂單資訊</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<OrderResponse>))]
+    public async Task<IActionResult> GetOrder([FromQuery] int orderId)
+    {
+        var target = await orderService.GetOrder(orderId, CurrentUserId);
+        return Ok(target);
+    }
+
+    /// <summary>
     /// 使用者購買商品並跳轉綠界界面
     /// </summary>
     /// <param name="Request">商品購買資訊 </param>

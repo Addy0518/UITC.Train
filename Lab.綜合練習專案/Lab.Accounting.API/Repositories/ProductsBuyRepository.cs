@@ -5,19 +5,24 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
     /// <summary>
     /// 查看單一訂單 ( Id 查詢 )
     /// </summary>
-    /// <param name="orderId">購買資訊</param>
+    /// <param name="orderId">訂單 ID </param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>訂單資訊</returns>
-    public async Task<MallOrder> GetOrder(int orderId, int userId)
+    public async Task<OrderResponse> GetOrder(int orderId, int userId)
     {
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"Select * From MallOrder
-                  Where OrderId = @OrderId
-                  And UserId = @UserId";
+            @"SELECT m.*,p.ProductsName, p.ProductCategoryId,
+                   (SELECT TOP 1 productsimg
+                    FROM   productimg i
+                    WHERE  i.productsid = m.productsid) as ProductsImg
+            FROM   mallorder m
+            Join   mallproducts p on m.productsid=p.productsid
+            Where OrderId = @OrderId
+            And m.UserId = @UserId";
 
-        return await conn.QueryFirstOrDefaultAsync<MallOrder>(
+        return await conn.QueryFirstOrDefaultAsync<OrderResponse>(
             addBoughtProductsql,
             new { OrderId = orderId, UserId = userId }
         );
@@ -50,11 +55,12 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"SELECT m.*,
+            @"SELECT m.*,p.ProductsName, p.ProductCategoryId,
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
             FROM   mallorder m
+            Join   mallproducts p on m.productsid=p.productsid
             WHERE  m.userid = @UserId ";
 
         return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });

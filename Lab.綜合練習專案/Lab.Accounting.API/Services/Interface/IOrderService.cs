@@ -10,6 +10,14 @@ public interface IOrderService
     Task<ApiResponse<IEnumerable<OrderResponse>>> GetUserOrder(int userId);
 
     /// <summary>
+    /// 查看使用者單一購買紀錄
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>訂單資訊</returns>
+    Task<ApiResponse<OrderResponse>> GetOrder(int orderId, int userId);
+
+    /// <summary>
     /// 使用者購買商品並跳轉綠界界面
     /// </summary>
     /// <param name="Request">商品購買資訊 </param>

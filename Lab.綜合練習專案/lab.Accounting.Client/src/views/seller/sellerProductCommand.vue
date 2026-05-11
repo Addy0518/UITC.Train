@@ -12,7 +12,7 @@ import { useRoute, useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { required, maxLength } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '../common/InValidErrorMessage.vue';
+import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
 
 /*
    變數名稱代表意義
