@@ -14,13 +14,26 @@ public class OrderController(IOrderService orderService) : ControllerBase
     private string tuuneUrl = "https://veneering-bannister-outlook.ngrok-free.dev";
 
     // 前端網址基底
-    private string fronturl = "http://localhost:5174";
+    private string fronturl = "http://localhost:5173";
 
     // 私有方法 : 從 Token 取出 UserId
     private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");
 
     /// <summary>
-    /// 查看使用者購買紀錄
+    /// 買家查看單一訂單
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <returns>訂單資訊</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<OrderResponse>))]
+    public async Task<IActionResult> GetUserOneOrder([FromQuery] int orderId)
+    {
+        var target = await orderService.GetUserOneOrder(orderId, CurrentUserId);
+        return Ok(target);
+    }
+
+    /// <summary>
+    /// 買家查看所有訂單
     /// </summary>
     /// <returns>訂單 ID</returns>
     [HttpGet]
@@ -32,15 +45,46 @@ public class OrderController(IOrderService orderService) : ControllerBase
     }
 
     /// <summary>
-    /// 查看使用者單一購買紀錄
+    /// 賣家查看單一訂單
     /// </summary>
     /// <param name="orderId">訂單 ID </param>
     /// <returns>訂單資訊</returns>
     [HttpGet]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<OrderResponse>))]
-    public async Task<IActionResult> GetOrder([FromQuery] int orderId)
+    public async Task<IActionResult> GetSellerOneOrder([FromQuery] int orderId)
     {
-        var target = await orderService.GetOrder(orderId, CurrentUserId);
+        var target = await orderService.GetSellerOneOrder(orderId, CurrentUserId);
+        return Ok(target);
+    }
+
+    /// <summary>
+    /// 賣家查看所有訂單
+    /// </summary>
+    /// <returns>所有訂單資訊</returns>
+    [HttpGet]
+    [Authorize(Roles = RolesAuth.賣家)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<OrderResponse>>))]
+    public async Task<IActionResult> GetSellerOrder()
+    {
+        var target = await orderService.GetSellerOrder(CurrentUserId);
+        return Ok(target);
+    }
+
+    /// <summary>
+    /// 改變運輸狀態
+    /// </summary>s
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>影響行數</returns>
+    [HttpPut]
+    [Authorize(Roles = RolesAuth.賣家)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> UpdateShippingStatus(
+        [FromQuery] int orderId,
+        [FromQuery] ShippingStatusEnum shippingStatus
+    )
+    {
+        var target = await orderService.UpdateShippingStatus(orderId, shippingStatus);
         return Ok(target);
     }
 

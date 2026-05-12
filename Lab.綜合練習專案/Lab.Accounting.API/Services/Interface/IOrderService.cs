@@ -3,19 +3,41 @@
 public interface IOrderService
 {
     /// <summary>
-    /// 查看使用者購買紀錄
+    /// 買家查看所有訂單
     /// </summary>
     /// <param name="userId">使用者 ID </param>
     /// <returns>訂單 ID</returns>
     Task<ApiResponse<IEnumerable<OrderResponse>>> GetUserOrder(int userId);
 
     /// <summary>
-    /// 查看使用者單一購買紀錄
+    /// 買家查看單一訂單
     /// </summary>
     /// <param name="orderId">訂單 ID </param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>訂單資訊</returns>
-    Task<ApiResponse<OrderResponse>> GetOrder(int orderId, int userId);
+    Task<ApiResponse<OrderResponse>> GetUserOneOrder(int orderId, int userId);
+
+    /// <summary>
+    /// 賣家查看所有訂單
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>所有訂單資訊</returns>
+    Task<ApiResponse<IEnumerable<OrderResponse>>> GetSellerOrder(int userId);
+
+    /// <summary>
+    /// 賣家查看單一訂單
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <returns>訂單資訊</returns>
+    Task<ApiResponse<OrderResponse>> GetSellerOneOrder(int orderId, int sellerId);
+
+    /// <summary>
+    /// 改變運輸狀態
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>影響行數</returns>
+    Task<ApiResponse<int>> UpdateShippingStatus(int orderId, ShippingStatusEnum shippingStatus);
 
     /// <summary>
     /// 使用者購買商品並跳轉綠界界面

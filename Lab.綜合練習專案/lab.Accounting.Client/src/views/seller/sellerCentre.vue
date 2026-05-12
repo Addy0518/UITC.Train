@@ -2,6 +2,7 @@
 import { computed, onMounted, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { getSellerAllProduct, deleteProducts } from '@/api/productsService';
+
 import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
@@ -66,6 +67,8 @@ const productscategory = (categories) => {
   return [...new Set(categories.split(','))];
 };
 
+
+
 /*
   軟刪除
 */
@@ -85,7 +88,7 @@ const deleteProduct = async (productId) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full" v-if="allproduct">
     <div class="border-gray-200h-full flex flex-col items-center">
       <div class="mt-40 w-300 rounded-lg shadow-sm">
         <div class="flex justify-end">
@@ -106,6 +109,7 @@ const deleteProduct = async (productId) => {
         <div v-for="product in allproduct">
           <div
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
+            @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
           >
             <img :src="getProductsImg(product)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
             <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
@@ -127,6 +131,8 @@ const deleteProduct = async (productId) => {
             >
               刪除
             </button>
+
+
           </div>
         </div>
       </div>

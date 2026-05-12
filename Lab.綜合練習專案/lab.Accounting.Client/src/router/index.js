@@ -164,29 +164,7 @@ const router = createRouter({
         },
         {
           /*
-            新增商品
-          */
-          path: 'add-product',
-          name: 'add-product',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/seller/sellerProductCommand.vue'),
-        },
-        {
-          /*
-            編輯商品
-          */
-          path: 'edit-product/:id',
-          name: 'edit-product',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/seller/sellerProductCommand.vue'),
-        },
-        {
-          /*
-            購買紀錄
+            買家訂單管理
           */
           path: 'purchase-orders',
           name: 'purchase-orders',
@@ -197,7 +175,7 @@ const router = createRouter({
         },
         {
           /*
-            單一購買紀錄
+            買家訂單詳細
           */
           path: 'purchase-orders-details/:id',
           name: 'purchase-orders-details',
@@ -221,6 +199,51 @@ const router = createRouter({
           },
           component: () => import('@/views/seller/sellerCentre.vue'),
         },
+        {
+          /*
+            新增商品
+          */
+          path: 'add-product',
+          name: 'add-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerProductCommand.vue'),
+        },
+        {
+          /*
+            編輯商品
+          */
+          path: 'edit-product/:id',
+          name: 'edit-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerProductCommand.vue'),
+        },
+        {
+          /*
+            賣家訂單管理
+          */
+          path: 'seller-product-order',
+          name: 'seller-product-order',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerProductOrder.vue'),
+        },
+        {
+          /*
+            賣家訂單詳細
+          */
+          path: 'seller-orders-details/:id',
+          name: 'seller-orders-details',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/seller/sellerOrderDetails.vue'),
+        },
+
         {
           /*
             商品回收桶

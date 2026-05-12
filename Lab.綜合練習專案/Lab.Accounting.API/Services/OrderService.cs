@@ -4,17 +4,17 @@ public class OrderService(
     IProductsRepository productsRepositories,
     IProductsImgRepository productsImgRepository,
     IProductsRateRepository productsRateRepositories,
-    IProductsBuyRepository productsBuyRepositories
+    IProductsOrderRepository productsBuyRepositories
 ) : IOrderService
 {
     /// <summary>
-    /// 查看使用者購買紀錄
+    /// 買家查看所有訂單
     /// </summary>
     /// <param name="userId">使用者 ID </param>
     /// <returns>訂單 ID</returns>
     public async Task<ApiResponse<IEnumerable<OrderResponse>>> GetUserOrder(int userId)
     {
-        var target = await productsBuyRepositories.GetUserAllOrder(userId);
+        var target = await productsBuyRepositories.GetUserOrder(userId);
 
         if (target == null)
         {
@@ -25,18 +25,70 @@ public class OrderService(
     }
 
     /// <summary>
-    /// 查看使用者單一購買紀錄
+    /// 買家查看單一訂單
     /// </summary>
     /// <param name="orderId">訂單 ID </param>
     /// <param name="userId">使用者 ID</param>
     /// <returns>訂單資訊</returns>
-    public async Task<ApiResponse<OrderResponse>> GetOrder(int orderId, int userId)
+    public async Task<ApiResponse<OrderResponse>> GetUserOneOrder(int orderId, int userId)
     {
-        var target = await productsBuyRepositories.GetOrder(orderId, userId);
+        var target = await productsBuyRepositories.GetUserOneOrder(orderId, userId);
 
         if (target == null)
         {
             return ApiResponseHelper.NotFound<OrderResponse>();
+        }
+
+        return ApiResponseHelper.Success(target);
+    }
+
+    /// <summary>
+    /// 賣家查看所有訂單
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>所有訂單資訊</returns>
+    public async Task<ApiResponse<IEnumerable<OrderResponse>>> GetSellerOrder(int userId)
+    {
+        var target = await productsBuyRepositories.GetSellerOrder(userId);
+
+        if (target == null)
+        {
+            return ApiResponseHelper.NotFound<IEnumerable<OrderResponse>>();
+        }
+
+        return ApiResponseHelper.Success(target);
+    }
+
+    /// <summary>
+    /// 賣家查看單一訂單
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <returns>訂單資訊</returns>
+    public async Task<ApiResponse<OrderResponse>> GetSellerOneOrder(int orderId, int sellerId)
+    {
+        var target = await productsBuyRepositories.GetSellerOneOrder(orderId, sellerId);
+
+        if (target == null)
+        {
+            return ApiResponseHelper.NotFound<OrderResponse>();
+        }
+
+        return ApiResponseHelper.Success(target);
+    }
+
+    /// <summary>
+    /// 改變運輸狀態
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>影響行數</returns>
+    public async Task<ApiResponse<int>> UpdateShippingStatus(int orderId, ShippingStatusEnum shippingStatus)
+    {
+        var target = await productsBuyRepositories.UpdateShippingStatus(orderId, shippingStatus);
+
+        if (target <= 0)
+        {
+            return ApiResponseHelper.NotFound<int>();
         }
 
         return ApiResponseHelper.Success(target);
@@ -98,7 +150,7 @@ public class OrderService(
     /// <returns>跳轉綠界訂單</returns>
     public async Task<ApiResponse<GreenPayResponse>> GetPaymentData(int orderId, int userId, string tunnelUrl)
     {
-        var target = await productsBuyRepositories.GetOrder(orderId, userId);
+        var target = await productsBuyRepositories.GetUserOneOrder(orderId, userId);
 
         if (target == null)
         {

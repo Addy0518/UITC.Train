@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed, watch, inject } from 'vue';
-import { getUserOneOrder } from '@/api/orderService';
+import { getSellerOneOrder, updateShippingStatus } from '@/api/orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import { shippingEnum, getEnumDescription } from '../../common/enum';
 import { useRoute, useRouter } from 'vue-router';
@@ -35,11 +35,10 @@ onMounted(() => {
 const getOneOrder = async (id) => {
   try {
     showLoading();
-    const res = await getUserOneOrder(id);
+    const res = await getSellerOneOrder(id);
     const { data } = res;
     if (data.codeStatus === 2000) {
       order.value = data.returnData;
-
     }
   } catch (err) {
     console.log(err);
@@ -56,6 +55,24 @@ const getProductsImg = (product) => {
     return `${baseUrl}/ProductsImg/${product.productsImg}`;
   }
   return defaultImgurl;
+};
+
+/*
+  改變運輸狀態
+*/
+const updateStatus = async (id, status) => {
+  try {
+    const res = await updateShippingStatus(id, status);
+    console.log('res', res);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      showToastSuccess('成功更新運輸狀態!');
+      await getSellerProduct();
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+  }
 };
 </script>
 
@@ -74,6 +91,16 @@ const getProductsImg = (product) => {
           >運送狀態 : {{ getEnumDescription(shippingEnum, order.shippingStatus) }}</span
         >
         <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
+
+        <select
+          class="border border-gray-300 rounded-lg p-2 cursor-pointer"
+          :value="order.shippingStatus"
+          @change="updateStatus(order.orderId, Number($event.target.value))"
+        >
+          <option v-for="status in shippingEnum" :key="status.value" :value="status.value">
+            {{ status.description }}
+          </option>
+        </select>
       </div>
     </div>
   </div>

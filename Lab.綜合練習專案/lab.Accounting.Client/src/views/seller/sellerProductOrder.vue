@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed, watch, inject } from 'vue';
-import { getUserOrder } from '@/api//orderService';
+import { getSellerOrder } from '@/api//orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import { shippingEnum, getEnumDescription } from '../../common/enum';
 import { useRouter } from 'vue-router';
@@ -26,7 +26,7 @@ const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
 onMounted(() => {
-  getUserOneOrder();
+  getOrders();
 });
 
 const filtTable = computed(() => {
@@ -34,10 +34,10 @@ const filtTable = computed(() => {
   return allOrders.value.filter((order) => order.shippingStatus == tableNow.value);
 });
 
-const getUserOneOrder = async () => {
+const getOrders = async () => {
   try {
     showLoading();
-    const res = await getUserOrder();
+    const res = await getSellerOrder();
     const { data } = res;
     if (data.codeStatus === 2000) {
       allOrders.value = data.returnData;
@@ -93,7 +93,7 @@ const getProductsImg = (product) => {
         <div v-for="order in filtTable">
           <div
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
-            @click="router.push({ name: 'purchase-orders-details', params: { id: order.orderId } })"
+            @click="router.push({ name: 'seller-orders-details', params: { id: order.orderId } })"
           >
             <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
             <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>

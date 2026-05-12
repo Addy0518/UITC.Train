@@ -1,14 +1,22 @@
 ﻿namespace Lab.Accounting.API.Repositories.Interface;
 
-public interface IProductsBuyRepository
+public interface IProductsOrderRepository
 {
     /// <summary>
-    /// 查看單一訂單 ( Id 查詢 )
+    /// 買家查看單一訂單
     /// </summary>
     /// <param name="orderId">訂單 ID </param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="userId">買家 ID</param>
     /// <returns>訂單資訊</returns>
-    Task<OrderResponse> GetOrder(int orderId, int userId);
+    Task<OrderResponse> GetUserOneOrder(int orderId, int userId);
+
+    /// <summary>
+    /// 賣家查看單一訂單
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <param name="userId">賣家 ID</param>
+    /// <returns>訂單資訊</returns>
+    Task<OrderResponse> GetSellerOneOrder(int orderId, int userId);
 
     /// <summary>
     /// 查看單一訂單 ( 訂單編號查詢 )
@@ -18,11 +26,25 @@ public interface IProductsBuyRepository
     Task<MallOrder> GetOrderByOrderNumber(string orderNumber);
 
     /// <summary>
-    /// 查看使用者的所有訂單
+    /// 買家查看所有訂單
     /// </summary>
     /// <param name="userId">使用者 ID</param>
     /// <returns>所有訂單資訊</returns>
-    Task<IEnumerable<OrderResponse>> GetUserAllOrder(int userId);
+    Task<IEnumerable<OrderResponse>> GetUserOrder(int userId);
+
+    /// <summary>
+    /// 賣家查看所有訂單
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>所有訂單資訊</returns>
+    Task<IEnumerable<OrderResponse>> GetSellerOrder(int userId);
+
+    /// <summary>
+    /// 改變運輸狀態
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>影響行數</returns>
+    Task<int> UpdateShippingStatus(int orderId, ShippingStatusEnum shippingStatus);
 
     /// <summary>
     /// 商品購買

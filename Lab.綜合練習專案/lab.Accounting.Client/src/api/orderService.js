@@ -6,8 +6,20 @@ import accountApiInstance from '@/api/accountInstance.js';
 export const userBuyProduct = (buyRequest) =>
   accountApiInstance.post(`Order/UserBuyProduct`, buyRequest);
 
-// 查看使用者購買紀錄
+// 買家查看所有訂單
 export const getUserOrder = () => accountApiInstance.get(`Order/GetUserOrder`);
 
-// 查看使用者單一購買紀錄
-export const getOrder = (id) => accountApiInstance.get(`Order/GetOrder?orderId=${id}`);
+// 買家查看單一訂單
+export const getUserOneOrder = (id) =>
+  accountApiInstance.get(`Order/GetUserOneOrder?orderId=${id}`);
+
+// 更新運輸狀態
+export const updateShippingStatus = (id, status) =>
+  accountApiInstance.put(`Order/UpdateShippingStatus?orderId=${id}&shippingStatus=${status}`);
+
+// 賣家查看所有訂單
+export const getSellerOrder = () => accountApiInstance.get(`Order/GetSellerOrder`);
+
+// 賣家查看單一訂單
+export const getSellerOneOrder = (id) =>
+  accountApiInstance.get(`Order/GetSellerOneOrder?orderId=${id}`);

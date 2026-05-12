@@ -1,14 +1,14 @@
 ﻿namespace Lab.Accounting.API.Repositories;
 
-public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyRepository
+public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRepository
 {
     /// <summary>
-    /// 查看單一訂單 ( Id 查詢 )
+    /// 買家查看單一訂單
     /// </summary>
     /// <param name="orderId">訂單 ID </param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="userId">買家 ID</param>
     /// <returns>訂單資訊</returns>
-    public async Task<OrderResponse> GetOrder(int orderId, int userId)
+    public async Task<OrderResponse> GetUserOneOrder(int orderId, int userId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -25,6 +25,32 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
         return await conn.QueryFirstOrDefaultAsync<OrderResponse>(
             addBoughtProductsql,
             new { OrderId = orderId, UserId = userId }
+        );
+    }
+
+    /// <summary>
+    /// 賣家查看單一訂單
+    /// </summary>
+    /// <param name="orderId">訂單 ID </param>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <returns>訂單資訊</returns>
+    public async Task<OrderResponse> GetSellerOneOrder(int orderId, int sellerId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var addBoughtProductsql =
+            @"SELECT m.*,p.ProductsName, p.ProductCategoryId,
+                   (SELECT TOP 1 productsimg
+                    FROM   productimg i
+                    WHERE  i.productsid = m.productsid) as ProductsImg
+            FROM   mallorder m
+            Join   mallproducts p on m.productsid=p.productsid
+            Where OrderId = @OrderId
+            And p.UserId = @SellerId";
+
+        return await conn.QueryFirstOrDefaultAsync<OrderResponse>(
+            addBoughtProductsql,
+            new { OrderId = orderId, SellerId = sellerId }
         );
     }
 
@@ -46,11 +72,11 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
     }
 
     /// <summary>
-    /// 查看使用者的所有訂單
+    /// 買家查看所有訂單
     /// </summary>
     /// <param name="userId">使用者 ID</param>
     /// <returns>所有訂單資訊</returns>
-    public async Task<IEnumerable<OrderResponse>> GetUserAllOrder(int userId)
+    public async Task<IEnumerable<OrderResponse>> GetUserOrder(int userId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -62,6 +88,27 @@ public class ProductsBuyRepository(DBConnecting connecting) : IProductsBuyReposi
             FROM   mallorder m
             Join   mallproducts p on m.productsid=p.productsid
             WHERE  m.userid = @UserId ";
+
+        return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });
+    }
+
+    /// <summary>
+    /// 賣家查看所有訂單
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>所有訂單資訊</returns>
+    public async Task<IEnumerable<OrderResponse>> GetSellerOrder(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var addBoughtProductsql =
+            @"SELECT m.*,m.UserId,p.ProductsName, p.ProductCategoryId
+                   , (SELECT TOP 1 productsimg
+                    FROM   productimg i
+                    WHERE  i.productsid = m.productsid) as ProductsImg
+            FROM   mallorder m
+            Join   mallproducts p on m.productsid=p.productsid
+            WHERE  p.userid = @UserId";
 
         return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });
     }

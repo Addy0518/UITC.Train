@@ -8,6 +8,11 @@
         public int OrderId { get; set; }
 
         /// <summary>
+        /// 使用者 ID
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
         /// 訂單編號
         /// </summary>
         public string OrderNumber { get; set; }
