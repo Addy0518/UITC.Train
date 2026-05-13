@@ -67,8 +67,6 @@ const productscategory = (categories) => {
   return [...new Set(categories.split(','))];
 };
 
-
-
 /*
   軟刪除
 */
@@ -107,11 +105,13 @@ const deleteProduct = async (productId) => {
         </div>
 
         <div v-for="product in allproduct">
-          <div
-            class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
-            @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
-          >
-            <img :src="getProductsImg(product)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
+          <div class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 items-center">
+            <img
+              :src="getProductsImg(product)"
+              alt="Logo"
+              class="w-full max-w-40 max-h-40 mt-4 cursor-pointer"
+              @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
+            />
             <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
             <span class="mt-3 ms-5 me-5">{{ product.productsPrice }}</span>
             <!-- 依照原始資料篩選出同個商品的類別  -->
@@ -131,8 +131,6 @@ const deleteProduct = async (productId) => {
             >
               刪除
             </button>
-
-
           </div>
         </div>
       </div>

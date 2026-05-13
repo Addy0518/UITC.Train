@@ -50,4 +50,18 @@ public interface IUserRepository
     /// <param name="request">使用者更新資訊</param>
     /// <returns>影響列數</returns>
     Task<int> UpdateUser(UserUpdateRequest request);
+
+    /// <summary>
+    /// 查看使用者密碼
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>影響列數</returns>
+    Task<User> GetUserPassword(int userId);
+
+    /// <summary>
+    /// 更新使用者密碼
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    Task<int> UpdatePassword(UserUpdatePasswordRequest request);
 }

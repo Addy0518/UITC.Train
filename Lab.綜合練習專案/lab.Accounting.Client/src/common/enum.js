@@ -43,6 +43,13 @@ export const isDeleteEnum = Object.freeze({
   Delete: { value: 1, description: '軟刪除' },
 });
 
+// 性別
+export const genderEnum = Object.freeze({
+  Man: { value: 0, description: '女性' },
+  Woman: { value: 1, description: '男性' },
+  Else: { value: 2, description: '其他' },
+});
+
 // 商品運送狀態
 export const shippingEnum = Object.freeze({
   PendingPayment: { value: 0, description: '待付款' },

@@ -6,6 +6,7 @@ import { loginApi } from '@/api/userService';
 import { required, vaildEmail, vaildLoginPassword, maxLength } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
 import InValidErrorMessage from '/src/common/InValidErrorMessage.vue';
+import { getError400Message } from '../../common/method';
 
 /*
    注入 Loading 跟 Toast
@@ -68,13 +69,15 @@ const userLogin = async () => {
   try {
     showLoading();
     const userlogin = { userAccount: account.value, userPassword: password.value };
-    console.log('送出資料：', userlogin);
     const res = await loginApi(userlogin);
     const { data } = res;
     if (data.codeStatus === 2000) {
       authStore.setAuth(data.returnData);
       showToastSuccess('登入成功 !');
       route.push('mall');
+    }
+    if (data.codeStatus === 4000) {
+      showToastError('錯誤', getError400Message(data.error400));
     }
     if (data.codeStatus === 4001) {
       showToastError('錯誤', data.message);

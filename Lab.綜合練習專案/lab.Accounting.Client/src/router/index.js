@@ -148,9 +148,6 @@ const router = createRouter({
           },
           component: () => import('@/views/mall/shoppingCar.vue'),
         },
-        /*
-            商品區 ================================================================
-        */
         {
           /*
              商品詳細
@@ -162,27 +159,65 @@ const router = createRouter({
           },
           component: () => import('@/views/product/productDetail.vue'),
         },
+        /*
+            用戶區 ================================================================
+        */
         {
           /*
-            買家訂單管理
+            用戶中心
           */
-          path: 'purchase-orders',
-          name: 'purchase-orders',
+          path: 'user-centre',
+          name: 'user-centre',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/product/purchaseOrders.vue'),
-        },
-        {
-          /*
-            買家訂單詳細
-          */
-          path: 'purchase-orders-details/:id',
-          name: 'purchase-orders-details',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/product/purchaseOrderDetails.vue'),
+          component: () => import('@/views/user/userCentre.vue'),
+          children: [
+            {
+              /*
+                個人檔案
+              */
+              path: 'profile',
+              name: 'profile',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/profile.vue'),
+            },
+            {
+              /*
+                更改密碼
+              */
+              path: 'update-password',
+              name: 'update-password',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/updatePassword.vue'),
+            },
+            {
+              /*
+                買家訂單管理
+              */
+              path: 'purchase-orders',
+              name: 'purchase-orders',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/purchaseOrders.vue'),
+            },
+            {
+              /*
+                買家訂單詳細
+              */
+              path: 'purchase-orders-details/:id',
+              name: 'purchase-orders-details',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/purchaseOrderDetails.vue'),
+            },
+          ],
         },
 
         /*

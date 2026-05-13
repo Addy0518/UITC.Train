@@ -321,9 +321,6 @@ const removeImage = async (index) => {
     </InputGroup>
     <InValidErrorMessage :errorDto="v$.selectChild.$errors" vaildChiName="子類別" />
     <InputGroup>
-      <InputGroupAddon>
-        <!-- <i class="pi pi-user"></i> -->
-      </InputGroupAddon>
       <InputNumber
         v-model="productPrice"
         placeholder="商品價格"
@@ -333,9 +330,6 @@ const removeImage = async (index) => {
     </InputGroup>
     <InValidErrorMessage :errorDto="v$.productPrice.$errors" vaildChiName="商品價格" />
     <InputGroup>
-      <InputGroupAddon>
-        <!-- <i class="pi pi-user"></i> -->
-      </InputGroupAddon>
       <InputNumber
         v-model="productStock"
         placeholder="商品庫存"

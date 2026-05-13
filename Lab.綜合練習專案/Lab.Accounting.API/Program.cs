@@ -14,6 +14,9 @@ try
     // AddSerilog 是把 Serilog 整合進 ASP.NET Core 的 ILogger 系統，這樣注入 ILogger<T> 的地方實際上會使用 Serilog 來輸出 Log 紀錄
     builder.Services.AddSerilog();
 
+    // 註冊 DateOnlyTypeHandler 幫助 Dapper 認得 DateOnly
+    SqlMapper.AddTypeHandler<DateOnly>(new DateOnlyTypeHandler());
+
     // 註冊 Controller
     builder
         .Services.AddControllers()

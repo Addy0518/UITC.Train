@@ -13,6 +13,11 @@ public class UserResponse
     public string UserName { get; set; }
 
     /// <summary>
+    /// 使用者帳號
+    /// </summary>
+    public string UserAccount { get; set; }
+
+    /// <summary>
     /// 使用者大頭照
     /// </summary>
     public string? UserHeadshot { get; set; }
@@ -21,6 +26,21 @@ public class UserResponse
     /// 使用者地址
     /// </summary>
     public string? UserAddress { get; set; }
+
+    /// <summary>
+    /// 使用者電話
+    /// </summary>
+    public string? UserPhone { get; set; }
+
+    /// <summary>
+    /// 使用者生日
+    /// </summary>
+    public DateOnly? UserBirthDate { get; set; }
+
+    /// <summary>
+    /// 使用者性別
+    /// </summary>
+    public GenderEnum UserGender { get; set; }
 
     /// <summary>
     /// Token

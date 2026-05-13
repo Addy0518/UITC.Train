@@ -50,4 +50,11 @@ public interface IUserService
     /// <param name="request">使用者更新資訊</param>
     /// <returns>影響列數</returns>
     Task<ApiResponse<int>> UpdateUser(UserUpdateRequest request);
+
+    /// <summary>
+    /// 更新使用者密碼
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    Task<ApiResponse<string>> UpdatePassword(UserUpdatePasswordRequest request);
 }

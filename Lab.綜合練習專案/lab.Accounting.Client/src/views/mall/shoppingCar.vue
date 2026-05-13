@@ -2,17 +2,20 @@
 import { ref, onMounted, inject } from 'vue';
 import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { value } from 'valibot';
+import { useRouter } from 'vue-router';
+
 /*
   變數名稱代表意義
   allProductsRaw : 初始資料 ( 全部商品 )
   products : 全部商品
   baseUrl : 環境變數裡的圖片基底位址
+  router : 控制路由
 */
 
 const products = ref([]);
 const allProductsRaw = ref();
 const baseUrl = import.meta.env.VITE_IMG_URL;
+const router = useRouter();
 
 /*
    注入 Loading 跟 Toast
@@ -96,10 +99,13 @@ const deleteProductsInCar = async (productId) => {
     <div class="border-gray-200h-full flex flex-col items-center">
       <div class="mt-40 w-300 rounded-lg shadow-sm">
         <div v-for="product in products">
-          <div
-            class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
-          >
-            <img :src="getProductsImg(product)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
+          <div class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 items-center">
+            <img
+              :src="getProductsImg(product)"
+              alt="Logo"
+              class="w-full max-w-40 max-h-40 mt-4 cursor-pointer"
+              @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
+            />
             <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
             <span class="mt-3 ms-5 me-5">{{ product.productsPrice }}</span>
             <!-- 依照原始資料篩選出同個商品的類別  -->

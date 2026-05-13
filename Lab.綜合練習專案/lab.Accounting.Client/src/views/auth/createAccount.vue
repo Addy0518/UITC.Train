@@ -12,6 +12,7 @@ import {
 } from '@/validator/validators';
 import { useVuelidate } from '@vuelidate/core';
 import InValidErrorMessage from '/src/common/InValidErrorMessage.vue';
+import { getError400Message } from '../../common/method';
 
 /*
    變數名稱代表意義
@@ -81,8 +82,7 @@ const userRegister = async () => {
       showToastSuccess('註冊成功!');
       route.push('/login');
     } else if (data.codeStatus === 4000) {
-      const errorMsg = data.error400.UserAccount;
-      showToastError('錯誤', errorMsg);
+      showToastError('錯誤', getError400Message(data.error400));
     }
   } catch (error) {
     console.error('使用者註冊錯誤 ', error.response);

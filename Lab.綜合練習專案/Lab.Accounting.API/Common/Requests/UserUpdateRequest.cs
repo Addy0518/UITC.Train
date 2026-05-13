@@ -24,5 +24,16 @@ public class UserUpdateRequest
     /// <summary>
     /// 使用者地址
     /// </summary>
+    [MaxLength(50, ErrorMessage = "{0} 不能超過 {200} 個字!")]
     public string? UserAddress { get; set; }
+
+    /// <summary>
+    /// 使用者生日
+    /// </summary>
+    public DateOnly? UserBirthDate { get; set; }
+
+    /// <summary>
+    /// 使用者性別
+    /// </summary>
+    public GenderEnum UserGender { get; set; }
 }

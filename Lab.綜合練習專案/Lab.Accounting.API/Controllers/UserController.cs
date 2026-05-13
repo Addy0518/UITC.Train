@@ -64,13 +64,12 @@ public class UserController(IUserService userserivce) : ControllerBase
     /// <summary>
     /// 取得使用者資訊
     /// </summary>
-    /// <param name="userId">使用者 ID </param>
     /// <returns>使用者資訊</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
-    public async Task<IActionResult> GetUser(int userId)
+    public async Task<IActionResult> GetUser()
     {
-        return Ok(await userserivce.GetUser(userId));
+        return Ok(await userserivce.GetUser(CurrentUserId));
     }
 
     /// <summary>
@@ -80,9 +79,22 @@ public class UserController(IUserService userserivce) : ControllerBase
     /// <returns>影響列數</returns>
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> UpdateUser(UserUpdateRequest request)
+    public async Task<IActionResult> UpdateUser([FromBody] UserUpdateRequest request)
     {
         request.UserId = CurrentUserId;
         return Ok(await userserivce.UpdateUser(request));
+    }
+
+    /// <summary>
+    /// 更新使用者密碼
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+    public async Task<IActionResult> UpdatePassword([FromBody] UserUpdatePasswordRequest request)
+    {
+        request.UserId = CurrentUserId;
+        return Ok(await userserivce.UpdatePassword(request));
     }
 }

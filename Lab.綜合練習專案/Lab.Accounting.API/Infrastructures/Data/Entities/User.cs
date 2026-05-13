@@ -23,6 +23,16 @@ public class User
     public string UserName { get; set; }
 
     /// <summary>
+    /// 使用者生日
+    /// </summary>
+    public DateOnly? UserBirthDate { get; set; }
+
+    /// <summary>
+    /// 使用者性別
+    /// </summary>
+    public GenderEnum UserGender { get; set; }
+
+    /// <summary>
     /// 使用者電話
     /// </summary>
     public string? UserPhone { get; set; }

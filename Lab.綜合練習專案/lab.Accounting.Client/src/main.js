@@ -24,7 +24,7 @@ import Chip from 'primevue/chip';
 import CascadeSelect from 'primevue/cascadeselect';
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
-
+import PanelMenu from 'primevue/panelmenu';
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -60,6 +60,7 @@ app.component('Password', Password);
 app.component('Chip', Chip);
 app.component('CascadeSelect', CascadeSelect);
 app.component('Toast', Toast);
+app.component('PanelMenu', PanelMenu);
 app.use(ToastService);
 app.mount('#app');
 export { app };

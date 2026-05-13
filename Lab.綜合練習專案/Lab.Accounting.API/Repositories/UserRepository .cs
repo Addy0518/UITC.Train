@@ -88,7 +88,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserId,UserName,UserHeadShot From [User]
+            @"Select UserAccount,UserId,UserName,UserHeadShot,UserPhone,UserBirthDate,UserGender,UserAddress From [User]
                 where 
                   UserId = @UserId";
 
@@ -122,9 +122,45 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         var sql =
             @"UPDATE [User]
                   SET
-                      UserName    = COALESCE(@UserName, UserName),
-                      UserAddress = COALESCE(@UserAddress, UserAddress),
-                      UserPhone   = COALESCE(@UserPhone, UserPhone),
+                       UserName      = COALESCE(@UserName, UserName),
+                       UserAddress   = COALESCE(@UserAddress, UserAddress),
+                       UserPhone     = COALESCE(@UserPhone, UserPhone),
+                       UserBirthDate = COALESCE(@UserBirthDate, UserBirthDate),
+                       UserGender    = COALESCE(@UserGender, UserGender)
+                  WHERE UserId = @UserId";
+
+        return await conn.ExecuteAsync(sql, request);
+    }
+
+    /// <summary>
+    /// 查看使用者密碼
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>影響列數</returns>
+    public async Task<User> GetUserPassword(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Select UserPassword From [User]
+                  WHERE UserId = @UserId";
+
+        return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserId = userId });
+    }
+
+    /// <summary>
+    /// 更新使用者密碼
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdatePassword(UserUpdatePasswordRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"UPDATE [User]
+                  SET
+                  UserPassword = @NewUserPassword
                   WHERE UserId = @UserId";
 
         return await conn.ExecuteAsync(sql, request);

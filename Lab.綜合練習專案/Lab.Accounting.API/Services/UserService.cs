@@ -1,4 +1,7 @@
-﻿namespace Lab.Accounting.API.Services;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity.Data;
+
+namespace Lab.Accounting.API.Services;
 
 public class UserService(
     IUserRepository userrepo,
@@ -58,7 +61,14 @@ public class UserService(
         bool isValid = passwordSecureHelper.VerifyPassword(loginRequest.UserPassword, dbuser.UserPassword);
 
         if (isValid == false)
-            return ApiResponseHelper.NotFound<UserResponse>();
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { "UserPassword", new[] { "密碼驗證失敗 , 請重新輸入!" } },
+            };
+
+            return ApiResponseHelper.RequestError<UserResponse>(errors);
+        }
 
         dbuser.UserPassword = null;
 
@@ -201,7 +211,44 @@ public class UserService(
             return ApiResponseHelper.NotFound<int>();
         }
         var result = await userrepo.UpdateUser(request);
+        if (result <= 0)
+        {
+            var errors = new Dictionary<string, string[]> { { "UserPassword", new[] { "更新失敗 , 請重新輸入!" } } };
 
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
         return ApiResponseHelper.Success<int>(result);
+    }
+
+    /// <summary>
+    /// 更新使用者密碼
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<string>> UpdatePassword(UserUpdatePasswordRequest request)
+    {
+        var dbuser = await userrepo.GetUserPassword(request.UserId);
+        if (dbuser == null)
+        {
+            return ApiResponseHelper.NotFound<string>();
+        }
+
+        bool isValid = passwordSecureHelper.VerifyPassword(request.OldUserPassword, dbuser.UserPassword);
+
+        if (isValid == false)
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { "UserPassword", new[] { "密碼驗證失敗 , 請重新輸入!" } },
+            };
+
+            return ApiResponseHelper.RequestError<string>(errors);
+        }
+
+        dbuser.UserPassword = null;
+        request.NewUserPassword = passwordSecureHelper.HashPassword(request.NewUserPassword);
+        var result = await userrepo.UpdatePassword(request);
+
+        return ApiResponseHelper.Success<string>("更新成功 !");
     }
 }
