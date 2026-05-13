@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted, inject } from 'vue';
+
 import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { useRouter } from 'vue-router';
+
 
 /*
   變數名稱代表意義

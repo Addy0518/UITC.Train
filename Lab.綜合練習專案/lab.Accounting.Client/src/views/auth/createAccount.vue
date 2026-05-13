@@ -1,18 +1,6 @@
 <script setup>
-import { ref, watch, computed, inject } from 'vue';
-import { useRouter } from 'vue-router';
 import { registerApi } from '@/api/userService';
-import Swal from 'sweetalert2';
-import {
-  required,
-  maxLength,
-  vaildEmail,
-  vaildLoginPassword,
-  vaildCellPhone,
-} from '@/validator/validators';
-import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '/src/common/InValidErrorMessage.vue';
-import { getError400Message } from '../../common/method';
+
 
 /*
    變數名稱代表意義

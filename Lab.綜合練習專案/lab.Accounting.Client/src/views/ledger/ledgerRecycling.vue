@@ -1,13 +1,11 @@
 <script setup>
-import { ref, onMounted, computed, watch, inject } from 'vue';
-import Swal from 'sweetalert2';
 import {
   deleteAllSoftDeleteLedger,
   updateLedger,
   getAllLedger,
   deleteLedger,
 } from '@/api/ledgerService';
-import { isDeleteEnum } from '../../common/enum';
+
 /*
   變數名稱代表意義
   ledger : 所有帳本項目

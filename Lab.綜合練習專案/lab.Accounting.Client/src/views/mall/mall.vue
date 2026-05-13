@@ -1,5 +1,4 @@
 <script setup>
-import { ref, onMounted, compile, computed, watch, inject } from 'vue';
 import { getAllProduct } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';

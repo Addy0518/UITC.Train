@@ -1,10 +1,7 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth';
-import { computed, onMounted, ref, watch } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義
-
    baseUrl : 基底位址
    authStore : localstorage
 */

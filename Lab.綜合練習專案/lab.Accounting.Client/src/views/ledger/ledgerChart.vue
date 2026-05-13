@@ -1,9 +1,7 @@
 <script setup>
 import * as echarts from 'echarts';
-import { ref, onMounted, compile, computed, watch } from 'vue';
 import { getAllLedger } from '@/api/ledgerService';
-const categoryChartRef = ref(null);
-const itemChartRef = ref(null);
+
 /*
   初始化時把資料帶入圖表 , 點選各類別又會再跳到細項圖表
 */
@@ -14,6 +12,8 @@ const itemChartRef = ref(null);
 */
 const chartData = ref([]);
 const chartData2 = ref([]);
+const categoryChartRef = ref(null);
+const itemChartRef = ref(null);
 onMounted(async () => {
   /*
     變數名稱代表意義

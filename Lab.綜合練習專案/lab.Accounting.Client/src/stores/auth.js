@@ -1,6 +1,3 @@
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-
 /*
    定義 pinia 的設定
 */
@@ -17,7 +14,6 @@ export const useAuthStore = defineStore(
       登入時存入 token 資料
     */
     function setAuth(data) {
-   
       token.value = data.token;
       userId.value = data.userId;
       userName.value = data.userName;

@@ -1,13 +1,6 @@
 <script setup>
-import { computed, onMounted, inject, ref } from 'vue';
 import { userHeadShot, getUser, updateUser, updatePassword } from '@/api/userService';
-import { useAuthStore } from '@/stores/auth';
-import { genderEnum, getEnumDescription } from '../../common/enum';
-import { formatDateOnly } from '@/common/formats';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { required, maxLength, vaildCellPhone, vaildEmail } from '@/validator/validators';
-import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
 
 /*
    變數名稱代表意義
@@ -31,7 +24,7 @@ const showToastError = inject('showToastError');
 
 // 加入已經寫好的驗證規則
 const rules = computed(() => ({
-  userAccount: { vaildEmail },
+  userAccount: { vaildEmail, required },
   userName: { required, maxLength: maxLength(50) },
   userPhone: { vaildCellPhone },
   userAddress: { maxLength: maxLength(200) },
@@ -114,7 +107,7 @@ const updateMyUser = async () => {
 
     const request = {
       ...userInfo.value,
-      // 生日轉為 DateOnly 
+      // 生日轉為 DateOnly
       userBirthDate: userInfo.value.userBirthDate
         ? formatDateOnly(userInfo.value.userBirthDate)
         : null,

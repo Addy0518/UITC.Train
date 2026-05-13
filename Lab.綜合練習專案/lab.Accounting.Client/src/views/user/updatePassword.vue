@@ -1,15 +1,5 @@
 <script setup>
-import { computed, onMounted, inject, ref } from 'vue';
-import { userHeadShot, getUser, updateUser, updatePassword } from '@/api/userService';
-import { useAuthStore } from '@/stores/auth';
-import { genderEnum, getEnumDescription } from '../../common/enum';
-import { formatDateOnly } from '@/common/formats';
-
-import { vaildLoginPassword, required } from '@/validator/validators';
-import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
-import { codeStatusEnum } from '@/common/enum';
-import { getError400Message } from '@/common/method';
+import { updatePassword } from '@/api/userService';
 
 /*
    變數名稱代表意義

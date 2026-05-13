@@ -1,9 +1,7 @@
 <script setup>
-import { ref, onMounted, computed, watch, inject } from 'vue';
 import { getSellerOneOrder, updateShippingStatus } from '@/api/orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { shippingEnum, getEnumDescription } from '../../common/enum';
-import { useRoute, useRouter } from 'vue-router';
+
 
 /*
    變數名稱代表意義

@@ -1,7 +1,4 @@
 <script setup>
-import { ref, provide } from 'vue';
-import Loading from './common/Loading.vue';
-
 //#region 提供控制 Toast 的方法給子組件
 import { useToast } from 'primevue/usetoast';
 const toast = useToast();

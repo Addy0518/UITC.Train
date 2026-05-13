@@ -1,10 +1,6 @@
 <script setup>
-import { computed, onMounted, inject } from 'vue';
-import { useRoute } from 'vue-router';
 import { getProduct } from '@/api/productsService';
 import { userBuyProduct } from '@/api//orderService';
-import { useAuthStore } from '@/stores/auth';
-import { ref } from 'vue';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義

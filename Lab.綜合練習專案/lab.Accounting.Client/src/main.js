@@ -25,6 +25,8 @@ import CascadeSelect from 'primevue/cascadeselect';
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import PanelMenu from 'primevue/panelmenu';
+import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
+import Loading from '@/common/Loading.vue';
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -61,6 +63,8 @@ app.component('Chip', Chip);
 app.component('CascadeSelect', CascadeSelect);
 app.component('Toast', Toast);
 app.component('PanelMenu', PanelMenu);
+app.component('InValidErrorMessage', InValidErrorMessage);
+app.component('Loading', Loading);
 app.use(ToastService);
 app.mount('#app');
 export { app };

@@ -1,12 +1,5 @@
 <script setup>
-import { ref, computed, inject } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
 import { loginApi } from '@/api/userService';
-import { required, vaildEmail, vaildLoginPassword, maxLength } from '@/validator/validators';
-import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '/src/common/InValidErrorMessage.vue';
-import { getError400Message } from '../../common/method';
 
 /*
    注入 Loading 跟 Toast

@@ -1,8 +1,4 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-
 /*
    變數名稱代表意義
    authStore : pinia 注入

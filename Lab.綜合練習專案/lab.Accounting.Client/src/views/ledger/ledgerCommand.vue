@@ -1,10 +1,6 @@
 <script setup>
-import { computed, onMounted, ref, inject } from 'vue';
-import { useRoute } from 'vue-router';
 import { getAllLedger, getLedger, createLedger, updateLedger } from '@/api/ledgerService';
-import { required, maxLength, vaildNumber } from '@/validator/validators';
-import { useVuelidate } from '@vuelidate/core';
-import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
+
 /*
    變數名稱代表意義
    route : 獲取路由資訊
