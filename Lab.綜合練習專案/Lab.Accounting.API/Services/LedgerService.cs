@@ -23,10 +23,8 @@ public class LedgerService(
         int userId
     )
     {
-        return ApiResponseHelper.Success(
-            await accountrepo.GetAllLedger(categoryId, date, itemname, isDelete, userId),
-            "成功!"
-        );
+        var result = await accountrepo.GetAllLedger(categoryId, date, itemname, isDelete, userId);
+        return ApiResponseHelper.Success(result ?? new List<LedgerItemJoinCategoryView>(), "成功!");
     }
 
     /// <summary>
@@ -139,6 +137,8 @@ public class LedgerService(
         else
         {
             categoryId = await categoryrepo.CreateLedgerItemCategory(categoryname);
+            if (categoryId <= 0)
+                throw new InvalidOperationException("類別建立失敗，請稍後再試");
         }
 
         return categoryId;
@@ -158,6 +158,9 @@ public class LedgerService(
             return ApiResponseHelper.NotFound<int>();
         }
         var deletetarget = await accountrepo.DeleteLedger(ledgerId, target.IsDelete, userId);
+
+        if (deletetarget <= 0)
+            return ApiResponseHelper.InternalException<int>("帳本刪除失敗");
 
         return ApiResponseHelper.Success<int>(deletetarget, "成功!");
     }

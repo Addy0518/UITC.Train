@@ -51,14 +51,13 @@ public class ProductsService(
             return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
         }
 
-        foreach (var product in products)
+        // 開兩條執行緒同時查詢
+        var tasks = products.Select(async product =>
         {
-            var avgRating = await productsRateRepositories.CountAVGProductRate(product.ProductsId);
-            product.ProductsRate = avgRating;
-            var imgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
-            product.ProductsImgs = imgs;
-        }
-
+            product.ProductsRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId);
+            product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
+        });
+        await Task.WhenAll(tasks);
         return ApiResponseHelper.Success(products);
     }
 
@@ -97,7 +96,8 @@ public class ProductsService(
         using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             var target = await productsRepositories.CreateProducts(product);
-
+            if (target <= 0)
+                return ApiResponseHelper.InternalException<int>("商品新增失敗");
             var Insertrate = new MallProductsRate
             {
                 ProductsId = target,
@@ -179,7 +179,11 @@ public class ProductsService(
             }
 
             var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, userId);
-            if (target.IsDelete == IsDeleteStatusEnum.Deleted && deletetarget != null)
+
+            if (deletetarget == null)
+                return ApiResponseHelper.InternalException<int>("刪除失敗");
+
+            if (target.IsDelete == IsDeleteStatusEnum.Deleted)
             {
                 foreach (var img in imgs)
                 {
@@ -203,8 +207,20 @@ public class ProductsService(
         int productId
     )
     {
+        var product = await productsRepositories.GetProducts(productId);
+        if (product == null)
+            return ApiResponseHelper.NotFound<IEnumerable<MallProductImg>>();
+
         var result = await FileUploadHelper.SaveFileAsync(productsImgsFiles, env.WebRootPath, "ProductsImg");
-        await productsImgRepository.ProductsImgUpload(productId, result);
+        var imgupload = await productsImgRepository.ProductsImgUpload(productId, result);
+
+        if (imgupload <= 0)
+        {
+            // DB 失敗，把剛存的實體檔案清掉，避免孤兒檔案
+            FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", result);
+            return ApiResponseHelper.InternalException<IEnumerable<MallProductImg>>("圖片上傳失敗");
+        }
+
         var newtarget = await productsImgRepository.GetProductsAllImg(productId);
         return ApiResponseHelper.Success(newtarget);
     }

@@ -37,6 +37,9 @@ public class UserService(
 
         var result = await userrepo.Register(user);
 
+        if (result == null)
+            return ApiResponseHelper.InternalException<UserResponse>();
+
         var userresult = new UserResponse { UserId = result.UserId, UserName = result.UserName };
 
         return ApiResponseHelper.Success<UserResponse>(userresult, "成功!");
@@ -87,9 +90,9 @@ public class UserService(
             Token = token,
             UserId = dbuser.UserId,
             UserName = dbuser.UserName,
-            UserHeadshot = userheadshot.UserHeadshot,
+            UserHeadshot = userheadshot?.UserHeadshot,
             UserRole = dbuser.UserRole,
-            UserAddress = dbuser.UserAddress,
+            UserAddress = dbuser?.UserAddress,
         };
 
         return ApiResponseHelper.Success(userresponse, "成功");
@@ -143,6 +146,10 @@ public class UserService(
     public async Task<ApiResponse<UserResponse>> UserHeadShotUpload(IFormFile userFile, int userId)
     {
         var target = await userrepo.GetUser(userId);
+        if (target == null)
+        {
+            return ApiResponseHelper.NotFound<UserResponse>();
+        }
         var existFile = await ExistFile(userFile, target.UserHeadshot, "UserHeadShot");
 
         var result = await userrepo.UserHeadShotUpload(existFile, userId);
@@ -213,7 +220,10 @@ public class UserService(
         var result = await userrepo.UpdateUser(request);
         if (result <= 0)
         {
-            var errors = new Dictionary<string, string[]> { { "UserPassword", new[] { "更新失敗 , 請重新輸入!" } } };
+            var errors = new Dictionary<string, string[]>
+            {
+                { "UpdateUser", new[] { "更新失敗 , 請確認資料後重新送出!" } },
+            };
 
             return ApiResponseHelper.RequestError<int>(errors);
         }

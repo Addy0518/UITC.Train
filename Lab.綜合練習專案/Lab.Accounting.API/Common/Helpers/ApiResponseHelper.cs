@@ -30,6 +30,23 @@ public static class ApiResponseHelper
         };
     }
 
+    // 簡易版 InternalException , 統一回傳伺服器錯誤
+    public static ApiResponse<T> InternalException<T>(string detail = "伺服器內部錯誤，請稍後再試")
+    {
+        return new ApiResponse<T>
+        {
+            CodeStatus = CodeStatusEnum.InternalException,
+            Message = CodeStatusEnum.InternalException.GetDescription(),
+            Error500 = new ProblemDetails
+            {
+                Type = "InternalServerError",
+                Status = StatusCodes.Status500InternalServerError,
+                Title = CodeStatusEnum.InternalException.GetDescription(),
+                Detail = detail,
+            },
+        };
+    }
+
     // RequestError 是 400 的 Bad Request：客戶端傳來的資料格式或內容有問題
     // 例如：必填欄位沒填、格式錯誤、Token 無效等
     // Dictionary 字典對應 ASP.NET Core ModelState 的驗證錯誤格式：

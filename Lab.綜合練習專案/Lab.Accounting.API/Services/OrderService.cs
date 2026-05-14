@@ -125,6 +125,9 @@ public class OrderService(
             var countStock = target.ProductsStock - Request.BoughtQuantity;
             var stock = await productsRepositories.SetStock(Request.ProductsId, countStock);
 
+            if (stock <= 0)
+                return ApiResponseHelper.InternalException<int>("庫存更新失敗");
+
             var buytarget = new MallOrder
             {
                 OrderNumber = merchantTradeNo,
@@ -238,15 +241,16 @@ public class OrderService(
             if (buyProduct != null)
             {
                 string tradeAmt = collection["TradeAmt"].ToString();
-                if (decimal.TryParse(tradeAmt, out decimal totalPrice))
-                {
-                    var totalAmount = buyProduct.UnitPrice * buyProduct.BoughtQuantity;
-                    if (totalPrice != totalAmount)
-                    {
-                        //金額不符,可能是資料被竄改了,不處理這筆訂單
-                        return "0|InvalidAmount";
-                    }
-                }
+
+                if (!decimal.TryParse(tradeAmt, out decimal totalPrice))
+                    return "0|InvalidTradeAmt";
+
+                var totalAmount = buyProduct.UnitPrice * buyProduct.BoughtQuantity;
+
+                if (totalPrice != totalAmount)
+                    //金額不符,可能是資料被竄改了,不處理這筆訂單
+                    return "0|InvalidAmount";
+
                 DateTime.TryParse(collection["PaymentDate"], out DateTime paidTime);
                 if (paidTime == DateTime.MinValue)
                 {
@@ -259,6 +263,10 @@ public class OrderService(
                     collection["PaymentType"].ToString(),
                     paidTime
                 );
+                if (paymentCompleted <= 0)
+                {
+                    return "0|DBUpdateFailed";
+                }
             }
             //因為綠界規定交易成功要回傳1跟ok
 
