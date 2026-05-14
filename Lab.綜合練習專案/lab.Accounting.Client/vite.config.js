@@ -24,6 +24,7 @@ export default defineConfig({
         },
       ], // vue 內建
       dirs: ['src/common', 'src/stores', 'src/validator', 'src/api'], // 我自訂的
+      vueTemplate: true, // 確保 template 裡的也能自動 import
     }),
   ],
   resolve: {

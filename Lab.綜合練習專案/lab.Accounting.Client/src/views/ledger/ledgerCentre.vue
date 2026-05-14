@@ -3,18 +3,14 @@ const router = useRouter();
 
 const menuItems = ref([
   {
-    label: '買家中心',
+    label: '帳本管理',
     icon: 'pi pi-user',
-    command: () => router.push('/user-centre/profile'),
+    command: () => router.push('/ledger-centre/ledger'),
     items: [
-      { label: '個人檔案', command: () => router.push('/user-centre/profile') },
-      { label: '更改密碼', command: () => router.push('/user-centre/update-password') },
+      { label: '新增帳本', command: () => router.push('/ledger-centre/add-ledger') },
+      { label: '帳本回收', command: () => router.push('/ledger-centre/ledger-recycling') },
+      { label: '帳本圖表', command: () => router.push('/ledger-centre/ledger-chart') },
     ],
-  },
-  {
-    label: '購買清單',
-    icon: 'pi pi-list',
-    command: () => router.push('/user-centre/purchase-orders'),
   },
 ]);
 </script>

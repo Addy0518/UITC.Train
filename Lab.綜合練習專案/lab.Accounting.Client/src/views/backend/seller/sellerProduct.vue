@@ -85,21 +85,6 @@ const deleteProduct = async (productId) => {
   <div class="flex flex-col w-full" v-if="allproduct">
     <div class="border-gray-200h-full flex flex-col items-center">
       <div class="mt-40 w-300 rounded-lg shadow-sm">
-        <div class="flex justify-end">
-          <button
-            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-            @click="router.push({ name: 'add-product' })"
-          >
-            新增商品
-          </button>
-          <button
-            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
-            @click="router.push({ name: 'seller-product-recycling' })"
-          >
-            前往回收桶
-          </button>
-        </div>
-
         <div v-for="product in allproduct">
           <div class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 items-center">
             <img

@@ -11,11 +11,11 @@ const router = createRouter({
   routes: [
     {
       /*
-         最外層 layout
+         前台 layout
       */
       path: '/',
-      name: 'layout',
-      component: () => import('@/views/layout/layout.vue'),
+      name: 'front-layout',
+      component: () => import('@/views/layout/frontLayout.vue'),
       children: [
         {
           /*
@@ -53,75 +53,79 @@ const router = createRouter({
             },
           ],
         },
-        {
-          /*
-            側邊欄
-          */
-          path: 'sidebar',
-          name: 'sidebar',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/layout/sidebar.vue'),
-        },
+
         /*
             帳本區 ================================================================
         */
         {
           /*
-            帳本回收桶
+            帳本中心
           */
-          path: 'ledger-recycling',
-          name: 'ledger-recycling',
+          path: 'ledger-centre',
+          name: 'ledger-centre',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/ledger/ledgerRecycling.vue'),
-        },
-        {
-          /*
-            帳本主畫面
-          */
-          path: 'ledger',
-          name: 'ledger',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/ledger/ledger.vue'),
-        },
-        {
-          /*
-            帳本統計圖表
-          */
-          path: 'ledger-chart',
-          name: 'ledger-chart',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/ledger/ledgerChart.vue'),
-        },
+          component: () => import('@/views/ledger/ledgerCentre.vue'),
+          redirect: { name: 'ledger' },
+          children: [
+            {
+              /*
+                帳本主畫面
+              */
+              path: 'ledger',
+              name: 'ledger',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/ledger/ledger.vue'),
+            },
+            {
+              /*
+                新增帳本
+              */
+              path: 'add-ledger',
+              name: 'add-ledger',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/ledger/ledgerCommand.vue'),
+            },
+            {
+              /*
+                編輯帳本
+              */
+              path: 'edit-ledger/:id',
+              name: 'edit-ledger',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/ledger/ledgerCommand.vue'),
+            },
+            {
+              /*
+                帳本回收桶
+              */
+              path: 'ledger-recycling',
+              name: 'ledger-recycling',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/ledger/ledgerRecycling.vue'),
+            },
 
-        {
-          /*
-            新增帳本
-          */
-          path: 'add-ledger',
-          name: 'add-ledger',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/ledger/ledgerCommand.vue'),
-        },
-        {
-          /*
-            編輯帳本
-          */
-          path: 'edit-ledger/:id',
-          name: 'edit-ledger',
-          meta: {
-            isPermissionVerification: true,
-          },
-          component: () => import('@/views/ledger/ledgerCommand.vue'),
+            {
+              /*
+                帳本統計圖表
+              */
+              path: 'ledger-chart',
+              name: 'ledger-chart',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/ledger/ledgerChart.vue'),
+            },
+          ],
         },
         /*
             商城區 ================================================================
@@ -172,6 +176,7 @@ const router = createRouter({
             isPermissionVerification: true,
           },
           component: () => import('@/views/user/userCentre.vue'),
+          redirect: { name: 'profile' },
           children: [
             {
               /*
@@ -219,76 +224,97 @@ const router = createRouter({
             },
           ],
         },
-
+      ],
+    },
+    {
+      /*
+         後台 layout
+      */
+      path: '/backend-layout',
+      name: 'backend-layout',
+      component: () => import('@/views/layout/backendLayout.vue'),
+      redirect: { name: 'seller-product' },
+      children: [
         /*
             賣家區 ================================================================
         */
         {
           /*
-            賣家中心
+            後臺側邊欄
           */
-          path: 'seller-centre',
-          name: 'seller-centre',
+          path: 'backend-sidebar',
+          name: 'backend-sidebar',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/seller/sellerCentre.vue'),
+          component: () => import('@/views/layout/backendSidebar.vue'),
         },
         {
           /*
-            新增商品
-          */
+                 商品管理
+              */
+          path: 'seller-product',
+          name: 'seller-product',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/backend/seller/sellerProduct.vue'),
+        },
+        {
+          /*
+                新增商品
+              */
           path: 'add-product',
           name: 'add-product',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/seller/sellerProductCommand.vue'),
+          component: () => import('@/views/backend/seller/sellerProductCommand.vue'),
         },
         {
           /*
-            編輯商品
-          */
+                編輯商品
+              */
           path: 'edit-product/:id',
           name: 'edit-product',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/seller/sellerProductCommand.vue'),
+          component: () => import('@/views/backend/seller/sellerProductCommand.vue'),
         },
         {
           /*
-            賣家訂單管理
-          */
+                賣家訂單管理
+              */
           path: 'seller-product-order',
           name: 'seller-product-order',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/seller/sellerProductOrder.vue'),
+          component: () => import('@/views/backend/seller/sellerProductOrder.vue'),
         },
         {
           /*
-            賣家訂單詳細
-          */
+                賣家訂單詳細
+              */
           path: 'seller-orders-details/:id',
           name: 'seller-orders-details',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/seller/sellerOrderDetails.vue'),
+          component: () => import('@/views/backend/seller/sellerOrderDetails.vue'),
         },
 
         {
           /*
-            商品回收桶
-          */
+                商品回收桶
+              */
           path: 'seller-product-recycling',
           name: 'seller-product-recycling',
           meta: {
             isPermissionVerification: true,
           },
-          component: () => import('@/views/seller/sellerProductRecycling.vue'),
+          component: () => import('@/views/backend/seller/sellerProductRecycling.vue'),
         },
       ],
     },
