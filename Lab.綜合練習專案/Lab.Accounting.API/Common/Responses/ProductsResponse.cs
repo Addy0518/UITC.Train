@@ -33,9 +33,14 @@ public class ProductsResponse
     public int ProductsStock { get; set; }
 
     /// <summary>
-    /// 商品評分
+    /// 商品總平均評分
     /// </summary>
-    public decimal ProductsRate { get; set; }
+    public decimal ProductsAVGRate { get; set; }
+
+    /// <summary>
+    /// 商品所有評價
+    /// </summary>
+    public IEnumerable<RateResponse>? ProductsAllRates { get; set; }
 
     /// <summary>
     /// 是否為刪除狀態

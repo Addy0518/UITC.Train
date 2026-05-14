@@ -58,16 +58,22 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>商品評價資訊</returns>
-    public async Task<IEnumerable<MallProductsRate>> GetProductRate(int productId)
+    public async Task<IEnumerable<RateResponse>> GetProductRate(int productId)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"SELECT *
-                FROM   MallProductsRate 
-                WHERE  ProductsId = @ProductsId ";
+            @"SELECT   
+                       u.UserName,        
+                       u.UserHeadshot,
+                       r.Rating,
+                       r.Comment,
+                       r.CreateTime
+                FROM   MallProductsRate r
+                Join   [User] u on r.UserId=u.UserId
+                WHERE  r.ProductsId = @ProductsId ";
 
-        return await conn.QueryAsync<MallProductsRate>(sql, new { ProductsId = productId });
+        return await conn.QueryAsync<RateResponse>(sql, new { ProductsId = productId });
     }
 
     /// <summary>

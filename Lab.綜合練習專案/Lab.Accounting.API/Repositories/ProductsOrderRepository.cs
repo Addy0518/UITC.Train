@@ -149,6 +149,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              ProductsId,
                              BoughtQuantity,
                              UnitPrice,
+                             AccountPrice,
                              BoughtTime,
                              ShippingAddress,
                              ShippingStatus)
@@ -158,6 +159,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              @ProductsId,
                              @BoughtQuantity,
                              @UnitPrice,
+                             @AccountPrice,
                              @BoughtTime,
                              @ShippingAddress,
                              @ShippingStatus)

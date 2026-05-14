@@ -291,9 +291,6 @@ const removeImage = async (index) => {
     </div>
 
     <InputGroup>
-      <InputGroupAddon>
-        <!-- <i class="pi pi-user"></i> -->
-      </InputGroupAddon>
       <InputText v-model="productName" placeholder="商品名稱" :invalid="v$.productName.$error" />
     </InputGroup>
     <InValidErrorMessage :errorDto="v$.productName.$errors" vaildChiName="商品名稱" />

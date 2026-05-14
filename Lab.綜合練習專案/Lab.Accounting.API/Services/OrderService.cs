@@ -135,6 +135,7 @@ public class OrderService(
                 ProductsId = Request.ProductsId,
                 BoughtQuantity = Request.BoughtQuantity,
                 UnitPrice = target.ProductsPrice,
+                AccountPrice = target.ProductsPrice * Request.BoughtQuantity,
                 BoughtTime = DateTime.Now,
                 ShippingAddress = Request.ShippingAddress,
                 ShippingStatus = (int)ShippingStatusEnum.PendingPayment,
@@ -230,6 +231,10 @@ public class OrderService(
         {
             //驗證成功!這是綠界傳來的不是其他地方傳的
             var rtnCode = collection["RtnCode"].ToString();
+            if (rtnCode != "1")
+            {
+                return "0|PaymentFailed";
+            }
 
             //訂單成立之後,開始更新資料庫
             var orderNo = collection["MerchantTradeNo"].ToString();

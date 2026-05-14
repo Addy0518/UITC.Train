@@ -8,13 +8,13 @@ namespace Lab.Accounting.API.Controllers;
 [Authorize]
 [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
 [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
-public class OrderController(IOrderService orderService) : ControllerBase
+public class OrderController(IOrderService orderService, IConfiguration config) : ControllerBase
 {
     // 公開網址基底給綠界呼叫
-    private string tuuneUrl = "https://veneering-bannister-outlook.ngrok-free.dev";
+    private string tuuneUrl = config["TuuneUrl"];
 
     // 前端網址基底
-    private string fronturl = "http://localhost:5173";
+    private string fronturl = config["FrontendUrl"];
 
     // 私有方法 : 從 Token 取出 UserId
     private int CurrentUserId => int.Parse(User.FindFirst("UserId")?.Value ?? "0");
@@ -140,8 +140,22 @@ public class OrderController(IOrderService orderService) : ControllerBase
     public IActionResult PaymentCallback([FromForm] IFormCollection collection)
     {
         var orderNo = collection["MerchantTradeNo"].ToString();
+        var rtnCode = collection["RtnCode"].ToString(); // 1=成功, 其他=失敗
 
-        // 然後使用 Redirect 導回 Vue 的路由（這會變成 GET 請求，Angular 就能接收了）
-        return Content($"<script>window.location.href='{fronturl}/mall';</script>", "text/html");
+        // 使用 Redirect 導回 Vue 的路由（這會變成 GET 請求，Angular 就能接收了）
+        if (rtnCode == "1")
+        {
+            return Content(
+                $"<script>window.location.href='{fronturl}/user-centre/purchase-orders?orderNo={orderNo}&status=success';</script>",
+                "text/html"
+            );
+        }
+        else
+        {
+            return Content(
+                $"<script>window.location.href='{fronturl}/user-centre/purchase-orders?status=fail';</script>",
+                "text/html"
+            );
+        }
     }
 }

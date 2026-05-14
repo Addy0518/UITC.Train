@@ -21,7 +21,7 @@ public interface IProductsRateRepository
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>商品評價資訊</returns>
-    Task<IEnumerable<MallProductsRate>> GetProductRate(int productId);
+    Task<IEnumerable<RateResponse>> GetProductRate(int productId);
 
     /// <summary>
     /// 計算商品評分平均值

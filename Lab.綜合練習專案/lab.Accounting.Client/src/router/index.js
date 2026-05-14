@@ -152,6 +152,9 @@ const router = createRouter({
           },
           component: () => import('@/views/mall/shoppingCar.vue'),
         },
+        /*
+            商品區 ================================================================
+        */
         {
           /*
              商品詳細
@@ -162,6 +165,17 @@ const router = createRouter({
             isPermissionVerification: false,
           },
           component: () => import('@/views/product/productDetail.vue'),
+        },
+        {
+          /*
+             商品購買
+          */
+          path: 'product-bought/:id',
+          name: 'product-bought',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/product/productBought.vue'),
         },
         /*
             用戶區 ================================================================

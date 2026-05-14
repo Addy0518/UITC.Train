@@ -1,6 +1,6 @@
 <script setup>
 import { logoutApi } from '@/api/userService';
-
+import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義
    authStore : pinia 注入
@@ -20,6 +20,9 @@ const logout = async () => {
   router.push({ name: 'login' });
 };
 
+/*
+   載入頭貼
+*/
 const imgUrl = computed(() => {
   if (authStore.userHeadshot) {
     return `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;

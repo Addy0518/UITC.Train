@@ -1,19 +1,21 @@
 <script setup>
 import { getUserOrder } from '@/api//orderService';
+import { shippingEnum } from '@/common/enum';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-
 
 /*
    變數名稱代表意義
    allOrders : 所有訂單
    baseUrl : 環境變數裡的圖片基底位址
-   tableNow : 目前顯示的購買紀錄
+   tableNow : 顯示目前頁面狀態
    router : 控制路由
+   route : 抓取路由參數
 */
 const allOrders = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
-const tableNow = ref();
+const tableNow = ref(shippingEnum.PendingShipment.value);
 const router = useRouter();
+const route = useRoute();
 
 /*
    注入 Loading 跟 Toast
@@ -24,15 +26,32 @@ const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
 onMounted(() => {
-  getUserOneOrder();
+  getUserAllOrder();
+
+  // 交易成功跳轉回來接下來的動作
+  if (route.query.status === 'success' && route.query.orderNo) {
+    showToastSuccess('付款成功!');
+    tableNow.value = shippingEnum.PendingShipment.value;
+  }
+  // 失敗則回到代付款
+  if (route.query.status === 'fail') {
+    showToastError('付款失敗，請重新嘗試!');
+    tableNow.value = shippingEnum.PendingPayment.value;
+  }
 });
 
+/*
+   顯示目前頁面狀態
+*/
 const filtTable = computed(() => {
   if (!allOrders.value) return [];
   return allOrders.value.filter((order) => order.shippingStatus == tableNow.value);
 });
 
-const getUserOneOrder = async () => {
+/*
+  查看全部訂單
+*/
+const getUserAllOrder = async () => {
   try {
     showLoading();
     const res = await getUserOrder();

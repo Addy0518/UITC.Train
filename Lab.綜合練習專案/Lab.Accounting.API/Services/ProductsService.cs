@@ -20,11 +20,11 @@ public class ProductsService(
         {
             return ApiResponseHelper.NotFound<ProductsResponse>();
         }
-        var imgs = await productsImgRepository.GetProductsAllImg(productId);
-        target.ProductsImgs = imgs;
+        target.ProductsImgs = await productsImgRepository.GetProductsAllImg(productId);
 
-        var avgRating = await productsRateRepositories.CountAVGProductRate(productId);
-        target.ProductsRate = avgRating;
+        target.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(productId);
+
+        target.ProductsAllRates = await productsRateRepositories.GetProductRate(productId);
 
         return ApiResponseHelper.Success(target);
     }
@@ -54,7 +54,7 @@ public class ProductsService(
         // 開兩條執行緒同時查詢
         var tasks = products.Select(async product =>
         {
-            product.ProductsRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId);
+            product.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId);
             product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
         });
         await Task.WhenAll(tasks);
