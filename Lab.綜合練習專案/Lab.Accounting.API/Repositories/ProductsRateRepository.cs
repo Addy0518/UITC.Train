@@ -81,7 +81,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>評分平均值</returns>
-    public async Task<decimal> CountAVGProductRate(int productId)
+    public async Task<decimal?> CountAVGProductRate(int productId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -90,6 +90,6 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
                 FROM   mallproductsrate
                 WHERE  productsid = @productsId ";
 
-        return await conn.QuerySingleAsync<decimal>(sql, new { productsId = productId });
+        return await conn.QuerySingleAsync<decimal?>(sql, new { productsId = productId });
     }
 }

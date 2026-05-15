@@ -119,6 +119,16 @@ public class OrderService(
                     return ApiResponseHelper.NotFound<List<int>>();
                 }
 
+                if (Request.UserId == target.UserId)
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { "UserId", new[] { "賣家沒辦法購買自己的商品!" } },
+                    };
+
+                    return ApiResponseHelper.RequestError<List<int>>(errors);
+                }
+
                 if (target.ProductsStock < product.BoughtQuantity)
                 {
                     var errors = new Dictionary<string, string[]> { { "ProductsStock", new[] { "庫存不足!" } } };

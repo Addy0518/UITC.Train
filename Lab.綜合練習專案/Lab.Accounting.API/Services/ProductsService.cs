@@ -22,7 +22,7 @@ public class ProductsService(
         }
         target.ProductsImgs = await productsImgRepository.GetProductsAllImg(productId);
 
-        target.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(productId);
+        target.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(productId) ?? 0;
 
         target.ProductsAllRates = await productsRateRepositories.GetProductRate(productId);
 
@@ -54,7 +54,7 @@ public class ProductsService(
         // 開兩條執行緒同時查詢
         var tasks = products.Select(async product =>
         {
-            product.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId);
+            product.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId) ?? 0;
             product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
         });
         await Task.WhenAll(tasks);
@@ -98,15 +98,6 @@ public class ProductsService(
             var target = await productsRepositories.CreateProducts(product);
             if (target <= 0)
                 return ApiResponseHelper.InternalException<int>("商品新增失敗");
-            var Insertrate = new MallProductsRate
-            {
-                ProductsId = target,
-                UserId = productsInsertRequest.UserId,
-                Comment = null,
-                CreateTime = DateTime.UtcNow,
-                Rating = 3,
-            };
-            var rating = await productsRateRepositories.CreateProductRate(Insertrate);
 
             trxScope.Complete();
             return ApiResponseHelper.Success(target);

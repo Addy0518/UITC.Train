@@ -28,5 +28,5 @@ public interface IProductsRateRepository
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>評分平均值</returns>
-    Task<decimal> CountAVGProductRate(int productId);
+    Task<decimal?> CountAVGProductRate(int productId);
 }

@@ -171,8 +171,6 @@ const boughtProduct = async (id, boughtquantity) => {
             <span class="mt-3 me-5">評價時間 : {{ rate.createTime }}</span>
             <span class="mt-3 me-5">評分 : {{ rate.rating }}</span>
           </div>
-
-          \
         </div>
       </div>
     </div>

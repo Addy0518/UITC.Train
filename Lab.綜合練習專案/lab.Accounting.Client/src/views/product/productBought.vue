@@ -104,7 +104,8 @@ const userBuy = async () => {
       }
     }
     if (data.codeStatus === 4000) {
-      showToastError('庫存不足!');
+      const firstError = Object.values(data.error400)[0][0];
+      showToastError(firstError);
     }
   } catch (err) {
     console.log(err);
