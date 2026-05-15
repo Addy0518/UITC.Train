@@ -1,6 +1,5 @@
 <script setup>
 import { getAllProduct } from '@/api/productsService';
-import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
   變數名稱代表意義
@@ -91,22 +90,6 @@ const getProductsImg = (product) => {
   }
   return defaultImgurl;
 };
-
-/*
-  商品加入購物車
-*/
-const addProductsInCar = async (productId) => {
-  try {
-    var res = await addProductsInShoppingCar(productId);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      showToastSuccess('加入成功!');
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-  }
-};
 </script>
 
 <template>
@@ -157,12 +140,6 @@ const addProductsInCar = async (productId) => {
                     {{ cate }}
                   </span>
                 </RouterLink>
-                <button
-                  class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-                  @click="addProductsInCar(product.productsId)"
-                >
-                  加入購物車
-                </button>
               </div>
             </div>
           </div>

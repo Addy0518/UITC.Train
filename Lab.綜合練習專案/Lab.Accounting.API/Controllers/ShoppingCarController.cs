@@ -27,12 +27,16 @@ public class ShoppingCarController(IShoppingCarService shoppingCarService) : Con
     /// 新增單一商品到購物車
     /// </summary>
     /// <param name="productsId">商品 Id</param>
+    /// <param name="boughtquantity">購買數量</param>
     /// <returns>影響列數</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> AddProductsInShoppingCar(int productsId)
+    public async Task<IActionResult> AddProductsInShoppingCar(
+        [FromQuery] int productsId,
+        [FromQuery] int boughtquantity
+    )
     {
-        return Ok(await shoppingCarService.AddProductsInShoppingCar(productsId, CurrentUserId));
+        return Ok(await shoppingCarService.AddProductsInShoppingCar(productsId, CurrentUserId, boughtquantity));
     }
 
     /// <summary>

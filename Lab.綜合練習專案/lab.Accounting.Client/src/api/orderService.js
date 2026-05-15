@@ -6,6 +6,10 @@ import accountApiInstance from '@/api/accountInstance.js';
 export const userBuyProduct = (buyRequest) =>
   accountApiInstance.post(`Order/UserBuyProduct`, buyRequest);
 
+// 使用者重新付款
+export const userRetryBuyProduct = (ids) =>
+  accountApiInstance.post(`Order/GetRetryPaymentData`, ids);
+
 // 買家查看所有訂單
 export const getUserOrder = () => accountApiInstance.get(`Order/GetUserOrder`);
 

@@ -33,6 +33,11 @@ public class ProductsResponse
     public int ProductsStock { get; set; }
 
     /// <summary>
+    /// 購買數量
+    /// </summary>
+    public int BoughtQuantity { get; set; }
+
+    /// <summary>
     /// 商品總平均評分
     /// </summary>
     public decimal ProductsAVGRate { get; set; }

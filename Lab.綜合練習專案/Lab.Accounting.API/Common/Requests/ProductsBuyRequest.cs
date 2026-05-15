@@ -10,6 +10,30 @@ public class ProductsBuyRequest
     public int UserId { get; set; }
 
     /// <summary>
+    /// 所有購買的商品
+    /// </summary>
+    [Display(Name = "所有購買的商品")]
+    [Required(ErrorMessage = "{0} 必輸")]
+    public IEnumerable<ProductsItem> Products { get; set; }
+
+    /// <summary>
+    /// 運送地址
+    /// </summary>
+    [Display(Name = "運送地址")]
+    [Required(ErrorMessage = "{0} 必輸")]
+    public string ShippingAddress { get; set; }
+
+    /// <summary>
+    /// 購買時間
+    /// </summary>
+    [Display(Name = "購買時間")]
+    [Required(ErrorMessage = "{0} 必輸")]
+    public DateTime BoughtTime { get; set; }
+}
+
+public class ProductsItem
+{
+    /// <summary>
     /// 商品 ID
     /// </summary>
     [Display(Name = "商品 ID")]
@@ -22,18 +46,4 @@ public class ProductsBuyRequest
     [Display(Name = "購買數量")]
     [Required(ErrorMessage = "{0} 必輸")]
     public int BoughtQuantity { get; set; }
-
-    /// <summary>
-    /// 購買時間
-    /// </summary>
-    [Display(Name = "購買時間")]
-    [Required(ErrorMessage = "{0} 必輸")]
-    public DateTime BoughtTime { get; set; }
-
-    /// <summary>
-    /// 運送地址
-    /// </summary>
-    [Display(Name = "運送地址")]
-    [Required(ErrorMessage = "{0} 必輸")]
-    public string ShippingAddress { get; set; }
 }

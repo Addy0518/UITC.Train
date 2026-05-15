@@ -1,5 +1,6 @@
 <script setup>
 import { getProduct } from '@/api/productsService';
+import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義
@@ -9,6 +10,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    baseUrl : 環境變數裡的圖片基底位址
    authStore : pinia
    allRate : 所有評價
+   boughtQuantity : 購買數量
 */
 const route = useRoute();
 const router = useRouter();
@@ -16,7 +18,7 @@ const product = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
 const allRate = ref(null);
-
+const boughtQuantity = ref(1);
 /*
    注入 Loading 跟 Toast
 */
@@ -80,6 +82,30 @@ const imgUrl = computed(() => {
     return defaultImgurl;
   }
 });
+
+/*
+  商品加入購物車
+*/
+const addProductsInCar = async (productId, boughtquantity) => {
+  try {
+    var res = await addProductsInShoppingCar(productId, boughtquantity);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      showToastSuccess('加入成功!');
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+  }
+};
+
+/*
+  直接購買
+*/
+const boughtProduct = async (id, boughtquantity) => {
+  await addProductsInCar(id, boughtquantity);
+  router.push({ name: 'shopping-car' });
+};
 </script>
 
 <template>
@@ -95,6 +121,46 @@ const imgUrl = computed(() => {
           <span class="mt-3">商品評分 : {{ product.productsAVGRate }}</span>
           <span class="mt-3">商品庫存 : {{ product.productsStock }}</span>
           <span class="mt-3">商品擁有者 ID : {{ product.userId }}</span>
+          <!-- 購買數量 -->
+          <label>購買數量</label>
+          <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden w-fit">
+            <button
+              class="px-3 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              @click="boughtQuantity = Math.max(1, boughtQuantity - 1)"
+            >
+              −
+            </button>
+            <span class="px-4 py-2 text-sm select-none">{{ boughtQuantity }}</span>
+            <button
+              class="px-3 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer"
+              @click="boughtQuantity = Math.min(product.productsStock, boughtQuantity + 1)"
+            >
+              +
+            </button>
+          </div>
+
+          <span class="text-2xl">{{ product.productsStock > 0 ? '尚有庫存' : '已售罄' }}</span>
+          <div class="flex gap-2 mt-3">
+            <span
+              v-for="cat in productscategory(product.productCategoryName)"
+              :key="cat"
+              class="bg-gray-100 px-2 py-1 rounded text-sm"
+            >
+              {{ cat }}
+            </span>
+            <button
+              class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+              @click="addProductsInCar(product.productsId, boughtQuantity)"
+            >
+              加入購物車
+            </button>
+            <button
+              class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+              @click="boughtProduct(product.productsId, boughtQuantity)"
+            >
+              購買
+            </button>
+          </div>
           <div
             v-for="rate in allRate"
             class="hover:shadow-xl hover:bg-gray-50 h-20 flex flex-row ps-10 items-center"
@@ -106,21 +172,7 @@ const imgUrl = computed(() => {
             <span class="mt-3 me-5">評分 : {{ rate.rating }}</span>
           </div>
 
-          <div class="flex gap-2 mt-3">
-            <span
-              v-for="cat in productscategory(product.productCategoryName)"
-              :key="cat"
-              class="bg-gray-100 px-2 py-1 rounded text-sm"
-            >
-              {{ cat }}
-            </span>
-            <button
-              class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-              @click="router.push({ name: 'product-bought', params: { id: route.params.id } })"
-            >
-              購買
-            </button>
-          </div>
+          \
         </div>
       </div>
     </div>

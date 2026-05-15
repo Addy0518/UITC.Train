@@ -1,5 +1,5 @@
 <script setup>
-import { getUserOrder } from '@/api//orderService';
+import { getUserOrder, userRetryBuyProduct } from '@/api//orderService';
 import { shippingEnum } from '@/common/enum';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
@@ -10,13 +10,14 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    tableNow : 顯示目前頁面狀態
    router : 控制路由
    route : 抓取路由參數
+   selectProducts : 選擇的商品
 */
 const allOrders = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const tableNow = ref(shippingEnum.PendingShipment.value);
 const router = useRouter();
 const route = useRoute();
-
+const selectProducts = ref([]);
 /*
    注入 Loading 跟 Toast
 */
@@ -75,6 +76,44 @@ const getProductsImg = (product) => {
   }
   return defaultImgurl;
 };
+
+const retryPayment = async () => {
+  try {
+    showLoading();
+    const res = await userRetryBuyProduct(selectProducts.value);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      try {
+        const ecpayData = data.returnData.formData;
+        const actionUrl = data.returnData.actionUrl;
+
+        // 建立一個隱藏的 Form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = actionUrl;
+
+        // 將所有綠界參數塞入 input 中
+        for (const key in ecpayData) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = ecpayData[key];
+          form.appendChild(input);
+        }
+
+        // 把表單加到 body 並送出 (這就會觸發頁面跳轉)
+        document.body.appendChild(form);
+        form.submit();
+      } catch (error) {
+        console.error('購買失敗 :', error.response);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
 </script>
 
 <template>
@@ -112,12 +151,29 @@ const getProductsImg = (product) => {
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
             @click="router.push({ name: 'purchase-orders-details', params: { id: order.orderId } })"
           >
+            <div v-if="tableNow === shippingEnum.PendingPayment.value">
+              <input
+                type="checkbox"
+                v-model="selectProducts"
+                :value="order.orderId"
+                @click.stop
+                class="w-5 h-5 me-2"
+              />
+            </div>
             <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
             <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
             <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
             <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
             <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
           </div>
+        </div>
+        <div v-if="selectProducts.length > 0" class="flex justify-end mt-3">
+          <button
+            class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
+            @click="retryPayment"
+          >
+            重新付款
+          </button>
         </div>
       </div>
     </div>

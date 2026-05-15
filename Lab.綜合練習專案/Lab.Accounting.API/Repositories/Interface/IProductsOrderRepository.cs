@@ -19,11 +19,11 @@ public interface IProductsOrderRepository
     Task<OrderResponse> GetSellerOneOrder(int orderId, int userId);
 
     /// <summary>
-    /// 查看單一訂單 ( 訂單編號查詢 )
+    /// 查看買家所有訂單 ( 訂單編號查詢 )
     /// </summary>
     /// <param name="orderNumber">訂單編號</param>
-    /// <returns>訂單資訊</returns>
-    Task<MallOrder> GetOrderByOrderNumber(string orderNumber);
+    /// <returns>多筆訂單資訊</returns>
+    Task<IEnumerable<MallOrder>> GetOrderByOrderNumber(string orderNumber);
 
     /// <summary>
     /// 買家查看所有訂單
@@ -58,15 +58,16 @@ public interface IProductsOrderRepository
     /// </summary>
     /// <param name="orderNumber">訂單編號</param>
     /// <param name="shippingStatus">運送狀態</param>
-    /// <param name="accountPrice">最終金額</param>
     /// <param name="paidType">付款方式</param>
     /// <param name="paidTime">付款時間</param>
     /// <returns>影響列數</returns>
-    Task<int> PaidProducts(
-        string orderNumber,
-        int shippingStatus,
-        decimal accountPrice,
-        string paidType,
-        DateTime paidTime
-    );
+    Task<int> PaidProducts(string orderNumber, int shippingStatus, string paidType, DateTime paidTime);
+
+    /// <summary>
+    /// 商品重新付款
+    /// </summary>
+    /// <param name="orderIds">所有訂單 ID</param>
+    /// <param name="newOrderNumber">新訂單編號</param>
+    /// <returns>訂單 ID</returns>
+    Task<int> RetryPaidProducts(List<int> orderIds, string newOrderNumber);
 }

@@ -14,8 +14,9 @@ public interface IShoppingCarService
     /// </summary>
     /// <param name="productsId">商品 Id</param>
     /// <param name="userId">使用者 Id</param>
+    /// <param name="boughtquantity">購買數量</param>
     /// <returns>影響列數</returns>
-    Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId);
+    Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId, int boughtquantity);
 
     /// <summary>
     /// 刪除單一商品從購物車

@@ -170,7 +170,7 @@ const router = createRouter({
           /*
              商品購買
           */
-          path: 'product-bought/:id',
+          path: 'product-bought',
           name: 'product-bought',
           meta: {
             isPermissionVerification: true,

@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Services;
+﻿using Org.BouncyCastle.Asn1.X509;
+
+namespace Lab.Accounting.API.Services;
 
 public class OrderService(
     IProductsRepository productsRepositories,
@@ -98,70 +100,83 @@ public class OrderService(
     /// 使用者購買商品並跳轉綠界界面
     /// </summary>
     /// <param name="Request">商品購買資訊 </param>
-    /// <returns>訂單 ID</returns>
-    public async Task<ApiResponse<int>> UserBuyProduct(ProductsBuyRequest Request)
+    /// <returns>多筆訂單 ID</returns>
+    public async Task<ApiResponse<List<int>>> UserBuyProduct(ProductsBuyRequest Request)
     {
+        List<int> orderIds = new List<int>();
+        //Guid是系統生成的"全球唯一識別碼",幾乎不會重複(像這樣=>550e8400-e29b-41d4-a716-446655440000)
+        //但因為Guid生成時中間會有"-"這種符號,而綠界的訂單編號不允許一些特殊符號,所以轉成字串後replace把它拿掉
+        //Substring切除剛剛的Guid碼,因為Guid字元會有32碼,太長了,所以只取前11碼
+        string merchantTradeNo = "GN" + Guid.NewGuid().ToString().Replace("-", "").Substring(0, 11);
         using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            var target = await productsRepositories.GetProducts(Request.ProductsId);
-
-            if (target == null)
+            foreach (var product in Request.Products)
             {
-                return ApiResponseHelper.NotFound<int>();
+                var target = await productsRepositories.GetProducts(product.ProductsId);
+
+                if (target == null)
+                {
+                    return ApiResponseHelper.NotFound<List<int>>();
+                }
+
+                if (target.ProductsStock < product.BoughtQuantity)
+                {
+                    var errors = new Dictionary<string, string[]> { { "ProductsStock", new[] { "庫存不足!" } } };
+
+                    return ApiResponseHelper.RequestError<List<int>>(errors);
+                }
+
+                var countStock = target.ProductsStock - product.BoughtQuantity;
+                var stock = await productsRepositories.SetStock(product.ProductsId, countStock);
+
+                if (stock <= 0)
+                    return ApiResponseHelper.InternalException<List<int>>("庫存更新失敗");
+
+                var buytarget = new MallOrder
+                {
+                    OrderNumber = merchantTradeNo,
+                    UserId = Request.UserId,
+                    ProductsId = product.ProductsId,
+                    BoughtQuantity = product.BoughtQuantity,
+                    UnitPrice = target.ProductsPrice,
+                    AccountPrice = target.ProductsPrice * product.BoughtQuantity,
+                    BoughtTime = DateTime.Now,
+                    ShippingAddress = Request.ShippingAddress,
+                    ShippingStatus = (int)ShippingStatusEnum.PendingPayment,
+                };
+                var order = await productsBuyRepositories.BuyProducts(buytarget);
+                orderIds.Add(order);
             }
 
-            if (target.ProductsStock < Request.BoughtQuantity)
-            {
-                var errors = new Dictionary<string, string[]> { { "ProductsStock", new[] { "庫存不足!" } } };
-
-                return ApiResponseHelper.RequestError<int>(errors);
-            }
-
-            //Guid是系統生成的"全球唯一識別碼",幾乎不會重複(像這樣=>550e8400-e29b-41d4-a716-446655440000)
-            //但因為Guid生成時中間會有"-"這種符號,而綠界的訂單編號不允許一些特殊符號,所以轉成字串後replace把它拿掉
-            //Substring切除剛剛的Guid碼,因為Guid字元會有32碼,太長了,所以只取前11碼
-            string merchantTradeNo = "GN" + Guid.NewGuid().ToString().Replace("-", "").Substring(0, 11);
-
-            var countStock = target.ProductsStock - Request.BoughtQuantity;
-            var stock = await productsRepositories.SetStock(Request.ProductsId, countStock);
-
-            if (stock <= 0)
-                return ApiResponseHelper.InternalException<int>("庫存更新失敗");
-
-            var buytarget = new MallOrder
-            {
-                OrderNumber = merchantTradeNo,
-                UserId = Request.UserId,
-                ProductsId = Request.ProductsId,
-                BoughtQuantity = Request.BoughtQuantity,
-                UnitPrice = target.ProductsPrice,
-                AccountPrice = target.ProductsPrice * Request.BoughtQuantity,
-                BoughtTime = DateTime.Now,
-                ShippingAddress = Request.ShippingAddress,
-                ShippingStatus = (int)ShippingStatusEnum.PendingPayment,
-            };
-            var order = await productsBuyRepositories.BuyProducts(buytarget);
             trxScope.Complete();
-            return ApiResponseHelper.Success(order);
+            return ApiResponseHelper.Success(orderIds);
         }
     }
 
     /// <summary>
     /// 綠界訂單創建(新增)
     /// </summary>
-    /// <param name="orderId">商品購買資訊 </param>
+    /// <param name="orderId">多筆訂單 ID </param>
+    /// <param name="userId">使用者 ID </param>
     /// <param name="tunnelUrl">開發者通道網址</param>
     /// <returns>跳轉綠界訂單</returns>
-    public async Task<ApiResponse<GreenPayResponse>> GetPaymentData(int orderId, int userId, string tunnelUrl)
+    public async Task<ApiResponse<GreenPayResponse>> GetPaymentData(List<int> orderId, int userId, string tunnelUrl)
     {
-        var target = await productsBuyRepositories.GetUserOneOrder(orderId, userId);
-
-        if (target == null)
+        // 所有訂單加總的金額
+        decimal totalAmount = 0;
+        OrderResponse target = new OrderResponse();
+        foreach (int Id in orderId)
         {
-            return ApiResponseHelper.NotFound<GreenPayResponse>();
+            target = await productsBuyRepositories.GetUserOneOrder(Id, userId);
+
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<GreenPayResponse>();
+            }
+
+            totalAmount += target.UnitPrice * target.BoughtQuantity;
         }
 
-        decimal totalAmount = target.UnitPrice * target.BoughtQuantity;
         var ecpay = new Dictionary<string, string>
         {
             { "MerchantID", "3002607" }, //這是測試用的商店編號,固定的
@@ -238,41 +253,40 @@ public class OrderService(
 
             //訂單成立之後,開始更新資料庫
             var orderNo = collection["MerchantTradeNo"].ToString();
+
             var buyProduct = await productsBuyRepositories.GetOrderByOrderNumber(orderNo);
             if (buyProduct == null)
             {
-                return "0|OrderNotFound_CheckDB"; // 如果回傳這個，代表你傳給 Postman 的編號在資料庫找不到
+                return "0|OrderNotFound_CheckDB";
             }
-            if (buyProduct != null)
+
+            string tradeAmt = collection["TradeAmt"].ToString();
+
+            if (!decimal.TryParse(tradeAmt, out decimal totalPrice))
+                return "0|InvalidTradeAmt";
+
+            var totalAmount = buyProduct.Sum(o => o.UnitPrice * o.BoughtQuantity);
+
+            if (totalPrice != totalAmount)
+                //金額不符,可能是資料被竄改了,不處理這筆訂單
+                return "0|InvalidAmount";
+
+            DateTime.TryParse(collection["PaymentDate"], out DateTime paidTime);
+            if (paidTime == DateTime.MinValue)
             {
-                string tradeAmt = collection["TradeAmt"].ToString();
-
-                if (!decimal.TryParse(tradeAmt, out decimal totalPrice))
-                    return "0|InvalidTradeAmt";
-
-                var totalAmount = buyProduct.UnitPrice * buyProduct.BoughtQuantity;
-
-                if (totalPrice != totalAmount)
-                    //金額不符,可能是資料被竄改了,不處理這筆訂單
-                    return "0|InvalidAmount";
-
-                DateTime.TryParse(collection["PaymentDate"], out DateTime paidTime);
-                if (paidTime == DateTime.MinValue)
-                {
-                    paidTime = DateTime.Now; // 如果解析不到時間，就用系統現在時間
-                }
-                var paymentCompleted = await productsBuyRepositories.PaidProducts(
-                    orderNo,
-                    (int)ShippingStatusEnum.PendingShipment,
-                    totalPrice,
-                    collection["PaymentType"].ToString(),
-                    paidTime
-                );
-                if (paymentCompleted <= 0)
-                {
-                    return "0|DBUpdateFailed";
-                }
+                paidTime = DateTime.Now; // 如果解析不到時間，就用系統現在時間
             }
+            var paymentCompleted = await productsBuyRepositories.PaidProducts(
+                orderNo,
+                (int)ShippingStatusEnum.PendingShipment,
+                collection["PaymentType"].ToString(),
+                paidTime
+            );
+            if (paymentCompleted <= 0)
+            {
+                return "0|DBUpdateFailed";
+            }
+
             //因為綠界規定交易成功要回傳1跟ok
 
             return "1|OK";
@@ -282,5 +296,69 @@ public class OrderService(
             //驗證失敗..丟掉
             return "0|CheckMacValueVerifyFail";
         }
+    }
+
+    /// <summary>
+    /// 綠界訂單創建( 重新付款 )
+    /// </summary>
+    /// <param name="orderIds">多筆訂單 ID </param>
+    /// <param name="userId">使用者 ID </param>
+    /// <param name="tunnelUrl">開發者通道網址</param>
+    /// <returns>跳轉綠界訂單</returns>
+    public async Task<ApiResponse<GreenPayResponse>> GetRetryPaymentData(
+        List<int> orderIds,
+        int userId,
+        string tunnelUrl
+    )
+    {
+        // 重新付款的話就重新生一個訂單編號
+        string merchantTradeNo = "GN" + Guid.NewGuid().ToString().Replace("-", "").Substring(0, 11);
+
+        // 所有訂單加總的金額
+        decimal totalAmount = 0;
+        foreach (int Id in orderIds)
+        {
+            var target = await productsBuyRepositories.GetUserOneOrder(Id, userId);
+
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<GreenPayResponse>();
+            }
+
+            if (target.ShippingStatus != (int)ShippingStatusEnum.PendingPayment)
+            {
+                var errors = new Dictionary<string, string[]> { { "ShippingStatus", new[] { "這筆訂單已付款完成!" } } };
+
+                return ApiResponseHelper.RequestError<GreenPayResponse>(errors);
+            }
+
+            totalAmount += target.UnitPrice * target.BoughtQuantity;
+        }
+        // 重新生成編號
+        await productsBuyRepositories.RetryPaidProducts(orderIds, merchantTradeNo);
+        // 接下來就跟原本付款邏輯一樣
+        var ecpay = new Dictionary<string, string>
+        {
+            { "MerchantID", "3002607" }, //這是測試用的商店編號,固定的
+            { "MerchantTradeNo", merchantTradeNo },
+            { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
+            { "PaymentType", "aio" },
+            { "TotalAmount", totalAmount.ToString() },
+            { "TradeDesc", "商品購買" },
+            { "ItemName", "商品名稱" },
+            { "ReturnURL", $"{tunnelUrl}/api/Order/EcPayBack" },
+            { "OrderResultURL", $"{tunnelUrl}/api/Order/PaymentCallback" },
+            { "ChoosePayment", "ALL" },
+            { "EncryptType", "1" },
+        };
+        ecpay["CheckMacValue"] = ECPayHelper.GetCheckMacValue(ecpay);
+
+        var result = new GreenPayResponse
+        {
+            FormData = ecpay,
+            ActionUrl = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5",
+        };
+
+        return ApiResponseHelper.Success(result);
     }
 }

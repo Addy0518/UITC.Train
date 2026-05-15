@@ -31,14 +31,21 @@ public class ShoppingCarService(
     /// </summary>
     /// <param name="productsId">商品 Id</param>
     /// <param name="userId">使用者 Id</param>
+    /// <param name="boughtquantity">購買數量</param>
     /// <returns>影響列數</returns>
-    public async Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId)
+    public async Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId, int boughtquantity)
     {
+        if (boughtquantity <= 0)
+        {
+            var errors = new Dictionary<string, string[]> { { "BoughtQuantity", new[] { "請輸入購買數量!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
         var product = await productsRepositories.GetProducts(productsId);
         if (product == null)
             return ApiResponseHelper.NotFound<int>();
 
-        var target = await productsShoppingCarRepositories.AddProductsInShoppingCar(productsId, userId);
+        var target = await productsShoppingCarRepositories.AddProductsInShoppingCar(productsId, userId, boughtquantity);
         if (target == 0)
             return ApiResponseHelper.InternalException<int>("加入購物車失敗，請稍後再試");
         return ApiResponseHelper.Success(target);

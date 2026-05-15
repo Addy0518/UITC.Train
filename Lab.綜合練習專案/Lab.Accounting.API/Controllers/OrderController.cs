@@ -105,7 +105,7 @@ public class OrderController(IOrderService orderService, IConfiguration config) 
             return Ok(target); // 直接回傳錯誤結果
         }
 
-        int orderId = target.ReturnData;
+        List<int> orderId = target.ReturnData;
 
         var payment = await orderService.GetPaymentData(orderId, CurrentUserId, tuuneUrl);
         return Ok(payment);
@@ -157,5 +157,19 @@ public class OrderController(IOrderService orderService, IConfiguration config) 
                 "text/html"
             );
         }
+    }
+
+    /// <summary>
+    /// 綠界訂單創建( 重新付款 )
+    /// </summary>
+    /// <param name="orderIds">多筆訂單 ID </param>
+    /// <returns>跳轉綠界訂單</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<GreenPayResponse>))]
+    public async Task<IActionResult> GetRetryPaymentData([FromBody] List<int> orderIds)
+    {
+        var result = await orderService.GetRetryPaymentData(orderIds, CurrentUserId, tuuneUrl);
+
+        return Ok(result);
     }
 }

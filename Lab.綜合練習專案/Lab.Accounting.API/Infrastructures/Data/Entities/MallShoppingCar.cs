@@ -16,4 +16,9 @@ public class MallShoppingCar
     /// 商品 ID
     /// </summary>
     public int ProductsId { get; set; }
+
+    /// <summary>
+    /// 購買數量
+    /// </summary>
+    public int BoughtQuantity { get; set; }
 }

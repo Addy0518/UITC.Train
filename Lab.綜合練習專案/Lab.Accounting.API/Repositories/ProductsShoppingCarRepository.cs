@@ -17,6 +17,8 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
                                  m.productsname,
                                  m.productsprice,
                                  m.ProductCategoryId,
+                                 m.ProductsStock,
+                                 s.boughtquantity,
                                  STRING_AGG(c.productcategoryname, ',') as Productcategoryname
                         FROM     mallproducts m
                         JOIN     mallproductcategory c
@@ -29,7 +31,9 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
                                m.userid,
                                m.productsname,
                                m.ProductCategoryId,
-                               m.productsprice";
+                               m.productsprice,
+                               m.ProductsStock,   
+                               s.boughtquantity";
 
         return await conn.QueryAsync<ProductsResponse>(sql, new { UserId = userId });
     }
@@ -39,25 +43,35 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
     /// </summary>
     /// <param name="productsId">商品 Id</param>
     /// <param name="userId">使用者 Id</param>
+    /// <param name="boughtquantity">購買數量</param>
     /// <returns>影響列數</returns>
-    public async Task<int> AddProductsInShoppingCar(int productsId, int userId)
+    public async Task<int> AddProductsInShoppingCar(int productsId, int userId, int boughtquantity)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"INSERT INTO mallshoppingcar
-                            (userid,
-                                productsid)
-                SELECT @userid,@productsid
-                        
-                WHERE  NOT EXISTS (SELECT 1
-                                    FROM   mallshoppingcar
-                                    WHERE  productsid = @productsid
-                                            AND userid = @userid)
+            @"IF EXISTS (
+                    SELECT 1 FROM mallshoppingcar
+                    WHERE productsid = @productsid AND userid = @userid
+                )
+                    UPDATE mallshoppingcar
+                    SET boughtquantity = boughtquantity + @boughtquantity
+                    WHERE productsid = @productsid AND userid = @userid
+                ELSE
+                    INSERT INTO mallshoppingcar (userid, productsid, boughtquantity)
+                    VALUES (@userid, @productsid, @boughtquantity)
 
-                SELECT Cast(@@RowCount AS INT) ;";
+                SELECT CAST(@@ROWCOUNT AS INT)";
 
-        return await conn.QuerySingleAsync<int>(sql, new { UserId = userId, ProductsId = productsId });
+        return await conn.QuerySingleAsync<int>(
+            sql,
+            new
+            {
+                UserId = userId,
+                ProductsId = productsId,
+                boughtquantity = boughtquantity,
+            }
+        );
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 /*
-   定義 pinia 的設定
+   定義 pinia 的權限設定
 */
 export const useAuthStore = defineStore(
   'auth',

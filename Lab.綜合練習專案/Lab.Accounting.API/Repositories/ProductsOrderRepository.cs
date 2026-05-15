@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories;
+﻿using System.Diagnostics.Eventing.Reader;
+
+namespace Lab.Accounting.API.Repositories;
 
 public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRepository
 {
@@ -55,11 +57,11 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     }
 
     /// <summary>
-    /// 查看單一訂單 ( 訂單編號查詢 )
+    /// 查看買家所有訂單 ( 訂單編號查詢 )
     /// </summary>
     /// <param name="orderNumber">訂單編號</param>
-    /// <returns>訂單資訊</returns>
-    public async Task<MallOrder> GetOrderByOrderNumber(string orderNumber)
+    /// <returns>多筆訂單資訊</returns>
+    public async Task<IEnumerable<MallOrder>> GetOrderByOrderNumber(string orderNumber)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -68,7 +70,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                   Where OrderNumber = @OrderNumber
                  ";
 
-        return await conn.QueryFirstOrDefaultAsync<MallOrder>(addBoughtProductsql, new { OrderNumber = orderNumber });
+        return await conn.QueryAsync<MallOrder>(addBoughtProductsql, new { OrderNumber = orderNumber });
     }
 
     /// <summary>
@@ -176,24 +178,16 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     /// </summary>
     /// <param name="orderNumber">訂單編號</param>
     /// <param name="shippingStatus">運送狀態</param>
-    /// <param name="accountPrice">最終金額</param>
     /// <param name="paidType">付款方式</param>
     /// <param name="paidTime">付款時間</param>
     /// <returns>影響列數</returns>
-    public async Task<int> PaidProducts(
-        string orderNumber,
-        int shippingStatus,
-        decimal accountPrice,
-        string paidType,
-        DateTime paidTime
-    )
+    public async Task<int> PaidProducts(string orderNumber, int shippingStatus, string paidType, DateTime paidTime)
     {
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
             @"Update MallOrder
                   Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus),
-                      AccountPrice = COALESCE(@AccountPrice, AccountPrice),
                       PaidType = COALESCE(@PaidType, PaidType),
                       PaidTime = COALESCE(@PaidTime, PaidTime)
                   Where OrderNumber = @OrderNumber";
@@ -204,10 +198,31 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
             {
                 OrderNumber = orderNumber,
                 ShippingStatus = shippingStatus,
-                AccountPrice = accountPrice,
                 PaidType = paidType,
                 PaidTime = paidTime,
             }
+        );
+    }
+
+    /// <summary>
+    /// 商品重新付款
+    /// </summary>
+    /// <param name="orderIds">所有訂單 ID</param>
+    /// <param name="newOrderNumber">新訂單編號</param>
+    /// <returns>訂單 ID</returns>
+    public async Task<int> RetryPaidProducts(List<int> orderIds, string newOrderNumber)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        // 更新所有 ID 的訂單編號
+        var addBoughtProductsql =
+            @"Update MallOrder
+                  Set OrderNumber =@NewOrderNumber
+                  Where OrderId in @OrderIds";
+
+        return await conn.ExecuteAsync(
+            addBoughtProductsql,
+            new { NewOrderNumber = newOrderNumber, OrderIds = orderIds }
         );
     }
 }

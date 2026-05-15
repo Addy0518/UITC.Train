@@ -2,21 +2,23 @@
 import { getProduct } from '@/api/productsService';
 import { userBuyProduct } from '@/api//orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import { computed } from 'vue';
 /*
    變數名稱代表意義
-   route : 獲取路由資訊
+   router : 改變路由
    product : 商品資訊
    baseUrl : 環境變數裡的圖片基底位址
    authStore : pinia
    boughtQuantity : 購買數量
    address : 地址
 */
-const route = useRoute();
-const product = ref(null);
+const router = useRouter();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
-const boughtQuantity = ref();
 const address = ref();
+const orderStore = useOrderStore();
+
+const items = orderStore.selectedItems;
 /*
    注入 Loading 跟 Toast
 */
@@ -37,41 +39,21 @@ const rules = computed(() => ({
 const v$ = useVuelidate(rules, { address }, { $autoDirty: true, $lazy: true, $scope: false });
 
 /*
-   查看商品細節資訊
-*/
-const getProductDetail = async (id) => {
-  try {
-    showLoading();
-    var res = await getProduct(id);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      product.value = data.returnData;
-    } else {
-      router.push({ name: 'products' });
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-    hideLoading();
-  }
-};
-
-/*
-   初始化時從 url 拿取 商品 ID
-*/
-onMounted(() => {
-  getProductDetail(route.params.id);
-});
-
-/*
   讀取商品的第一張圖片 , 判斷是否有圖片沒有就回傳預設
 */
-const productImg = computed(() => {
-  const imgs = product.value?.productsImgs;
+const getProductImg = (item) => {
+  const imgs = item.productsImgs;
   if (imgs && imgs.length > 0 && imgs[0].productsImg) {
     return `${baseUrl}/ProductsImg/${imgs[0].productsImg}`;
   }
   return defaultImgurl;
+};
+
+/*
+  計算總金額
+*/
+const totalPrice = computed(() => {
+  return (items ?? []).reduce((sum, item) => sum + item.productsPrice * item.boughtQuantity, 0);
 });
 
 /*
@@ -82,10 +64,12 @@ const userBuy = async () => {
   if (!isFormCorrect) return;
 
   const bought = {
-    productsId: Number(route.params.id),
-    boughtQuantity: boughtQuantity.value,
+    products: items.map((item) => ({
+      productsId: item.productsId,
+      boughtQuantity: item.boughtQuantity,
+    })),
     shippingAddress: authStore.userAddress ?? address.value,
-    createTime: new Date().toLocaleDateString('en-CA'),
+    boughtTime: new Date().toLocaleDateString('en-CA'),
   };
 
   try {
@@ -131,31 +115,42 @@ const userBuy = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full items-center mt-20" v-if="product">
+  <div class="flex flex-col w-full items-center mt-20" v-if="items">
     <!-- 正在購買的商品資訊 -->
-    <div class="w-150 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
       <h2 class="text-base font-bold mb-4 text-gray-700">正在購買</h2>
-      <div class="flex flex-row gap-5 items-center">
-        <img
-          :src="productImg"
-          alt="商品圖片"
-          class="w-24 h-24 object-cover rounded-md border border-gray-100"
-        />
-        <div class="flex flex-col gap-2">
-          <span class="font-semibold text-base">{{ product.productsName }}</span>
-          <span class="text-gray-500 text-sm">單價：NT$ {{ product.productsPrice }}</span>
-          <span class="text-gray-500 text-sm">剩餘庫存：{{ product.productsStock }}</span>
+      <div
+        v-for="item in items"
+        :key="item.productsId"
+        class="w-full rounded-lg shadow-sm border border-gray-200 p-6 mb-4"
+      >
+        <div class="flex flex-row gap-5 items-center">
+          <img
+            :src="getProductImg(item)"
+            alt="商品圖片"
+            class="w-24 h-24 object-cover rounded-md border border-gray-100"
+          />
+          <div class="flex flex-col gap-2">
+            <span class="font-semibold text-base">{{ item.productsName }}</span>
+            <span class="text-gray-500 text-sm">單價：NT$ {{ item.productsPrice }}</span>
+          </div>
+        </div>
+
+        <!-- 小計 -->
+        <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+          <span class="font-bold text-lg">
+            小計 NT$ {{ (item.productsPrice * item.boughtQuantity).toLocaleString() }}
+          </span>
         </div>
       </div>
     </div>
-
     <!-- 購買資訊填寫 -->
-    <div class="w-150 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-5">
+    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-5">
       <h2 class="text-base font-bold text-gray-700">填寫購買資訊</h2>
 
       <!-- 收件地址（從 authStore 拿） -->
       <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-500 mb-3">收件地址</label>
+        <label class="text-sm mb-3">收件地址</label>
         <div v-if="authStore.userAddress">
           <InputText
             v-model="authStore.userAddress"
@@ -171,28 +166,7 @@ const userBuy = async () => {
           <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
         </div>
       </div>
-
-      <!-- 購買數量 -->
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-500">購買數量</label>
-        <InputGroup>
-          <InputNumber
-            v-model="boughtQuantity"
-            placeholder="請輸入數量"
-            :min="1"
-            :max="product.productsStock"
-          />
-        </InputGroup>
-      </div>
-
-      <!-- 小計 -->
-      <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-        <span class="text-sm text-gray-500">小計</span>
-        <span class="font-bold text-lg">
-          NT$ {{ (product.productsPrice * (boughtQuantity ?? 0)).toLocaleString() }}
-        </span>
-      </div>
-
+      <span>總金額 : {{ totalPrice.toLocaleString() }}</span>
       <!-- 按鈕 -->
       <div class="flex gap-3">
         <button
@@ -203,7 +177,7 @@ const userBuy = async () => {
         </button>
         <button
           class="flex-1 bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-          @click="userBuy()"
+          @click="userBuy"
         >
           前往付款
         </button>
