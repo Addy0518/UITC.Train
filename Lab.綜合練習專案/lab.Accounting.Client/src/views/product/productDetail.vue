@@ -2,6 +2,7 @@
 import { getProduct } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
+
 /*
    變數名稱代表意義
    route : 獲取路由資訊
@@ -93,6 +94,9 @@ const addProductsInCar = async (productId, boughtquantity) => {
     if (data.codeStatus === 2000) {
       showToastSuccess('加入成功!');
     }
+    if (data.codeStatus === 4000) {
+      showToastError(getError400Message(data.error400));
+    }
   } catch (err) {
     console.log(err);
   } finally {
@@ -168,7 +172,7 @@ const boughtProduct = async (id, boughtquantity) => {
             <img :src="imgUrl" alt="頭貼" class="w-10 h-10 rounded-full object-cover me-5" />
             <span class="mt-3 me-5">評價者名稱 : {{ rate.userName }}</span>
             <span class="mt-3 me-5">評論 : {{ rate.comment }}</span>
-            <span class="mt-3 me-5">評價時間 : {{ rate.createTime }}</span>
+            <span class="mt-3 me-5">評價時間 : {{ formatDateTimeString(rate.createTime) }}</span>
             <span class="mt-3 me-5">評分 : {{ rate.rating }}</span>
           </div>
         </div>

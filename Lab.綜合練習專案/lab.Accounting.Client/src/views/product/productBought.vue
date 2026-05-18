@@ -1,8 +1,7 @@
 <script setup>
-import { getProduct } from '@/api/productsService';
 import { userBuyProduct } from '@/api//orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { computed } from 'vue';
+
 /*
    變數名稱代表意義
    router : 改變路由
@@ -29,7 +28,8 @@ const showToastError = inject('showToastError');
 
 // 加入已經寫好的驗證規則
 const rules = computed(() => ({
-  address: { required, maxLength: maxLength(200) },
+  // authstore 有的情況就不驗證
+  address: authStore.userAddress ? {} : { required, maxLength: maxLength(200) },
 }));
 
 // 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
@@ -57,7 +57,7 @@ const totalPrice = computed(() => {
 });
 
 /*
-  使用者購買跟評分
+  使用者購買
 */
 const userBuy = async () => {
   const isFormCorrect = await v$.value.$validate();
@@ -104,8 +104,7 @@ const userBuy = async () => {
       }
     }
     if (data.codeStatus === 4000) {
-      const firstError = Object.values(data.error400)[0][0];
-      showToastError(firstError);
+      showToastError(getError400Message(data.error400));
     }
   } catch (err) {
     console.log(err);

@@ -1,9 +1,14 @@
-﻿namespace Lab.Accounting.API.Services;
+﻿using Org.BouncyCastle.Asn1.X509;
+
+namespace Lab.Accounting.API.Services;
 
 public class ProductsService(
     IProductsRepository productsRepositories,
     IProductsImgRepository productsImgRepository,
     IProductsRateRepository productsRateRepositories,
+    IUserRepository userRepository,
+    IProductsOrderRepository productsOrderRepository,
+    IProductsRepository productsRepository,
     IWebHostEnvironment env
 ) : IProductsService
 {
@@ -229,6 +234,55 @@ public class ProductsService(
             return ApiResponseHelper.NotFound<MallProductImg>();
         }
         FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", result.ProductsImg);
+        return ApiResponseHelper.Success(result);
+    }
+
+    /// <summary>
+    /// 新增單一商品評價
+    /// </summary>
+    /// <param name="request">商品評價資訊</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<int>> CreateProductRate(ProductsRateRequest request)
+    {
+        var order = await productsOrderRepository.GetUserOneOrder(request.OrderId, request.UserId);
+        if (order == null)
+            return ApiResponseHelper.NotFound<int>();
+
+        if (order.ShippingStatus != ShippingStatusEnum.Arrived)
+        {
+            var errors = new Dictionary<string, string[]> { { "ShippingStatus", new[] { "商品尚未送達,無法評價!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+
+        var existRate = await productsRateRepositories.GetOrderRate(order.OrderId);
+
+        if (existRate != null)
+        {
+            var errors = new Dictionary<string, string[]> { { "OrderId", new[] { "這筆訂單已經評價過了!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+
+        var product = await productsRepository.GetProducts(request.ProductsId);
+        if (product.UserId == request.UserId)
+        {
+            var errors = new Dictionary<string, string[]> { { "UserId", new[] { "賣家無法評價自己的商品!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+
+        var rate = new MallProductsRate
+        {
+            UserId = request.UserId,
+            ProductsId = request.ProductsId,
+            OrderId = request.OrderId,
+            Rating = request.Rating,
+            Comment = request.Comment,
+            CreateTime = DateTime.Now,
+        };
+
+        var result = await productsRateRepositories.CreateProductRate(rate);
         return ApiResponseHelper.Success(result);
     }
 }

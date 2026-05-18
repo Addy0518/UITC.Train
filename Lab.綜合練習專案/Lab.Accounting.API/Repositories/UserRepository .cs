@@ -88,7 +88,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserAccount,UserId,UserName,UserHeadShot,UserPhone,UserBirthDate,UserGender,UserAddress From [User]
+            @"Select UserAccount,UserId,UserName,UserHeadShot,UserPhone,UserBirthDate,UserGender,UserAddress,UserRole From [User]
                 where 
                   UserId = @UserId";
 

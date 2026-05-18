@@ -75,4 +75,11 @@ public interface IProductsService
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>刪除的圖片</returns>
     Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId);
+
+    /// <summary>
+    /// 新增單一商品評價
+    /// </summary>
+    /// <param name="request">商品評價資訊</param>
+    /// <returns>影響列數</returns>
+    Task<ApiResponse<int>> CreateProductRate(ProductsRateRequest request);
 }

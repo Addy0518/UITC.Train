@@ -151,4 +151,17 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     {
         return Ok(await productsService.DeleteProductsImg(productsImgId));
     }
+
+    /// <summary>
+    /// 新增單一商品評價
+    /// </summary>
+    /// <param name="request">商品評價資訊</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> CreateProductRate([FromBody] ProductsRateRequest request)
+    {
+        request.UserId = CurrentUserId;
+        return Ok(await productsService.CreateProductRate(request));
+    }
 }

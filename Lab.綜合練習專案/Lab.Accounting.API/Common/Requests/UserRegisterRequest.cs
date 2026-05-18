@@ -33,6 +33,7 @@ public class UserRegisterRequest
     /// 使用者電話
     /// </summary>
     [Display(Name = "使用者電話")]
+    [RegularExpression(@"^09\d{8}$", ErrorMessage = "請符合手機號碼格式 0912345678")]
     public string? UserPhone { get; set; }
 
     /// <summary>

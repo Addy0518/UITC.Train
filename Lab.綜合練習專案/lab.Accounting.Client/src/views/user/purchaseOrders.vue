@@ -165,6 +165,15 @@ const retryPayment = async () => {
             <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
             <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
             <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
+            <div v-if="tableNow === shippingEnum.Arrived.value">
+               <!-- 用 click.stop 防止冒泡 -->
+              <button
+                class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
+                @click.stop="router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })"
+              >
+                去評價
+              </button>
+            </div>
           </div>
         </div>
         <div v-if="selectProducts.length > 0" class="flex justify-end mt-3">

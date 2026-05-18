@@ -2,7 +2,6 @@
 import { getSellerOrder } from '@/api//orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
-
 /*
    變數名稱代表意義
    allOrders : 所有訂單
@@ -94,6 +93,7 @@ const getProductsImg = (product) => {
             @click="router.push({ name: 'seller-orders-details', params: { id: order.orderId } })"
           >
             <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
+            <span class="mt-3 ms-5 me-5">訂單編號 : {{ order.orderNumber }}</span>
             <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
             <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
             <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>

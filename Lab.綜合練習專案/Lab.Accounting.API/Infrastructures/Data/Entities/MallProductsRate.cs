@@ -3,7 +3,7 @@
 public class MallProductsRate
 {
     /// <summary>
-    /// 項目 ID
+    /// 商品評價 ID
     /// </summary>
     public int ProductsRateId { get; set; }
 
@@ -11,6 +11,11 @@ public class MallProductsRate
     /// 使用者 ID
     /// </summary>
     public int UserId { get; set; }
+
+    /// <summary>
+    /// 訂單 ID
+    /// </summary>
+    public int OrderId { get; set; }
 
     /// <summary>
     /// 商品 ID

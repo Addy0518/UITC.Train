@@ -236,6 +236,17 @@ const router = createRouter({
               },
               component: () => import('@/views/user/purchaseOrderDetails.vue'),
             },
+            {
+              /*
+                買家評價
+              */
+              path: 'purchaseOrderRate/:id',
+              name: 'purchaseOrderRate',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/purchaseOrderRate.vue'),
+            },
           ],
         },
       ],

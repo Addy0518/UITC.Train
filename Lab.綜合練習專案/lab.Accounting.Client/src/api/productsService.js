@@ -33,9 +33,18 @@ export const deleteProducts = (productsId) =>
 // 復原單一或全部商品刪除狀態
 export const updateProductsDeleteStatus = (productsId) =>
   accountApiInstance.put(`Products/UpdateProductsDeleteStatus`, productsId);
+
+// 商品圖片相關 API ===========================================================
+
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Products/ProductsImgUpload`, ImgData);
 // 商品圖片刪除
 export const productsImgDelete = (productsImgId) =>
   accountApiInstance.delete(`Products/ProductsImgDelete?productsImgId=${productsImgId}`);
+
+// 評價相關 API ===========================================================
+
+// 新增單一商品評價
+export const createProductRate = (request) =>
+  accountApiInstance.post(`Products/CreateProductRate`, request);

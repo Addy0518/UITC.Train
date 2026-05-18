@@ -17,7 +17,14 @@ public interface IProductsRateRepository
     Task<int> DeleteProductRate(int productRateId);
 
     /// <summary>
-    /// 查看單一商品評價
+    /// 查看單一訂單評價
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>商品評價資訊</returns>
+    Task<RateResponse> GetOrderRate(int orderId);
+
+    /// <summary>
+    /// 查看單一商品所有評價
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>商品評價資訊</returns>

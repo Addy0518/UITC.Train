@@ -15,11 +15,13 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
             @"INSERT INTO MallProductsRate
                                     (UserId,
                                      ProductsId,
+                                     OrderId,
                                      Rating,
                                      Comment,
                                      CreateTime)
                         VALUES      (@UserId,
                                      @ProductsId,
+                                     @OrderId,
                                      @Rating,
                                      @Comment,
                                      @CreateTime) 
@@ -27,17 +29,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
                                     Cast(
                                     Scope_Identity() as int
                                     );";
-        return await conn.QuerySingleAsync<int>(
-            sql,
-            new
-            {
-                UserId = productrate.UserId,
-                ProductsId = productrate.ProductsId,
-                Rating = productrate.Rating,
-                Comment = productrate.Comment,
-                CreateTime = productrate.CreateTime,
-            }
-        );
+        return await conn.QuerySingleAsync<int>(sql, productrate);
     }
 
     /// <summary>
@@ -54,7 +46,31 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     }
 
     /// <summary>
-    /// 查看單一商品評價
+    /// 查看單一訂單評價
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>商品評價資訊</returns>
+    public async Task<RateResponse> GetOrderRate(int orderId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"SELECT   Top 1
+                       u.UserName,        
+                       u.UserHeadshot,
+                       r.OrderId,
+                       r.Rating,
+                       r.Comment,
+                       r.CreateTime
+                FROM   MallProductsRate r
+                Join   [User] u on r.UserId=u.UserId
+                WHERE  r.OrderId = @OrderId ";
+
+        return await conn.QueryFirstOrDefaultAsync<RateResponse>(sql, new { OrderId = orderId });
+    }
+
+    /// <summary>
+    /// 查看單一商品所有評價
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>商品評價資訊</returns>
@@ -66,6 +82,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
             @"SELECT   
                        u.UserName,        
                        u.UserHeadshot,
+                       r.OrderId,
                        r.Rating,
                        r.Comment,
                        r.CreateTime

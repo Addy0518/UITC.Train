@@ -3,7 +3,8 @@
 public class ShoppingCarService(
     IProductsRepository productsRepositories,
     IProductsImgRepository productsImgRepository,
-    IProductsShoppingCarRepository productsShoppingCarRepositories
+    IProductsShoppingCarRepository productsShoppingCarRepositories,
+    IUserRepository userRepository
 ) : IShoppingCarService
 {
     /// <summary>
@@ -35,6 +36,16 @@ public class ShoppingCarService(
     /// <returns>影響列數</returns>
     public async Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId, int boughtquantity)
     {
+        var userRole = await userRepository.GetUser(userId);
+        if (userRole.UserRole == RolesAuth.賣家)
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { "UserRole", new[] { "賣家無法將自己的商品加入購物車!" } },
+            };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
         if (boughtquantity <= 0)
         {
             var errors = new Dictionary<string, string[]> { { "BoughtQuantity", new[] { "請輸入購買數量!" } } };
