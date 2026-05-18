@@ -86,7 +86,6 @@ const getMyUser = async () => {
     const { data } = res;
 
     if (data.codeStatus === 2000) {
-      console.log('rawBirthDate:', data.returnData.userBirthDate);
       userInfo.value = data.returnData;
     }
   } catch (err) {

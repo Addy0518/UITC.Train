@@ -29,21 +29,13 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.ProductsStock,
                                  m.ProductCategoryId,
                                  m.isDelete,
-                                 STRING_AGG(c.productcategoryname, ',') as Productcategoryname
+                                 c.productcategoryname
                         FROM     mallproducts m
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
                         Where (@UserId is null or m.userId=@UserId) 
                         and  (@isDelete is null or m.isDelete=@isDelete)
                         and  m.ProductsStock > 0
-                        GROUP BY 
-                               m.productsid,
-                               m.userid,
-                               m.productsname,
-                               m.productsprice,
-                               m.isDelete,
-                               m.ProductCategoryId,
-                               m.ProductsStock
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
         var result = await conn.QueryAsync<ProductsResponse>(
@@ -76,19 +68,11 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                m.ProductsStock,
                                m.ProductCategoryId,
                                m.isDelete,
-                               STRING_AGG(c.productcategoryname, ',') as Productcategoryname
+                               c.productcategoryname
                         FROM   mallproducts m
                                left JOIN mallproductcategory c
                                  ON c.productcategoryid =  m.ProductCategoryId
-                        WHERE  m.ProductsId = @ProductsId
-                        GROUP BY 
-                               m.productsid,
-                               m.userid,
-                               m.productsname,
-                               m.productsprice,
-                               m.isDelete,
-                               m.ProductCategoryId,
-                               m.ProductsStock";
+                        WHERE  m.ProductsId = @ProductsId";
 
         var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(sql, new { ProductsId = productId });
 

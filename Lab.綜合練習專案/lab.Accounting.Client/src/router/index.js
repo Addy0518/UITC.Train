@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import { inject } from 'vue';
 
-const showToastError = inject('showToastError');
 /*
     路由設定
 */
@@ -177,6 +175,17 @@ const router = createRouter({
           },
           component: () => import('@/views/product/productBought.vue'),
         },
+        {
+          /*
+             買家查看的賣場
+          */
+          path: 'seller-store/:id',
+          name: 'seller-store',
+          meta: {
+            isPermissionVerification: false,
+          },
+          component: () => import('@/views/product/sellerStore.vue'),
+        },
         /*
             用戶區 ================================================================
         */
@@ -276,8 +285,8 @@ const router = createRouter({
         },
         {
           /*
-                 商品管理
-              */
+            賣家查看的賣場
+          */
           path: 'seller-product',
           name: 'seller-product',
           meta: {
@@ -293,6 +302,7 @@ const router = createRouter({
           name: 'add-product',
           meta: {
             isPermissionVerification: true,
+            isSeller: true,
           },
           component: () => import('@/views/backend/seller/sellerProductCommand.vue'),
         },
@@ -304,6 +314,7 @@ const router = createRouter({
           name: 'edit-product',
           meta: {
             isPermissionVerification: true,
+            isSeller: true,
           },
           component: () => import('@/views/backend/seller/sellerProductCommand.vue'),
         },
@@ -326,6 +337,7 @@ const router = createRouter({
           name: 'seller-orders-details',
           meta: {
             isPermissionVerification: true,
+            isSeller: true,
           },
           component: () => import('@/views/backend/seller/sellerOrderDetails.vue'),
         },
@@ -364,8 +376,10 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore();
   if (to.meta.isPermissionVerification && !authStore.token) {
-    showToastError('請先登入帳號!');
     return { name: 'login' };
+  }
+  if (to.meta.isSeller && authStore.token.userRole !== 'Seller') {
+    return { name: 'mall' };
   }
 });
 

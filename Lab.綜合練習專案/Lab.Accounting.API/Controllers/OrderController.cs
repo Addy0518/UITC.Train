@@ -63,7 +63,6 @@ public class OrderController(IOrderService orderService, IConfiguration config) 
     /// </summary>
     /// <returns>所有訂單資訊</returns>
     [HttpGet]
-    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<OrderResponse>>))]
     public async Task<IActionResult> GetSellerOrder()
     {

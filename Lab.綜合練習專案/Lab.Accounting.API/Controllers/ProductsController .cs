@@ -40,14 +40,34 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     }
 
     /// <summary>
-    /// 查看賣家所有商品
+    /// 買家查看賣場所有商品
+    /// </summary>
+    /// <param name="pageIndex">頁碼</param>
+    /// <param name="pageSize">每頁顯示數量</param>
+    /// <param name="isDelete">是否為刪除狀態</param>
+    /// <param name="userId">賣家 ID </param>
+    /// <returns>商品列表</returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
+    public async Task<IActionResult> UserGetSellerAllProducts(
+        [FromQuery] int userId,
+        [FromQuery] int? pageIndex,
+        [FromQuery] int? pageSize,
+        [FromQuery] IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
+    )
+    {
+        return Ok(await productsService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, userId, isDelete));
+    }
+
+    /// <summary>
+    /// 賣家查看賣場所有商品
     /// </summary>
     /// <param name="pageIndex">頁碼</param>
     /// <param name="pageSize">每頁顯示數量</param>
     /// <param name="isDelete">是否為刪除狀態</param>
     /// <returns>商品列表</returns>
     [HttpGet]
-    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
     public async Task<IActionResult> GetSellerAllProducts(
         [FromQuery] int? pageIndex,

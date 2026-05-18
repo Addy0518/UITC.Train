@@ -7,11 +7,11 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
   products : 全部商品
   allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
   baseUrl : 環境變數裡的圖片基底位址
+  selectedCategory : 選擇的類別區塊
 */
-const categorys = ref();
-const products = ref([]);
-const allProductsRaw = ref([]);
+const allProducts = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
+const selectedCategory = ref(null);
 
 /*
    注入 Loading 跟 Toast
@@ -38,21 +38,7 @@ const loadproducts = async () => {
     const { data } = res;
 
     if (data.codeStatus === 2000) {
-      allProductsRaw.value = data.returnData;
-      products.value = data.returnData;
-
-      /*
-       使用 flatmap 把後端的類別攤平去重 , 跟 map 的差別是
-       map 會把 ['男士,男士', '鞋子'] + split(',') 變成 [['男士', '男士'], ['鞋子']] （ 陣列裡面包陣列 ）, 系統就會分不出來
-       flatmap 則會 ['男士', '男士', '鞋子'] + split(',') 變成 ['男士', '男士', '鞋子'] ( 自動攤平成一個大陣列 ）, 這樣就能比對重複
-    */
-      const allNames = products.value.flatMap((x) =>
-        x.productCategoryName ? x.productCategoryName.split(',') : [],
-      );
-      /*
-       最後在用 new Set 把剛剛 flatmap 攤平的陣列去重複塞進類別
-    */
-      categorys.value = [...new Set(allNames)];
+      allProducts.value = data.returnData;
     }
   } catch (err) {
     console.log(err);
@@ -62,24 +48,21 @@ const loadproducts = async () => {
 };
 
 /*
-  依據點擊類別篩選商品
+  根據所有商品類別取出不重複的各個類別
 */
-const categoryFilter = (cate) => {
-  if (cate !== null) {
-    products.value = allProductsRaw.value.filter(
-      (x) => x.productCategoryName && x.productCategoryName.split(',').includes(cate),
-    );
-  }
-};
+const allCategories = computed(() => {
+  if (!allProducts.value) return [];
+  return [...new Set(allProducts.value.map((x) => x.productCategoryName))];
+});
 
 /*
-  去除後端傳回類別重複
+  再根據類別分區塊
 */
-const productscategory = (categories) => {
-  if (!categories) return [];
-
-  return [...new Set(categories.split(','))];
-};
+const filterProducts = computed(() => {
+  if (!allProducts.value) return [];
+  if (!selectedCategory.value) return allProducts.value;
+  return allProducts.value.filter((p) => p.productCategoryName === selectedCategory.value);
+});
 
 /*
   讀取商品圖片 , 判斷是否有圖片沒有就回傳預設
@@ -99,9 +82,9 @@ const getProductsImg = (product) => {
         <div class="justify-between">
           <span class="text-2xl m-5">分類</span>
           <div class="grid grid-cols-4 mt-5">
-            <div v-for="categoryname in categorys">
+            <div v-for="categoryname in allCategories">
               <div
-                @click="categoryFilter(categoryname)"
+                @click="selectedCategory = selectedCategory === categoryname ? null : categoryname"
                 class="hover:shadow-xl hover:bg-gray-50 h-80 cursor-pointer flex flex-col items-center"
               >
                 <img :src="defaultImgurl" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
@@ -117,7 +100,7 @@ const getProductsImg = (product) => {
         <div class="justify-between">
           <span class="text-2xl m-5">商品</span>
           <div class="grid grid-cols-4 mt-5">
-            <div v-for="product in products">
+            <div v-for="product in filterProducts">
               <div class="hover:shadow-xl hover:bg-gray-50 h-100 flex flex-col items-center">
                 <RouterLink
                   :to="{ name: 'product-detail', params: { id: product.productsId } }"
@@ -130,14 +113,9 @@ const getProductsImg = (product) => {
                   />
                   <span class="mt-3">{{ product.productsName }}</span>
                   <span class="mt-3">{{ product.productsPrice }}</span>
-                  <!-- 迴圈讀取商品類別並去重複 ( 因為這裡是拿沒去重複的 product 資料 , 所以類別會多重複一次 ) -->
 
-                  <span
-                    v-for="cate in productscategory(product.productCategoryName)"
-                    :key="cate"
-                    class="mt-3 ms-2 me-2 text-sm text-gray-500"
-                  >
-                    {{ cate }}
+                  <span class="mt-3 ms-2 me-2 text-sm text-gray-500">
+                    {{ product.productCategoryName }}
                   </span>
                 </RouterLink>
               </div>

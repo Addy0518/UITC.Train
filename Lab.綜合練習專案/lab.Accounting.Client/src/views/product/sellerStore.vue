@@ -1,17 +1,22 @@
 <script setup>
-import { getSellerAllProduct, deleteProducts } from '@/api/productsService';
+import { userGetSellerAllProduct } from '@/api/productsService';
+
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
 /*
    變數名稱代表意義
    allproduct : 賣家所有商品
+   userInfo : 賣家資訊
    baseUrl : 環境變數裡的圖片基底位址
    router : 控制路由
+   selectedCategory : 選擇的類別區塊
 */
 const allproduct = ref(null);
+const userInfo = ref();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
-
+const route = useRoute();
+const selectedCategory = ref(null);
 /*
    注入 Loading 跟 Toast
 */
@@ -32,7 +37,8 @@ onMounted(() => {
 */
 const getSellerProduct = async () => {
   try {
-    var res = await getSellerAllProduct();
+    showLoading();
+    var res = await userGetSellerAllProduct(0, 10, isDeleteEnum.Normal.value, route.params.id);
     const { data } = res;
 
     if (data.codeStatus === 2000) {
@@ -41,6 +47,7 @@ const getSellerProduct = async () => {
   } catch (err) {
     console.log(err);
   } finally {
+    hideLoading();
   }
 };
 
@@ -55,28 +62,41 @@ const getProductsImg = (product) => {
 };
 
 /*
-  軟刪除
+  根據所有商品類別取出不重複的各個類別
 */
-const deleteProduct = async (productId) => {
-  try {
-    const res = await deleteProducts(productId);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      showToastSuccess('成功加入回收桶!');
-      await getSellerProduct();
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-  }
-};
+const allCategories = computed(() => {
+  if (!allproduct.value) return [];
+  return [...new Set(allproduct.value.map((x) => x.productCategoryName))];
+});
+
+/*
+  再根據類別分區塊
+*/
+const filterProducts = computed(() => {
+  if (!allproduct.value) return [];
+  if (!selectedCategory.value) return allproduct.value;
+  return allproduct.value.filter((p) => p.productCategoryName === selectedCategory.value);
+});
 </script>
 
 <template>
   <div class="flex flex-col w-full" v-if="allproduct">
     <div class="border-gray-200h-full flex flex-col items-center">
       <div class="mt-40 w-300 rounded-lg shadow-sm">
-        <div v-for="product in allproduct">
+        <h2 class="text-2xl">賣場</h2>
+        <!-- 類別 tab -->
+        <div class="flex gap-2 mb-4">
+          <button
+            v-for="cat in allCategories"
+            :key="cat"
+            @click="selectedCategory = selectedCategory === cat ? null : cat"
+            class="px-3 py-1 rounded-full text-sm cursor-pointer"
+            :class="selectedCategory === cat ? 'bg-black text-white' : 'bg-gray-100'"
+          >
+            {{ cat }}
+          </button>
+        </div>
+        <div v-for="product in filterProducts">
           <div class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 items-center">
             <img
               :src="getProductsImg(product)"
@@ -86,21 +106,8 @@ const deleteProduct = async (productId) => {
             />
             <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
             <span class="mt-3 ms-5 me-5">{{ product.productsPrice }}</span>
-
+            <!-- 依照原始資料篩選出同個商品的類別  -->
             <span class="mt-3 ms-5 me-5">{{ product.productCategoryName }}</span>
-
-            <button
-              class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-              @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
-            >
-              編輯商品
-            </button>
-            <button
-              class="bg-red-800 text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
-              @click="deleteProduct(product.productsId)"
-            >
-              刪除
-            </button>
           </div>
         </div>
       </div>

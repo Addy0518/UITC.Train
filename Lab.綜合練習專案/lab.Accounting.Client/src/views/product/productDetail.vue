@@ -125,6 +125,12 @@ const boughtProduct = async (id, boughtquantity) => {
           <span class="mt-3">商品評分 : {{ product.productsAVGRate }}</span>
           <span class="mt-3">商品庫存 : {{ product.productsStock }}</span>
           <span class="mt-3">商品擁有者 ID : {{ product.userId }}</span>
+          <button
+            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+            @click="router.push({ name: 'seller-store', params: { id: product.userId } })"
+          >
+            前往賣場
+          </button>
           <!-- 購買數量 -->
           <label>購買數量</label>
           <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden w-fit">
@@ -144,6 +150,7 @@ const boughtProduct = async (id, boughtquantity) => {
           </div>
 
           <span class="text-2xl">{{ product.productsStock > 0 ? '尚有庫存' : '已售罄' }}</span>
+
           <div class="flex gap-2 mt-3">
             <span
               v-for="cat in productscategory(product.productCategoryName)"

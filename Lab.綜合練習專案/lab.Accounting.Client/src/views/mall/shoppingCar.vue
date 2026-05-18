@@ -2,7 +2,6 @@
 import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/shoppingcarService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import { useOrderStore } from '@/stores/order';
-import { xid } from 'zod';
 
 /*
   變數名稱代表意義
@@ -62,15 +61,6 @@ const loadproducts = async () => {
   } finally {
     hideLoading();
   }
-};
-
-/*
-  把後端傳回類別分開
-*/
-const productscategory = (categories) => {
-  if (!categories) return [];
-
-  return [...new Set(categories.split(','))];
 };
 
 /*
@@ -155,9 +145,7 @@ const totalPrice = computed(() =>
             <p class="text-xl font-medium mb-2">{{ product.productsName }}</p>
             <p class="text-sm text-gray-400 mb-2">
               NT$ {{ product.productsPrice }}　｜　
-              <span v-for="cate in productscategory(product.productCategoryName)" :key="cate">{{
-                cate
-              }}</span>
+              <span>{{ product.productCategoryName }}</span>
             </p>
             <div class="flex items-center gap-2">
               <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden">
@@ -210,12 +198,13 @@ const totalPrice = computed(() =>
                 >NT$ {{ totalPrice.toLocaleString() }}</span
               >
             </span>
+            `
             <button
               class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
               @click="goToOrder"
             >
-              前往訂單
-            </button>
+              前往訂單</button
+            >`
           </div>
         </div>
       </div>
