@@ -378,7 +378,7 @@ router.beforeEach((to) => {
   if (to.meta.isPermissionVerification && !authStore.token) {
     return { name: 'login' };
   }
-  if (to.meta.isSeller && authStore.token.userRole !== 'Seller') {
+  if (to.meta.isSeller && authStore.userRole !== 'Seller') {
     return { name: 'mall' };
   }
 });

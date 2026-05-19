@@ -165,4 +165,30 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
 
         return await conn.ExecuteAsync(sql, request);
     }
+
+    /// <summary>
+    /// 改變權限變賣家
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <param name="userRole">使用者權限 </param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateRole(int userId, string userRole)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Update [User] Set 
+                    UserRole  = COALESCE(@UserRole, UserRole),
+                    UpdateTime  = COALESCE(@UpdateTime, UpdateTime)
+                  WHERE UserId = @UserId";
+        return await conn.ExecuteAsync(
+            sql,
+            new
+            {
+                UserId = userId,
+                UserRole = userRole,
+                UpdateTime = DateTime.Now,
+            }
+        );
+    }
 }

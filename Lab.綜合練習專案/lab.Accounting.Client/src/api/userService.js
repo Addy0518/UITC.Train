@@ -13,8 +13,11 @@ export const logoutApi = () => accountApiInstance.post(`User/Logout`);
 export const userHeadShot = (userFile) =>
   accountApiInstance.post(`User/UserHeadShotUpload`, userFile);
 
-// 查看使用者資訊
-export const getUser = () => accountApiInstance.get(`User/GetUser`);
+// 查看登入者資訊
+export const getMyUser = () => accountApiInstance.get(`User/GetUser`);
+
+// 查看指定使用者資訊
+export const getOneUser = (id) => accountApiInstance.get(`User/GetOneUser?userId=${id}`);
 
 // 更新使用者資訊
 export const updateUser = (request) => accountApiInstance.put(`User/UpdateUser`, request);

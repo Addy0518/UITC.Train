@@ -62,7 +62,7 @@ public class UserController(IUserService userserivce) : ControllerBase
     }
 
     /// <summary>
-    /// 取得使用者資訊
+    /// 取得登入者資訊
     /// </summary>
     /// <returns>使用者資訊</returns>
     [HttpGet]
@@ -70,6 +70,17 @@ public class UserController(IUserService userserivce) : ControllerBase
     public async Task<IActionResult> GetUser()
     {
         return Ok(await userserivce.GetUser(CurrentUserId));
+    }
+
+    /// <summary>
+    /// 取得指定使用者資訊
+    /// </summary>
+    /// <returns>使用者資訊</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
+    public async Task<IActionResult> GetOneUser([FromQuery] int userId)
+    {
+        return Ok(await userserivce.GetUser(userId));
     }
 
     /// <summary>

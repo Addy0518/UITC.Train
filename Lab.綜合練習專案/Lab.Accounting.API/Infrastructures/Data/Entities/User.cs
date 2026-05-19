@@ -51,4 +51,14 @@ public class User
     /// 使用者權限
     /// </summary>
     public string? UserRole { get; set; }
+
+    /// <summary>
+    /// 創建時間
+    /// </summary>
+    public DateTime CreateTime { get; set; }
+
+    /// <summary>
+    /// 更新時間
+    /// </summary>
+    public DateTime UpdateTime { get; set; }
 }

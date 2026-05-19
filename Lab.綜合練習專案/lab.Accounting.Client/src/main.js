@@ -28,6 +28,7 @@ import PanelMenu from 'primevue/panelmenu';
 import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
 import Loading from '@/common/Loading.vue';
 import Rating from 'primevue/rating';
+import Galleria from 'primevue/galleria';
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -65,6 +66,7 @@ app.component('CascadeSelect', CascadeSelect);
 app.component('Toast', Toast);
 app.component('PanelMenu', PanelMenu);
 app.component('Rating', Rating);
+app.component('Galleria', Galleria);
 app.component('InValidErrorMessage', InValidErrorMessage);
 app.component('Loading', Loading);
 app.use(ToastService);

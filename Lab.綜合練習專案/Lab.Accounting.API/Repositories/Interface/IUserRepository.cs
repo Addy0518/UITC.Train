@@ -64,4 +64,12 @@ public interface IUserRepository
     /// <param name="request">舊密碼</param>
     /// <returns>影響列數</returns>
     Task<int> UpdatePassword(UserUpdatePasswordRequest request);
+
+    /// <summary>
+    /// 改變權限變賣家
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <param name="userRole">使用者權限 </param>
+    /// <returns>影響列數</returns>
+    Task<int> UpdateRole(int userId, string userRole);
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { userHeadShot, getUser, updateUser, updatePassword } from '@/api/userService';
+import { userHeadShot, getMyUser, updateUser, updatePassword } from '@/api/userService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
 /*
@@ -41,7 +41,7 @@ const v$ = useVuelidate(
 );
 
 onMounted(() => {
-  getMyUser();
+  getMineUser();
   if (authStore.userHeadshot) {
     imgUrl.value = `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
   } else {
@@ -78,10 +78,10 @@ const uploadFile = async (event) => {
 /*
    載入用戶資訊
 */
-const getMyUser = async () => {
+const getMineUser = async () => {
   try {
     showLoading();
-    const res = await getUser();
+    const res = await getMyUser();
 
     const { data } = res;
 

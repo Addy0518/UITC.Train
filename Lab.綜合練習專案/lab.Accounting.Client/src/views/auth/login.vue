@@ -44,10 +44,17 @@ const v$ = useVuelidate(
 );
 
 /*
-  測試用帳號
+  測試用賣家帳號
 */
 const testUser = () => {
   account.value = 'andy@gmail.com';
+  password.value = 'Andy1111';
+};
+/*
+  測試用買家帳號
+*/
+const test2User = () => {
+  account.value = 'bbb@gmail.com';
   password.value = 'Andy1111';
 };
 
@@ -119,7 +126,13 @@ const userLogin = async () => {
         @click="testUser"
         class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
       >
-        測試帳號
+        賣家帳號
+      </button>
+      <button
+        @click="test2User"
+        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
+      >
+        買家帳號
       </button>
       <button
         @click="userLogin"
