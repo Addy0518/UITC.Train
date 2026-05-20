@@ -1,10 +1,8 @@
 <script setup>
-import { getProduct, userGetSellerAllProduct } from '@/api/productsService';
+import { getProduct } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
-import { getMyUser, getOneUser } from '@/api/userService';
+import {  getOneUser } from '@/api/userService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { all } from 'axios';
-import { ref } from 'vue';
 
 /*
    變數名稱代表意義
@@ -357,7 +355,7 @@ const boughtProduct = async (id, boughtquantity) => {
 
         <!--#region 賣家資訊 -->
         <div class="bg-white rounded-lg p-6 flex gap-8 items-center" v-if="product.userId">
-          <!-- 頭像 + 名稱 + 按鈕 -->
+          <!--#region  頭像 + 名稱 + 按鈕 -->
           <div class="flex gap-5 items-center min-w-52">
             <img
               :src="sellerImg(seller)"
@@ -384,11 +382,12 @@ const boughtProduct = async (id, boughtquantity) => {
               </div>
             </div>
           </div>
+          <!-- #endregion -->
 
           <!-- 分隔線 -->
           <div class="w-px h-20 bg-gray-100"></div>
 
-          <!-- 右：統計 grid -->
+          <!--#region  統計資訊 -->
           <div class="grid grid-cols-3 gap-x-10 gap-y-2.5 flex-1 text-sm">
             <div class="flex items-center gap-2">
               <i class="pi pi-box text-gray-300 text-sm"></i>
@@ -421,10 +420,20 @@ const boughtProduct = async (id, boughtquantity) => {
               <span class="text-gray-700 font-medium">--</span>
             </div>
           </div>
+          <!-- #endregion -->
+        </div>
+        <!-- #endregion -->
+        <!--#region 商品描述 -->
+        <div class="bg-white rounded-lg p-6" v-if="product.productsDescription">
+          <h3 class="text-sm font-medium text-gray-700 mb-4 pb-2 border-b border-gray-100">
+            商品描述
+          </h3>
+          <div v-html="product.productsDescription" class="leading-relaxed text-gray-700" />
         </div>
         <!-- #endregion -->
       </div>
 
+      <!--#region 評論區 -->
       <div
         v-for="rate in allRate"
         class="hover:shadow-xl hover:bg-gray-50 h-20 flex flex-row ps-10 items-center"
@@ -435,6 +444,7 @@ const boughtProduct = async (id, boughtquantity) => {
         <span class="mt-3 me-5">評價時間 : {{ formatDateTimeString(rate.createTime) }}</span>
         <span class="mt-3 me-5">評分 : {{ rate.rating }}</span>
       </div>
+      <!-- #endregion -->
     </div>
   </div>
 </template>

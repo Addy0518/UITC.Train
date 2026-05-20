@@ -28,6 +28,11 @@ public class MallProducts
     public int? ProductsStock { get; set; }
 
     /// <summary>
+    /// 商品描述
+    /// </summary>
+    public string? ProductsDescription { get; set; }
+
+    /// <summary>
     /// 商品類別 ID
     /// </summary>
     public int ProductCategoryId { get; set; }

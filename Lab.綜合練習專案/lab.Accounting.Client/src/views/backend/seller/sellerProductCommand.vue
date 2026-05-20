@@ -6,9 +6,14 @@ import {
   getProduct,
   updateProducts,
   getCategory,
+  productsDescriptionImgUpload,
 } from '@/api/productsService';
+// Tiptap 的 Editor 和內容元件
+import { useEditor, EditorContent } from '@tiptap/vue-3';
+// StarterKit 跟 Image 是 Tiptap 的工具包 , 讓他支援編輯 , 圖片新增等功能
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
 import Swal from 'sweetalert2';
-
 
 /*
    變數名稱代表意義
@@ -19,9 +24,11 @@ import Swal from 'sweetalert2';
    productName : 商品名稱
    productPrice : 商品價格
    productStock : 商品庫存
+   productDescription : 商品描述
    productsId : 商品 ID
    isAdd : 路由判斷新增或刪除
    baseUrl : 環境變數裡的圖片基底位址
+
 */
 let imgs = ref([]);
 
@@ -35,6 +42,7 @@ const childCategory = ref([]);
 const productName = ref();
 const productPrice = ref();
 const productStock = ref();
+const productDescription = ref();
 const productsId = ref();
 const isAdd = computed(() => route.name === 'add-product');
 const baseUrl = import.meta.env.VITE_IMG_URL;
@@ -46,6 +54,22 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
+
+/*
+   把 Tiptap 的擴充套件載入
+*/
+const editor = useEditor({
+  // StarterKit：包含粗體、斜體、清單、段落等基本功能
+  // Image：讓編輯器支援插入圖片
+  extensions: [StarterKit, Image],
+
+  // 每次編輯器內容有變動時觸發
+  // 把編輯器當下內容轉成 HTML 字串，同步存進 productDescription ref
+  // 這樣按儲存時 productDescription.value 就是最新的 HTML
+  onUpdate: ({ editor }) => {
+    productDescription.value = editor.getHTML();
+  },
+});
 
 onMounted(() => {
   getCategories();
@@ -109,6 +133,7 @@ const updateData = async (productId) => {
     if (!productId) return;
     showLoading();
     const res = await getProduct(productId);
+
     const { data } = res;
     if (data.codeStatus === 2000) {
       const item = data.returnData;
@@ -116,9 +141,27 @@ const updateData = async (productId) => {
       productName.value = item.productsName;
       productPrice.value = item.productsPrice;
       productStock.value = item.productsStock;
+      productDescription.value = item.productsDescription ?? '';
+      nextTick(() => {
+        editor.value?.commands.setContent(item.productsDescription ?? '');
+      });
 
-      if (item.productCategoryName) {
-        productCategoryName.value = item.productCategoryName.split(',');
+      if (item.productParentId) {
+        // 找父類別物件中的類別名稱
+        selectParent.value = parentCategory.value.find(
+          (p) => p.productCategoryId === item.productParentId,
+        );
+
+        // 載入子類別清單
+        const catRes = await getCategory(item.productParentId);
+        const { data: catData } = catRes;
+        if (catData.codeStatus === 2000) {
+          childCategory.value = catData.returnData;
+          // 找子類別物件中的類別名稱
+          selectChild.value = childCategory.value.find(
+            (c) => c.productCategoryId === item.productCategoryId,
+          );
+        }
       }
 
       if (item.productsImgs) {
@@ -154,6 +197,7 @@ const createOrUpdateProduct = async () => {
         productsName: productName.value,
         productsPrice: productPrice.value,
         productsStock: productStock.value,
+        productsDescription: productDescription.value,
       };
       const res = await createProducts(createData);
       const { data } = res;
@@ -181,10 +225,10 @@ const createOrUpdateProduct = async () => {
       const updateData = {
         productsId: productsId.value,
         ProductCategoryId: selectChild.value.productCategoryId,
-
         productsName: productName.value,
         productsPrice: productPrice.value,
         productsStock: productStock.value,
+        productsDescription: productDescription.value,
       };
       const res = await updateProducts(updateData);
       const { data } = res;
@@ -263,6 +307,25 @@ const removeImage = async (index) => {
     imgs.value.splice(index, 1);
   }
 };
+
+/*
+   上傳商品描述圖片
+*/
+const uploadDescriptionImage = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('productsDescriptionImgsFiles', file);
+
+  const res = await productsDescriptionImgUpload(formData);
+  const { data } = res;
+  if (data.codeStatus === 2000) {
+    const url = `${baseUrl}/ProductsDescriptionImg/${data.returnData}`;
+    editor.value.chain().focus().setImage({ src: url }).run();
+  }
+  e.target.value = '';
+};
 </script>
 
 <template>
@@ -330,6 +393,56 @@ const removeImage = async (index) => {
       />
     </InputGroup>
     <InValidErrorMessage :errorDto="v$.productStock.$errors" vaildChiName="商品庫存" />
+
+    <!-- 商品描述整體區塊 -->
+    <div class="mt-4">
+      <label class="text-sm text-gray-400 block mb-2">商品描述</label>
+
+      <!-- 工具列 -->
+      <div class="flex gap-1 p-2 border border-b-0 rounded-t-lg bg-gray-50">
+        <!-- 粗體按鈕 -->
+        <!-- editor.chain().focus() : 確保操作後游標回到編輯器 -->
+        <!-- toggleBold() : 切換粗體狀態（有就關，沒有就開） -->
+        <!-- isActive('bold') : 目前游標在粗體文字上時加深背景，給使用者視覺回饋 -->
+        <button
+          type="button"
+          @click="editor.chain().focus().toggleBold().run()"
+          :class="editor?.isActive('bold') ? 'bg-gray-200' : ''"
+          class="px-2 py-1 rounded text-sm font-bold hover:bg-gray-200"
+        >
+          B
+        </button>
+
+        <!-- 斜體按鈕，邏輯同粗體 -->
+        <button
+          type="button"
+          @click="editor.chain().focus().toggleItalic().run()"
+          :class="editor?.isActive('italic') ? 'bg-gray-200' : ''"
+          class="px-2 py-1 rounded text-sm italic hover:bg-gray-200"
+        >
+          I
+        </button>
+
+        <!-- 項目清單按鈕 -->
+        <button
+          type="button"
+          @click="editor.chain().focus().toggleBulletList().run()"
+          class="px-2 py-1 rounded text-sm hover:bg-gray-200"
+        >
+          • 清單
+        </button>
+
+        <!-- 圖片上傳 -->
+        <!-- 用 label 包住隱藏的 input，點 label 就等於點 input，視覺上比較好看 -->
+        <label class="px-2 py-1 rounded text-sm hover:bg-gray-200 cursor-pointer">
+          🖼 插入圖片
+          <input type="file" accept="image/*" class="hidden" @change="uploadDescriptionImage" />
+        </label>
+      </div>
+
+      <!-- 編輯區 -->
+      <EditorContent :editor="editor" class="border rounded-b-lg p-3 min-h-40 prose max-w-none" />
+    </div>
     <!-- 按鈕區 -->
     <div class="justify-end flex mt-5">
       <button

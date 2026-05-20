@@ -50,6 +50,11 @@ export const updateProductsDeleteStatus = (productsId) =>
 // 商品圖片上傳
 export const productsImgUpload = (ImgData) =>
   accountApiInstance.post(`Products/ProductsImgUpload`, ImgData);
+
+// 商品描述的圖片上傳
+export const productsDescriptionImgUpload = (ImgData) =>
+  accountApiInstance.post(`Products/ProductsDescriptionImgUpload`, ImgData);
+
 // 商品圖片刪除
 export const productsImgDelete = (productsImgId) =>
   accountApiInstance.delete(`Products/ProductsImgDelete?productsImgId=${productsImgId}`);

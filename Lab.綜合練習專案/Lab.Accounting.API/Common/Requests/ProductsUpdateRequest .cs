@@ -39,4 +39,11 @@ public class ProductsUpdateRequest
     /// </summary>
     [Display(Name = "商品庫存數量")]
     public int? ProductsStock { get; set; }
+
+    /// <summary>
+    /// 商品描述
+    /// </summary>
+    [Display(Name = "商品描述")]
+    [MaxLength(500, ErrorMessage = "{0} 不可超過 {1} 字!")]
+    public string? ProductsDescription { get; set; }
 }

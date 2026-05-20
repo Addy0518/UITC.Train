@@ -13,9 +13,19 @@ public class ProductsResponse
     public int UserId { get; set; }
 
     /// <summary>
+    /// 商品類別 ID
+    /// </summary>
+    public int ProductCategoryId { get; set; }
+
+    /// <summary>
     /// 商品類別名稱
     /// </summary>
     public string ProductCategoryName { get; set; }
+
+    /// <summary>
+    /// 類別父 ID ( 可為 null，表示該類別為頂層類別 )
+    /// </summary>
+    public int? ProductParentId { get; set; }
 
     /// <summary>
     /// 商品名稱
@@ -31,6 +41,11 @@ public class ProductsResponse
     /// 商品庫存數量
     /// </summary>
     public int ProductsStock { get; set; }
+
+    /// <summary>
+    /// 商品描述
+    /// </summary>
+    public string? ProductsDescription { get; set; }
 
     /// <summary>
     /// 購買數量

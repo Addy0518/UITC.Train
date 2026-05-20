@@ -70,6 +70,13 @@ public interface IProductsService
     Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
 
     /// <summary>
+    /// 商品描述的圖片上傳
+    /// </summary>
+    /// <param name="productsDescriptionImgsFiles">商品描述圖片檔案</param>
+    /// <returns>上傳是否成功</returns>
+    Task<ApiResponse<string>> ProductsDescriptionImgUpload(IFormFile productsDescriptionImgsFiles);
+
+    /// <summary>
     /// 刪除商品圖片
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>

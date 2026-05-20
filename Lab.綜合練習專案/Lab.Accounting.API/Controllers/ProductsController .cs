@@ -160,6 +160,19 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     }
 
     /// <summary>
+    /// 商品描述的圖片上傳
+    /// </summary>
+    /// <param name="productsDescriptionImgsFiles">商品描述圖片檔案</param>
+    /// <returns>上傳是否成功</returns>
+    [HttpPost]
+    [Authorize(Roles = RolesAuth.賣家)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+    public async Task<IActionResult> ProductsDescriptionImgUpload([FromForm] IFormFile productsDescriptionImgsFiles)
+    {
+        return Ok(await productsService.ProductsDescriptionImgUpload(productsDescriptionImgsFiles));
+    }
+
+    /// <summary>
     /// 刪除商品圖片
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>

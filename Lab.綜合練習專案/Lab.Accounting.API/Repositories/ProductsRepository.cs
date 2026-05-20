@@ -66,9 +66,12 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                m.productsname,
                                m.productsprice,
                                m.ProductsStock,
+                               m.ProductsDescription,
                                m.ProductCategoryId,
                                m.isDelete,
-                               c.productcategoryname
+                               c.productcategoryname,
+                               c.productcategoryid,        
+                               c.ProductParentId 
                         FROM   mallproducts m
                                left JOIN mallproductcategory c
                                  ON c.productcategoryid =  m.ProductCategoryId
@@ -114,6 +117,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      productsname,
                                      productsprice,
                                      ProductsStock,
+                                     ProductsDescription,
                                      ProductCategoryId,
                                      IsDelete
                                      )
@@ -121,6 +125,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      @ProductsName,
                                      @ProductsPrice,
                                      @ProductsStock,
+                                     @ProductsDescription,
                                      @ProductCategoryId,
                                      @IsDelete
                                      ) 
@@ -146,6 +151,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  productsname = COALESCE(@ProductsName, productsname),
                                  productsprice = COALESCE(@ProductsPrice, productsprice),
                                  ProductsStock = COALESCE(@ProductsStock, ProductsStock),
+                                 ProductsDescription = COALESCE(@ProductsDescription, ProductsDescription),
                                  ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId)
                         WHERE    productsid = @ProductsId and userId=@UserId;";
         return await conn.ExecuteAsync(sql, products);

@@ -1,4 +1,6 @@
-﻿using Org.BouncyCastle.Asn1.X509;
+﻿using System.Text.RegularExpressions;
+using NPOI.HPSF;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace Lab.Accounting.API.Services;
 
@@ -94,6 +96,7 @@ public class ProductsService(
             ProductsName = productsInsertRequest.ProductsName,
             ProductsPrice = productsInsertRequest.ProductsPrice,
             ProductsStock = productsInsertRequest.ProductsStock,
+            ProductsDescription = productsInsertRequest.ProductsDescription,
             ProductCategoryId = productsInsertRequest.ProductCategoryId,
             UserId = productsInsertRequest.UserId,
             IsDelete = IsDeleteStatusEnum.Normal,
@@ -123,6 +126,7 @@ public class ProductsService(
             ProductsName = productsUpdateRequest.ProductsName,
             ProductsPrice = productsUpdateRequest.ProductsPrice,
             ProductsStock = productsUpdateRequest.ProductsStock,
+            ProductsDescription = productsUpdateRequest.ProductsDescription,
             ProductCategoryId = productsUpdateRequest.ProductCategoryId,
         };
 
@@ -131,6 +135,20 @@ public class ProductsService(
         {
             return ApiResponseHelper.NotFound<int>();
         }
+
+        // 比對商品描述的圖片有沒有在資料夾
+        var oldImgs = ParseDescriptionImgs(target.ProductsDescription);
+        var newImgs = ParseDescriptionImgs(productsUpdateRequest.ProductsDescription);
+
+        // Except 差集 => 顯示舊的有但新的沒有的 , 這裡抓 oldImgs 有的但 newImgs 沒有的
+        var deletedImgs = oldImgs.Except(newImgs);
+
+        // 抓出來刪除
+        foreach (var img in deletedImgs)
+        {
+            FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsDescriptionImg", img);
+        }
+
         var result = await productsRepositories.UpdateProducts(updateTarget);
 
         return ApiResponseHelper.Success(result);
@@ -172,6 +190,12 @@ public class ProductsService(
             if (target.IsDelete == IsDeleteStatusEnum.Deleted)
             {
                 imgs = await productsImgRepository.GetProductsAllImg(productsId);
+
+                var descImgs = ParseDescriptionImgs(target.ProductsDescription);
+                foreach (var img in descImgs)
+                {
+                    FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsDescriptionImg", img);
+                }
             }
 
             var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, userId);
@@ -219,6 +243,30 @@ public class ProductsService(
 
         var newtarget = await productsImgRepository.GetProductsAllImg(productId);
         return ApiResponseHelper.Success(newtarget);
+    }
+
+    /// <summary>
+    /// 商品描述的圖片上傳
+    /// </summary>
+    /// <param name="productsDescriptionImgsFiles">商品描述圖片檔案</param>
+    /// <returns>上傳是否成功</returns>
+    public async Task<ApiResponse<string>> ProductsDescriptionImgUpload(IFormFile productsDescriptionImgsFiles)
+    {
+        if (productsDescriptionImgsFiles == null)
+            return ApiResponseHelper.NotFound<string>();
+
+        var fileName = await FileUploadHelper.SaveFileAsync(
+            productsDescriptionImgsFiles,
+            env.WebRootPath,
+            "ProductsDescriptionImg"
+        );
+
+        if (fileName == null)
+        {
+            return ApiResponseHelper.InternalException<string>("圖片上傳失敗");
+        }
+
+        return ApiResponseHelper.Success(fileName);
     }
 
     /// <summary>
@@ -284,5 +332,27 @@ public class ProductsService(
 
         var result = await productsRateRepositories.CreateProductRate(rate);
         return ApiResponseHelper.Success(result);
+    }
+
+    /// <summary>
+    /// 從 html 解析出所有商品描述圖片的檔名
+    /// </summary>
+    /// <param name="html">描述內容</param>
+    /// <returns>檔案名稱清單</returns>
+    private IEnumerable<string> ParseDescriptionImgs(string html)
+    {
+        // 空的就回傳空清單
+        if (string.IsNullOrEmpty(html))
+            return Enumerable.Empty<string>();
+
+        // 用正規表達式在 HTML 字串裡找所有符合 /ProductsDescriptionImg/檔名 的地方
+        // [^"]+ 的意思是「一直匹配到碰到 " 為止」，用來擷取到 src="" 結尾前的檔名 , [^""] 等於 [^"]
+        // 例如：<img src="http://xxx/ProductsDescriptionImg/abc123.jpg"> → 抓到 abc123.jpg
+        var matches = Regex.Matches(html, @"/ProductsDescriptionImg/([^""]+)");
+
+        // Group 是正規表達式的內容部分
+        // Groups[0] = /ProductsDescriptionImg/abc123.jpg => 整個字串
+        // Groups[1] = abc123.jpg => () 裡的部分
+        return matches.Select(m => m.Groups[1].Value);
     }
 }
