@@ -41,17 +41,17 @@ public class ProductsService(
     /// </summary>
     /// <param name="pageIndex">頁碼</param>
     /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="userId">使用者 Id</param>
+    /// <param name="sellerId">賣家 Id</param>
     /// <param name="isDelete">是否為刪除狀態</param>
     /// <returns>商品列表</returns>
     public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(
         int pageIndex,
         int pageSize,
-        int? userId = null,
+        int? sellerId = null,
         IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
     )
     {
-        var products = await productsRepositories.GetAllProducts(pageIndex, pageSize, userId, isDelete);
+        var products = await productsRepositories.GetAllProducts(pageIndex, pageSize, sellerId, isDelete);
 
         if (products == null)
         {
@@ -158,11 +158,11 @@ public class ProductsService(
     /// 復原已選取的商品刪除狀態
     /// </summary>
     /// <param name="productId">選取的所有商品 Id</param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<ApiResponse<int>> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId)
+    public async Task<ApiResponse<int>> UpdateProductsDeleteStatus(int sellerId, IEnumerable<int> productId)
     {
-        var target = await productsRepositories.UpdateProductsDeleteStatus(userId, productId);
+        var target = await productsRepositories.UpdateProductsDeleteStatus(sellerId, productId);
         if (target == 0)
         {
             return ApiResponseHelper.NotFound<int>();
@@ -174,14 +174,14 @@ public class ProductsService(
     /// 軟刪除或硬刪除單一商品
     /// </summary>
     /// <param name="productsId">商品 ID</param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<ApiResponse<int>> DeleteProducts(int productsId, int userId)
+    public async Task<ApiResponse<int>> DeleteProducts(int productsId, int sellerId)
     {
         using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             var target = await productsRepositories.GetProducts(productsId);
-            if (target == null || target.UserId != userId)
+            if (target == null || target.UserId != sellerId)
             {
                 return ApiResponseHelper.NotFound<int>();
             }
@@ -198,7 +198,7 @@ public class ProductsService(
                 }
             }
 
-            var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, userId);
+            var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, sellerId);
 
             if (deletetarget == null)
                 return ApiResponseHelper.InternalException<int>("刪除失敗");

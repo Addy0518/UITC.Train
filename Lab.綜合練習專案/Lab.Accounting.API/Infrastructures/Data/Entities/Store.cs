@@ -1,11 +1,11 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities
 {
-    public class Seller
+    public class Store
     {
         /// <summary>
-        /// 賣家 ID
+        /// 賣場 ID
         /// </summary>
-        public int SellerId { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// 使用者 ID
@@ -13,19 +13,19 @@
         public int UserId { get; set; }
 
         /// <summary>
-        /// 賣家名稱
+        /// 賣場名稱
         /// </summary>
-        public string SellerName { get; set; }
+        public string StoreName { get; set; }
 
         /// <summary>
         /// 統一編號
         /// </summary>
-        public int SellerUnifiedNumber { get; set; }
+        public int StoreUnifiedNumber { get; set; }
 
         /// <summary>
         /// 公司名稱
         /// </summary>
-        public string? SellerCompanyName { get; set; }
+        public string? StoreCompanyName { get; set; }
 
         /// <summary>
         /// 創建時間
@@ -36,5 +36,10 @@
         /// 更新時間
         /// </summary>
         public DateTime UpdateTime { get; set; }
+
+        /// <summary>
+        /// 是否為刪除狀態
+        /// </summary>
+        public IsDeleteStatusEnum IsDelete { get; set; }
     }
 }

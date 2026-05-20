@@ -25,6 +25,7 @@ public class UserService(
             UserPhone = registerRequest.UserPhone,
             UserPassword = passwordSecureHelper.HashPassword(registerRequest.UserPassword),
             UserAddress = registerRequest.UserAddress,
+            IsDelete = IsDeleteStatusEnum.Normal,
         };
         var exist = await userrepo.ExistRegister(user);
 
@@ -217,6 +218,7 @@ public class UserService(
         {
             return ApiResponseHelper.NotFound<int>();
         }
+
         var result = await userrepo.UpdateUser(request);
         if (result <= 0)
         {

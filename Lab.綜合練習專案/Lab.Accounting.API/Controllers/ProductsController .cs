@@ -45,19 +45,19 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <param name="pageIndex">頁碼</param>
     /// <param name="pageSize">每頁顯示數量</param>
     /// <param name="isDelete">是否為刪除狀態</param>
-    /// <param name="userId">賣家 ID </param>
+    /// <param name="sellerId">賣家 ID </param>
     /// <returns>商品列表</returns>
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
     public async Task<IActionResult> UserGetSellerAllProducts(
-        [FromQuery] int userId,
+        [FromQuery] int sellerId,
         [FromQuery] int? pageIndex,
         [FromQuery] int? pageSize,
         [FromQuery] IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
     )
     {
-        return Ok(await productsService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, userId, isDelete));
+        return Ok(await productsService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, sellerId, isDelete));
     }
 
     /// <summary>

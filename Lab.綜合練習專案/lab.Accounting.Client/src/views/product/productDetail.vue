@@ -1,7 +1,8 @@
 <script setup>
 import { getProduct } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
-import {  getOneUser } from '@/api/userService';
+import { getSeller } from '@/api/sellerService';
+import { getOneUser } from '@/api/userService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
 /*
@@ -46,7 +47,7 @@ const getProductDetail = async (id) => {
       product.value = data.returnData;
 
       allRate.value = data.returnData.productsAllRates;
-      await getSeller(product.value.userId);
+      await getSellerInfo(product.value.userId);
     }
   } catch (err) {
     console.log(err);
@@ -65,7 +66,7 @@ onMounted(() => {
 /*
    拿到賣家資訊
 */
-const getSeller = async (id) => {
+const getSellerInfo = async (id) => {
   try {
     showLoading();
     const res = await getOneUser(id);
@@ -73,7 +74,6 @@ const getSeller = async (id) => {
 
     if (data.codeStatus === 2000) {
       seller.value = data.returnData;
-      console.log('seller', seller);
     }
   } catch (err) {
     console.log(err);
@@ -431,20 +431,19 @@ const boughtProduct = async (id, boughtquantity) => {
           <div v-html="product.productsDescription" class="leading-relaxed text-gray-700" />
         </div>
         <!-- #endregion -->
+        <!--#region 評論區 -->
+        <div
+          v-for="rate in allRate"
+          class="hover:shadow-xl bg-white h-20 hover:bg-gray-50 flex flex-row ps-10 items-center"
+        >
+          <img :src="userImg(rate)" alt="頭貼" class="w-10 h-10 rounded-full object-cover me-5" />
+          <span class="mt-3 me-5">評價者名稱 : {{ rate.userName }}</span>
+          <span class="mt-3 me-5">評論 : {{ rate.comment }}</span>
+          <span class="mt-3 me-5">評價時間 : {{ formatDateTimeString(rate.createTime) }}</span>
+          <span class="mt-3 me-5">評分 : {{ rate.rating }}</span>
+        </div>
+        <!-- #endregion -->
       </div>
-
-      <!--#region 評論區 -->
-      <div
-        v-for="rate in allRate"
-        class="hover:shadow-xl hover:bg-gray-50 h-20 flex flex-row ps-10 items-center"
-      >
-        <img :src="userImg(rate)" alt="頭貼" class="w-10 h-10 rounded-full object-cover me-5" />
-        <span class="mt-3 me-5">評價者名稱 : {{ rate.userName }}</span>
-        <span class="mt-3 me-5">評論 : {{ rate.comment }}</span>
-        <span class="mt-3 me-5">評價時間 : {{ formatDateTimeString(rate.createTime) }}</span>
-        <span class="mt-3 me-5">評分 : {{ rate.rating }}</span>
-      </div>
-      <!-- #endregion -->
     </div>
   </div>
 </template>

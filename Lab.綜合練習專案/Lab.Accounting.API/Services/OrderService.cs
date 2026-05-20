@@ -47,11 +47,11 @@ public class OrderService(
     /// <summary>
     /// 賣家查看所有訂單
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>所有訂單資訊</returns>
-    public async Task<ApiResponse<IEnumerable<OrderResponse>>> GetSellerOrder(int userId)
+    public async Task<ApiResponse<IEnumerable<OrderResponse>>> GetSellerOrder(int sellerId)
     {
-        var target = await productsBuyRepositories.GetSellerOrder(userId);
+        var target = await productsBuyRepositories.GetSellerOrder(sellerId);
 
         if (target == null)
         {
@@ -147,6 +147,8 @@ public class OrderService(
                     OrderNumber = merchantTradeNo,
                     UserId = Request.UserId,
                     ProductsId = product.ProductsId,
+                    ProductsName = target.ProductsName,
+                    ProductCategoryId = target.ProductCategoryId,
                     BoughtQuantity = product.BoughtQuantity,
                     UnitPrice = target.ProductsPrice,
                     AccountPrice = target.ProductsPrice * product.BoughtQuantity,

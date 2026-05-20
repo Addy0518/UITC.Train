@@ -12,12 +12,12 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
         var sql =
             @"Insert Into [User] (
-                  UserName, UserAccount, UserPassword, UserPhone,UserAddress
+                  UserName, UserAccount, UserPassword, UserPhone,UserAddress,CreateTime,UpdateTime,IsDelete
                 ) 
                 values 
                   (
                     @UserName, @UserAccount, @UserPassword, 
-                    @UserPhone,@UserAddress
+                    @UserPhone,@UserAddress,GetDate(),GetDate(),@IsDelete
                   );
                 Select 
                   Cast(
@@ -43,9 +43,9 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
     }
 
     /// <summary>
-    /// 使用者註冊
+    /// 使用者登入
     /// </summary>
-    /// <param name="userInformation">使用者註冊資訊</param>
+    /// <param name="userInformation">使用者登入資訊</param>
     /// <returns>使用者資訊</returns>
     public async Task<User> Login(User userInformation)
     {
@@ -71,7 +71,8 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
             @"Update 
                   [User] 
                 Set 
-                  UserHeadShot = COALESCE(@UserHeadShot, UserHeadShot)
+                  UserHeadShot = COALESCE(@UserHeadShot, UserHeadShot),
+                  UpdateTime    = GetDate()
                 where 
                   UserId = @UserId";
 
@@ -126,7 +127,8 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                        UserAddress   = COALESCE(@UserAddress, UserAddress),
                        UserPhone     = COALESCE(@UserPhone, UserPhone),
                        UserBirthDate = COALESCE(@UserBirthDate, UserBirthDate),
-                       UserGender    = COALESCE(@UserGender, UserGender)
+                       UserGender    = COALESCE(@UserGender, UserGender),
+                       UpdateTime    = GetDate()
                   WHERE UserId = @UserId";
 
         return await conn.ExecuteAsync(sql, request);
@@ -160,7 +162,8 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         var sql =
             @"UPDATE [User]
                   SET
-                  UserPassword = @NewUserPassword
+                  UserPassword = @NewUserPassword,
+                  UpdateTime    = GetDate()
                   WHERE UserId = @UserId";
 
         return await conn.ExecuteAsync(sql, request);
@@ -178,7 +181,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
 
         var sql =
             @"Update [User] Set 
-                    UserRole  = COALESCE(@UserRole, UserRole),
+                    UserRole    = COALESCE(@UserRole, UserRole),
                     UpdateTime  = COALESCE(@UpdateTime, UpdateTime)
                   WHERE UserId = @UserId";
         return await conn.ExecuteAsync(

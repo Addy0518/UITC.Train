@@ -20,9 +20,9 @@ public interface IOrderService
     /// <summary>
     /// 賣家查看所有訂單
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>所有訂單資訊</returns>
-    Task<ApiResponse<IEnumerable<OrderResponse>>> GetSellerOrder(int userId);
+    Task<ApiResponse<IEnumerable<OrderResponse>>> GetSellerOrder(int sellerId);
 
     /// <summary>
     /// 賣家查看單一訂單

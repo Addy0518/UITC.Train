@@ -7,13 +7,13 @@ public interface IProductsRepository
     /// </summary>
     /// <param name="pageIndex">頁碼</param>
     /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="userId">使用者 Id</param>
+    /// <param name="sellerId">賣家 Id</param>
     /// <param name="isDelete">是否為刪除狀態</param>
     /// <returns>商品列表</returns>
     Task<IEnumerable<ProductsResponse>> GetAllProducts(
         int pageIndex,
         int pageSize,
-        int? userId = null,
+        int? sellerId = null,
         IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
     );
 
@@ -49,9 +49,9 @@ public interface IProductsRepository
     /// 復原已選取的商品刪除狀態
     /// </summary>
     /// <param name="productId">選取的所有商品 Id</param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
-    Task<int> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId);
+    Task<int> UpdateProductsDeleteStatus(int sellerId, IEnumerable<int> productId);
 
     /// <summary>
     /// 設定商品庫存
@@ -62,11 +62,18 @@ public interface IProductsRepository
     Task<int> SetStock(int productsId, int purchaseQuantity);
 
     /// <summary>
+    /// 計算賣家所有商品數量
+    /// </summary>
+    /// <param name="sellerId">賣家 Id</param>
+    /// <returns>影響列數</returns>
+    Task<int> CountSellerProducts(int sellerId);
+
+    /// <summary>
     /// 軟刪除或硬刪除單一商品
     /// </summary>
     /// <param name="productsId">商品 ID</param>
     /// <param name="isDelete">刪除狀態</param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
-    Task<int> DeleteProducts(int productsId, IsDeleteStatusEnum isDelete, int userId);
+    Task<int> DeleteProducts(int productsId, IsDeleteStatusEnum isDelete, int sellerId);
 }

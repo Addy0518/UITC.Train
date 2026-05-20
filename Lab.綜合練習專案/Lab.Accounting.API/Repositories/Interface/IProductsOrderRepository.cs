@@ -14,9 +14,9 @@ public interface IProductsOrderRepository
     /// 賣家查看單一訂單
     /// </summary>
     /// <param name="orderId">訂單 ID </param>
-    /// <param name="userId">賣家 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>訂單資訊</returns>
-    Task<OrderResponse> GetSellerOneOrder(int orderId, int userId);
+    Task<OrderResponse> GetSellerOneOrder(int orderId, int sellerId);
 
     /// <summary>
     /// 查看買家所有訂單 ( 訂單編號查詢 )
@@ -35,9 +35,9 @@ public interface IProductsOrderRepository
     /// <summary>
     /// 賣家查看所有訂單
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>所有訂單資訊</returns>
-    Task<IEnumerable<OrderResponse>> GetSellerOrder(int userId);
+    Task<IEnumerable<OrderResponse>> GetSellerOrder(int sellerId);
 
     /// <summary>
     /// 改變運輸狀態

@@ -198,13 +198,13 @@ const totalPrice = computed(() =>
                 >NT$ {{ totalPrice.toLocaleString() }}</span
               >
             </span>
-            `
+
             <button
               class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
               @click="goToOrder"
             >
-              前往訂單</button
-            >`
+              前往訂單
+            </button>
           </div>
         </div>
       </div>

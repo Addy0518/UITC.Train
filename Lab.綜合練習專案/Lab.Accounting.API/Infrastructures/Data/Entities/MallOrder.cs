@@ -13,7 +13,12 @@ public class MallOrder
     public string OrderNumber { get; set; }
 
     /// <summary>
-    /// 使用者 ID
+    /// 賣家 ID
+    /// </summary>
+    public int SellerUserId { get; set; }
+
+    /// <summary>
+    /// 購買者 ID
     /// </summary>
     public int UserId { get; set; }
 
@@ -21,6 +26,16 @@ public class MallOrder
     /// 商品 ID
     /// </summary>
     public int ProductsId { get; set; }
+
+    /// <summary>
+    /// 商品當下的名稱
+    /// </summary>
+    public string ProductsName { get; set; }
+
+    /// <summary>
+    /// 商品當下的類別 ID
+    /// </summary>
+    public int? ProductCategoryId { get; set; }
 
     /// <summary>
     /// 購買數量

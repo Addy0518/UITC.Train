@@ -61,4 +61,9 @@ public class User
     /// 更新時間
     /// </summary>
     public DateTime UpdateTime { get; set; }
+
+    /// <summary>
+    /// 是否為刪除狀態
+    /// </summary>
+    public IsDeleteStatusEnum IsDelete { get; set; }
 }

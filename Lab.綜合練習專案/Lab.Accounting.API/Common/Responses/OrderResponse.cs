@@ -8,7 +8,12 @@
         public int OrderId { get; set; }
 
         /// <summary>
-        /// 使用者 ID
+        /// 賣家 ID
+        /// </summary>
+        public int SellerUserId { get; set; }
+
+        /// <summary>
+        /// 購買者 ID
         /// </summary>
         public int UserId { get; set; }
 
@@ -58,6 +63,11 @@
         public DateTime? PaidTime { get; set; }
 
         /// <summary>
+        /// 購買時間
+        /// </summary>
+        public DateTime BoughtTime { get; set; }
+
+        /// <summary>
         /// 運送地址
         /// </summary>
         public string? ShippingAddress { get; set; }
@@ -71,5 +81,10 @@
         /// 商品圖片 URL
         /// </summary>
         public string ProductsImg { get; set; }
+
+        /// <summary>
+        /// 是否為刪除狀態
+        /// </summary>
+        public IsDeleteStatusEnum? IsDelete { get; set; }
     }
 }

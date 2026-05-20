@@ -7,13 +7,13 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="pageIndex">頁碼</param>
     /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="userId">使用者 Id</param>
+    /// <param name="sellerId">賣家 Id</param>
     /// <param name="isDelete">是否為刪除狀態</param>
     /// <returns>商品列表</returns>
     public async Task<IEnumerable<ProductsResponse>> GetAllProducts(
         int pageIndex,
         int pageSize,
-        int? userId = null,
+        int? sellerId = null,
         IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
     )
     {
@@ -44,7 +44,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
             {
                 offset = offset,
                 pageSize = pageSize,
-                UserId = userId,
+                UserId = sellerId,
                 isDelete = isDelete,
             }
         );
@@ -119,6 +119,8 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      ProductsStock,
                                      ProductsDescription,
                                      ProductCategoryId,
+                                     CreateTime,
+                                     UpdateTime,
                                      IsDelete
                                      )
                         VALUES      (@UserId,
@@ -127,6 +129,8 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      @ProductsStock,
                                      @ProductsDescription,
                                      @ProductCategoryId,
+                                     GetDate(),
+                                     GetDate(),
                                      @IsDelete
                                      ) 
                         Select 
@@ -152,7 +156,8 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  productsprice = COALESCE(@ProductsPrice, productsprice),
                                  ProductsStock = COALESCE(@ProductsStock, ProductsStock),
                                  ProductsDescription = COALESCE(@ProductsDescription, ProductsDescription),
-                                 ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId)
+                                 ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId),
+                                 UpdateTime    = GetDate()
                         WHERE    productsid = @ProductsId and userId=@UserId;";
         return await conn.ExecuteAsync(sql, products);
     }
@@ -161,18 +166,19 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// 復原已選取的商品刪除狀態
     /// </summary>
     /// <param name="productId">選取的所有商品 Id</param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<int> UpdateProductsDeleteStatus(int userId, IEnumerable<int> productId)
+    public async Task<int> UpdateProductsDeleteStatus(int sellerId, IEnumerable<int> productId)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
             @"UPDATE mallproducts
-                        SET     IsDelete = 0                              
+                        SET     IsDelete = 0 ,
+                                UpdateTime   = GetDate()
                         WHERE   UserId = @UserId
                         And     ProductsId in @ProductsId";
-        return await conn.ExecuteAsync(sql, new { ProductsId = productId, UserId = userId });
+        return await conn.ExecuteAsync(sql, new { ProductsId = productId, UserId = sellerId });
     }
 
     /// <summary>
@@ -180,9 +186,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="productsId">商品 ID</param>
     /// <param name="isDelete">刪除狀態</param>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<int> DeleteProducts(int productsId, IsDeleteStatusEnum isDelete, int userId)
+    public async Task<int> DeleteProducts(int productsId, IsDeleteStatusEnum isDelete, int sellerId)
     {
         using var conn = connecting.CreateConnecting();
         //用 true 跟 false 判斷是否執行硬刪除或是軟刪除
@@ -193,10 +199,10 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                     Delete From MallProductsRate Where ProductsID=@productsId;
                     Delete From MallShoppingCar Where ProductsID=@productsId;
                     Delete From MallProducts Where ProductsID=@productsId and UserId=@userId;"
-                : @"Update MallProducts Set IsDelete=1 Where ProductsID=@productsId and UserId=@userId;
+                : @"Update MallProducts Set IsDelete=1,UpdateTime=GetDate() Where ProductsID=@productsId and UserId=@userId;
                     ";
 
-        return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = userId });
+        return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = sellerId });
     }
 
     /// <summary>
@@ -211,9 +217,27 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
 
         var sql =
             @"Update mallproducts
-                    SET ProductsStock = @purchaseQuantity
+                    SET 
+                          ProductsStock = @purchaseQuantity,
+                          UpdateTime   = GetDate()
                     WHERE ProductsId = @productsId ";
 
         return await conn.ExecuteAsync(sql, new { productsId, purchaseQuantity });
+    }
+
+    /// <summary>
+    /// 計算賣家所有商品數量
+    /// </summary>
+    /// <param name="sellerId">賣家 Id</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> CountSellerProducts(int sellerId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"SELECT COUNT(*) FROM mallproducts 
+              WHERE UserId = @SellerId AND isDelete = 0";
+
+        return await conn.ExecuteAsync(sql, new { SellerId = sellerId });
     }
 }

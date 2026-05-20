@@ -15,12 +15,12 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"SELECT m.*,p.ProductsName, p.ProductCategoryId,
+            @"SELECT m.*,p.IsDelete,
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
             FROM   mallorder m
-            Join   mallproducts p on m.productsid=p.productsid
+            Left Join   mallproducts p on m.productsid=p.productsid
             Where OrderId = @OrderId
             And m.UserId = @UserId";
 
@@ -41,14 +41,14 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"SELECT m.*,p.ProductsName, p.ProductCategoryId,
+            @"SELECT m.*,p.IsDelete,
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
             FROM   mallorder m
-            Join   mallproducts p on m.productsid=p.productsid
+            Left Join   mallproducts p on m.productsid=p.productsid
             Where OrderId = @OrderId
-            And p.UserId = @SellerId";
+            And m.SellerUserId = @SellerId";
 
         return await conn.QueryFirstOrDefaultAsync<OrderResponse>(
             addBoughtProductsql,
@@ -83,12 +83,12 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"SELECT m.*,p.ProductsName, p.ProductCategoryId,
+            @"SELECT m.*,p.IsDelete,
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
             FROM   mallorder m
-            Join   mallproducts p on m.productsid=p.productsid
+            Left Join   mallproducts p on m.productsid=p.productsid
             WHERE  m.userid = @UserId ";
 
         return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });
@@ -97,22 +97,22 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     /// <summary>
     /// 賣家查看所有訂單
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
     /// <returns>所有訂單資訊</returns>
-    public async Task<IEnumerable<OrderResponse>> GetSellerOrder(int userId)
+    public async Task<IEnumerable<OrderResponse>> GetSellerOrder(int sellerId)
     {
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"SELECT m.*,m.UserId,p.ProductsName, p.ProductCategoryId
+            @"SELECT m.*,m.UserId,p.IsDelete
                    , (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
             FROM   mallorder m
-            Join   mallproducts p on m.productsid=p.productsid
-            WHERE  p.userid = @UserId";
+            Left Join   mallproducts p on m.productsid=p.productsid
+            WHERE  m.SellerUserId = @UserId";
 
-        return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });
+        return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = sellerId });
     }
 
     /// <summary>
@@ -147,8 +147,11 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         var addBoughtProductsql =
             @"INSERT INTO MallOrder
                             (OrderNumber,
+                             SellerUserId,
                              UserId,
                              ProductsId,
+                             ProductsName,
+                             ProductCategoryId,
                              BoughtQuantity,
                              UnitPrice,
                              AccountPrice,
@@ -157,8 +160,11 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              ShippingStatus)
 
                 VALUES      (@OrderNumber,
+                             @SellerUserId,
                              @UserId,
                              @ProductsId,
+                             @ProductsName,
+                             @ProductCategoryId,
                              @BoughtQuantity,
                              @UnitPrice,
                              @AccountPrice,
