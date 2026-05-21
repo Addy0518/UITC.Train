@@ -34,6 +34,7 @@ onMounted(() => {
 const loadproducts = async () => {
   try {
     showLoading();
+    
     const res = await getAllProduct();
     const { data } = res;
 

@@ -10,6 +10,7 @@ global using System.Text;
 global using System.Transactions;
 global using System.Web;
 global using Dapper;
+global using FluentValidation;
 global using Lab.Accounting.API.Common.Enums;
 global using Lab.Accounting.API.Common.Helpers;
 global using Lab.Accounting.API.Common.Requests;

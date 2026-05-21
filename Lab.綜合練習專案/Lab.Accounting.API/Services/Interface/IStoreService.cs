@@ -5,7 +5,7 @@
         /// <summary>
         /// 取得賣場資訊
         /// </summary>
-        /// <param name="sellerId">賣場 ID </param>
+        /// <param name="sellerId">賣家 ID </param>
         /// <returns>賣場資訊</returns>
         Task<ApiResponse<StoreResponse>> GetStore(int sellerId);
 

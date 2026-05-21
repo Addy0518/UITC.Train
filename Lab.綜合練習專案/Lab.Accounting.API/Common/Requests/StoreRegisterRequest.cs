@@ -21,7 +21,7 @@
         /// </summary>
         [Display(Name = "統一編號")]
         [Required(ErrorMessage = "{0} 不能為空!")]
-        public int StoreUnifiedNumber { get; set; }
+        public string StoreUnifiedNumber { get; set; }
 
         /// <summary>
         /// 公司名稱

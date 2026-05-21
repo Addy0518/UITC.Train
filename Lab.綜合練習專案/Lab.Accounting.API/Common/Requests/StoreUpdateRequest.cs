@@ -21,6 +21,7 @@
         /// </summary>
         [Display(Name = "賣場名稱")]
         [Required(ErrorMessage = "{0} 不能為空!")]
+        [MaxLength(100, ErrorMessage = "{0} 不能超過 {1} 個字!")]
         public string StoreName { get; set; }
 
         /// <summary>
@@ -28,12 +29,14 @@
         /// </summary>
         [Display(Name = "統一編號")]
         [Required(ErrorMessage = "{0} 不能為空!")]
-        public int StoreUnifiedNumber { get; set; }
+        [RegularExpression(@"^\d{8}$", ErrorMessage = "{0} 格式不正確，須為 8 位數字!")]
+        public string StoreUnifiedNumber { get; set; }
 
         /// <summary>
         /// 公司名稱
         /// </summary>
         [Display(Name = "公司名稱")]
+        [MaxLength(100, ErrorMessage = "{0} 不能超過 {1} 個字!")]
         public string? StoreCompanyName { get; set; }
     }
 }

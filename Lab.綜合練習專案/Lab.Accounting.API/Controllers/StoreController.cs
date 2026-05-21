@@ -13,12 +13,14 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     /// <summary>
     /// 取得賣場資訊
     /// </summary>
+    /// <param name="sellerId">賣家 ID </param>
     /// <returns>賣家資訊</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<StoreResponse>))]
-    public async Task<IActionResult> GetStore()
+    public async Task<IActionResult> GetStore([FromQuery] int sellerId)
     {
-        return Ok(await sellerservice.GetStore(CurrentUserId));
+        return Ok(await sellerservice.GetStore(sellerId));
     }
 
     /// <summary>

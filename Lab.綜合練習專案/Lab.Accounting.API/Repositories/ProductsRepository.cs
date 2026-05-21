@@ -5,21 +5,52 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
     /// </summary>
-    /// <param name="pageIndex">頁碼</param>
-    /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="sellerId">賣家 Id</param>
-    /// <param name="isDelete">是否為刪除狀態</param>
+    /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<IEnumerable<ProductsResponse>> GetAllProducts(
-        int pageIndex,
-        int pageSize,
-        int? sellerId = null,
-        IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
-    )
+    public async Task<IEnumerable<ProductsResponse>> GetAllProducts(ProductsSearchRequest request)
     {
         using var conn = connecting.CreateConnecting();
 
-        int offset = pageIndex * pageSize;
+        int offset = request.pageIndex * request.pageSize;
+        // Offset 代表要跳過的行數，Fetch Next 代表要取得的行數
+        var sql =
+            @"SELECT   m.productsid,
+                                 m.userid,
+                                 m.productsname,
+                                 m.productsprice,
+                                 m.ProductsStock,
+                                 m.ProductCategoryId,
+                                 c.productcategoryname
+                        FROM     mallproducts m
+                        JOIN     mallproductcategory c
+                        ON       c.productcategoryid= m.ProductCategoryId
+                        Where (@UserId is null or m.userId=@UserId) 
+                        and  m.isDelete=0
+                        and  m.ProductsStock > 0
+                        ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
+
+        var result = await conn.QueryAsync<ProductsResponse>(
+            sql,
+            new
+            {
+                offset = offset,
+                pageSize = request.pageSize,
+                UserId = request.sellerId,
+            }
+        );
+        return result;
+    }
+
+    /// <summary>
+    /// 賣家查看自己的所有商品
+    /// </summary>
+    ///  <param name="request">搜尋條件</param>
+    /// <returns>商品列表</returns>
+    public async Task<IEnumerable<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        int offset = request.pageIndex * request.pageSize;
         // Offset 代表要跳過的行數，Fetch Next 代表要取得的行數
         var sql =
             @"SELECT   m.productsid,
@@ -34,8 +65,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
                         Where (@UserId is null or m.userId=@UserId) 
-                        and  (@isDelete is null or m.isDelete=@isDelete)
-                        and  m.ProductsStock > 0
+                        and  (@IsDelete is null or m.IsDelete=@IsDelete) 
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
         var result = await conn.QueryAsync<ProductsResponse>(
@@ -43,9 +73,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
             new
             {
                 offset = offset,
-                pageSize = pageSize,
-                UserId = sellerId,
-                isDelete = isDelete,
+                pageSize = request.pageSize,
+                UserId = request.sellerId,
+                IsDelete = request.isDelete,
             }
         );
         return result;

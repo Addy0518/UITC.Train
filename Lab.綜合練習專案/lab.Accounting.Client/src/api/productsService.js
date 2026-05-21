@@ -1,5 +1,4 @@
 import accountApiInstance from '@/api/accountInstance.js';
-import { isDeleteEnum } from '../common/enum';
 
 // 商品相關 API ===========================================================
 
@@ -7,28 +6,12 @@ import { isDeleteEnum } from '../common/enum';
 export const getProduct = (productId) =>
   accountApiInstance.get(`Products/GetProducts?productId=${productId}`);
 // 查看所有商品
-export const getAllProduct = (pageIndex = 0, pageSize = 10) =>
-  accountApiInstance.get(`Products/GetAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+export const getAllProduct = (request) =>
+  accountApiInstance.get(`Products/GetAllProducts`, { params: request });
 // 賣家查看賣場所有商品
-export const getSellerAllProduct = (
-  pageIndex = 0,
-  pageSize = 10,
-  isDelete = isDeleteEnum.Normal.value,
-) =>
-  accountApiInstance.get(
-    `Products/GetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}&isDelete=${isDelete}`,
-  );
+export const getSellerAllProduct = (request) =>
+  accountApiInstance.get(`Products/SellerGetAllProducts`, { params: request });
 
-// 買家查看賣場所有商品
-export const userGetSellerAllProduct = (
-  pageIndex = 0,
-  pageSize = 10,
-  isDelete = isDeleteEnum.Normal.value,
-  userId,
-) =>
-  accountApiInstance.get(
-    `Products/UserGetSellerAllProducts?pageIndex=${pageIndex}&pageSize=${pageSize}&isDelete=${isDelete}&userId=${userId}`,
-  );
 // 查看類別
 export const getCategory = (categoryId = null) =>
   accountApiInstance.get(`Products/GetCategory`, { params: { productcategoryId: categoryId } });

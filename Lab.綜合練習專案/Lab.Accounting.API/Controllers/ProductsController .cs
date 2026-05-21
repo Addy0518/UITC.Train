@@ -28,54 +28,27 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <summary>
     /// 查看所有商品
     /// </summary>
-    /// <param name="pageIndex">頁碼</param>
-    /// <param name="pageSize">每頁顯示數量</param>
+    /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
-    public async Task<IActionResult> GetAllProducts([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAllProducts([FromQuery] ProductsSearchRequest request)
     {
-        return Ok(await productsService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10));
+        return Ok(await productsService.GetAllProducts(request));
     }
 
     /// <summary>
-    /// 買家查看賣場所有商品
+    /// 賣家查看自己的所有商品
     /// </summary>
-    /// <param name="pageIndex">頁碼</param>
-    /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="isDelete">是否為刪除狀態</param>
-    /// <param name="sellerId">賣家 ID </param>
+    /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
     [HttpGet]
-    [AllowAnonymous]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
-    public async Task<IActionResult> UserGetSellerAllProducts(
-        [FromQuery] int sellerId,
-        [FromQuery] int? pageIndex,
-        [FromQuery] int? pageSize,
-        [FromQuery] IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
-    )
+    public async Task<IActionResult> SellerGetAllProducts([FromQuery] ProductsSearchRequest request)
     {
-        return Ok(await productsService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, sellerId, isDelete));
-    }
-
-    /// <summary>
-    /// 賣家查看賣場所有商品
-    /// </summary>
-    /// <param name="pageIndex">頁碼</param>
-    /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="isDelete">是否為刪除狀態</param>
-    /// <returns>商品列表</returns>
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
-    public async Task<IActionResult> GetSellerAllProducts(
-        [FromQuery] int? pageIndex,
-        [FromQuery] int? pageSize,
-        [FromQuery] IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
-    )
-    {
-        return Ok(await productsService.GetAllProducts(pageIndex ?? 0, pageSize ?? 10, CurrentUserId, isDelete));
+        return Ok(await productsService.SellerGetAllProducts(request));
     }
 
     /// <summary>

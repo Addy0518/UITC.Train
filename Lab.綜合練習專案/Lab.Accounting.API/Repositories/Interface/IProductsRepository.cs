@@ -5,17 +5,16 @@ public interface IProductsRepository
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
     /// </summary>
-    /// <param name="pageIndex">頁碼</param>
-    /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="sellerId">賣家 Id</param>
-    /// <param name="isDelete">是否為刪除狀態</param>
+    /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<IEnumerable<ProductsResponse>> GetAllProducts(
-        int pageIndex,
-        int pageSize,
-        int? sellerId = null,
-        IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
-    );
+    Task<IEnumerable<ProductsResponse>> GetAllProducts(ProductsSearchRequest request);
+
+    /// <summary>
+    /// 賣家查看自己的所有商品
+    /// </summary>
+    ///  <param name="request">搜尋條件</param>
+    /// <returns>商品列表</returns>
+    Task<IEnumerable<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 查看單一商品

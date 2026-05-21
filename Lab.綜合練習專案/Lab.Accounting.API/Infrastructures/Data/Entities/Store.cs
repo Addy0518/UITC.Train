@@ -20,7 +20,7 @@
         /// <summary>
         /// 統一編號
         /// </summary>
-        public int StoreUnifiedNumber { get; set; }
+        public string StoreUnifiedNumber { get; set; }
 
         /// <summary>
         /// 公司名稱

@@ -39,21 +39,37 @@ public class ProductsService(
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
     /// </summary>
-    /// <param name="pageIndex">頁碼</param>
-    /// <param name="pageSize">每頁顯示數量</param>
-    /// <param name="sellerId">賣家 Id</param>
-    /// <param name="isDelete">是否為刪除狀態</param>
+    /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(
-        int pageIndex,
-        int pageSize,
-        int? sellerId = null,
-        IsDeleteStatusEnum? isDelete = IsDeleteStatusEnum.Normal
-    )
+    public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(ProductsSearchRequest request)
     {
-        var products = await productsRepositories.GetAllProducts(pageIndex, pageSize, sellerId, isDelete);
+        var products = await productsRepositories.GetAllProducts(request);
 
-        if (products == null)
+        if (!products.Any())
+        {
+            return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
+        }
+
+        // 開兩條執行緒同時查詢
+        var tasks = products.Select(async product =>
+        {
+            product.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId) ?? 0;
+            product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
+        });
+        await Task.WhenAll(tasks);
+        return ApiResponseHelper.Success(products);
+    }
+
+    /// <summary>
+    /// 賣家查看自己的所有商品
+    /// </summary>
+    /// <param name="request">搜尋條件</param>
+    /// <returns>商品列表</returns>
+    public async Task<ApiResponse<IEnumerable<ProductsResponse>>> SellerGetAllProducts(ProductsSearchRequest request)
+    {
+        var products = await productsRepositories.SellerGetAllProducts(request);
+
+        if (!products.Any())
         {
             return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
         }
@@ -200,7 +216,7 @@ public class ProductsService(
 
             var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, sellerId);
 
-            if (deletetarget == null)
+            if (deletetarget == 0)
                 return ApiResponseHelper.InternalException<int>("刪除失敗");
 
             if (target.IsDelete == IsDeleteStatusEnum.Deleted)

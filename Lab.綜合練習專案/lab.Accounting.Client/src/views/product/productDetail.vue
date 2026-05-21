@@ -1,7 +1,7 @@
 <script setup>
 import { getProduct } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
-import { getSeller } from '@/api/sellerService';
+import { getStore } from '@/api/storeService';
 import { getOneUser } from '@/api/userService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
@@ -16,6 +16,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    displayBasic : 大圖展開開關
    activeIndex : 當下選擇開啟的大圖
    seller : 賣家
+   store : 賣場
 */
 const route = useRoute();
 const router = useRouter();
@@ -26,6 +27,7 @@ const boughtQuantity = ref(1);
 const displayBasic = ref(false);
 const activeIndex = ref();
 const seller = ref();
+const store = ref();
 /*
    注入 Loading 跟 Toast
 */
@@ -59,8 +61,9 @@ const getProductDetail = async (id) => {
 /*
    初始化時從 url 拿取 商品 ID
 */
-onMounted(() => {
-  getProductDetail(route.params.id);
+onMounted(async () => {
+  await getProductDetail(route.params.id);
+  await getStoreInfo(product.value.userId);
 });
 
 /*
@@ -74,6 +77,25 @@ const getSellerInfo = async (id) => {
 
     if (data.codeStatus === 2000) {
       seller.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
+   拿到賣場資訊
+*/
+const getStoreInfo = async (id) => {
+  try {
+    showLoading();
+    const res = await getStore(id);
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      store.value = data.returnData;
     }
   } catch (err) {
     console.log(err);
@@ -353,7 +375,7 @@ const boughtProduct = async (id, boughtquantity) => {
         </div>
         <!-- #endregion -->
 
-        <!--#region 賣家資訊 -->
+        <!--#region 賣場資訊 -->
         <div class="bg-white rounded-lg p-6 flex gap-8 items-center" v-if="product.userId">
           <!--#region  頭像 + 名稱 + 按鈕 -->
           <div class="flex gap-5 items-center min-w-52">
@@ -363,21 +385,22 @@ const boughtProduct = async (id, boughtquantity) => {
               class="w-18 h-18 rounded-full object-cover border border-gray-100"
             />
             <div class="flex flex-col gap-1.5">
-              <p class="m-0 text-base font-medium text-gray-900">{{ seller.userName }}</p>
+              <p class="m-0 text-base font-medium text-gray-900">{{ store.storeName }}</p>
               <div class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
                 <span class="text-xs text-gray-400">在線上</span>
               </div>
               <div class="flex gap-2 mt-1">
                 <button
-                  class="px-3 py-1 border border-orange-500 text-orange-500 text-xs rounded cursor-pointer hover:bg-orange-50 flex items-center gap-1"
-                >
-                  <i class="pi pi-plus text-xs"></i>關注
-                </button>
-                <button
                   class="px-3 py-1 border border-gray-300 text-gray-500 text-xs rounded cursor-pointer hover:bg-gray-50 flex items-center gap-1"
                 >
                   <i class="pi pi-comment text-xs"></i>聊聊
+                </button>
+                <button
+                  class="px-3 py-1 border border-orange-500 text-orange-500 text-xs rounded cursor-pointer hover:bg-orange-50 flex items-center gap-1"
+                  @click="router.push({ name: 'seller-store', params: { id: seller.userId } })"
+                >
+                  <i class="pi pi-plus text-xs"></i>前往賣場
                 </button>
               </div>
             </div>
@@ -390,34 +413,25 @@ const boughtProduct = async (id, boughtquantity) => {
           <!--#region  統計資訊 -->
           <div class="grid grid-cols-3 gap-x-10 gap-y-2.5 flex-1 text-sm">
             <div class="flex items-center gap-2">
-              <i class="pi pi-box text-gray-300 text-sm"></i>
               <span class="text-gray-400">商品</span>
-              <span class="text-orange-500 font-medium">--</span>
+              <span class="text-orange-500 font-medium">{{ store.allProductsCount }}</span>
             </div>
+
             <div class="flex items-center gap-2">
-              <i class="pi pi-users text-gray-300 text-sm"></i>
-              <span class="text-gray-400">粉絲</span>
-              <span class="text-orange-500 font-medium">--</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-clock text-gray-300 text-sm"></i>
               <span class="text-gray-400">加入時間</span>
-              <span class="text-gray-700 font-medium">--</span>
+              <span class="text-gray-700 font-medium">{{ formatDateOnly(store.createTime) }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <i class="pi pi-star text-gray-300 text-sm"></i>
               <span class="text-gray-400">評價</span>
               <span class="text-orange-500 font-medium">{{ allRate.length }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <i class="pi pi-comment text-gray-300 text-sm"></i>
-              <span class="text-gray-400">聊聊回應率</span>
-              <span class="text-orange-500 font-medium">--</span>
+              <span class="text-gray-400">公司名稱</span>
+              <span class="text-gray-700 font-medium">{{ store.storeCompanyName }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <i class="pi pi-bolt text-gray-300 text-sm"></i>
-              <span class="text-gray-400">回應速度</span>
-              <span class="text-gray-700 font-medium">--</span>
+              <span class="text-gray-400">公司統編</span>
+              <span class="text-gray-700 font-medium">{{ store.storeUnifiedNumber }}</span>
             </div>
           </div>
           <!-- #endregion -->

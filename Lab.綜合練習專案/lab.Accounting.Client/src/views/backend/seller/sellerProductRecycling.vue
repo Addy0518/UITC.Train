@@ -4,6 +4,7 @@ import {
   deleteProducts,
   updateProductsDeleteStatus,
 } from '@/api/productsService';
+import { isDeleteEnum } from '@/common/enum';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import Swal from 'sweetalert2';
 
@@ -34,7 +35,12 @@ onMounted(() => {
 */
 const getSellerProduct = async () => {
   try {
-    const res = await getSellerAllProduct(0, 10, isDeleteEnum.Delete.value);
+    const request = {
+      pageIndex: 0,
+      pageSize: 10,
+      isDelete: isDeleteEnum.Delete.value,
+    };
+    const res = await getSellerAllProduct(request);
     const { data } = res;
     if (data.codeStatus === 2000) {
       allproduct.value = data.returnData;

@@ -36,17 +36,17 @@
         /// <summary>
         /// 取得賣場資訊
         /// </summary>
-        /// <param name="sellerId">賣場 ID </param>
+        /// <param name="sellerId">賣家 ID </param>
         /// <returns>賣場資訊</returns>
         public async Task<Store> GetStore(int sellerId)
         {
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"Select * From Seller
-                where UserId = @SellerId";
+                @"Select * From Store
+                where UserId = @UserId";
 
-            return await conn.QueryFirstOrDefaultAsync<Store>(sql, new { SellerId = sellerId });
+            return await conn.QueryFirstOrDefaultAsync<Store>(sql, new { UserId = sellerId });
         }
 
         /// <summary>

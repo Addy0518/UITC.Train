@@ -11,7 +11,7 @@ namespace Lab.Accounting.API.Services
         /// <summary>
         /// 取得賣場資訊
         /// </summary>
-        /// <param name="sellerId">賣場 ID </param>
+        /// <param name="sellerId">賣家 ID </param>
         /// <returns>賣場資訊</returns>
         public async Task<ApiResponse<StoreResponse>> GetStore(int sellerId)
         {
@@ -30,6 +30,7 @@ namespace Lab.Accounting.API.Services
                 StoreUnifiedNumber = target.StoreUnifiedNumber,
                 StoreCompanyName = target.StoreCompanyName,
                 AllProductsCount = productCount,
+                CreateTime = target.CreateTime,
             };
             return ApiResponseHelper.Success(result);
         }

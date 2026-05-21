@@ -15,7 +15,7 @@
         /// <summary>
         /// 統一編號
         /// </summary>
-        public int StoreUnifiedNumber { get; set; }
+        public string StoreUnifiedNumber { get; set; }
 
         /// <summary>
         /// 公司名稱
@@ -26,5 +26,10 @@
         /// 所有商品的數量
         /// </summary>
         public int? AllProductsCount { get; set; }
+
+        /// <summary>
+        /// 創建時間
+        /// </summary>
+        public DateTime CreateTime { get; set; }
     }
 }

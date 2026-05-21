@@ -32,7 +32,11 @@ onMounted(() => {
 */
 const getSellerProduct = async () => {
   try {
-    var res = await getSellerAllProduct();
+    const request = {
+      pageIndex: 0,
+      pageSize: 10,
+    };
+    const res = await getSellerAllProduct(request);
     const { data } = res;
 
     if (data.codeStatus === 2000) {

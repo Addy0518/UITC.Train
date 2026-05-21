@@ -1,5 +1,5 @@
 <script setup>
-import { userGetSellerAllProduct } from '@/api/productsService';
+import { getAllProduct } from '@/api/productsService';
 
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
@@ -38,7 +38,12 @@ onMounted(() => {
 const getSellerProduct = async () => {
   try {
     showLoading();
-    var res = await userGetSellerAllProduct(0, 10, isDeleteEnum.Normal.value, route.params.id);
+    const request = {
+      pageIndex: 0,
+      pageSize: 10,
+      sellerId: route.params.id,
+    };
+    const res = await getAllProduct(request);
     const { data } = res;
 
     if (data.codeStatus === 2000) {
