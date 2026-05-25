@@ -7,7 +7,7 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
     /// </summary>
     /// <param name="userId">使用者 Id</param>
     /// <returns>購物車中的所有商品</returns>
-    public async Task<IEnumerable<ProductsResponse>> GetAllProductsInShoppingCar(int userId)
+    public async Task<IEnumerable<Product>> GetAllProductsInShoppingCar(int userId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -35,7 +35,7 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
                                m.ProductsStock,   
                                s.boughtquantity";
 
-        return await conn.QueryAsync<ProductsResponse>(sql, new { UserId = userId });
+        return await conn.QueryAsync<Product>(sql, new { UserId = userId });
     }
 
     /// <summary>

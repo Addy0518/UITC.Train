@@ -21,6 +21,12 @@
         public int? sellerId { get; set; }
 
         /// <summary>
+        /// 商品類別 ID
+        /// </summary>
+        [Display(Name = "商品類別 ID")]
+        public int? productCategoryId { get; set; }
+
+        /// <summary>
         /// 是否為刪除狀態
         /// </summary>
         [Display(Name = "是否為刪除狀態")]

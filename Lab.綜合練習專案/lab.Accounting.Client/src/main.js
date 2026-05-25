@@ -29,6 +29,9 @@ import InValidErrorMessage from '@/common/InValidErrorMessage.vue';
 import Loading from '@/common/Loading.vue';
 import Rating from 'primevue/rating';
 import Galleria from 'primevue/galleria';
+import Breadcrumb from 'primevue/breadcrumb';
+import Paginator from 'primevue/paginator';
+
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -67,6 +70,8 @@ app.component('Toast', Toast);
 app.component('PanelMenu', PanelMenu);
 app.component('Rating', Rating);
 app.component('Galleria', Galleria);
+app.component('Breadcrumb', Breadcrumb);
+app.component('Paginator', Paginator);
 app.component('InValidErrorMessage', InValidErrorMessage);
 app.component('Loading', Loading);
 app.use(ToastService);

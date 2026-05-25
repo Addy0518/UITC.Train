@@ -68,7 +68,7 @@ instance.interceptors.response.use(
         break;
       case httpCodeStatusEnum.Forbidden:
         toast.add({ severity: 'error', summary: '認證失敗', detail: '你沒有訪問權限', life: 5000 });
-
+        router.push({ name: 'mall' });
         break;
       case httpCodeStatusEnum.InternalServerError:
         const msg = `${data.message} | ${data.error500?.title}`;

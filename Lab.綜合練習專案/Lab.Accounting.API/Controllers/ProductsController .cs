@@ -19,7 +19,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>商品資訊</returns>
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Product>))]
     public async Task<IActionResult> GetProducts([FromQuery] int productId)
     {
         return Ok(await productsService.GetProducts(productId));
@@ -32,7 +32,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>商品列表</returns>
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> GetAllProducts([FromQuery] ProductsSearchRequest request)
     {
         return Ok(await productsService.GetAllProducts(request));
@@ -45,7 +45,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>商品列表</returns>
     [HttpGet]
     [Authorize(Roles = RolesAuth.賣家)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> SellerGetAllProducts([FromQuery] ProductsSearchRequest request)
     {
         return Ok(await productsService.SellerGetAllProducts(request));
@@ -58,7 +58,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>商品類別</returns>
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductsResponse>>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
     public async Task<IActionResult> GetCategory([FromQuery] int? productcategoryId = null)
     {
         return Ok(await productsService.GetCategory(productcategoryId));
@@ -71,7 +71,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>商品資訊</returns>
     [HttpPost]
     [Authorize(Roles = RolesAuth.賣家)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> CreateProducts([FromBody] ProductsInsertRequest productsInsertRequest)
     {
         productsInsertRequest.UserId = CurrentUserId;
@@ -85,7 +85,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>影響列數</returns>
     [HttpPut]
     [Authorize(Roles = RolesAuth.賣家)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> UpdateProducts(ProductsUpdateRequest productsUpdateRequest)
     {
         productsUpdateRequest.UserId = CurrentUserId;
@@ -99,7 +99,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>影響列數</returns>
     [HttpPut]
     [Authorize(Roles = RolesAuth.賣家)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> UpdateProductsDeleteStatus([FromBody] IEnumerable<int> productId)
     {
         return Ok(await productsService.UpdateProductsDeleteStatus(CurrentUserId, productId));
@@ -112,7 +112,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>影響列數</returns>
     [HttpDelete]
     [Authorize(Roles = RolesAuth.賣家)]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> DeleteProducts([FromQuery] int productsId)
     {
         return Ok(await productsService.DeleteProducts(productsId, CurrentUserId));

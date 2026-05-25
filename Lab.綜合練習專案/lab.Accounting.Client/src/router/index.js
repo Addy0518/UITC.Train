@@ -141,6 +141,17 @@ const router = createRouter({
         },
         {
           /*
+            類別詳細
+          */
+          path: 'mall-category/:id',
+          name: 'mall-category',
+          meta: {
+            isPermissionVerification: false,
+          },
+          component: () => import('@/views/mall/mallCategory.vue'),
+        },
+        {
+          /*
             購物車
           */
           path: 'shopping-car',
@@ -375,11 +386,12 @@ const router = createRouter({
 */
 router.beforeEach((to) => {
   const authStore = useAuthStore();
+
   if (to.meta.isPermissionVerification && !authStore.token) {
     return { name: 'login' };
   }
   if (to.meta.isSeller && authStore.userRole !== 'Seller') {
-    return { name: 'mall' };
+    return { name: 'mall', query: { forbidden: 1 } };
   }
 });
 

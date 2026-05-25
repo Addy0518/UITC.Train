@@ -7,21 +7,21 @@ public interface IProductsService
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    Task<ApiResponse<ProductsResponse>> GetProducts(int productId);
+    Task<ApiResponse<Product>> GetProducts(int productId);
 
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(ProductsSearchRequest request);
+    Task<ApiResponse<ProductsResponse>> GetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 賣家查看自己的所有商品
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<ApiResponse<IEnumerable<ProductsResponse>>> SellerGetAllProducts(ProductsSearchRequest request);
+    Task<ApiResponse<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 查看商品類別

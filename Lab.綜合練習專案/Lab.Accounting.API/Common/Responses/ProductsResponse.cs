@@ -2,6 +2,16 @@
 
 public class ProductsResponse
 {
+    public IEnumerable<Product> Products { get; set; }
+
+    /// <summary>
+    /// 總筆數
+    /// </summary>
+    public int? TotalCount { get; set; }
+}
+
+public class Product
+{
     /// <summary>
     /// 商品 ID
     /// </summary>
@@ -23,9 +33,14 @@ public class ProductsResponse
     public string ProductCategoryName { get; set; }
 
     /// <summary>
-    /// 類別父 ID ( 可為 null，表示該類別為頂層類別 )
+    /// 父類別 ID ( 可為 null，表示該類別為頂層類別 )
     /// </summary>
     public int? ProductParentId { get; set; }
+
+    /// <summary>
+    /// 父類別名稱
+    /// </summary>
+    public string ParentCategoryName { get; set; }
 
     /// <summary>
     /// 商品名稱

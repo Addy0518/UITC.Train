@@ -19,13 +19,13 @@ public class ProductsService(
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    public async Task<ApiResponse<ProductsResponse>> GetProducts(int productId)
+    public async Task<ApiResponse<Product>> GetProducts(int productId)
     {
         var target = await productsRepositories.GetProducts(productId);
 
         if (target == null)
         {
-            return ApiResponseHelper.NotFound<ProductsResponse>();
+            return ApiResponseHelper.NotFound<Product>();
         }
         target.ProductsImgs = await productsImgRepository.GetProductsAllImg(productId);
 
@@ -41,13 +41,13 @@ public class ProductsService(
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<ApiResponse<IEnumerable<ProductsResponse>>> GetAllProducts(ProductsSearchRequest request)
+    public async Task<ApiResponse<ProductsResponse>> GetAllProducts(ProductsSearchRequest request)
     {
         var products = await productsRepositories.GetAllProducts(request);
-
+        var totalCount = await productsRepositories.CountProducts(request);
         if (!products.Any())
         {
-            return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
+            return ApiResponseHelper.NotFound<ProductsResponse>();
         }
 
         // 開兩條執行緒同時查詢
@@ -57,7 +57,10 @@ public class ProductsService(
             product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
         });
         await Task.WhenAll(tasks);
-        return ApiResponseHelper.Success(products);
+
+        var result = new ProductsResponse { Products = products, TotalCount = totalCount };
+
+        return ApiResponseHelper.Success(result);
     }
 
     /// <summary>
@@ -65,13 +68,13 @@ public class ProductsService(
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<ApiResponse<IEnumerable<ProductsResponse>>> SellerGetAllProducts(ProductsSearchRequest request)
+    public async Task<ApiResponse<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request)
     {
         var products = await productsRepositories.SellerGetAllProducts(request);
 
         if (!products.Any())
         {
-            return ApiResponseHelper.NotFound<IEnumerable<ProductsResponse>>();
+            return ApiResponseHelper.NotFound<ProductsResponse>();
         }
 
         // 開兩條執行緒同時查詢
@@ -81,7 +84,9 @@ public class ProductsService(
             product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
         });
         await Task.WhenAll(tasks);
-        return ApiResponseHelper.Success(products);
+
+        var result = new ProductsResponse { Products = products };
+        return ApiResponseHelper.Success(result);
     }
 
     /// <summary>

@@ -40,7 +40,7 @@ const getSellerProduct = async () => {
     const { data } = res;
 
     if (data.codeStatus === 2000) {
-      allproduct.value = data.returnData;
+      allproduct.value = data.returnData.products;
     }
   } catch (err) {
     console.log(err);

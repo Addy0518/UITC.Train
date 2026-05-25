@@ -27,7 +27,7 @@ const boughtQuantity = ref(1);
 const displayBasic = ref(false);
 const activeIndex = ref();
 const seller = ref();
-const store = ref();
+const store = ref({});
 /*
    注入 Loading 跟 Toast
 */
@@ -93,7 +93,7 @@ const getStoreInfo = async (id) => {
     showLoading();
     const res = await getStore(id);
     const { data } = res;
-
+    console.log('data', data);
     if (data.codeStatus === 2000) {
       store.value = data.returnData;
     }
@@ -194,6 +194,21 @@ const boughtProduct = async (id, boughtquantity) => {
   await addProductsInCar(id, boughtquantity);
   router.push({ name: 'shopping-car' });
 };
+
+/*
+  麵包屑
+*/
+const home = ref({
+  icon: 'pi pi-home',
+  command: () => router.push({ name: 'mall' }),
+});
+const breadCrumbItem = computed(() => {
+  if (!product.value) return [];
+  return [
+    { label: product.value.parentCategoryName, command: () => router.push({ name: 'mall' }) },
+    { label: product.value.productCategoryName, command: () => router.push({ name: 'mall' }) },
+  ];
+});
 </script>
 
 <template>
@@ -297,7 +312,7 @@ const boughtProduct = async (id, boughtquantity) => {
             </div>
             <!-- #endregion -->
 
-            <!-- #region 分類 / 庫存 / 賣家 -->
+            <!-- #region 分類 / 庫存-->
             <div class="flex flex-col gap-2 text-sm">
               <div class="flex items-center gap-3">
                 <span class="text-gray-400 min-w-15">分類</span>
@@ -311,10 +326,6 @@ const boughtProduct = async (id, boughtquantity) => {
               <div class="flex items-center gap-3">
                 <span class="text-gray-400 min-w-15">庫存</span>
                 <span class="text-gray-800">{{ product.productsStock }} 件</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-gray-400 min-w-15">賣家</span>
-                <span class="text-gray-500">ID: {{ product.userId }}</span>
               </div>
             </div>
             <!-- #endregion -->
@@ -442,6 +453,9 @@ const boughtProduct = async (id, boughtquantity) => {
           <h3 class="text-sm font-medium text-gray-700 mb-4 pb-2 border-b border-gray-100">
             商品描述
           </h3>
+          <div class="card flex justify-start">
+            <Breadcrumb :home="home" :model="breadCrumbItem" />
+          </div>
           <div v-html="product.productsDescription" class="leading-relaxed text-gray-700" />
         </div>
         <!-- #endregion -->

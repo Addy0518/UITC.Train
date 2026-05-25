@@ -7,7 +7,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<IEnumerable<ProductsResponse>> GetAllProducts(ProductsSearchRequest request)
+    public async Task<IEnumerable<Product>> GetAllProducts(ProductsSearchRequest request)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -20,22 +20,28 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.productsprice,
                                  m.ProductsStock,
                                  m.ProductCategoryId,
-                                 c.productcategoryname
+                                 c.productcategoryname,
+                                 parent.ProductCategoryId as ProductParentId,
+                                 parent.productcategoryname as ParentCategoryName
                         FROM     mallproducts m
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
+                        LEFT JOIN mallproductcategory parent    
+                        ON       parent.productcategoryid = c.ProductParentId
                         Where (@UserId is null or m.userId=@UserId) 
                         and  m.isDelete=0
                         and  m.ProductsStock > 0
+                        and  (@productCategoryId is null or c.ProductParentId=@productCategoryId or m.ProductCategoryId=@productCategoryId)
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
-        var result = await conn.QueryAsync<ProductsResponse>(
+        var result = await conn.QueryAsync<Product>(
             sql,
             new
             {
                 offset = offset,
                 pageSize = request.pageSize,
                 UserId = request.sellerId,
+                productCategoryId = request.productCategoryId,
             }
         );
         return result;
@@ -46,7 +52,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     ///  <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<IEnumerable<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request)
+    public async Task<IEnumerable<Product>> SellerGetAllProducts(ProductsSearchRequest request)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -68,7 +74,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         and  (@IsDelete is null or m.IsDelete=@IsDelete) 
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
-        var result = await conn.QueryAsync<ProductsResponse>(
+        var result = await conn.QueryAsync<Product>(
             sql,
             new
             {
@@ -86,7 +92,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    public async Task<ProductsResponse> GetProducts(int productId)
+    public async Task<Product> GetProducts(int productId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -101,13 +107,16 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                m.isDelete,
                                c.productcategoryname,
                                c.productcategoryid,        
-                               c.ProductParentId 
+                               c.ProductParentId,
+                               parent.productcategoryname as parentcategoryname
                         FROM   mallproducts m
-                               left JOIN mallproductcategory c
-                                 ON c.productcategoryid =  m.ProductCategoryId
+                        left JOIN mallproductcategory c
+                            ON c.productcategoryid =  m.ProductCategoryId
+                        left JOIN mallproductcategory parent
+                            ON parent.productcategoryid =  c.ProductParentId
                         WHERE  m.ProductsId = @ProductsId";
 
-        var result = await conn.QueryFirstOrDefaultAsync<ProductsResponse>(sql, new { ProductsId = productId });
+        var result = await conn.QueryFirstOrDefaultAsync<Product>(sql, new { ProductsId = productId });
 
         return result;
     }
@@ -125,10 +134,11 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
         //  第二層 ( 子 ) ProductParentId = ( 父 ) ProductCategoryId  的就是往下一層的類別
         //  (衣服 => 短袖 , 長袖 => 男士短袖 , 女士短袖 ...)
         var sql =
-            @"Select ProductCategoryId,ProductCategoryName,ProductParentId 
-                From mallproductcategory 
-                Where (@ProductCategoryId is null and ProductParentId is null) 
-                OR ProductParentId = @ProductCategoryId";
+            @"
+                Select ｃ.ProductCategoryId,c.ProductCategoryName,c.ProductParentId
+                From mallproductcategory ｃ
+                Where (@ProductCategoryId is null and c.ProductParentId is null) 
+                OR c.ProductParentId = @ProductCategoryId";
         return await conn.QueryAsync<MallProductCategory>(sql, new { ProductCategoryId = productcategoryId });
     }
 
@@ -256,6 +266,24 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     }
 
     /// <summary>
+    /// 計算商品數量
+    /// </summary>
+    /// <param name="request">搜尋條件</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> CountProducts(ProductsSearchRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+        var sql =
+            @"SELECT COUNT(*) FROM mallproducts m
+            JOIN mallproductcategory c ON c.productcategoryid = m.ProductCategoryId
+            WHERE m.isDelete = 0 AND m.ProductsStock > 0
+            AND (@productCategoryId is null 
+                    or c.ProductParentId = @productCategoryId 
+                    or m.ProductCategoryId = @productCategoryId)";
+        return await conn.ExecuteScalarAsync<int>(sql, new { productCategoryId = request.productCategoryId });
+    }
+
+    /// <summary>
     /// 計算賣家所有商品數量
     /// </summary>
     /// <param name="sellerId">賣家 Id</param>
@@ -268,6 +296,6 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
             @"SELECT COUNT(*) FROM mallproducts 
               WHERE UserId = @SellerId AND isDelete = 0";
 
-        return await conn.ExecuteAsync(sql, new { SellerId = sellerId });
+        return await conn.ExecuteScalarAsync<int>(sql, new { SellerId = sellerId });
     }
 }

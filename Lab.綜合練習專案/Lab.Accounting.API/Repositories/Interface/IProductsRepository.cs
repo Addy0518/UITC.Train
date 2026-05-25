@@ -7,21 +7,21 @@ public interface IProductsRepository
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<IEnumerable<ProductsResponse>> GetAllProducts(ProductsSearchRequest request);
+    Task<IEnumerable<Product>> GetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 賣家查看自己的所有商品
     /// </summary>
     ///  <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<IEnumerable<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request);
+    Task<IEnumerable<Product>> SellerGetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 查看單一商品
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    Task<ProductsResponse> GetProducts(int productId);
+    Task<Product> GetProducts(int productId);
 
     /// <summary>
     /// 查看商品類別
@@ -59,6 +59,13 @@ public interface IProductsRepository
     /// <param name="purchaseQuantity">購買數量</param>
     /// <returns>影響列數</returns>
     Task<int> SetStock(int productsId, int purchaseQuantity);
+
+    /// <summary>
+    /// 計算商品數量
+    /// </summary>
+    /// <param name="request">搜尋條件</param>
+    /// <returns>影響列數</returns>
+    Task<int> CountProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 計算賣家所有商品數量
