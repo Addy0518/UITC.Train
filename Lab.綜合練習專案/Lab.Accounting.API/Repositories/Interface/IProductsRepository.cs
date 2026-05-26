@@ -53,6 +53,15 @@ public interface IProductsRepository
     Task<int> UpdateProductsDeleteStatus(int sellerId, IEnumerable<int> productId);
 
     /// <summary>
+    /// 檢查商品名稱重複
+    /// </summary>
+    /// <param name="productsName">商品名稱</param>
+    /// <param name="sellerId">賣家 ID </param>
+    /// <param name="productId">商品 ID </param>
+    /// <returns>影響列數</returns>
+    Task<bool> ExistsProductsName(string productsName, int sellerId, int? productId = null);
+
+    /// <summary>
     /// 設定商品庫存
     /// </summary>
     /// <param name="productsId">商品 Id</param>

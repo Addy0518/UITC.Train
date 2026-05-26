@@ -14,6 +14,7 @@ import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Swal from 'sweetalert2';
+import { getError400Message } from '@/common/method';
 
 /*
    變數名稱代表意義
@@ -213,6 +214,9 @@ const createOrUpdateProduct = async () => {
 
         showToastSuccess('上架商品成功!');
         router.push({ name: 'mall' });
+      }
+      if (data.codeStatus === 4000) {
+        showToastError(getError400Message(data.error400));
       }
     } catch (err) {
       console.log(err);

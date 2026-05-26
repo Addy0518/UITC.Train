@@ -246,6 +246,39 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     }
 
     /// <summary>
+    /// 檢查商品名稱重複
+    /// </summary>
+    /// <param name="productsName">商品名稱</param>
+    /// <param name="sellerId">賣家 ID </param>
+    /// <param name="productId">商品 ID </param>
+    /// <returns>影響列數</returns>
+    public async Task<bool> ExistsProductsName(string productsName, int sellerId, int? productId = null)
+    {
+        using var conn = connecting.CreateConnecting();
+        // 檢查資料表內有無重複的資料 , 有就回傳 true , 無就 false
+        // 如果是更新商品就要把 productid 是自己的排除在外 , 不然沒更新商品名稱的話就會跟原本的自己重複
+        var sql =
+            @"Select Case When Exists 
+              ( 
+                Select 1 From MallProducts 
+                Where  ProductsName=@ProductsName
+                AND    UserId=@SellerId
+                AND    ( @ProductId is Null or ProductsId != @ProductId )
+              ) Then 1 Else 0
+              End ";
+
+        return await conn.ExecuteScalarAsync<bool>(
+            sql,
+            new
+            {
+                ProductsName = productsName,
+                SellerId = sellerId,
+                ProductId = productId,
+            }
+        );
+    }
+
+    /// <summary>
     /// 設定商品庫存
     /// </summary>
     /// <param name="productsId">商品 Id</param>

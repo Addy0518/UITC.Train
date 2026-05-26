@@ -7,6 +7,8 @@ import { useRoute } from 'vue-router';
   變數名稱代表意義
   route : 獲取路由資訊
   allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
+  totalCount : 商品數量
+  allCategories : 所有子類別
   baseUrl : 環境變數裡的圖片基底位址
   selectedCategory : 選擇的類別區塊
 */
@@ -14,6 +16,8 @@ const route = useRoute();
 const allProducts = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const selectedCategory = ref(null);
+const totalCount = ref();
+const allCategories = ref();
 
 /*
    注入 Loading 跟 Toast
@@ -29,21 +33,23 @@ const showToastError = inject('showToastError');
 onMounted(() => {
   if (route.params.id) {
     loadproducts(route.params.id);
+    loadCategory(route.params.id);
   }
 });
 
 /*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
 */
-const loadproducts = async (parentId) => {
+const loadproducts = async (parentId, page = 0) => {
   try {
     showLoading();
 
-    const res = await getAllProduct({ productCategoryId: parentId });
+    const res = await getAllProduct({ productCategoryId: parentId, pageIndex: page, pageSize: 12 });
     const { data } = res;
 
     if (data.codeStatus === 2000) {
       allProducts.value = data.returnData.products;
+      totalCount.value = data.returnData.totalCount;
     }
   } catch (err) {
     console.log(err);
@@ -53,20 +59,30 @@ const loadproducts = async (parentId) => {
 };
 
 /*
+   換頁
+*/
+const pageChange = (event) => {
+  loadproducts(route.params.id, event.page);
+};
+
+/*
   根據所有商品類別取出不重複的各個子類別
 */
-const allCategories = computed(() => {
-  if (!allProducts.value) return [];
-  const seen = new Set();
-  // 創建新的 Set 來記錄類別 id 跟名稱
-  return allProducts.value
-    .filter((p) => {
-      if (seen.has(p.productCategoryName)) return false;
-      seen.add(p.productCategoryName);
-      return true;
-    })
-    .map((p) => ({ id: p.productCategoryId, name: p.productCategoryName }));
-});
+const loadCategory = async (id) => {
+  try {
+    showLoading();
+
+    const res = await getCategory(id);
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      allCategories.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
 
 /*
   再根據類別分區塊
@@ -98,13 +114,14 @@ const getProductsImg = (product) => {
           <div class="w-50 shrink-0">
             <span class="text-2xl m-5 font-bold">分類</span>
             <div class="flex flex-col mt-5 gap-2">
-              <div v-for="categoryname in allCategories" :key="categoryname.id">
+              <div v-for="category in allCategories" :key="category.productCategoryId">
                 <span
                   @click="
-                    selectedCategory = selectedCategory === categoryname.id ? null : categoryname.id
+                    selectedCategory =
+                      selectedCategory === category.id ? null : category.productCategoryId
                   "
                   class="cursor-pointer m-5"
-                  >{{ categoryname.name }}</span
+                  >{{ category.productCategoryName }}</span
                 >
               </div>
             </div>
@@ -138,6 +155,19 @@ const getProductsImg = (product) => {
             </div>
           </div>
         </div>
+        <Paginator
+          :template="{
+            '640px': 'PrevPageLink CurrentPageReport NextPageLink',
+            '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
+            '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+            default:
+              'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
+          }"
+          :rows="12"
+          :totalRecords="totalCount"
+          @page="pageChange"
+        >
+        </Paginator>
       </div>
     </div>
   </div>

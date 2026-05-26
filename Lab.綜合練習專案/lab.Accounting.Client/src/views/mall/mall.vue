@@ -1,5 +1,5 @@
 <script setup>
-import { getAllProduct } from '@/api/productsService';
+import { getAllProduct, getCategory } from '@/api/productsService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import advertise1 from '@/img/廣告1.jpg';
 import advertise2 from '@/img/廣告2.jpg';
@@ -11,14 +11,16 @@ import advertise3 from '@/img/廣告3.jpg';
   router :　改變路由
   allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
   baseUrl : 環境變數裡的圖片基底位址
-  selectedCategory : 選擇的類別區塊
+  totalCount : 商品數量
+  allCategories : 所有類別
   advertiseImg : 廣告圖片
 */
 const route = useRoute();
 const router = useRouter();
 const allProducts = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
-const selectedCategory = ref(null);
+const totalCount = ref();
+const allCategories = ref();
 const advertiseImg = ref([
   { itemImageSrc: advertise1 },
   { itemImageSrc: advertise2 },
@@ -41,19 +43,21 @@ onMounted(() => {
     showToastError('你沒有訪問權限');
   }
   loadproducts();
+  loadCategory();
 });
 
 /*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
 */
-const loadproducts = async () => {
+const loadproducts = async (page = 0) => {
   try {
     showLoading();
-
-    const res = await getAllProduct();
+    allProducts.value = [];
+    const res = await getAllProduct({ pageIndex: page, pageSize: 12 });
     const { data } = res;
     if (data.codeStatus === 2000) {
       allProducts.value = data.returnData.products;
+      totalCount.value = data.returnData.totalCount;
     }
   } catch (err) {
     console.log(err);
@@ -63,20 +67,30 @@ const loadproducts = async () => {
 };
 
 /*
+   換頁
+*/
+const pageChange = (event) => {
+  loadproducts(event.page);
+};
+
+/*
   根據所有商品類別取出不重複的各個父類別
 */
-const allCategories = computed(() => {
-  if (!allProducts.value) return [];
-  const seen = new Set();
-  // 創建新的 Set 來記錄類別 id 跟名稱
-  return allProducts.value
-    .filter((p) => {
-      if (seen.has(p.parentCategoryName)) return false;
-      seen.add(p.parentCategoryName);
-      return true;
-    })
-    .map((p) => ({ id: p.productParentId, name: p.parentCategoryName }));
-});
+const loadCategory = async () => {
+  try {
+    showLoading();
+
+    const res = await getCategory();
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      allCategories.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
 
 /*
   讀取商品圖片 , 判斷是否有圖片沒有就回傳預設
@@ -117,13 +131,15 @@ const getProductsImg = (product) => {
           <!-- #endregion -->
           <span class="text-2xl m-5">分類</span>
           <div class="grid grid-cols-4 mt-5">
-            <div v-for="categoryname in allCategories">
+            <div v-for="category in allCategories" :key="category.productCategoryId">
               <div
-                @click="router.push({ name: 'mall-category', params: { id: categoryname.id } })"
+                @click="
+                  router.push({ name: 'mall-category', params: { id: category.productCategoryId } })
+                "
                 class="hover:shadow-xl hover:bg-gray-50 h-80 cursor-pointer flex flex-col items-center"
               >
                 <img :src="defaultImgurl" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-                <span class="mt-15">{{ categoryname.name }}</span>
+                <span class="mt-15">{{ category.productCategoryName }}</span>
               </div>
             </div>
           </div>
@@ -157,19 +173,20 @@ const getProductsImg = (product) => {
             </div>
           </div>
         </div>
+        <Paginator
+          :template="{
+            '640px': 'PrevPageLink CurrentPageReport NextPageLink',
+            '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
+            '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+            default:
+              'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
+          }"
+          :rows="12"
+          :totalRecords="totalCount"
+          @page="pageChange"
+        >
+        </Paginator>
       </div>
     </div>
-    <Paginator
-      :template="{
-        '640px': 'PrevPageLink CurrentPageReport NextPageLink',
-        '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
-        '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
-        default:
-          'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
-      }"
-      :rows="10"
-      :totalRecords="120"
-    >
-    </Paginator>
   </div>
 </template>

@@ -5,7 +5,6 @@ using Org.BouncyCastle.Asn1.X509;
 namespace Lab.Accounting.API.Services;
 
 public class ProductsService(
-    IProductsRepository productsRepositories,
     IProductsImgRepository productsImgRepository,
     IProductsRateRepository productsRateRepositories,
     IUserRepository userRepository,
@@ -21,7 +20,7 @@ public class ProductsService(
     /// <returns>商品資訊</returns>
     public async Task<ApiResponse<Product>> GetProducts(int productId)
     {
-        var target = await productsRepositories.GetProducts(productId);
+        var target = await productsRepository.GetProducts(productId);
 
         if (target == null)
         {
@@ -43,8 +42,8 @@ public class ProductsService(
     /// <returns>商品列表</returns>
     public async Task<ApiResponse<ProductsResponse>> GetAllProducts(ProductsSearchRequest request)
     {
-        var products = await productsRepositories.GetAllProducts(request);
-        var totalCount = await productsRepositories.CountProducts(request);
+        var products = await productsRepository.GetAllProducts(request);
+        var totalCount = await productsRepository.CountProducts(request);
         if (!products.Any())
         {
             return ApiResponseHelper.NotFound<ProductsResponse>();
@@ -70,7 +69,7 @@ public class ProductsService(
     /// <returns>商品列表</returns>
     public async Task<ApiResponse<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request)
     {
-        var products = await productsRepositories.SellerGetAllProducts(request);
+        var products = await productsRepository.SellerGetAllProducts(request);
 
         if (!products.Any())
         {
@@ -96,7 +95,7 @@ public class ProductsService(
     /// <returns>商品類別</returns>
     public async Task<ApiResponse<IEnumerable<MallProductCategory>>> GetCategory(int? productcategoryId = null)
     {
-        var target = await productsRepositories.GetCategory(productcategoryId);
+        var target = await productsRepository.GetCategory(productcategoryId);
         if (target == null)
         {
             return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
@@ -122,9 +121,21 @@ public class ProductsService(
             UserId = productsInsertRequest.UserId,
             IsDelete = IsDeleteStatusEnum.Normal,
         };
+        var exists = await productsRepository.ExistsProductsName(
+            productsInsertRequest.ProductsName,
+            productsInsertRequest.UserId
+        );
+
+        if (exists)
+        {
+            var errors = new Dictionary<string, string[]> { { "ProductsName", new[] { "已有相同名稱的商品!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+
         using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            var target = await productsRepositories.CreateProducts(product);
+            var target = await productsRepository.CreateProducts(product);
             if (target <= 0)
                 return ApiResponseHelper.InternalException<int>("商品新增失敗");
 
@@ -150,8 +161,19 @@ public class ProductsService(
             ProductsDescription = productsUpdateRequest.ProductsDescription,
             ProductCategoryId = productsUpdateRequest.ProductCategoryId,
         };
+        var exists = await productsRepository.ExistsProductsName(
+            productsUpdateRequest.ProductsName,
+            productsUpdateRequest.UserId,
+            productsUpdateRequest.ProductsId
+        );
 
-        var target = await productsRepositories.GetProducts(productsUpdateRequest.ProductsId);
+        if (exists)
+        {
+            var errors = new Dictionary<string, string[]> { { "ProductsName", new[] { "已有相同名稱的商品!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+        var target = await productsRepository.GetProducts(productsUpdateRequest.ProductsId);
         if (target == null || target.UserId != productsUpdateRequest.UserId)
         {
             return ApiResponseHelper.NotFound<int>();
@@ -170,7 +192,7 @@ public class ProductsService(
             FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsDescriptionImg", img);
         }
 
-        var result = await productsRepositories.UpdateProducts(updateTarget);
+        var result = await productsRepository.UpdateProducts(updateTarget);
 
         return ApiResponseHelper.Success(result);
     }
@@ -183,7 +205,7 @@ public class ProductsService(
     /// <returns>影響列數</returns>
     public async Task<ApiResponse<int>> UpdateProductsDeleteStatus(int sellerId, IEnumerable<int> productId)
     {
-        var target = await productsRepositories.UpdateProductsDeleteStatus(sellerId, productId);
+        var target = await productsRepository.UpdateProductsDeleteStatus(sellerId, productId);
         if (target == 0)
         {
             return ApiResponseHelper.NotFound<int>();
@@ -201,7 +223,7 @@ public class ProductsService(
     {
         using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            var target = await productsRepositories.GetProducts(productsId);
+            var target = await productsRepository.GetProducts(productsId);
             if (target == null || target.UserId != sellerId)
             {
                 return ApiResponseHelper.NotFound<int>();
@@ -219,7 +241,7 @@ public class ProductsService(
                 }
             }
 
-            var deletetarget = await productsRepositories.DeleteProducts(productsId, target.IsDelete, sellerId);
+            var deletetarget = await productsRepository.DeleteProducts(productsId, target.IsDelete, sellerId);
 
             if (deletetarget == 0)
                 return ApiResponseHelper.InternalException<int>("刪除失敗");
@@ -248,7 +270,7 @@ public class ProductsService(
         int productId
     )
     {
-        var product = await productsRepositories.GetProducts(productId);
+        var product = await productsRepository.GetProducts(productId);
         if (product == null)
             return ApiResponseHelper.NotFound<IEnumerable<MallProductImg>>();
 
