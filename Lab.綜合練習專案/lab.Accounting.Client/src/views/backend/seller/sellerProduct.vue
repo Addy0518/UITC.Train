@@ -77,37 +77,62 @@ const deleteProduct = async (productId) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full" v-if="allproduct">
-    <div class="border-gray-200h-full flex flex-col items-center">
-      <div class="mt-40 w-300 rounded-lg shadow-sm">
-        <div v-for="product in allproduct">
-          <div class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 items-center">
-            <img
-              :src="getProductsImg(product)"
-              alt="Logo"
-              class="w-full max-w-40 max-h-40 mt-4 cursor-pointer"
-              @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
-            />
-            <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
-            <span class="mt-3 ms-5 me-5">{{ product.productsPrice }}</span>
-
-            <span class="mt-3 ms-5 me-5">{{ product.productCategoryName }}</span>
-
-            <button
-              class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-              @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
-            >
-              編輯商品
-            </button>
-            <button
-              class="bg-red-800 text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
-              @click="deleteProduct(product.productsId)"
-            >
-              刪除
-            </button>
-          </div>
+  <div class="flex flex-col w-full p-6" v-if="allproduct">
+    <!-- #region  標題列-->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-2xl font-bold m-0">商品管理</p>
+      <button
+        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm cursor-pointer"
+        @click="router.push({ name: 'add-product' })"
+      >
+        + 新增商品
+      </button>
+    </div>
+    <!-- #endregion -->
+    <!-- #region  欄位標頭-->
+    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+      <div
+        class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+      >
+        <span class="text-xs text-gray-400">圖片</span>
+        <span class="text-xs text-gray-400">商品名稱</span>
+        <span class="text-xs text-gray-400">價格</span>
+        <span class="text-xs text-gray-400">類別</span>
+        <span class="text-xs text-gray-400">庫存</span>
+        <span class="text-xs text-gray-400 text-right">操作</span>
+      </div>
+      <!-- #endregion -->
+      <!-- #region  商品-->
+      <div
+        v-for="product in allproduct"
+        :key="product.productsId"
+        class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
+      >
+        <img
+          :src="getProductsImg(product)"
+          class="w-14 h-14 object-cover rounded-lg border border-gray-100 cursor-pointer"
+          @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
+        />
+        <span class="text-sm font-medium">{{ product.productsName }}</span>
+        <span class="text-sm text-orange-500 font-medium">$ {{ product.productsPrice }}</span>
+        <span class="text-sm text-gray-400">{{ product.productCategoryName }}</span>
+        <span class="text-sm">{{ product.productsStock }} 件</span>
+        <div class="flex gap-2 justify-end">
+          <button
+            class="px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50"
+            @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
+          >
+            編輯
+          </button>
+          <button
+            class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 cursor-pointer hover:bg-red-50"
+            @click="deleteProduct(product.productsId)"
+          >
+            刪除
+          </button>
         </div>
       </div>
+      <!-- #endregion -->
     </div>
   </div>
 </template>

@@ -10,14 +10,15 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    authStore : pinia
    boughtQuantity : 購買數量
    address : 地址
+   items : 存在 pinia 的購物車選擇的商品
 */
 const router = useRouter();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
 const address = ref();
 const orderStore = useOrderStore();
-
 const items = orderStore.selectedItems;
+
 /*
    注入 Loading 跟 Toast
 */
@@ -26,16 +27,20 @@ const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
-// 加入已經寫好的驗證規則
+/*
+   加入已經寫好的驗證規則
+*/
 const rules = computed(() => ({
   // authstore 有的情況就不驗證
   address: authStore.userAddress ? {} : { required, maxLength: maxLength(200) },
 }));
 
-// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
-// autoDirty => 一碰到欄位就開始驗證
-// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
-// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+/*
+   加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
+   autoDirty : 一碰到欄位就開始驗證
+   lazy : 元件載入時不會馬上驗證 , 等使用者開始互動才會
+   scope : 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+*/
 const v$ = useVuelidate(rules, { address }, { $autoDirty: true, $lazy: true, $scope: false });
 
 /*
@@ -116,7 +121,7 @@ const userBuy = async () => {
 
 <template>
   <div class="flex flex-col w-full items-center mt-20" v-if="items">
-    <!-- 正在購買的商品資訊 -->
+    <!-- #region  正在購買的商品資訊 -->
     <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
       <h2 class="text-base font-bold mb-4 text-gray-700">正在購買</h2>
       <div
@@ -144,11 +149,12 @@ const userBuy = async () => {
         </div>
       </div>
     </div>
-    <!-- 購買資訊填寫 -->
+    <!-- #endregion -->
+
     <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-5">
+      <!-- #region  購買資訊填寫-->
       <h2 class="text-base font-bold text-gray-700">填寫購買資訊</h2>
 
-      <!-- 收件地址（從 authStore 拿） -->
       <div class="flex flex-col gap-1">
         <label class="text-sm mb-3">收件地址</label>
         <div v-if="authStore.userAddress">
@@ -167,7 +173,8 @@ const userBuy = async () => {
         </div>
       </div>
       <span>總金額 : {{ totalPrice.toLocaleString() }}</span>
-      <!-- 按鈕 -->
+      <!-- #endregion -->
+      <!-- #region  購買按鈕-->
       <div class="flex gap-3">
         <button
           class="flex-1 border border-gray-300 text-gray-600 p-3 rounded-2xl cursor-pointer"
@@ -182,6 +189,7 @@ const userBuy = async () => {
           前往付款
         </button>
       </div>
+      <!-- #endregion -->
     </div>
   </div>
 </template>

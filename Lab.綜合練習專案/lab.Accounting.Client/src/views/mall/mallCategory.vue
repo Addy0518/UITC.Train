@@ -108,9 +108,9 @@ const getProductsImg = (product) => {
   <div class="flex flex-col w-full">
     <div class="flex flex-col items-center">
       <div class="mt-20 w-300 rounded-lg shadow-sm">
-        <!-- 類別 + 商品 左右並排 -->
+        <!-- #region  類別 / 商品-->
         <div class="flex gap-4">
-          <!-- 左邊：類別 -->
+          <!-- #region  類別-->
           <div class="w-50 shrink-0">
             <span class="text-2xl m-5 font-bold">分類</span>
             <div class="flex flex-col mt-5 gap-2">
@@ -126,8 +126,8 @@ const getProductsImg = (product) => {
               </div>
             </div>
           </div>
-
-          <!-- 右邊：商品 -->
+          <!-- #endregion -->
+          <!-- #region  商品-->
           <div class="flex-1">
             <span class="text-2xl m-5">商品</span>
             <div class="grid grid-cols-3 mt-5 gap-4">
@@ -154,7 +154,10 @@ const getProductsImg = (product) => {
               </div>
             </div>
           </div>
+          <!-- #endregion -->
         </div>
+        <!-- #endregion -->
+        <!-- #region  頁碼按鈕-->
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -168,6 +171,7 @@ const getProductsImg = (product) => {
           @page="pageChange"
         >
         </Paginator>
+        <!-- #endregion -->
       </div>
     </div>
   </div>

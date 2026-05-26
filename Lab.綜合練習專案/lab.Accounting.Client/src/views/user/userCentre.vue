@@ -1,6 +1,18 @@
 <script setup>
+import { userHeadShot } from '@/api/userService';
+import defaultImgurl from '@/img/oguri-cap-chibi.png';
+/*
+   變數名稱代表意義
+   router : 改變路由
+   imgUrl : 大頭照圖片路徑
+   baseUrl : 基底位址
+   authStore : localstorage
+   menuItems : 清單列表
+*/
 const router = useRouter();
-
+let imgUrl = ref();
+const baseUrl = import.meta.env.VITE_IMG_URL;
+const authStore = useAuthStore();
 const menuItems = ref([
   {
     label: '買家中心',
@@ -17,20 +29,86 @@ const menuItems = ref([
     command: () => router.push('/user-centre/purchase-orders'),
   },
 ]);
+
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
+/*
+   載入頭像
+*/
+onMounted(() => {
+  if (authStore.userHeadshot) {
+    imgUrl.value = `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
+  } else {
+    imgUrl.value = defaultImgurl;
+  }
+});
+
+/*
+   上傳檔案 ( 大頭照 ) 並在前端顯示
+*/
+const uploadFile = async (event) => {
+  try {
+    showLoading();
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('userFile', file);
+    const res = await userHeadShot(formData);
+
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      imgUrl.value = `${baseUrl}/UserHeadShot/${data.returnData.userHeadshot}`;
+      authStore.userHeadshot = data.returnData.userHeadshot;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
 </script>
 
 <template>
   <div class="container mx-auto">
     <div class="flex gap-6 p-6">
-      <!-- 側邊欄 -->
-      <aside class="w-60 shrink-0">
+      <!-- #region  側邊攔 -->
+      <aside class="w-60 p-5 bg-black rounded-xl">
+        <div class="flex justify-end mb-10 mt-10">
+          <!-- #region  頭貼 -->
+          <label class="relative cursor-pointer group">
+            <img
+              :src="imgUrl"
+              alt="User Avatar"
+              class="w-50 h-50 rounded-full object-cover border-2 border-gray-200 group-hover:opacity-75 transition-opacity"
+            />
+            <div
+              class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
+            >
+              <span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded"
+                >更換照片</span
+              >
+            </div>
+            <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
+          </label>
+          <!-- #endregion -->
+        </div>
         <PanelMenu :model="menuItems" />
       </aside>
+      <!-- #endregion -->
 
-      <!-- 內容區 -->
+      <!-- #region  內容區 -->
       <main class="flex-1">
         <RouterView />
       </main>
+      <!-- #endregion -->
     </div>
   </div>
 </template>

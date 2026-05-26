@@ -209,6 +209,8 @@ const breadCrumbItem = computed(() => {
     { label: product.value.productCategoryName, command: () => router.push({ name: 'mall' }) },
   ];
 });
+
+
 </script>
 
 <template>

@@ -117,12 +117,11 @@ const totalPrice = computed(() =>
   <div class="flex flex-col w-full mt-20">
     <div class="max-w-5xl mx-auto w-full">
       <div class="border border-gray-200 rounded-xl overflow-hidden">
-        <!-- 標題 -->
         <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
           <span class="font-medium">購物車</span>
         </div>
 
-        <!-- 商品列表 -->
+        <!-- #region  商品列表-->
         <div
           v-for="product in products"
           :key="product.productsId"
@@ -141,6 +140,7 @@ const totalPrice = computed(() =>
             @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
           />
 
+          <!-- #region  商品細項-->
           <div class="flex-1 min-w-0">
             <p class="text-xl font-medium mb-2">{{ product.productsName }}</p>
             <p class="text-sm text-gray-400 mb-2">
@@ -175,7 +175,8 @@ const totalPrice = computed(() =>
               }}</span>
             </div>
           </div>
-
+          <!-- #endregion -->
+          <!-- #region  價格 / 移除按鈕-->
           <div class="flex flex-col items-end gap-2">
             <span class="text-xl font-medium"
               >NT$ {{ (product.productsPrice * product.boughtQuantity).toLocaleString() }}</span
@@ -187,9 +188,10 @@ const totalPrice = computed(() =>
               移除
             </button>
           </div>
+          <!-- #endregion -->
         </div>
-
-        <!-- 底部結算 -->
+        <!-- #endregion -->
+        <!-- #region  底部結算-->
         <div class="px-5 py-4 flex justify-between items-center">
           <span class="text-sm text-gray-400">已選 {{ selectProducts.length }} 件</span>
           <div class="flex items-center gap-4">
@@ -207,6 +209,7 @@ const totalPrice = computed(() =>
             </button>
           </div>
         </div>
+        <!-- #endregion -->
       </div>
     </div>
   </div>

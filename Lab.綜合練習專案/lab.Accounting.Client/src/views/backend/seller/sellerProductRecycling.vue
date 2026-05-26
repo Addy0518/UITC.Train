@@ -26,6 +26,9 @@ const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
+/*
+   初始化拿到所有回收桶資料( isDelete === true 的)
+*/
 onMounted(() => {
   getSellerProduct();
 });
@@ -43,7 +46,7 @@ const getSellerProduct = async () => {
     const res = await getSellerAllProduct(request);
     const { data } = res;
     if (data.codeStatus === 2000) {
-      allproduct.value = data.returnData;
+      allproduct.value = data.returnData.products;
     }
   } catch (err) {
     console.log(err);
@@ -131,45 +134,76 @@ const rollbackAll = async (target) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
-    <div class="border-gray-200h-full flex flex-col items-center">
-      <div class="mt-40 w-300 rounded-lg shadow-sm">
-        <div class="flex justify-end">
-          <button
-            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-            @click="rollbackAll(selectIds)"
-            v-if="selectIds.length > 0"
-          >
-            復原商品
-          </button>
-          <button
-            class="bg-red-800 text-white p-3 rounded-2xl cursor-pointer font-bold ms-5"
-            @click="deleteProduct()"
-            v-if="selectIds.length > 0"
-          >
-            刪除商品
-          </button>
-        </div>
-        <div v-for="product in allproduct" :key="product.productsId">
-          <label
-            class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
-          >
-            <input
-              type="checkbox"
-              :value="product.productsId"
-              v-model="selectIds"
-              class="cursor-pointer me-3 w-8 h-8"
-            />
-            <img :src="getProductsImg(product)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-            <span class="mt-3 ms-5 me-5">{{ product.productsName }}</span>
-            <span class="mt-3 ms-5 me-5">{{ product.productsPrice }}</span>
-            <!-- 依照原始資料篩選出同個商品的類別  -->
-            <div v-for="cate in productscategory(product.productCategoryName)" :key="cate">
-              <span class="mt-3 ms-5 me-5">{{ cate }}</span>
-            </div>
-          </label>
-        </div>
+  <div class="flex flex-col w-full p-6">
+    <!-- #region  標題列-->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-lg font-medium m-0">商品回收桶</p>
+      <div class="flex gap-2" v-if="selectIds.length > 0">
+        <button
+          class="px-4 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50"
+          @click="rollbackAll(selectIds)"
+        >
+          復原商品
+        </button>
+        <button
+          class="px-4 py-2 border border-red-200 rounded-lg text-sm text-red-500 cursor-pointer hover:bg-red-50"
+          @click="deleteProduct()"
+        >
+          刪除商品
+        </button>
       </div>
     </div>
+    <!-- #endregion -->
+
+    <!-- #region  所有商品-->
+    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+      <!-- #region  欄位刊頭-->
+      <div
+        class="grid grid-cols-[40px_80px_1fr_100px_120px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+      >
+        <span></span>
+        <span class="text-xs text-gray-400">圖片</span>
+        <span class="text-xs text-gray-400">商品名稱</span>
+        <span class="text-xs text-gray-400">價格</span>
+        <span class="text-xs text-gray-400">類別</span>
+      </div>
+      <!-- #endregion -->
+      <!-- #region  商品列表-->
+      <label
+        v-for="product in allproduct"
+        :key="product.productsId"
+        class="grid grid-cols-[40px_80px_1fr_100px_120px] px-5 py-4 border-b border-gray-100 items-center cursor-pointer hover:bg-gray-50"
+        :class="selectIds.includes(product.productsId) ? 'bg-orange-50' : ''"
+      >
+        <input
+          type="checkbox"
+          :value="product.productsId"
+          v-model="selectIds"
+          class="w-4 h-4 cursor-pointer"
+        />
+        <img
+          :src="getProductsImg(product)"
+          class="w-14 h-14 object-cover rounded-lg border border-gray-100"
+        />
+        <span class="text-sm font-medium">{{ product.productsName }}</span>
+        <span class="text-sm text-gray-400">$ {{ product.productsPrice }}</span>
+        <div class="flex flex-wrap gap-1">
+          <span
+            v-for="cate in productscategory(product.productCategoryName)"
+            :key="cate"
+            class="text-xs text-gray-400"
+            >{{ cate }}</span
+          >
+        </div>
+      </label>
+      <!-- #endregion -->
+    </div>
+    <!-- #endregion -->
+
+    <!-- #region  已選取提示-->
+    <p class="text-xs text-gray-400 mt-3" v-if="selectIds.length > 0">
+      已選取 {{ selectIds.length }} 件商品
+    </p>
+    <!-- #endregion -->
   </div>
 </template>

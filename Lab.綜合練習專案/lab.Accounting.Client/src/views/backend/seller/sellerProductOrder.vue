@@ -22,15 +22,24 @@ const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
+/*
+   初始化拿到所有訂單
+*/
 onMounted(() => {
   getOrders();
 });
 
+/*
+   篩選訂單狀態
+*/
 const filtTable = computed(() => {
   if (!allOrders.value) return [];
   return allOrders.value.filter((order) => order.shippingStatus == tableNow.value);
 });
 
+/*
+   拿到所有訂單
+*/
 const getOrders = async () => {
   try {
     showLoading();
@@ -60,8 +69,9 @@ const getProductsImg = (product) => {
 <template>
   <div class="flex flex-col w-full">
     <div class="border-gray-200h-full flex flex-col items-center">
+      <!-- #region  訂單列表-->
       <div class="mt-40 w-300 rounded-lg shadow-sm">
-        <!-- Tab 列 -->
+        <!-- #region  Tab 列-->
         <div class="flex border-b border-gray-200">
           <button
             v-for="tab in shippingEnum"
@@ -77,16 +87,18 @@ const getProductsImg = (product) => {
             {{ tab.description }}
           </button>
         </div>
+        <!-- #endregion -->
 
-        <!-- 訂單列表 -->
-        <!-- 沒有訂單時顯示 -->
+        <!-- #region  沒有訂單時顯示 -->
         <div
           v-if="filtTable.length === 0"
           class="flex justify-center items-center h-40 text-gray-400"
         >
           目前沒有訂單
         </div>
-        <!-- 有訂單時顯示 -->
+        <!-- #endregion -->
+
+        <!-- #region  有訂單時顯示-->
         <div v-for="order in filtTable">
           <div
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
@@ -100,7 +112,9 @@ const getProductsImg = (product) => {
             <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
           </div>
         </div>
+        <!-- #endregion -->
       </div>
+      <!-- #endregion -->
     </div>
   </div>
 </template>

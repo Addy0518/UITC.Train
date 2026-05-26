@@ -2,7 +2,6 @@
 import { getSellerOneOrder, updateShippingStatus } from '@/api/orderService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
-
 /*
    變數名稱代表意義
    order : 訂單
@@ -75,30 +74,71 @@ const updateStatus = async (id, status) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
-    <div class="border-gray-200h-full flex flex-col items-center">
-      <div class="mt-40 w-300 rounded-lg shadow-sm" v-if="order">
-        <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-        <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
-        <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
-        <span class="mt-3 ms-5 me-5">訂單編號 : {{ order.orderNumber }}</span>
-        <span class="mt-3 ms-5 me-5">購買時間 : {{ order.paidTime }}</span>
-        <span class="mt-3 ms-5 me-5">付款方式 : {{ order.paidType }}</span>
-        <span class="mt-3 ms-5 me-5">寄送地址 : {{ order.shippingAddress }}</span>
-        <span class="mt-3 ms-5 me-5"
-          >運送狀態 : {{ getEnumDescription(shippingEnum, order.shippingStatus) }}</span
-        >
-        <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
+  <div class="flex flex-col w-full p-6 mt-10" v-if="order">
+    <div class="max-w-4xl mx-auto w-full">
+      <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+        <!-- #region  訂單編號 / 購買商品資訊-->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 m-0">訂單編號</p>
+            <p class="text-sm font-medium mt-1 m-0">{{ order.orderNumber }}</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded-md bg-yellow-50 text-yellow-700">
+            {{ getEnumDescription(shippingEnum, order.shippingStatus) }}
+          </span>
+        </div>
 
-        <select
-          class="border border-gray-300 rounded-lg p-2 cursor-pointer"
-          :value="order.shippingStatus"
-          @change="updateStatus(order.orderId, Number($event.target.value))"
-        >
-          <option v-for="status in shippingEnum" :key="status.value" :value="status.value">
-            {{ status.description }}
-          </option>
-        </select>
+        <div class="px-6 py-5 border-b border-gray-100 flex gap-5">
+          <img
+            :src="getProductsImg(order)"
+            class="w-20 h-20 rounded-lg object-cover border border-gray-100"
+          />
+          <div class="flex-1">
+            <p class="font-medium text-base m-0 mb-1">{{ order.productsName }}</p>
+            <p class="text-sm text-gray-400 m-0 mb-2">數量：{{ order.boughtQuantity }} 件</p>
+            <p class="text-base font-medium text-orange-500 m-0">$ {{ order.accountPrice }}</p>
+          </div>
+        </div>
+        <!-- #endregion -->
+        <!-- #region  訂單資訊-->
+        <div class="px-6 py-5 border-b border-gray-100">
+          <p class="text-xs font-medium text-gray-600 mb-3">訂單資訊</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-gray-500 m-0 mb-1">購買時間</p>
+              <p class="text-sm m-0">{{ formatDateTimeString(order.paidTime) }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 m-0 mb-1">付款方式</p>
+              <p class="text-sm m-0">{{ order.paidType }}</p>
+            </div>
+            <div class="col-span-2">
+              <p class="text-xs text-gray-500 m-0 mb-1">寄送地址</p>
+              <p class="text-sm m-0">{{ order.shippingAddress }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- #endregion -->
+        <!-- #region  更新狀態 / 總金額-->
+        <div class="px-6 py-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <p class="text-sm text-gray-400 m-0">更新運送狀態</p>
+            <select
+              class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm cursor-pointer"
+              :value="order.shippingStatus"
+              @change="updateStatus(order.orderId, Number($event.target.value))"
+            >
+              <option v-for="status in shippingEnum" :key="status.value" :value="status.value">
+                {{ status.description }}
+              </option>
+            </select>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-300 m-0 mb-1">訂單金額</p>
+            <p class="text-xl font-medium text-orange-500 m-0">$ {{ order.accountPrice }}</p>
+          </div>
+        </div>
+        <!-- #endregion -->
       </div>
     </div>
   </div>

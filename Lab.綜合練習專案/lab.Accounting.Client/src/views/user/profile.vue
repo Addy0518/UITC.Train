@@ -1,17 +1,10 @@
 <script setup>
-import { userHeadShot, getMyUser, updateUser, updatePassword } from '@/api/userService';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import { getMyUser, updateUser } from '@/api/userService';
 
 /*
    變數名稱代表意義
-   imgUrl : 大頭照圖片路徑
-   baseUrl : 基底位址
-   authStore : localstorage
    userInfo : 用戶資料
 */
-let imgUrl = ref();
-const baseUrl = import.meta.env.VITE_IMG_URL;
-const authStore = useAuthStore();
 const userInfo = ref();
 
 /*
@@ -42,38 +35,7 @@ const v$ = useVuelidate(
 
 onMounted(() => {
   getMineUser();
-  if (authStore.userHeadshot) {
-    imgUrl.value = `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
-  } else {
-    imgUrl.value = defaultImgurl;
-  }
 });
-
-/*
-   上傳檔案 ( 大頭照 ) 並在前端顯示
-*/
-const uploadFile = async (event) => {
-  try {
-    showLoading();
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('userFile', file);
-    const res = await userHeadShot(formData);
-
-    const { data } = res;
-
-    if (data.codeStatus === 2000) {
-      imgUrl.value = `${baseUrl}/UserHeadShot/${data.returnData.userHeadshot}`;
-      authStore.userHeadshot = data.returnData.userHeadshot;
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-    hideLoading();
-  }
-};
 
 /*
    載入用戶資訊
@@ -130,91 +92,107 @@ const updateMyUser = async () => {
 <template>
   <div class="container">
     <div class="flex flex-col w-full">
-      <div class="flex justify-end p-20">
-        <label class="relative cursor-pointer group">
-          <!-- 顯示照片 -->
-          <img
-            :src="imgUrl"
-            alt="User Avatar"
-            class="w-50 h-50 rounded-full object-cover border-2 border-gray-200 group-hover:opacity-75 transition-opacity"
-          />
+      <!-- #region  表單區 -->
+      <div class="p-8" v-if="userInfo">
+        <p class="text-2xl font-bold mb-5 ml-24">我的個人資料</p>
 
-          <!-- 提示文字 -->
-          <div
-            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
-          >
-            <span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded"
-              >更換照片</span
-            >
+        <div class="flex flex-col gap-4 max-w-lg">
+          <!-- #region  帳號 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-gray-400 w-20 text-right shrink-0">帳號</label>
+            <div class="flex-1">
+              <InputText
+                v-model="userInfo.userAccount"
+                placeholder="使用者帳號"
+                :invalid="v$.userAccount.$error"
+                class="w-full"
+              />
+              <InValidErrorMessage :errorDto="v$.userAccount.$errors" vaildChiName="使用者帳號" />
+            </div>
           </div>
-
-          <!-- 隱藏的檔案輸入框 -->
-          <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
-        </label>
-      </div>
-
-      <div class="mt-40 w-300 rounded-lg shadow-sm" v-if="userInfo">
-        <!-- 帳號 -->
-        <InputGroup>
-          <InputText
-            v-model="userInfo.userAccount"
-            placeholder="使用者帳號"
-            :invalid="v$.userAccount.$error"
-          />
-        </InputGroup>
-        <InValidErrorMessage :errorDto="v$.userAccount.$errors" vaildChiName="使用者帳號" />
-
-        <!-- 姓名 -->
-        <InputGroup>
-          <InputText v-model="userInfo.userName" placeholder="姓名" :invalid="v$.userName.$error" />
-        </InputGroup>
-        <InValidErrorMessage :errorDto="v$.userName.$errors" vaildChiName="姓名" />
-
-        <!-- 電話 -->
-        <InputGroup>
-          <InputText
-            v-model="userInfo.userPhone"
-            placeholder="電話"
-            :invalid="v$.userPhone.$error"
-          />
-        </InputGroup>
-        <InValidErrorMessage :errorDto="v$.userPhone.$errors" vaildChiName="電話" />
-
-        <!-- 地址 -->
-        <InputGroup>
-          <InputText
-            v-model="userInfo.userAddress"
-            placeholder="地址"
-            :invalid="v$.userAddress.$error"
-          />
-        </InputGroup>
-        <InValidErrorMessage :errorDto="v$.userAddress.$errors" vaildChiName="地址" />
-
-        <!-- 生日 -->
-
-        <DatePicker v-model="userInfo.userBirthDate" placeholder="生日" dateFormat="yy-mm-dd" />
-
-        <!-- 性別 -->
-        <div class="flex gap-5 ms-5 mt-3">
-          <label
-            v-for="g in genderEnum"
-            :key="g.value"
-            class="flex items-center gap-2 cursor-pointer"
-          >
-            <input type="radio" :value="g.value" v-model="userInfo.userGender" />
-            {{ g.description }}
-          </label>
+          <!-- #endregion -->
+          <!-- #region  姓名 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-gray-400 w-20 text-right shrink-0">姓名</label>
+            <div class="flex-1">
+              <InputText
+                v-model="userInfo.userName"
+                placeholder="姓名"
+                :invalid="v$.userName.$error"
+                class="w-full"
+              />
+              <InValidErrorMessage :errorDto="v$.userName.$errors" vaildChiName="姓名" />
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region  電話 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-gray-400 w-20 text-right shrink-0">電話</label>
+            <div class="flex-1">
+              <InputText
+                v-model="userInfo.userPhone"
+                placeholder="電話"
+                :invalid="v$.userPhone.$error"
+                class="w-full"
+              />
+              <InValidErrorMessage :errorDto="v$.userPhone.$errors" vaildChiName="電話" />
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region  地址 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-gray-400 w-20 text-right shrink-0">地址</label>
+            <div class="flex-1">
+              <InputText
+                v-model="userInfo.userAddress"
+                placeholder="地址"
+                :invalid="v$.userAddress.$error"
+                class="w-full"
+              />
+              <InValidErrorMessage :errorDto="v$.userAddress.$errors" vaildChiName="地址" />
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region  生日 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-gray-400 w-20 text-right shrink-0">生日</label>
+            <div class="flex-1">
+              <DatePicker
+                v-model="userInfo.userBirthDate"
+                placeholder="生日"
+                dateFormat="yy-mm-dd"
+                class="w-full"
+              />
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region  性別 -->
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-gray-400 w-20 text-right shrink-0">性別</label>
+            <div class="flex gap-5">
+              <label
+                v-for="g in genderEnum"
+                :key="g.value"
+                class="flex items-center gap-2 cursor-pointer text-sm text-gray-700"
+              >
+                <input type="radio" :value="g.value" v-model="userInfo.userGender" />
+                {{ g.description }}
+              </label>
+            </div>
+          </div>
+          <!-- #endregion -->
         </div>
-
-        <!-- 送出按鈕 -->
-        <div class="flex justify-end mt-5">
+        <!-- #endregion -->
+        <!-- #region  送出按鈕 -->
+        <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
           <button
             @click="updateMyUser"
-            class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2 rounded cursor-pointer text-sm font-medium transition-colors"
           >
-            更新資料
+            儲存
           </button>
         </div>
+        <!-- #endregion -->
       </div>
     </div>
   </div>

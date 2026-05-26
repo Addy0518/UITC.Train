@@ -104,11 +104,12 @@ const getProductsImg = (product) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
-    <div class="border-gray-200h-full flex flex-col items-center">
+  <div class="flex flex-col w-full items-center">
+    <!-- #region  廣告-->
+    <div class="border-gray-200h-full">
       <div class="mt-20 w-300 rounded-lg shadow-sm">
         <div class="justify-between">
-          <!-- #region 頁面圖片 -->
+          <!-- #region 廣告 -->
 
           <div class="card">
             <Galleria
@@ -127,8 +128,17 @@ const getProductsImg = (product) => {
               </template>
             </Galleria>
           </div>
-
           <!-- #endregion -->
+        </div>
+      </div>
+    </div>
+    <!-- #endregion -->
+
+    <!-- #region  類別 / 商品 -->
+    <!-- #region 類別區 -->
+    <div class="border-gray-200h-full">
+      <div class="mt-20 w-300 rounded-lg shadow-sm">
+        <div class="justify-between">
           <span class="text-2xl m-5">分類</span>
           <div class="grid grid-cols-4 mt-5">
             <div v-for="category in allCategories" :key="category.productCategoryId">
@@ -146,7 +156,10 @@ const getProductsImg = (product) => {
         </div>
       </div>
     </div>
-    <div class="border-gray-200h-full flex flex-col items-center">
+    <!-- #endregion -->
+
+    <!-- #region 商品區 -->
+    <div class="border-gray-200h-full">
       <div class="mt-10 w-300 rounded-lg shadow-sm">
         <div class="justify-between">
           <span class="text-2xl m-5">商品</span>
@@ -173,6 +186,7 @@ const getProductsImg = (product) => {
             </div>
           </div>
         </div>
+        <!-- #region  頁碼按鈕-->
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -186,7 +200,10 @@ const getProductsImg = (product) => {
           @page="pageChange"
         >
         </Paginator>
+        <!-- #endregion -->
       </div>
     </div>
+    <!-- #endregion -->
+    <!-- #endregion -->
   </div>
 </template>

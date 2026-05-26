@@ -14,7 +14,6 @@ import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Swal from 'sweetalert2';
-import { getError400Message } from '@/common/method';
 
 /*
    變數名稱代表意義
@@ -72,6 +71,9 @@ const editor = useEditor({
   },
 });
 
+/*
+   載入類別跟判斷是不是更新商品
+*/
 onMounted(() => {
   getCategories();
   if (route.params.id) {
@@ -79,7 +81,9 @@ onMounted(() => {
   }
 });
 
-// 加入已經寫好的驗證規則
+/*
+   加入已經寫好的驗證規則
+*/
 const rules = computed(() => ({
   productName: { required, maxLength: maxLength(50) },
   productPrice: { required },
@@ -87,10 +91,12 @@ const rules = computed(() => ({
   selectChild: { required },
 }));
 
-// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
-// autoDirty => 一碰到欄位就開始驗證
-// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
-// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+/*
+   加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
+   autoDirty : 一碰到欄位就開始驗證
+   lazy : 元件載入時不會馬上驗證 , 等使用者開始互動才會
+   scope : 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+*/
 const v$ = useVuelidate(
   rules,
   { productName, productPrice, productStock, selectChild },
@@ -333,128 +339,161 @@ const uploadDescriptionImage = async (e) => {
 </script>
 
 <template>
-  <div>
-    <div class="flex flex-wrap gap-4 p-5">
-      <!-- 顯示已上傳的圖片預覽 -->
-      <div v-for="(img, index) in imgs" :key="index" class="relative w-100 h-100">
-        <img :src="img.url" class="w-full h-full object-cover rounded-lg shadow" />
-        <!-- 刪除按鈕 -->
-        <button
-          @click="removeImage(index)"
-          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer"
-        >
-          ✕
-        </button>
+  <div class="flex flex-col w-full p-6">
+    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+      <!-- #region  標題 / 商品圖片-->
+      <div class="px-6 py-4 border-b border-gray-100">
+        <p class="text-2xl font-bold m-0">{{ route.params.id ? '編輯商品' : '新增商品' }}</p>
       </div>
 
-      <!-- 上傳按鈕 (永遠在最後面) -->
-      <label
-        class="w-100 h-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition"
-      >
-        <i class="pi pi-plus text-gray-400"></i>
-        <span class="text-xs text-gray-400 mt-1">上傳照片</span>
-        <input type="file" @change="uploadFile" accept="image/*" class="hidden" multiple />
-      </label>
-    </div>
+      <div class="p-6 flex flex-col gap-6">
+        <div>
+          <p class="text-sm text-gray-400 mb-2">商品圖片</p>
+          <div class="flex flex-wrap gap-2.5">
+            <div v-for="(img, index) in imgs" :key="index" class="relative w-80 h-80">
+              <img
+                :src="img.url"
+                class="w-full h-full object-cover rounded-lg border border-gray-100"
+              />
+              <button
+                @click="removeImage(index)"
+                class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <label
+              class="w-80 h-80 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 gap-1"
+            >
+              <i class="pi pi-plus text-gray-400 text-sm"></i>
+              <span class="text-xs text-gray-400">上傳照片</span>
+              <input type="file" @change="uploadFile" accept="image/*" class="hidden" multiple />
+            </label>
+          </div>
+        </div>
+        <!-- #endregion -->
+        <!-- #region  表單欄位-->
+        <div class="grid grid-cols-2 gap-4">
+          <!-- 商品名稱 -->
+          <div class="col-span-2">
+            <label class="text-sm text-gray-400 block mb-1.5">商品名稱</label>
+            <InputText
+              v-model="productName"
+              placeholder="輸入商品名稱"
+              :invalid="v$.productName.$error"
+              class="w-full"
+            />
+            <InValidErrorMessage :errorDto="v$.productName.$errors" vaildChiName="商品名稱" />
+          </div>
 
-    <InputGroup>
-      <InputText v-model="productName" placeholder="商品名稱" :invalid="v$.productName.$error" />
-    </InputGroup>
-    <InValidErrorMessage :errorDto="v$.productName.$errors" vaildChiName="商品名稱" />
+          <!-- 類別 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">類別</label>
+            <Select
+              v-model="selectParent"
+              :options="parentCategory"
+              optionLabel="productCategoryName"
+              placeholder="選擇類別"
+              @change="changeCategory()"
+              class="w-full"
+            />
+          </div>
 
-    <InputGroup>
-      <Select
-        v-model="selectParent"
-        :options="parentCategory"
-        optionLabel="productCategoryName"
-        placeholder="類別"
-        @change="changeCategory()"
-      />
-    </InputGroup>
-    <InputGroup v-if="childCategory.length > 0">
-      <Select
-        v-model="selectChild"
-        :options="childCategory"
-        optionLabel="productCategoryName"
-        placeholder="子類別"
-      />
-    </InputGroup>
-    <InValidErrorMessage :errorDto="v$.selectChild.$errors" vaildChiName="子類別" />
-    <InputGroup>
-      <InputNumber
-        v-model="productPrice"
-        placeholder="商品價格"
-        :invalid="v$.productPrice.$error"
-      />
-      <InputGroupAddon>.00</InputGroupAddon>
-    </InputGroup>
-    <InValidErrorMessage :errorDto="v$.productPrice.$errors" vaildChiName="商品價格" />
-    <InputGroup>
-      <InputNumber
-        v-model="productStock"
-        placeholder="商品庫存"
-        :invalid="v$.productStock.$error"
-      />
-    </InputGroup>
-    <InValidErrorMessage :errorDto="v$.productStock.$errors" vaildChiName="商品庫存" />
+          <!-- 子類別 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">子類別</label>
+            <Select
+              v-model="selectChild"
+              :options="childCategory"
+              optionLabel="productCategoryName"
+              placeholder="選擇子類別"
+              class="w-full"
+              :disabled="childCategory.length === 0"
+            />
+            <InValidErrorMessage :errorDto="v$.selectChild.$errors" vaildChiName="子類別" />
+          </div>
 
-    <!-- 商品描述整體區塊 -->
-    <div class="mt-4">
-      <label class="text-sm text-gray-400 block mb-2">商品描述</label>
+          <!-- 價格 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">商品價格</label>
+            <InputGroup>
+              <InputNumber
+                v-model="productPrice"
+                placeholder="0"
+                :invalid="v$.productPrice.$error"
+                class="w-full"
+              />
+              <InputGroupAddon>.00</InputGroupAddon>
+            </InputGroup>
+            <InValidErrorMessage :errorDto="v$.productPrice.$errors" vaildChiName="商品價格" />
+          </div>
 
-      <!-- 工具列 -->
-      <div class="flex gap-1 p-2 border border-b-0 rounded-t-lg bg-gray-50">
-        <!-- 粗體按鈕 -->
-        <!-- editor.chain().focus() : 確保操作後游標回到編輯器 -->
-        <!-- toggleBold() : 切換粗體狀態（有就關，沒有就開） -->
-        <!-- isActive('bold') : 目前游標在粗體文字上時加深背景，給使用者視覺回饋 -->
-        <button
-          type="button"
-          @click="editor.chain().focus().toggleBold().run()"
-          :class="editor?.isActive('bold') ? 'bg-gray-200' : ''"
-          class="px-2 py-1 rounded text-sm font-bold hover:bg-gray-200"
-        >
-          B
-        </button>
-
-        <!-- 斜體按鈕，邏輯同粗體 -->
-        <button
-          type="button"
-          @click="editor.chain().focus().toggleItalic().run()"
-          :class="editor?.isActive('italic') ? 'bg-gray-200' : ''"
-          class="px-2 py-1 rounded text-sm italic hover:bg-gray-200"
-        >
-          I
-        </button>
-
-        <!-- 項目清單按鈕 -->
-        <button
-          type="button"
-          @click="editor.chain().focus().toggleBulletList().run()"
-          class="px-2 py-1 rounded text-sm hover:bg-gray-200"
-        >
-          • 清單
-        </button>
-
-        <!-- 圖片上傳 -->
-        <!-- 用 label 包住隱藏的 input，點 label 就等於點 input，視覺上比較好看 -->
-        <label class="px-2 py-1 rounded text-sm hover:bg-gray-200 cursor-pointer">
-          🖼 插入圖片
-          <input type="file" accept="image/*" class="hidden" @change="uploadDescriptionImage" />
-        </label>
+          <!-- 庫存 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">商品庫存</label>
+            <InputNumber
+              v-model="productStock"
+              placeholder="0"
+              :invalid="v$.productStock.$error"
+              class="w-full"
+            />
+            <InValidErrorMessage :errorDto="v$.productStock.$errors" vaildChiName="商品庫存" />
+          </div>
+        </div>
+        <!-- #endregion -->
+        <!-- #region  商品描述 -->
+        <div>
+          <label class="text-sm text-gray-400 block mb-1.5">商品描述</label>
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="flex gap-1 p-2 bg-gray-50 border-b border-gray-200">
+              <button
+                type="button"
+                @click="editor.chain().focus().toggleBold().run()"
+                :class="editor?.isActive('bold') ? 'bg-gray-200' : ''"
+                class="px-2 py-1 rounded text-sm font-bold hover:bg-gray-200"
+              >
+                B
+              </button>
+              <button
+                type="button"
+                @click="editor.chain().focus().toggleItalic().run()"
+                :class="editor?.isActive('italic') ? 'bg-gray-200' : ''"
+                class="px-2 py-1 rounded text-sm italic hover:bg-gray-200"
+              >
+                I
+              </button>
+              <button
+                type="button"
+                @click="editor.chain().focus().toggleBulletList().run()"
+                class="px-2 py-1 rounded text-sm hover:bg-gray-200"
+              >
+                • 清單
+              </button>
+              <label class="px-2 py-1 rounded text-sm hover:bg-gray-200 cursor-pointer">
+                🖼 插入圖片
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="uploadDescriptionImage"
+                />
+              </label>
+            </div>
+            <EditorContent :editor="editor" class="p-3 min-h-32 prose max-w-none" />
+          </div>
+        </div>
+        <!-- #endregion -->
+        <!-- #region  儲存按鍵-->
+        <div class="flex justify-end pt-4 border-t border-gray-100">
+          <button
+            @click="createOrUpdateProduct()"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2.5 rounded-lg text-xl font-medium cursor-pointer transition-colors"
+          >
+            儲存
+          </button>
+        </div>
+        <!-- #endregion -->
       </div>
-
-      <!-- 編輯區 -->
-      <EditorContent :editor="editor" class="border rounded-b-lg p-3 min-h-40 prose max-w-none" />
-    </div>
-    <!-- 按鈕區 -->
-    <div class="justify-end flex mt-5">
-      <button
-        @click="createOrUpdateProduct()"
-        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer"
-      >
-        儲存
-      </button>
     </div>
   </div>
 </template>
