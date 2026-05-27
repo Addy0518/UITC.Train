@@ -6,7 +6,8 @@ public class OrderService(
     IProductsRepository productsRepositories,
     IProductsImgRepository productsImgRepository,
     IProductsRateRepository productsRateRepositories,
-    IProductsOrderRepository productsBuyRepositories
+    IProductsOrderRepository productsBuyRepositories,
+    IProductsShoppingCarRepository productsShoppingCarRepository
 ) : IOrderService
 {
     /// <summary>
@@ -159,6 +160,7 @@ public class OrderService(
                 };
                 var order = await productsBuyRepositories.BuyProducts(buytarget);
                 orderIds.Add(order);
+                await productsShoppingCarRepository.DeleteProductsInShoppingCar(product.ProductsId, Request.UserId);
             }
 
             trxScope.Complete();
