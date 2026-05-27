@@ -211,7 +211,11 @@ const home = ref({
 const breadCrumbItem = computed(() => {
   if (!product.value) return [];
   return [
-    { label: product.value.parentCategoryName, command: () => router.push({ name: 'mall' }) },
+    {
+      label: product.value.parentCategoryName,
+      command: () =>
+        router.push({ name: 'mall-category', params: { id: product.value.productParentId } }),
+    },
     { label: product.value.productCategoryName, command: () => router.push({ name: 'mall' }) },
   ];
 });
