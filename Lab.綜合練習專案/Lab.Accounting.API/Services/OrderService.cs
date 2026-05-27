@@ -145,6 +145,7 @@ public class OrderService(
                 var buytarget = new MallOrder
                 {
                     OrderNumber = merchantTradeNo,
+                    SellerUserId = target.UserId,
                     UserId = Request.UserId,
                     ProductsId = product.ProductsId,
                     ProductsName = target.ProductsName,

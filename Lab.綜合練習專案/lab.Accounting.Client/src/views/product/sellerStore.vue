@@ -1,6 +1,7 @@
 <script setup>
 import { getAllProduct } from '@/api/productsService';
-
+import { getStore } from '@/api/storeService';
+import { getOneUser } from '@/api/userService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
 /*
@@ -10,13 +11,20 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    baseUrl : 環境變數裡的圖片基底位址
    router : 控制路由
    selectedCategory : 選擇的類別區塊
+   seller : 賣家
+   store : 賣場
+   sellerAllRate : 賣家的所有評價
+   sellerAVGRate : 賣家評分
 */
 const allproduct = ref(null);
-const userInfo = ref();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
 const route = useRoute();
 const selectedCategory = ref(null);
+const seller = ref();
+const store = ref({});
+const sellerAllRate = ref(null);
+const sellerAVGRate = ref();
 /*
    注入 Loading 跟 Toast
 */
@@ -29,8 +37,40 @@ const showToastError = inject('showToastError');
    初始化時查看賣家所有商品
 */
 onMounted(() => {
+  getSellerInfo(route.params.id);
+  getStoreInfo(route.params.id);
   getSellerProduct();
 });
+
+/*
+   拿到賣家資訊
+*/
+const getSellerInfo = async (id) => {
+  try {
+    showLoading();
+    const res = await getOneUser(id);
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      seller.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
+   載入賣家頭貼
+*/
+const sellerImg = (user) => {
+  if (user) {
+    return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
+  } else {
+    return defaultImgurl;
+  }
+};
 
 /*
    查看賣家所有商品
@@ -48,6 +88,27 @@ const getSellerProduct = async () => {
 
     if (data.codeStatus === 2000) {
       allproduct.value = data.returnData.products;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
+   拿到賣場資訊
+*/
+const getStoreInfo = async (id) => {
+  try {
+    showLoading();
+    const res = await getStore(id);
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      store.value = data.returnData;
+      sellerAllRate.value = data.returnData.allProductsRateCount;
+      sellerAVGRate.value = data.returnData.countAVGAllProductRate;
     }
   } catch (err) {
     console.log(err);
@@ -88,11 +149,44 @@ const filterProducts = computed(() => {
   <div class="flex flex-col w-full p-6" v-if="allproduct">
     <!-- 賣家資訊 -->
     <div class="bg-gray-50 rounded-lg p-6 mb-5 flex items-center gap-5">
-      <img :src="sellerImg" class="w-18 h-18 rounded-full object-cover border-2 border-gray-200" />
+      <img
+        :src="sellerImg(seller)"
+        class="w-18 h-18 rounded-full object-cover border-2 border-gray-200"
+      />
       <div>
         <p class="text-lg font-medium m-0 mb-1">{{ store.storeName }}</p>
         <p class="text-sm text-gray-400 m-0">共 {{ allproduct.length }} 件商品</p>
       </div>
+      <!--#region  統計資訊 -->
+      <div class="grid grid-cols-3 gap-x-10 gap-y-2.5 flex-1 text-sm">
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">商品</span>
+          <span class="text-orange-500 font-medium">{{ store.allProductsCount }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">加入時間</span>
+          <span class="text-gray-700 font-medium">{{ formatDateOnly(store.createTime) }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">評價</span>
+          <span class="text-orange-500 font-medium">{{ sellerAllRate }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">賣場評分</span
+          ><span class="text-orange-500 font-medium">{{ sellerAVGRate }}</span>
+          <Rating :modelValue="sellerAVGRate" :stars="5" :readonly="true" />
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">公司名稱</span>
+          <span class="text-gray-700 font-medium">{{ store.storeCompanyName }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">公司統編</span>
+          <span class="text-gray-700 font-medium">{{ store.storeUnifiedNumber }}</span>
+        </div>
+      </div>
+      <!-- #endregion -->
     </div>
 
     <!-- 類別篩選 -->

@@ -94,7 +94,26 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     }
 
     /// <summary>
-    /// 計算商品評分平均值
+    /// 查看賣家所有商品所有評價的數量
+    /// </summary>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <returns>商品評價資訊</returns>
+    public async Task<int> GetAllProductsRateCount(int sellerId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"SELECT   Count(*)
+                FROM   MallProductsRate r
+                Join   mallProducts p 
+                on     p.ProductsId=r.ProductsId
+                WHERE  p.UserId = @SellerId";
+
+        return await conn.ExecuteScalarAsync<int>(sql, new { SellerId = sellerId });
+    }
+
+    /// <summary>
+    /// 計算賣家單一商品評分平均值
     /// </summary>
     /// <param name="productId">商品 ID</param>
     /// <returns>評分平均值</returns>
@@ -108,5 +127,24 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
                 WHERE  productsid = @productsId ";
 
         return await conn.QuerySingleAsync<decimal?>(sql, new { productsId = productId });
+    }
+
+    /// <summary>
+    /// 計算賣家所有商品評分平均值
+    /// </summary>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <returns>評分平均值</returns>
+    public async Task<decimal?> CountAVGAllProductRate(int sellerId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"SELECT Round(Avg(rating),1)
+                FROM   mallproductsrate r
+                Join   mallProducts p 
+                on     p.ProductsId=r.ProductsId
+                WHERE  p.UserId = @SellerId ";
+
+        return await conn.QuerySingleAsync<decimal?>(sql, new { SellerId = sellerId });
     }
 }

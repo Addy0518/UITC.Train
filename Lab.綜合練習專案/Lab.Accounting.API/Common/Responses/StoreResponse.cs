@@ -23,6 +23,16 @@
         public string? StoreCompanyName { get; set; }
 
         /// <summary>
+        /// 所有評價的數量
+        /// </summary>
+        public int? AllProductsRateCount { get; set; }
+
+        /// <summary>
+        /// 所有評價的平均評分
+        /// </summary>
+        public decimal? CountAVGAllProductRate { get; set; }
+
+        /// <summary>
         /// 所有商品的數量
         /// </summary>
         public int? AllProductsCount { get; set; }

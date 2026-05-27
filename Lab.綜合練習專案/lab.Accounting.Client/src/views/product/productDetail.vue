@@ -11,7 +11,9 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    router : 改變路徑
    product : 商品資訊
    baseUrl : 環境變數裡的圖片基底位址
-   allRate : 所有評價
+   productAllRate : 商品的所有評價
+   sellerAllRate : 賣家的所有評價
+   sellerAVGRate : 賣家評分
    boughtQuantity : 購買數量
    displayBasic : 大圖展開開關
    activeIndex : 當下選擇開啟的大圖
@@ -22,7 +24,9 @@ const route = useRoute();
 const router = useRouter();
 const product = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
-const allRate = ref(null);
+const productAllRate = ref(null);
+const sellerAllRate = ref(null);
+const sellerAVGRate = ref();
 const boughtQuantity = ref(1);
 const displayBasic = ref(false);
 const activeIndex = ref();
@@ -48,7 +52,7 @@ const getProductDetail = async (id) => {
     if (data.codeStatus === 2000) {
       product.value = data.returnData;
 
-      allRate.value = data.returnData.productsAllRates;
+      productAllRate.value = data.returnData.productsAllRates;
       await getSellerInfo(product.value.userId);
     }
   } catch (err) {
@@ -93,9 +97,11 @@ const getStoreInfo = async (id) => {
     showLoading();
     const res = await getStore(id);
     const { data } = res;
-    console.log('data', data);
+
     if (data.codeStatus === 2000) {
       store.value = data.returnData;
+      sellerAllRate.value = data.returnData.allProductsRateCount;
+      sellerAVGRate.value = data.returnData.countAVGAllProductRate;
     }
   } catch (err) {
     console.log(err);
@@ -209,8 +215,6 @@ const breadCrumbItem = computed(() => {
     { label: product.value.productCategoryName, command: () => router.push({ name: 'mall' }) },
   ];
 });
-
-
 </script>
 
 <template>
@@ -302,7 +306,7 @@ const breadCrumbItem = computed(() => {
               }}</span>
               <Rating :modelValue="product.productsAVGRate" :stars="5" :readonly="true" />
               <div class="w-px h-3.5 bg-gray-200"></div>
-              <span class="text-xs text-gray-400">{{ allRate?.length ?? 0 }} 則評價</span>
+              <span class="text-xs text-gray-400">{{ productAllRate?.length ?? 0 }} 則評價</span>
             </div>
             <!-- #endregion -->
 
@@ -436,7 +440,12 @@ const breadCrumbItem = computed(() => {
             </div>
             <div class="flex items-center gap-2">
               <span class="text-gray-400">評價</span>
-              <span class="text-orange-500 font-medium">{{ allRate.length }}</span>
+              <span class="text-orange-500 font-medium">{{ sellerAllRate }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-gray-400">賣場評分</span
+              ><span class="text-orange-500 font-medium">{{ sellerAVGRate }}</span>
+              <Rating :modelValue="sellerAVGRate" :stars="5" :readonly="true" />
             </div>
             <div class="flex items-center gap-2">
               <span class="text-gray-400">公司名稱</span>
@@ -462,8 +471,9 @@ const breadCrumbItem = computed(() => {
         </div>
         <!-- #endregion -->
         <!--#region 評論區 -->
+        <span class="text-xs text-gray-400">{{ productAllRate?.length ?? 0 }} 則評價</span>
         <div
-          v-for="rate in allRate"
+          v-for="rate in productAllRate"
           class="hover:shadow-xl bg-white h-20 hover:bg-gray-50 flex flex-row ps-10 items-center"
         >
           <img :src="userImg(rate)" alt="頭貼" class="w-10 h-10 rounded-full object-cover me-5" />

@@ -5,7 +5,8 @@ namespace Lab.Accounting.API.Services
     public class StoreService(
         IStoreRepository sellerRepository,
         IUserRepository userRepository,
-        IProductsRepository productsRepository
+        IProductsRepository productsRepository,
+        IProductsRateRepository productsRateRepository
     ) : IStoreService
     {
         /// <summary>
@@ -21,6 +22,8 @@ namespace Lab.Accounting.API.Services
             {
                 return ApiResponseHelper.NotFound<StoreResponse>();
             }
+            var allRateCount = await productsRateRepository.GetAllProductsRateCount(sellerId);
+            var allRateAVG = await productsRateRepository.CountAVGAllProductRate(sellerId);
 
             var productCount = await productsRepository.CountSellerProducts(sellerId);
             var result = new StoreResponse
@@ -29,6 +32,8 @@ namespace Lab.Accounting.API.Services
                 StoreName = target.StoreName,
                 StoreUnifiedNumber = target.StoreUnifiedNumber,
                 StoreCompanyName = target.StoreCompanyName,
+                AllProductsRateCount = allRateCount,
+                CountAVGAllProductRate = allRateAVG,
                 AllProductsCount = productCount,
                 CreateTime = target.CreateTime,
             };
