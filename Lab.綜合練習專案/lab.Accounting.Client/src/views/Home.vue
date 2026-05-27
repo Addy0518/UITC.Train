@@ -11,7 +11,7 @@ const isLogin = computed(() => route.name === 'login' || route.name === 'home');
 const isRegister = computed(() => route.name === 'create-Account');
 
 /*
-   首頁清空登入狀態
+   初始化時首頁清空登入狀態
 */
 onMounted(() => {
   authStore.clearAuth();
@@ -22,6 +22,7 @@ onMounted(() => {
     class="min-h-screen w-full bg-center flex items-center justify-center"
     style="background-color: white"
   >
+   <!--#region 首頁 -->
     <div
       class="container mx-auto flex flex-col md:flex-row items-center justify-start px-10 md:pl-24"
     >
@@ -29,6 +30,7 @@ onMounted(() => {
         <img src="@/img/記帳.png" alt="Logo" class="max-w-2xl object-contain" />
       </div>
       <div class="flex-1 flex justify-center">
+         <!--#region 登入註冊 -->
         <div
           class="w-full max-w-xl backdrop-blur-sm p-8 border rounded-2xl shadow-2xl overflow-hidden"
         >
@@ -56,7 +58,9 @@ onMounted(() => {
 
           <RouterView></RouterView>
         </div>
+        <!-- #endregion -->
       </div>
     </div>
+    <!-- #endregion -->
   </div>
 </template>

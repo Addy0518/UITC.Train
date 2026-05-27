@@ -221,7 +221,7 @@ const breadCrumbItem = computed(() => {
   <div class="flex flex-col w-full gap-4" v-if="product">
     <div class="min-h-screen py-6 px-4 bg-gray-50">
       <div class="max-w-5xl mx-auto flex flex-col gap-3">
-        <!--#region 商品圖片,簡介區 -->
+        <!--#region 商品圖片 / 簡介區 -->
         <div class="bg-white rounded-lg flex gap-8">
           <!-- #region 圖片 -->
           <div class="flex flex-col gap-2">

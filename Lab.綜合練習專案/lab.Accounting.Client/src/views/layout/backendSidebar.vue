@@ -1,26 +1,8 @@
-<script setup>
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
-/*
-   變數名稱代表意義
-   baseUrl : 基底位址
-   authStore : localstorage
-*/
+<script setup></script>
 
-const baseUrl = import.meta.env.VITE_IMG_URL;
-const authStore = useAuthStore();
-
-const imgUrl = computed(() => {
-  if (authStore.userHeadshot) {
-    return `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
-  } else {
-    return defaultImgurl;
-  }
-});
-</script>
-
-/* 側邊攔 */
 <template>
   <div class="w-80">
+    <!-- #region  賣家後台區-->
     <div class="w-80 h-full shadow-xl">
       <RouterLink
         :to="{ name: 'seller-product' }"
@@ -45,5 +27,6 @@ const imgUrl = computed(() => {
         ><i class="pi pi-wallet px-5 ps-5"></i>商品回收</RouterLink
       >
     </div>
+    <!-- #endregion -->
   </div>
 </template>

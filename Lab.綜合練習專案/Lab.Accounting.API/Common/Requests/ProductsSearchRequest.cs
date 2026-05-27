@@ -15,6 +15,12 @@
         public int pageSize { get; set; } = 10;
 
         /// <summary>
+        /// 關鍵字搜尋
+        /// </summary>
+        [Display(Name = "關鍵字搜尋")]
+        public string? keyWords { get; set; }
+
+        /// <summary>
         /// 賣家 ID
         /// </summary>
         [Display(Name = "賣家 ID")]

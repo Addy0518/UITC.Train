@@ -1,7 +1,6 @@
 <script setup>
 import { registerApi } from '@/api/userService';
 
-
 /*
    變數名稱代表意義
    route : 獲取路由資訊
@@ -20,7 +19,17 @@ const phone = ref();
 const address = ref();
 const tooglePassword = ref(true);
 
-// 加入已經寫好的驗證規則
+/*
+   注入 Loading 跟 Toast
+*/
+const showLoading = inject('showLoading');
+const hideLoading = inject('hideLoading');
+const showToastSuccess = inject('showToastSuccess');
+const showToastError = inject('showToastError');
+
+/*
+   加入已經寫好的驗證規則
+*/
 const rules = computed(() => ({
   account: { required, maxLength: maxLength(200), vaildEmail },
   password: { required, vaildLoginPassword },
@@ -29,23 +38,14 @@ const rules = computed(() => ({
   address: {},
 }));
 
-// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
-// autoDirty => 一碰到欄位就開始驗證
-// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
-// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+/*
+   加入套件驗證設定
+*/
 const v$ = useVuelidate(
   rules,
   { account, password, name, phone, address },
   { $autoDirty: true, $lazy: true, $scope: false },
 );
-
-/*
-   注入 Loading 跟 Toast
-*/
-const showLoading = inject('showLoading');
-const hideLoading = inject('hideLoading');
-const showToastSuccess = inject('showToastSuccess');
-const showToastError = inject('showToastError');
 
 /*
   呼叫註冊使用者 API
@@ -84,9 +84,9 @@ const userRegister = async () => {
   <div class="container mx-auto p-10">
     <p class="text-center mb-10 text-3xl font-bold">註冊帳號</p>
 
-    <!-- 欄位區 -->
+    <!-- #region  註冊欄位-->
     <div class="card grid grid-cols-1 gap-4 gap-y-5">
-      <!-- 帳號跟密碼 -->
+      <!-- #region  帳號 / 密碼 -->
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-user"></i>
@@ -109,7 +109,8 @@ const userRegister = async () => {
         </InputGroupAddon>
       </InputGroup>
       <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
-      <!-- 名稱跟電話 -->
+      <!-- #endregion -->
+      <!-- #region  名稱 / 電話-->
       <InputGroup>
         <InputGroupAddon>
           <i class="pi pi-id-card"></i>
@@ -133,8 +134,10 @@ const userRegister = async () => {
         <InputText v-model="address" placeholder="地址" :invalid="v$.address.$error" />
       </InputGroup>
       <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="地址" />
+      <!-- #endregion -->
     </div>
-
+    <!-- #endregion -->
+    <!-- #region  儲存按鈕-->
     <div class="justify-end flex mt-5">
       <button
         @click="userRegister"
@@ -144,5 +147,6 @@ const userRegister = async () => {
         註冊
       </button>
     </div>
+    <!-- #endregion -->
   </div>
 </template>

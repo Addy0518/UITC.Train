@@ -1,5 +1,6 @@
 <script setup>
 import { getUserOrder, userRetryBuyProduct } from '@/api//orderService';
+import { getOrderRate } from '@/api/productsService';
 import { shippingEnum } from '@/common/enum';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 
@@ -11,6 +12,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    router : 控制路由
    route : 抓取路由參數
    selectProducts : 選擇的商品
+   ratedOrders : 所有評論紀錄,用來判斷是否評論過
 */
 const allOrders = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
@@ -18,6 +20,8 @@ const tableNow = ref(shippingEnum.PendingShipment.value);
 const router = useRouter();
 const route = useRoute();
 const selectProducts = ref([]);
+const ratedOrders = ref(new Set());
+
 /*
    注入 Loading 跟 Toast
 */
@@ -26,6 +30,9 @@ const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
+/*
+   初始化時拿到全部訂單 , 跟交易回來時觸發的動作
+*/
 onMounted(() => {
   getUserAllOrder();
 
@@ -50,6 +57,25 @@ const filtTable = computed(() => {
 });
 
 /*
+  查看訂單評價來比對是否評價過
+*/
+const existOrderRate = async (id) => {
+  try {
+    showLoading();
+    const res = await getOrderRate(id);
+    const { data } = res;
+
+    if (data.codeStatus === 2000 && data.returnData) {
+      ratedOrders.value.add(id);
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
   查看全部訂單
 */
 const getUserAllOrder = async () => {
@@ -59,6 +85,9 @@ const getUserAllOrder = async () => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       allOrders.value = data.returnData;
+      for (let order of allOrders.value) {
+        await existOrderRate(order.orderId);
+      }
     }
   } catch (err) {
     console.log(err);
@@ -77,6 +106,9 @@ const getProductsImg = (product) => {
   return defaultImgurl;
 };
 
+/*
+  重新付款
+*/
 const retryPayment = async () => {
   try {
     showLoading();
@@ -120,7 +152,7 @@ const retryPayment = async () => {
   <div class="flex flex-col w-full">
     <div class="border-gray-200h-full flex flex-col items-center">
       <div class="mt-40 w-300 rounded-lg shadow-sm">
-        <!-- Tab 列 -->
+        <!--#region Tab -->
         <div class="flex border-b border-gray-200">
           <button
             v-for="tab in shippingEnum"
@@ -136,16 +168,18 @@ const retryPayment = async () => {
             {{ tab.description }}
           </button>
         </div>
+        <!-- #endregion -->
 
-        <!-- 訂單列表 -->
-        <!-- 沒有訂單時顯示 -->
+        <!--#region 訂單列表 / 沒有訂單時顯示 -->
         <div
           v-if="filtTable.length === 0"
           class="flex justify-center items-center h-40 text-gray-400"
         >
           目前沒有訂單
         </div>
-        <!-- 有訂單時顯示 -->
+        <!-- #endregion -->
+
+        <!--#region 有訂單時顯示 -->
         <div v-for="order in filtTable">
           <div
             class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
@@ -166,16 +200,25 @@ const retryPayment = async () => {
             <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
             <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
             <div v-if="tableNow === shippingEnum.Arrived.value">
-               <!-- 用 click.stop 防止冒泡 -->
-              <button
-                class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
-                @click.stop="router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })"
-              >
-                去評價
-              </button>
+              <!-- 用 click.stop 防止冒泡 -->
+              <div v-if="ratedOrders.has(order.orderId)">
+                <span class="text-sm font-medium px-5 py-2 text-red-500">已評價</span>
+              </div>
+              <div v-else>
+                <button
+                  class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
+                  @click.stop="
+                    router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })
+                  "
+                >
+                  去評價
+                </button>
+              </div>
             </div>
           </div>
         </div>
+        <!-- #endregion -->
+        <!--#region 按鈕區 -->
         <div v-if="selectProducts.length > 0" class="flex justify-end mt-3">
           <button
             class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
@@ -184,6 +227,7 @@ const retryPayment = async () => {
             重新付款
           </button>
         </div>
+        <!-- #endregion -->
       </div>
     </div>
   </div>

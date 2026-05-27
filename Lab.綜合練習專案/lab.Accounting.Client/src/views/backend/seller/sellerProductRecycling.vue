@@ -45,6 +45,7 @@ const getSellerProduct = async () => {
     };
     const res = await getSellerAllProduct(request);
     const { data } = res;
+
     if (data.codeStatus === 2000) {
       allproduct.value = data.returnData.products;
     }
@@ -99,7 +100,8 @@ const deleteProduct = async () => {
       }
       showToastSuccess('已成功刪除!');
       selectIds.value = [];
-      await getSellerProduct(0, 10, isDeleteEnum.Delete.value);
+
+      await getSellerProduct();
     } catch (err) {
       console.log(err);
     } finally {
@@ -122,9 +124,9 @@ const rollbackAll = async (target) => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       selectIds.value = [];
+      await getSellerProduct();
 
       showToastSuccess('商品已復原');
-      await getSellerProduct(0, 10, true);
     }
   } catch (err) {
     console.log(err);

@@ -25,18 +25,16 @@ const password = ref(null);
 const tooglePassword = ref(true);
 
 /*
-  驗證帳號格式
+   加入已經寫好的驗證規則
 */
-// 加入已經寫好的驗證規則
 const rules = computed(() => ({
   account: { required, maxLength: maxLength(200), vaildEmail },
   password: { required, vaildLoginPassword },
 }));
 
-// 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
-// autoDirty => 一碰到欄位就開始驗證
-// lazy => 元件載入時不會馬上驗證 , 等使用者開始互動才會
-// scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
+/*
+   加入套件驗證設定
+*/
 const v$ = useVuelidate(
   rules,
   { account, password },
@@ -94,7 +92,7 @@ const userLogin = async () => {
   <div class="container mx-auto p-10">
     <p class="text-center mb-10 text-3xl font-bold">登入帳號</p>
 
-    <!-- 帳號跟密碼欄位 -->
+    <!-- #region  帳號 / 密碼-->
     <div class="card grid grid-cols-1 gap-4 gap-y-10">
       <InputGroup>
         <InputGroupAddon>
@@ -102,7 +100,7 @@ const userLogin = async () => {
         </InputGroupAddon>
         <InputText v-model="account" placeholder="帳號" :invalid="v$.account.$error" />
       </InputGroup>
-      <!-- 自訂的顯示錯誤訊息元件 -->
+
       <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
       <InputGroup>
         <InputGroupAddon>
@@ -120,7 +118,8 @@ const userLogin = async () => {
       </InputGroup>
       <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
     </div>
-    <!-- 按鈕區 -->
+    <!-- #endregion -->
+    <!-- #region  按鈕區-->
     <div class="justify-end flex mt-5">
       <button
         @click="testUser"
@@ -142,5 +141,6 @@ const userLogin = async () => {
         登入
       </button>
     </div>
+    <!-- #endregion -->
   </div>
 </template>

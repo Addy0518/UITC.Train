@@ -44,6 +44,9 @@ export const productsImgDelete = (productsImgId) =>
 
 // 評價相關 API ===========================================================
 
+// 查看單一訂單評價
+export const getOrderRate = (id) => accountApiInstance.get(`Products/GetOrderRate?orderId=${id}`);
+
 // 新增單一商品評價
 export const createProductRate = (request) =>
   accountApiInstance.post(`Products/CreateProductRate`, request);

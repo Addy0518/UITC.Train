@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using NPOI.HPSF;
 using Org.BouncyCastle.Asn1.X509;
 
@@ -329,6 +330,19 @@ public class ProductsService(
     }
 
     /// <summary>
+    /// 查看單一訂單評價
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>商品評價資訊</returns>
+    public async Task<ApiResponse<RateResponse>> GetOrderRate(int orderId)
+    {
+        var rate = await productsRateRepositories.GetOrderRate(orderId);
+        if (rate == null)
+            return ApiResponseHelper.NotFound<RateResponse>();
+        return ApiResponseHelper.Success(rate);
+    }
+
+    /// <summary>
     /// 新增單一商品評價
     /// </summary>
     /// <param name="request">商品評價資訊</param>
@@ -356,6 +370,13 @@ public class ProductsService(
         }
 
         var product = await productsRepository.GetProducts(request.ProductsId);
+        if (product == null)
+        {
+            var errors = new Dictionary<string, string[]> { { "MallProducts", new[] { "商品不存在了!" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+
         if (product.UserId == request.UserId)
         {
             var errors = new Dictionary<string, string[]> { { "UserId", new[] { "賣家無法評價自己的商品!" } } };

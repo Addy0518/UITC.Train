@@ -83,6 +83,13 @@ public interface IProductsService
     Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId);
 
     /// <summary>
+    /// 查看單一訂單評價
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <returns>商品評價資訊</returns>
+    Task<ApiResponse<RateResponse>> GetOrderRate(int orderId);
+
+    /// <summary>
     /// 新增單一商品評價
     /// </summary>
     /// <param name="request">商品評價資訊</param>

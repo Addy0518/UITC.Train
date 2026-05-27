@@ -147,17 +147,18 @@ const filterProducts = computed(() => {
 
 <template>
   <div class="flex flex-col w-full p-6" v-if="allproduct">
-    <!-- 賣家資訊 -->
+    <!--#region 賣家資訊 -->
     <div class="bg-gray-50 rounded-lg p-6 mb-5 flex items-center gap-5">
       <img
         :src="sellerImg(seller)"
         class="w-18 h-18 rounded-full object-cover border-2 border-gray-200"
       />
+      <!--#region  統計資訊 -->
       <div>
         <p class="text-lg font-medium m-0 mb-1">{{ store.storeName }}</p>
         <p class="text-sm text-gray-400 m-0">共 {{ allproduct.length }} 件商品</p>
       </div>
-      <!--#region  統計資訊 -->
+
       <div class="grid grid-cols-3 gap-x-10 gap-y-2.5 flex-1 text-sm">
         <div class="flex items-center gap-2">
           <span class="text-gray-400">商品</span>
@@ -188,8 +189,9 @@ const filterProducts = computed(() => {
       </div>
       <!-- #endregion -->
     </div>
+    <!-- #endregion -->
 
-    <!-- 類別篩選 -->
+    <!--#region 類別 -->
     <div class="flex gap-2 mb-5 flex-wrap">
       <button
         @click="selectedCategory = null"
@@ -216,8 +218,9 @@ const filterProducts = computed(() => {
         {{ cat }}
       </button>
     </div>
+    <!-- #endregion -->
 
-    <!-- 商品格狀列表 -->
+    <!--#region 商品 -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       <div
         v-for="product in filterProducts"
@@ -237,5 +240,6 @@ const filterProducts = computed(() => {
         </div>
       </div>
     </div>
+    <!-- #endregion -->
   </div>
 </template>

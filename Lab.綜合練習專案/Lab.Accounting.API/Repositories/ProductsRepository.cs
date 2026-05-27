@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories;
+﻿using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+
+namespace Lab.Accounting.API.Repositories;
 
 public class ProductsRepository(DBConnecting connecting) : IProductsRepository
 {
@@ -32,6 +34,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         and  m.isDelete=0
                         and  m.ProductsStock > 0
                         and  (@productCategoryId is null or c.ProductParentId=@productCategoryId or m.ProductCategoryId=@productCategoryId)
+                        and  (@keyWords is null or  m.productsname like '%' + @keyWords + '%')
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
         var result = await conn.QueryAsync<Product>(
@@ -42,6 +45,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                 pageSize = request.pageSize,
                 UserId = request.sellerId,
                 productCategoryId = request.productCategoryId,
+                keyWords = request.keyWords,
             }
         );
         return result;

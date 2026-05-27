@@ -42,9 +42,20 @@ onMounted(() => {
   if (route.query.forbidden) {
     showToastError('你沒有訪問權限');
   }
+  // 載入 Layout 的搜尋參數
   loadproducts();
   loadCategory();
 });
+
+/*
+   監聽搜尋欄位變化
+*/
+watch(
+  () => route.query.keyword,
+  () => {
+    loadproducts();
+  },
+);
 
 /*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
@@ -53,7 +64,11 @@ const loadproducts = async (page = 0) => {
   try {
     showLoading();
     allProducts.value = [];
-    const res = await getAllProduct({ pageIndex: page, pageSize: 12 });
+    const res = await getAllProduct({
+      pageIndex: page,
+      pageSize: 12,
+      keyWords: route.query.keyword ?? null,
+    });
     const { data } = res;
     if (data.codeStatus === 2000) {
       allProducts.value = data.returnData.products;

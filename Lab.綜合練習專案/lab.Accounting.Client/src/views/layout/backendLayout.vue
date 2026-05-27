@@ -21,6 +21,9 @@ const logout = async () => {
   router.push({ name: 'login' });
 };
 
+/*
+   大頭照
+*/
 const imgUrl = computed(() => {
   if (authStore.userHeadshot) {
     return `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
@@ -32,15 +35,15 @@ const imgUrl = computed(() => {
 
 <template>
   <div class="w-screen bg-black">
+    <!-- #region  Layout 區-->
     <div class="container flex mx-auto h-20 items-center justify-center gap-6">
       <RouterLink :to="{ name: 'mall' }" class="text-white text-2xl">回到商城</RouterLink>
 
       <div class="flex-1 flex items-center justify-end gap-6">
-        <!-- 已登入：顯示用戶名跟登出 -->
+        <!-- #region  已登入：顯示用戶名跟登出-->
         <template v-if="authStore.token">
           <div class="relative group">
             <div class="cursor-pointer flex items-center">
-              <!-- 顯示照片 -->
               <img :src="imgUrl" alt="頭貼" class="w-10 h-10 rounded-full object-cover" />
               <span class="text-white ps-3 text-xl">{{ authStore.userName }}</span>
             </div>
@@ -66,8 +69,8 @@ const imgUrl = computed(() => {
             </div>
           </div>
         </template>
-
-        <!-- 未登入：顯示註冊登入 -->
+        <!-- #endregion -->
+        <!-- #region  未登入：顯示註冊登入-->
         <template v-else>
           <RouterLink :to="{ name: 'login' }">
             <strong class="text-white text-xl">登入</strong>
@@ -77,8 +80,10 @@ const imgUrl = computed(() => {
             <strong class="text-white text-xl">註冊</strong>
           </RouterLink>
         </template>
+        <!-- #endregion -->
       </div>
     </div>
+    <!-- #endregion -->
   </div>
   <div class="flex">
     <backendSidebar class="w-80 h-screen" />

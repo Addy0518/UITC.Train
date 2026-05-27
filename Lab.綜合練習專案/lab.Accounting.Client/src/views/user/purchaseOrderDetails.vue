@@ -23,12 +23,18 @@ const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
+/*
+   初始化時拿到訂單
+*/
 onMounted(() => {
   if (route.params.id) {
     getOneOrder(route.params.id);
   }
 });
 
+/*
+   拿到訂單
+*/
 const getOneOrder = async (id) => {
   try {
     showLoading();
@@ -59,6 +65,7 @@ const getProductsImg = (product) => {
 <template>
   <div class="flex flex-col w-full">
     <div class="border-gray-200h-full flex flex-col items-center">
+       <!--#region 訂單資訊 -->
       <div class="mt-40 w-300 rounded-lg shadow-sm" v-if="order">
         <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
         <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
@@ -72,6 +79,7 @@ const getProductsImg = (product) => {
         >
         <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
       </div>
+       <!-- #endregion -->
     </div>
   </div>
 </template>
