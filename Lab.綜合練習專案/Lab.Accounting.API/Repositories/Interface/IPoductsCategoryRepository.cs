@@ -17,6 +17,12 @@
         Task<IEnumerable<MallProductCategory>> GetFatherCategories(int sonCategoryId);
 
         /// <summary>
+        /// 查看最頂層一層的父類別
+        /// </summary>
+        /// <returns>商品類別</returns>
+        Task<IEnumerable<MallProductCategory>> GetOneFatherCategory();
+
+        /// <summary>
         /// 查看指定類別往下的第一個層級類別
         /// </summary>
         /// <param name="fatherCategoryId">商品父類別 ID</param>

@@ -1,4 +1,5 @@
 ﻿using NPOI.POIFS.Properties;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lab.Accounting.API.Repositories
 {
@@ -38,6 +39,24 @@ namespace Lab.Accounting.API.Repositories
                 where cl.SonId=@SonCategoryId
                 order by cl.Depth desc";
             return await conn.QueryAsync<MallProductCategory>(sql, new { SonCategoryId = sonCategoryId });
+        }
+
+        /// <summary>
+        /// 查看最頂層一層的父類別
+        /// </summary>
+        /// <returns>商品類別</returns>
+        public async Task<IEnumerable<MallProductCategory>> GetOneFatherCategory()
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"select c.*
+                from MallProductCategory c
+                Join MallProductCategory_Closure cl on cl.SonId=c.ProductCategoryId
+                where cl.FatherId=cl.SonId
+                and cl.Depth=0
+                and c.ProductParentId is null";
+            return await conn.QueryAsync<MallProductCategory>(sql);
         }
 
         /// <summary>
@@ -85,9 +104,18 @@ namespace Lab.Accounting.API.Repositories
                     var sql2 =
                         @" INSERT INTO MallProductCategory_Closure (FatherId, SonId, Depth)
                            VALUES (@SonId, @SonId, 0)";
-                    await conn.ExecuteScalarAsync(sql2, new { SonId = sonId });
+                    await conn.ExecuteAsync(sql2, new { SonId = sonId });
 
                     // 如果他不是最高層級就在新增他的父類別關聯
+                    // 比如 : Closure 裡 SonId = ParentId ( 比如是 39 ) 的資料：
+                    // 39 | 39 | 0    ← 自己
+                    // 38 | 39 | 1    ← 38 是 39 的父
+                    // 37 | 39 | 2    ← 37 是 39 的祖父
+
+                    // 然後 就全部 + 1 ( 因為又多下一層 ( SonId = 41 )) , 變成=>
+                    // 39, 39, 0  → 變成(39, 41, 1)
+                    // 38, 39, 1  → 變成(38, 41, 2)
+                    // 37, 39, 2  → 變成(37, 41, 3)
                     if (parentId.HasValue)
                     {
                         var sql3 =
@@ -95,7 +123,7 @@ namespace Lab.Accounting.API.Repositories
                              SELECT FatherId, @SonId, Depth + 1
                              FROM MallProductCategory_Closure
                              WHERE SonId = @ParentId;";
-                        await conn.ExecuteScalarAsync(sql3, new { SonId = sonId, ParentId = parentId });
+                        await conn.ExecuteAsync(sql3, new { SonId = sonId, ParentId = parentId });
                     }
                     trxScope.Complete();
                     return sonId;
@@ -126,7 +154,10 @@ namespace Lab.Accounting.API.Repositories
                     await conn.ExecuteAsync(sql1, new { CategoryId = categoryId });
 
                     // 刪除類別
-                    var sql2 = @"Delete from MallProductCategory Where ProductCategoryId=@CategoryId";
+                    var sql2 =
+                        @"Delete from MallProductCategory Where ProductCategoryId IN (
+                                SELECT SonId FROM MallProductCategory_Closure 
+                                WHERE FatherId = @CategoryId)";
                     var affectRows = await conn.ExecuteAsync(sql2, new { CategoryId = categoryId });
 
                     trxScope.Complete();

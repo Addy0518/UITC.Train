@@ -36,6 +36,18 @@ namespace Lab.Accounting.API.Controllers
         }
 
         /// <summary>
+        /// 查看最頂層一層的父類別
+        /// </summary>
+        /// <returns>商品類別</returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
+        public async Task<IActionResult> GetOneFatherCategory()
+        {
+            var target = await categoryService.GetOneFatherCategory();
+            return Ok(target);
+        }
+
+        /// <summary>
         /// 查看指定類別往下的第一個層級類別
         /// </summary>
         /// <param name="fatherCategoryId">商品父類別 ID</param>
@@ -56,7 +68,7 @@ namespace Lab.Accounting.API.Controllers
         /// <returns>新增的類別 ID </returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> AddCategory([FromQuery] string categoryName, [FromQuery] int? parentId)
+        public async Task<IActionResult> AddCategory([FromBody] string categoryName, [FromBody] int? parentId)
         {
             var target = await categoryService.AddCategory(categoryName, parentId);
             return Ok(target);

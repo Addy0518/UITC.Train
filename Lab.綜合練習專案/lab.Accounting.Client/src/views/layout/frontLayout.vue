@@ -1,6 +1,6 @@
 <script setup>
 import { logoutApi } from '@/api/userService';
-import { getAllProduct, getCategory } from '@/api/productsService';
+import { getAllProduct} from '@/api/productsService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義

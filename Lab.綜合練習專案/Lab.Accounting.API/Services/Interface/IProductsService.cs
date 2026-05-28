@@ -24,13 +24,6 @@ public interface IProductsService
     Task<ApiResponse<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
-    /// 查看商品類別
-    /// </summary>
-    /// <param name="productcategoryId">商品類別 ID</param>
-    /// <returns>商品類別</returns>
-    Task<ApiResponse<IEnumerable<MallProductCategory>>> GetCategory(int? productcategoryId = null);
-
-    /// <summary>
     /// 新增單一商品 + 類別
     /// </summary>
     /// <param name="productsInsertRequest">商品資訊</param>

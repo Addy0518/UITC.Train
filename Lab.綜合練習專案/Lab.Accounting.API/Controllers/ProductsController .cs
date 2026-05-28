@@ -52,19 +52,6 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     }
 
     /// <summary>
-    /// 查看商品類別
-    /// </summary>
-    /// <param name="productcategoryId">商品類別 ID</param>
-    /// <returns>商品類別</returns>
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
-    public async Task<IActionResult> GetCategory([FromQuery] int? productcategoryId = null)
-    {
-        return Ok(await productsService.GetCategory(productcategoryId));
-    }
-
-    /// <summary>
     /// 新增單一商品 + 類別
     /// </summary>
     /// <param name="productsInsertRequest">新增商品資訊</param>

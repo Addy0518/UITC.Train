@@ -33,7 +33,10 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         Where (@UserId is null or m.userId=@UserId) 
                         and  m.isDelete=0
                         and  m.ProductsStock > 0
-                        and  (@productCategoryId is null or c.ProductParentId=@productCategoryId or m.ProductCategoryId=@productCategoryId)
+                        and  (@productCategoryId is null or m.ProductCategoryId IN (
+                                SELECT SonId FROM MallProductCategory_Closure
+                                WHERE FatherId = @productCategoryId
+                            ))
                         and  (@keyWords is null or  m.productsname like '%' + @keyWords + '%')
                         ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
 
@@ -294,8 +297,10 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
             JOIN mallproductcategory c ON c.productcategoryid = m.ProductCategoryId
             WHERE m.isDelete = 0 AND m.ProductsStock > 0
             AND (@productCategoryId is null 
-                    or c.ProductParentId = @productCategoryId 
-                    or m.ProductCategoryId = @productCategoryId)";
+                 or m.ProductCategoryId IN (
+                 SELECT SonId FROM MallProductCategory_Closure
+                 WHERE FatherId = @productCategoryId
+                ))";
         return await conn.ExecuteScalarAsync<int>(sql, new { productCategoryId = request.productCategoryId });
     }
 

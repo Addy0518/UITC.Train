@@ -13,7 +13,7 @@ namespace Lab.Accounting.API.Services
         {
             var target = await poductsCategoryRepository.GetSonCategories(fatherCategoryId);
 
-            if (target == null)
+            if (!target.Any())
             {
                 return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
             }
@@ -30,7 +30,23 @@ namespace Lab.Accounting.API.Services
         {
             var target = await poductsCategoryRepository.GetFatherCategories(sonCategoryId);
 
-            if (target == null)
+            if (!target.Any())
+            {
+                return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
+        /// 查看最頂層一層的父類別
+        /// </summary>
+        /// <returns>商品類別</returns>
+        public async Task<ApiResponse<IEnumerable<MallProductCategory>>> GetOneFatherCategory()
+        {
+            var target = await poductsCategoryRepository.GetOneFatherCategory();
+
+            if (!target.Any())
             {
                 return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
             }
@@ -47,7 +63,7 @@ namespace Lab.Accounting.API.Services
         {
             var target = await poductsCategoryRepository.GetOneSonCategory(fatherCategoryId);
 
-            if (target == null)
+            if (!target.Any())
             {
                 return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
             }
@@ -65,7 +81,7 @@ namespace Lab.Accounting.API.Services
         {
             var target = await poductsCategoryRepository.AddCategory(categoryName, parentId);
 
-            if (target == null)
+            if (target <= 0)
             {
                 return ApiResponseHelper.NotFound<int>();
             }
@@ -82,7 +98,7 @@ namespace Lab.Accounting.API.Services
         {
             var target = await poductsCategoryRepository.DeleteCategory(categoryId);
 
-            if (target == null)
+            if (target <= 0)
             {
                 return ApiResponseHelper.NotFound<int>();
             }

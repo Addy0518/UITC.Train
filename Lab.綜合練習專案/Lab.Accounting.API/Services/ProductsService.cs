@@ -11,6 +11,7 @@ public class ProductsService(
     IUserRepository userRepository,
     IProductsOrderRepository productsOrderRepository,
     IProductsRepository productsRepository,
+    ICategoryService categoryService,
     IWebHostEnvironment env
 ) : IProductsService
 {
@@ -87,22 +88,6 @@ public class ProductsService(
 
         var result = new ProductsResponse { Products = products };
         return ApiResponseHelper.Success(result);
-    }
-
-    /// <summary>
-    /// 查看商品類別
-    /// </summary>
-    /// <param name="productcategoryId">商品類別 ID</param>
-    /// <returns>商品類別</returns>
-    public async Task<ApiResponse<IEnumerable<MallProductCategory>>> GetCategory(int? productcategoryId = null)
-    {
-        var target = await productsRepository.GetCategory(productcategoryId);
-        if (target == null)
-        {
-            return ApiResponseHelper.NotFound<IEnumerable<MallProductCategory>>();
-        }
-
-        return ApiResponseHelper.Success(target);
     }
 
     /// <summary>

@@ -5,9 +5,13 @@ import {
   createProducts,
   getProduct,
   updateProducts,
-  getCategory,
   productsDescriptionImgUpload,
 } from '@/api/productsService';
+import {
+  getOneFatherCategory,
+  getOneSonCategory,
+  getFatherCategories,
+} from '@/api/categoryService';
 // Tiptap 的 Editor 和內容元件
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 // StarterKit 跟 Image 是 Tiptap 的工具包 , 讓他支援編輯 , 圖片新增等功能
@@ -20,7 +24,6 @@ import Swal from 'sweetalert2';
    imgs : 商品圖片
    route : 獲取路由資訊
    router : 改變路由
-   productCategoryName : 商品類型名稱
    productName : 商品名稱
    productPrice : 商品價格
    productStock : 商品庫存
@@ -28,22 +31,21 @@ import Swal from 'sweetalert2';
    productsId : 商品 ID
    isAdd : 路由判斷新增或刪除
    baseUrl : 環境變數裡的圖片基底位址
-
+   categoryLevels : 每層的選項清單
+   selectedLevels : 每層選到的值
 */
 let imgs = ref([]);
 
 const route = useRoute();
 const router = useRouter();
-const productCategoryName = ref([]);
 const parentCategory = ref([]);
-const selectParent = ref();
-const selectChild = ref();
-const childCategory = ref([]);
 const productName = ref();
 const productPrice = ref();
 const productStock = ref();
 const productDescription = ref();
 const productsId = ref();
+const categoryLevels = ref([]);
+const selectedLevels = ref([]);
 const isAdd = computed(() => route.name === 'add-product');
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
@@ -74,11 +76,19 @@ const editor = useEditor({
 /*
    載入類別跟判斷是不是更新商品
 */
-onMounted(() => {
-  getCategories();
+onMounted(async () => {
+  await getCategories();
   if (route.params.id) {
     updateData(route.params.id);
   }
+});
+
+/*
+  取得最終選到的 CategoryId（最後一個有選的）
+*/
+const finalCategoryId = computed(() => {
+  const last = selectedLevels.value.at(-1);
+  return last?.productCategoryId ?? null;
 });
 
 /*
@@ -88,7 +98,7 @@ const rules = computed(() => ({
   productName: { required, maxLength: maxLength(50) },
   productPrice: { required },
   productStock: { required },
-  selectChild: { required },
+  finalCategoryId: { required },
 }));
 
 /*
@@ -99,19 +109,20 @@ const rules = computed(() => ({
 */
 const v$ = useVuelidate(
   rules,
-  { productName, productPrice, productStock, selectChild },
+  { productName, productPrice, productStock, finalCategoryId },
   { $autoDirty: true, $lazy: true, $scope: false },
 );
 
 /*
-  依據階層查看類別
+  查看最頂層類別
 */
 const getCategories = async () => {
   showLoading();
-  const res = await getCategory();
+  const res = await getOneFatherCategory();
   const { data } = res;
   if (data.codeStatus === 2000) {
-    parentCategory.value = data.returnData;
+    categoryLevels.value = [data.returnData];
+    selectedLevels.value = [];
   }
   hideLoading();
 };
@@ -119,16 +130,23 @@ const getCategories = async () => {
 /*
   偵測父類別並改變子類別
 */
-const changeCategory = async () => {
-  childCategory.value = [];
-  selectChild.value = null;
+const changeCategory = async (levelIndex) => {
+  // levelIndex 是目前選到的類別階層
+  // 把目前選到的類別階層都清掉 , 只保留前一個類別階層 ( 比如選擇了衣服就把衣服後面的類別階層都清掉只留衣服跟前面的男士服裝 )
+  // 目的是怕使用者選到一半又回去重選 , 要及時清掉舊的選擇
+  categoryLevels.value = categoryLevels.value.slice(0, levelIndex + 1);
+  selectedLevels.value = selectedLevels.value.slice(0, levelIndex + 1);
 
-  if (selectParent.value) {
-    const res = await getCategory(selectParent.value.productCategoryId);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      childCategory.value = data.returnData;
-    }
+  // 拿到當前選擇的類別
+  const selected = selectedLevels.value[levelIndex];
+  if (!selected) return;
+
+  const res = await getOneSonCategory(selected.productCategoryId);
+  const { data } = res;
+
+  // 還有下一層的話就繼續加
+  if (data.codeStatus === 2000 && data.returnData.length > 0) {
+    categoryLevels.value.push(data.returnData);
   }
 };
 
@@ -153,30 +171,28 @@ const updateData = async (productId) => {
         editor.value?.commands.setContent(item.productsDescription ?? '');
       });
 
-      if (item.productParentId) {
-        // 找父類別物件中的類別名稱
-        selectParent.value = parentCategory.value.find(
-          (p) => p.productCategoryId === item.productParentId,
-        );
+      // 用 GetFatherCategories 拿到麵包屑路徑，依序重建每層下拉
+      const catRes = await getFatherCategories(item.productCategoryId);
+      const { data: catData } = catRes;
 
-        // 載入子類別清單
-        const catRes = await getCategory(item.productParentId);
-        const { data: catData } = catRes;
-        if (catData.codeStatus === 2000) {
-          childCategory.value = catData.returnData;
-          // 找子類別物件中的類別名稱
-          selectChild.value = childCategory.value.find(
-            (c) => c.productCategoryId === item.productCategoryId,
-          );
+      if (catData.codeStatus === 2000) {
+        const ancestors = catData.returnData; // 從頂層到當前，已經 ORDER BY Depth DESC
+
+        categoryLevels.value = [parentCategory.value];
+        selectedLevels.value = [];
+
+        for (let i = 0; i < ancestors.length; i++) {
+          selectedLevels.value.push(ancestors[i]);
+
+          // 不是最後一層才需要載入下一層選項
+          if (i < ancestors.length - 1) {
+            const res = await getOneSonCategory(ancestors[i].productCategoryId);
+            const { data } = res;
+            if (data.codeStatus === 2000) {
+              categoryLevels.value.push(data.returnData);
+            }
+          }
         }
-      }
-
-      if (item.productsImgs) {
-        imgs.value = item.productsImgs.map((img) => ({
-          productsImgId: img.productsImgId,
-          url: `${baseUrl}/ProductsImg/${img.productsImg}`,
-          file: null,
-        }));
       }
     }
     if (data.codeStatus === 4001) {
@@ -200,7 +216,7 @@ const createOrUpdateProduct = async () => {
     showLoading();
     try {
       const createData = {
-        ProductCategoryId: selectChild.value.productCategoryId,
+        ProductCategoryId: finalCategoryId.value,
         productsName: productName.value,
         productsPrice: productPrice.value,
         productsStock: productStock.value,
@@ -234,7 +250,7 @@ const createOrUpdateProduct = async () => {
     try {
       const updateData = {
         productsId: productsId.value,
-        ProductCategoryId: selectChild.value.productCategoryId,
+        ProductCategoryId: finalCategoryId.value,
         productsName: productName.value,
         productsPrice: productPrice.value,
         productsStock: productStock.value,
@@ -386,32 +402,21 @@ const uploadDescriptionImage = async (e) => {
             <InValidErrorMessage :errorDto="v$.productName.$errors" vaildChiName="商品名稱" />
           </div>
 
-          <!-- 類別 -->
-          <div>
-            <label class="text-sm text-gray-400 block mb-1.5">類別</label>
+          <!-- 類別（動態多層） -->
+          <div v-for="(options, index) in categoryLevels" :key="index">
+            <label class="text-sm text-gray-400 block mb-1.5">
+              {{ index === 0 ? '類別' : `子類別 ${index}` }}
+            </label>
             <Select
-              v-model="selectParent"
-              :options="parentCategory"
+              v-model="selectedLevels[index]"
+              :options="options"
               optionLabel="productCategoryName"
-              placeholder="選擇類別"
-              @change="changeCategory()"
+              placeholder="請選擇"
+              @change="changeCategory(index)"
               class="w-full"
             />
           </div>
-
-          <!-- 子類別 -->
-          <div>
-            <label class="text-sm text-gray-400 block mb-1.5">子類別</label>
-            <Select
-              v-model="selectChild"
-              :options="childCategory"
-              optionLabel="productCategoryName"
-              placeholder="選擇子類別"
-              class="w-full"
-              :disabled="childCategory.length === 0"
-            />
-            <InValidErrorMessage :errorDto="v$.selectChild.$errors" vaildChiName="子類別" />
-          </div>
+          <InValidErrorMessage :errorDto="v$.finalCategoryId.$errors" vaildChiName="類別" />
 
           <!-- 價格 -->
           <div>

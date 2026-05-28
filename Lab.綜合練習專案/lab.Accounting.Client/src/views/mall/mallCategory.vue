@@ -75,11 +75,7 @@ const loadCategory = async (id) => {
   try {
     showLoading();
 
-    const res = await getCategory(id);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      allCategories.value = data.returnData;
-    }
+
   } catch (err) {
     console.log(err);
   } finally {

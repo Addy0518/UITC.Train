@@ -11,10 +11,6 @@ export const getAllProduct = (request) =>
 // 賣家查看賣場所有商品
 export const getSellerAllProduct = (request) =>
   accountApiInstance.get(`Products/SellerGetAllProducts`, { params: request });
-
-// 查看類別
-export const getCategory = (categoryId = null) =>
-  accountApiInstance.get(`Products/GetCategory`, { params: { productcategoryId: categoryId } });
 // 新增單一商品 + 類別
 export const createProducts = (product) =>
   accountApiInstance.post(`Products/CreateProducts`, product);
