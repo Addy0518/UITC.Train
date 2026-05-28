@@ -33,7 +33,10 @@ const showToastError = inject('showToastError');
 onMounted(() => {
   if (route.params.id) {
     loadproducts(route.params.id);
-    loadCategory(route.params.id);
+
+    // 區分進來的是父類別層級還是子類別
+    const parentId = route.query.parentId ?? route.params.id;
+    loadCategory(parentId);
   }
 });
 

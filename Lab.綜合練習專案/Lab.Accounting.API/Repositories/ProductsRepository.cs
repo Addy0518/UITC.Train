@@ -126,27 +126,6 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     }
 
     /// <summary>
-    /// 查看商品類別
-    /// </summary>
-    /// <param name="productcategoryId">商品類別 ID</param>
-    /// <returns>商品類別</returns>
-    public async Task<IEnumerable<MallProductCategory>> GetCategory(int? productcategoryId = null)
-    {
-        using var conn = connecting.CreateConnecting();
-
-        //  第一層 ProductCategoryId 跟 ProductParentId 為 null 的是最頂層的類別
-        //  第二層 ( 子 ) ProductParentId = ( 父 ) ProductCategoryId  的就是往下一層的類別
-        //  (衣服 => 短袖 , 長袖 => 男士短袖 , 女士短袖 ...)
-        var sql =
-            @"
-                Select ｃ.ProductCategoryId,c.ProductCategoryName,c.ProductParentId
-                From mallproductcategory ｃ
-                Where (@ProductCategoryId is null and c.ProductParentId is null) 
-                OR c.ProductParentId = @ProductCategoryId";
-        return await conn.QueryAsync<MallProductCategory>(sql, new { ProductCategoryId = productcategoryId });
-    }
-
-    /// <summary>
     /// 新增單一商品
     /// </summary>
     /// <param name="products">商品資訊</param>

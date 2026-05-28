@@ -216,7 +216,16 @@ const breadCrumbItem = computed(() => {
       command: () =>
         router.push({ name: 'mall-category', params: { id: product.value.productParentId } }),
     },
-    { label: product.value.productCategoryName, command: () => router.push({ name: 'mall' }) },
+    {
+      label: product.value.productCategoryName,
+      command: () =>
+        // 父類別也要帶過去才能顯示所有類別
+        router.push({
+          name: 'mall-category',
+          params: { id: product.value.productCategoryId },
+          query: { parentId: product.value.productParentId },
+        }),
+    },
   ];
 });
 </script>
