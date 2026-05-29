@@ -1,5 +1,4 @@
 <script setup>
-import { getAllProduct } from '@/api/productsService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 import advertise1 from '@/img/廣告1.jpg';
 import advertise2 from '@/img/廣告2.jpg';
@@ -94,8 +93,12 @@ const pageChange = (event) => {
 const loadCategory = async () => {
   try {
     showLoading();
+    const res = await getOneFatherCategory();
+    const { data } = res;
 
-   
+    if (data.codeStatus === 2000) {
+      allCategories.value = data.returnData;
+    }
   } catch (err) {
     console.log(err);
   } finally {

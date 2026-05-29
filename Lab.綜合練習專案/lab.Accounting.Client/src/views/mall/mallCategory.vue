@@ -1,23 +1,26 @@
 <script setup>
-import { getAllProduct } from '@/api/productsService';
+import { getFatherCategories, getOneSonCategory } from '@/api/categoryService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
-import { useRoute } from 'vue-router';
 
 /*
   變數名稱代表意義
   route : 獲取路由資訊
+  router : 改變路徑
   allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
   totalCount : 商品數量
   allCategories : 所有子類別
   baseUrl : 環境變數裡的圖片基底位址
   selectedCategory : 選擇的類別區塊
+  breadCrumCategories : 麵包屑的類別
 */
 const route = useRoute();
+const router = useRouter();
 const allProducts = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const selectedCategory = ref(null);
 const totalCount = ref();
 const allCategories = ref();
+const breadCrumCategories = ref([]);
 
 /*
    注入 Loading 跟 Toast
@@ -28,17 +31,27 @@ const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
 /*
-   初始化加載所有商品
+   初始化加載所有商品 / 類別 / 麵包屑
 */
 onMounted(() => {
   if (route.params.id) {
     loadproducts(route.params.id);
-
-    // 區分進來的是父類別層級還是子類別
-    const parentId = route.query.parentId ?? route.params.id;
-    loadCategory(parentId);
+    loadCategory(route.params.id);
+    loadBreadCrumb(route.params.id);
   }
 });
+
+/*
+   監聽路由變化 , 隨時加載類別跟商品
+*/
+watch(
+  () => route.params.id,
+  (newId) => {
+    loadproducts(newId);
+    loadCategory(newId);
+    loadBreadCrumb(newId);
+  },
+);
 
 /*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
@@ -46,7 +59,6 @@ onMounted(() => {
 const loadproducts = async (parentId, page = 0) => {
   try {
     showLoading();
-
     const res = await getAllProduct({ productCategoryId: parentId, pageIndex: page, pageSize: 12 });
     const { data } = res;
 
@@ -73,25 +85,31 @@ const pageChange = (event) => {
 */
 const loadCategory = async (id) => {
   try {
-    showLoading();
+    const res = await getOneSonCategory(id);
+    const { data } = res;
 
-
+    if (data.codeStatus === 2000) {
+      allCategories.value = data.returnData;
+    }
   } catch (err) {
     console.log(err);
   } finally {
-    hideLoading();
   }
 };
 
 /*
-  再根據類別分區塊
+  點擊類別區分商品
 */
-const filterProducts = computed(() => {
-  if (!allProducts.value) return [];
-  if (!selectedCategory.value) return allProducts.value;
-  return allProducts.value.filter((p) => p.productCategoryId === selectedCategory.value);
-});
-
+const selectCategory = async (categoryId) => {
+  if (selectedCategory.value === categoryId) {
+    // 再點一次取消，回到當前路由的全部商品
+    selectedCategory.value = null;
+    loadproducts(route.params.id);
+  } else {
+    selectedCategory.value = categoryId;
+    loadproducts(categoryId); // 打 API 拿該類別商品
+  }
+};
 /*
   讀取商品圖片 , 判斷是否有圖片沒有就回傳預設
 */
@@ -101,11 +119,60 @@ const getProductsImg = (product) => {
   }
   return defaultImgurl;
 };
+
+/*
+  拿到麵包屑類別
+*/
+const loadBreadCrumb = async (id) => {
+  try {
+    const res = await getFatherCategories(id);
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      breadCrumCategories.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+  }
+};
+
+/*
+  麵包屑 , 回主頁
+*/
+const home = ref({
+  icon: 'pi pi-home',
+  command: () => router.push({ name: 'mall' }),
+});
+
+/*
+  麵包屑 , 動態讀取所有父類別
+*/
+const breadCrumbItem = computed(() => {
+  if (!allProducts.value) return [];
+
+  return breadCrumCategories.value.map((category, index) => ({
+    label: category.productCategoryName,
+    command: () =>
+      router.push({
+        name: 'mall-category',
+        params: { id: category.productCategoryId },
+        query:
+          // 不是第一層才要帶 parentId
+          index > 0 ? { parentId: breadCrumCategories.value[index - 1].productCategoryId } : {},
+      }),
+  }));
+});
 </script>
 
 <template>
   <div class="flex flex-col w-full">
     <div class="flex flex-col items-center">
+      <!-- #region  麵包屑-->
+      <div class="card flex justify-start">
+        <Breadcrumb :home="home" :model="breadCrumbItem" />
+      </div>
+      <!-- #endregion -->
       <div class="mt-20 w-300 rounded-lg shadow-sm">
         <!-- #region  類別 / 商品-->
         <div class="flex gap-4">
@@ -115,11 +182,13 @@ const getProductsImg = (product) => {
             <div class="flex flex-col mt-5 gap-2">
               <div v-for="category in allCategories" :key="category.productCategoryId">
                 <span
-                  @click="
-                    selectedCategory =
-                      selectedCategory === category.id ? null : category.productCategoryId
-                  "
+                  @click="selectCategory(category.productCategoryId)"
                   class="cursor-pointer m-5"
+                  :class="
+                    selectedCategory === category.productCategoryId
+                      ? 'text-orange-500 font-medium'
+                      : 'text-gray-700'
+                  "
                   >{{ category.productCategoryName }}</span
                 >
               </div>
@@ -130,7 +199,7 @@ const getProductsImg = (product) => {
           <div class="flex-1">
             <span class="text-2xl m-5">商品</span>
             <div class="grid grid-cols-3 mt-5 gap-4">
-              <div v-for="product in filterProducts" :key="product.productsId">
+              <div v-for="product in allProducts" :key="product.productsId">
                 <div
                   class="hover:shadow-xl hover:bg-gray-50 flex flex-col items-center rounded-lg p-3"
                 >

@@ -32,10 +32,9 @@
         /// <summary>
         /// 新增類別及關連閉鎖表
         /// </summary>
-        /// <param name="categoryName">類別名稱</param>
-        /// <param name="parentId">父類別 ID </param>
+        /// <param name="request">類別新增資訊</param>
         /// <returns>新增的類別 ID </returns>
-        Task<ApiResponse<int>> AddCategory(string categoryName, int? parentId);
+        Task<ApiResponse<int>> AddCategory(CategoryInsertRequest request);
 
         /// <summary>
         /// 刪除類別及關連閉鎖表

@@ -80,10 +80,9 @@ namespace Lab.Accounting.API.Repositories
         /// <summary>
         /// 新增類別及關連閉鎖表
         /// </summary>
-        /// <param name="categoryName">類別名稱</param>
-        /// <param name="parentId">父類別 ID </param>
+        /// <param name = "request" > 類別新增資訊 </param >
         /// <returns>新增的類別 ID </returns>
-        public async Task<int> AddCategory(string categoryName, int? parentId)
+        public async Task<int> AddCategory(CategoryInsertRequest request)
         {
             using var conn = connecting.CreateConnecting();
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -93,12 +92,9 @@ namespace Lab.Accounting.API.Repositories
                     // 新增類別
                     var sql1 =
                         @" INSERT INTO MallProductCategory (ProductCategoryName, ProductParentId)
-                         VALUES (@CategoryName, @ParentId);
+                         VALUES (@ProductCategoryName, @ProductParentId);
                          SELECT SCOPE_IDENTITY();";
-                    var sonId = await conn.ExecuteScalarAsync<int>(
-                        sql1,
-                        new { CategoryName = categoryName, ParentId = parentId }
-                    );
+                    var sonId = await conn.ExecuteScalarAsync<int>(sql1, request);
 
                     // 用剛剛新增的類別的 ID 新增類別關聯閉鎖表
                     var sql2 =
@@ -116,14 +112,14 @@ namespace Lab.Accounting.API.Repositories
                     // 39, 39, 0  → 變成(39, 41, 1)
                     // 38, 39, 1  → 變成(38, 41, 2)
                     // 37, 39, 2  → 變成(37, 41, 3)
-                    if (parentId.HasValue)
+                    if (request.ProductParentId.HasValue)
                     {
                         var sql3 =
                             @" INSERT INTO MallProductCategory_Closure (FatherId, SonId, Depth)
                              SELECT FatherId, @SonId, Depth + 1
                              FROM MallProductCategory_Closure
                              WHERE SonId = @ParentId;";
-                        await conn.ExecuteAsync(sql3, new { SonId = sonId, ParentId = parentId });
+                        await conn.ExecuteAsync(sql3, new { SonId = sonId, ParentId = request.ProductParentId });
                     }
                     trxScope.Complete();
                     return sonId;

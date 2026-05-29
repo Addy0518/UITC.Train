@@ -1,4 +1,5 @@
 <script setup>
+import { getFatherCategories } from '@/api/categoryService';
 import { getProduct } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import { getStore } from '@/api/storeService';
@@ -19,6 +20,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    activeIndex : 當下選擇開啟的大圖
    seller : 賣家
    store : 賣場
+   breadCrumCategories : 麵包屑的類別
 */
 const route = useRoute();
 const router = useRouter();
@@ -32,6 +34,8 @@ const displayBasic = ref(false);
 const activeIndex = ref();
 const seller = ref();
 const store = ref({});
+const breadCrumCategories = ref([]);
+
 /*
    注入 Loading 跟 Toast
 */
@@ -54,6 +58,12 @@ const getProductDetail = async (id) => {
 
       productAllRate.value = data.returnData.productsAllRates;
       await getSellerInfo(product.value.userId);
+
+      const catRes = await getFatherCategories(product.value.productCategoryId);
+      const { data: catData } = catRes;
+      if (catData.codeStatus === 2000) {
+        breadCrumCategories.value = catData.returnData;
+      }
     }
   } catch (err) {
     console.log(err);
@@ -202,31 +212,30 @@ const boughtProduct = async (id, boughtquantity) => {
 };
 
 /*
-  麵包屑
+  麵包屑 , 回主頁
 */
 const home = ref({
   icon: 'pi pi-home',
   command: () => router.push({ name: 'mall' }),
 });
+
+/*
+  麵包屑 , 動態讀取所有父類別
+*/
 const breadCrumbItem = computed(() => {
   if (!product.value) return [];
-  return [
-    {
-      label: product.value.parentCategoryName,
-      command: () =>
-        router.push({ name: 'mall-category', params: { id: product.value.productParentId } }),
-    },
-    {
-      label: product.value.productCategoryName,
-      command: () =>
-        // 父類別也要帶過去才能顯示所有類別
-        router.push({
-          name: 'mall-category',
-          params: { id: product.value.productCategoryId },
-          query: { parentId: product.value.productParentId },
-        }),
-    },
-  ];
+
+  return breadCrumCategories.value.map((category, index) => ({
+    label: category.productCategoryName,
+    command: () =>
+      router.push({
+        name: 'mall-category',
+        params: { id: category.productCategoryId },
+        query:
+          // 不是第一層才要帶 parentId
+          index > 0 ? { parentId: breadCrumCategories.value[index - 1].productCategoryId } : {},
+      }),
+  }));
 });
 </script>
 
@@ -472,14 +481,17 @@ const breadCrumbItem = computed(() => {
           <!-- #endregion -->
         </div>
         <!-- #endregion -->
+        <!--#region 麵包屑 -->
+        <div class="card flex justify-start">
+          <Breadcrumb :home="home" :model="breadCrumbItem" />
+        </div>
+        <!-- #endregion -->
         <!--#region 商品描述 -->
         <div class="bg-white rounded-lg p-6" v-if="product.productsDescription">
           <h3 class="text-sm font-medium text-gray-700 mb-4 pb-2 border-b border-gray-100">
             商品描述
           </h3>
-          <div class="card flex justify-start">
-            <Breadcrumb :home="home" :model="breadCrumbItem" />
-          </div>
+
           <div v-html="product.productsDescription" class="leading-relaxed text-gray-700" />
         </div>
         <!-- #endregion -->

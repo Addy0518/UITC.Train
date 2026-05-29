@@ -2,6 +2,7 @@
 //#region 提供控制 Toast 的方法給子組件
 import { useToast } from 'primevue/usetoast';
 const toast = useToast();
+let loadingTimer = null;
 
 //#region 提供控制 Loading 的方法給子組件
 const isLoading = ref(false);
@@ -13,7 +14,10 @@ const showLoading = () => {
 
 // 關閉 Loading
 const hideLoading = () => {
-  isLoading.value = false;
+  clearTimeout(loadingTimer);
+  loadingTimer = setTimeout(() => {
+    isLoading.value = false;
+  }, 500);
 };
 
 // 用 provide 把 Loading 的函式掛到全域

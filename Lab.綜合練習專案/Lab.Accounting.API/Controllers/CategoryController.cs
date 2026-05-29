@@ -4,7 +4,7 @@ namespace Lab.Accounting.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
     public class CategoryController(ICategoryService categoryService) : ControllerBase
@@ -63,14 +63,13 @@ namespace Lab.Accounting.API.Controllers
         /// <summary>
         /// 新增類別及關連閉鎖表
         /// </summary>
-        /// <param name="categoryName">類別名稱</param>
-        /// <param name="parentId">父類別 ID </param>
+        /// <param name="request">類別新增資訊</param>
         /// <returns>新增的類別 ID </returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> AddCategory([FromBody] string categoryName, [FromBody] int? parentId)
+        public async Task<IActionResult> AddCategory([FromBody] CategoryInsertRequest request)
         {
-            var target = await categoryService.AddCategory(categoryName, parentId);
+            var target = await categoryService.AddCategory(request);
             return Ok(target);
         }
 

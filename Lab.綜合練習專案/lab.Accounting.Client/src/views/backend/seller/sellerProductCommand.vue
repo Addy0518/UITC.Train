@@ -33,12 +33,12 @@ import Swal from 'sweetalert2';
    baseUrl : 環境變數裡的圖片基底位址
    categoryLevels : 每層的選項清單
    selectedLevels : 每層選到的值
+   parentCategory : 頂層的類別清單
 */
 let imgs = ref([]);
 
 const route = useRoute();
 const router = useRouter();
-const parentCategory = ref([]);
 const productName = ref();
 const productPrice = ref();
 const productStock = ref();
@@ -46,6 +46,7 @@ const productDescription = ref();
 const productsId = ref();
 const categoryLevels = ref([]);
 const selectedLevels = ref([]);
+const parentCategory = ref([]);
 const isAdd = computed(() => route.name === 'add-product');
 const baseUrl = import.meta.env.VITE_IMG_URL;
 
@@ -121,6 +122,8 @@ const getCategories = async () => {
   const res = await getOneFatherCategory();
   const { data } = res;
   if (data.codeStatus === 2000) {
+    // parentCategory 是備用 , 是給更新時 updateData 拿重建下拉清單時用的
+    parentCategory.value = data.returnData;
     categoryLevels.value = [data.returnData];
     selectedLevels.value = [];
   }
@@ -132,7 +135,7 @@ const getCategories = async () => {
 */
 const changeCategory = async (levelIndex) => {
   // levelIndex 是目前選到的類別階層
-  // 把目前選到的類別階層都清掉 , 只保留前一個類別階層 ( 比如選擇了衣服就把衣服後面的類別階層都清掉只留衣服跟前面的男士服裝 )
+  // slice 把目前選到的類別階層都清掉 , 只保留前一個類別階層 ( 比如選擇了衣服就把衣服後面的類別階層都清掉只留衣服跟前面的男士服裝 )
   // 目的是怕使用者選到一半又回去重選 , 要及時清掉舊的選擇
   categoryLevels.value = categoryLevels.value.slice(0, levelIndex + 1);
   selectedLevels.value = selectedLevels.value.slice(0, levelIndex + 1);
@@ -171,25 +174,49 @@ const updateData = async (productId) => {
         editor.value?.commands.setContent(item.productsDescription ?? '');
       });
 
+      if (item.productsImgs) {
+        imgs.value = item.productsImgs.map((img) => ({
+          productsImgId: img.productsImgId,
+          url: `${baseUrl}/ProductsImg/${img.productsImg}`,
+          file: null,
+        }));
+      }
+
       // 用 GetFatherCategories 拿到麵包屑路徑，依序重建每層下拉
       const catRes = await getFatherCategories(item.productCategoryId);
       const { data: catData } = catRes;
 
       if (catData.codeStatus === 2000) {
-        const ancestors = catData.returnData; // 從頂層到當前，已經 ORDER BY Depth DESC
+        const ancestors = catData.returnData;
+        // ancestors 的內容範例：
+        // [
+        //   { productCategoryId: 27, productCategoryName: '男士衣服' },  ← index 0
+        //   { productCategoryId: 28, productCategoryName: '長褲' },      ← index 1
+        // ]
 
+        // 第一層固定是頂層選項（男士衣服、女士衣服、娛樂...）
+        // parentCategory 是 getCategories 時存好的備份
         categoryLevels.value = [parentCategory.value];
+
+        // selectedLevels 現在：
+        // []  ← 還沒有任何選擇
         selectedLevels.value = [];
 
         for (let i = 0; i < ancestors.length; i++) {
+          // 把這層的父類別塞進 selectedLevels，代表「這層選了誰」
+          // i=0 → selectedLevels = [男士衣服]
+          // i=1 → selectedLevels = [男士衣服, 長褲]
           selectedLevels.value.push(ancestors[i]);
 
-          // 不是最後一層才需要載入下一層選項
+          // 如果不是最後一層，就要載入下一層的選項清單
           if (i < ancestors.length - 1) {
+            // 用 getOneSonCategory 一層一層下去找子類別
             const res = await getOneSonCategory(ancestors[i].productCategoryId);
             const { data } = res;
             if (data.codeStatus === 2000) {
-              categoryLevels.value.push(data.returnData);
+
+              // 把子類別選項塞進 categoryLevels，變成新的一層下拉選單
+              categoryLevels.value.push(data.returnData); 
             }
           }
         }
@@ -403,6 +430,8 @@ const uploadDescriptionImage = async (e) => {
           </div>
 
           <!-- 類別（動態多層） -->
+          <!-- index=0 → options=[男士,女士,娛樂] -->
+          <!-- index=1 → options=[衣服,褲子,鞋子] -->
           <div v-for="(options, index) in categoryLevels" :key="index">
             <label class="text-sm text-gray-400 block mb-1.5">
               {{ index === 0 ? '類別' : `子類別 ${index}` }}
