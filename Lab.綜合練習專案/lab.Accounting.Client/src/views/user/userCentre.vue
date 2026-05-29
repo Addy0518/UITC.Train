@@ -15,7 +15,7 @@ const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
 const menuItems = ref([
   {
-    label: '買家中心',
+    label: '用戶資料',
     icon: 'pi pi-user',
     command: () => router.push('/user-centre/profile'),
     items: [

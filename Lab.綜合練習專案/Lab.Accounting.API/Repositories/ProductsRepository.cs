@@ -23,14 +23,17 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.ProductsStock,
                                  m.ProductCategoryId,
                                  c.productcategoryname,
-                                 parent.ProductCategoryId as ProductParentId,
-                                 parent.productcategoryname as ParentCategoryName
+                                 -- 計算平均評分
+                                 -- 外層 ISNULL 是為了當今天回傳值是 null ( 沒有評分 ) 的話就回傳 0
+                                 ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
+                                 FROM MallProductsRate r 
+                                 WHERE r.ProductsId = m.productsid), 0) AS ProductsAVGRate
                         FROM     mallproducts m
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
-                        LEFT JOIN mallproductcategory parent    
-                        ON       parent.productcategoryid = c.ProductParentId
                         Where (@UserId is null or m.userId=@UserId) 
+
+                        -- 動態條件
                         and  m.isDelete=0
                         and  m.ProductsStock > 0
                         and  (@productCategoryId is null or m.ProductCategoryId IN (
@@ -38,7 +41,22 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                 WHERE FatherId = @productCategoryId
                             ))
                         and  (@keyWords is null or  m.productsname like '%' + @keyWords + '%')
-                        ORDER BY productsid offset @offset rows FETCH next @pageSize rows only";
+                        and (@minPrice is null or m.productsprice >= @minPrice)
+                        and (@maxPrice is null or m.productsprice <= @maxPrice)
+                        
+                        -- 在使用者指定的條件以上
+                        and (@rate is null or  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
+                            FROM MallProductsRate r 
+                            WHERE r.ProductsId = m.productsid), 0)>=@rate)
+                        
+                        -- 排序
+                        ORDER BY 
+                        case when @sortBy='ProductsPrice' and @sortOrder='asc' then m.productsprice end asc,
+                        case when @sortBy='ProductsPrice' and @sortOrder='desc' then m.productsprice end desc,
+                        case when @sortBy='CreateTime' and @sortOrder='asc' then m.CreateTime end asc,
+                        case when @sortBy='CreateTime' and @sortOrder='desc' then m.CreateTime end desc,
+                        m.productsid 
+                        offset @offset rows FETCH next @pageSize rows only";
 
         var result = await conn.QueryAsync<Product>(
             sql,
@@ -49,6 +67,11 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                 UserId = request.sellerId,
                 productCategoryId = request.productCategoryId,
                 keyWords = request.keyWords,
+                sortBy = request.sortBy,
+                sortOrder = request.sortOrder,
+                maxPrice = request.maxPrice,
+                minPrice = request.minPrice,
+                rate = request.rate,
             }
         );
         return result;

@@ -16,7 +16,7 @@ public class ProductsService(
 ) : IProductsService
 {
     /// <summary>
-    /// 賣家查看商品
+    /// 查看商品
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
