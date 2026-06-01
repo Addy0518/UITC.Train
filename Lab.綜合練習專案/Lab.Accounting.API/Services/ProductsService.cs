@@ -45,8 +45,8 @@ public class ProductsService(
     public async Task<ApiResponse<ProductsResponse>> GetAllProducts(ProductsSearchRequest request)
     {
         var products = await productsRepository.GetAllProducts(request);
-        var totalCount = await productsRepository.CountProducts(request);
-        if (!products.Any())
+
+        if (products == null)
         {
             return ApiResponseHelper.NotFound<ProductsResponse>();
         }
@@ -54,12 +54,15 @@ public class ProductsService(
         // 開兩條執行緒同時查詢
         var tasks = products.Select(async product =>
         {
-            product.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId) ?? 0;
             product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
         });
         await Task.WhenAll(tasks);
 
-        var result = new ProductsResponse { Products = products, TotalCount = totalCount };
+        var result = new ProductsResponse
+        {
+            Products = products,
+            TotalCount = products.FirstOrDefault()?.TotalCount ?? 0,
+        };
 
         return ApiResponseHelper.Success(result);
     }
@@ -81,12 +84,15 @@ public class ProductsService(
         // 開兩條執行緒同時查詢
         var tasks = products.Select(async product =>
         {
-            product.ProductsAVGRate = await productsRateRepositories.CountAVGProductRate(product.ProductsId) ?? 0;
             product.ProductsImgs = await productsImgRepository.GetProductsAllImg(product.ProductsId);
         });
         await Task.WhenAll(tasks);
 
-        var result = new ProductsResponse { Products = products };
+        var result = new ProductsResponse
+        {
+            Products = products,
+            TotalCount = products.FirstOrDefault()?.TotalCount ?? 0,
+        };
         return ApiResponseHelper.Success(result);
     }
 

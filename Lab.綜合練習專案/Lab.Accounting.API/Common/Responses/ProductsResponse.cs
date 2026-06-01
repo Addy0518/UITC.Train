@@ -86,4 +86,9 @@ public class Product
     /// 商品圖片 URL
     /// </summary>
     public IEnumerable<MallProductImg>? ProductsImgs { get; set; }
+
+    /// <summary>
+    /// 總筆數
+    /// </summary>
+    public int? TotalCount { get; set; }
 }

@@ -63,13 +63,6 @@ public interface IProductsRepository
     Task<int> SetStock(int productsId, int purchaseQuantity);
 
     /// <summary>
-    /// 計算商品數量
-    /// </summary>
-    /// <param name="request">搜尋條件</param>
-    /// <returns>影響列數</returns>
-    Task<int> CountProducts(ProductsSearchRequest request);
-
-    /// <summary>
     /// 計算賣家所有商品數量
     /// </summary>
     /// <param name="sellerId">賣家 Id</param>

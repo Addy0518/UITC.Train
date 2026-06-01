@@ -12,6 +12,14 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
   baseUrl : 環境變數裡的圖片基底位址
   selectedCategory : 選擇的類別區塊
   breadCrumCategories : 麵包屑的類別
+  currentSort : 現在的排序
+  sortBy : 分類排序
+  sortOrder : 排序方向
+  maxPrice : 最大價格
+  minPrice = 最少價格
+  rate = 評分
+  visible : Dialog 開關
+  isFiltering : 是否為第一次加載
 */
 const route = useRoute();
 const router = useRouter();
@@ -21,6 +29,26 @@ const selectedCategory = ref(null);
 const totalCount = ref();
 const allCategories = ref();
 const breadCrumCategories = ref([]);
+const currentSort = ref({ type: 'CreateTime', order: 'desc' });
+const sortBy = ref('CreateTime');
+const sortOrder = ref('desc');
+const maxPrice = ref();
+const minPrice = ref();
+const rate = ref();
+const visible = ref(false);
+const isFiltering = ref(false);
+
+/*
+   評價選項
+*/
+const rateOptions = [
+  { label: '全部', value: null },
+  { label: '5星', value: 5 },
+  { label: '4星以上', value: 4 },
+  { label: '3星以上', value: 3 },
+  { label: '2星以上', value: 2 },
+  { label: '1星以上', value: 1 },
+];
 
 /*
    注入 Loading 跟 Toast
@@ -35,7 +63,7 @@ const showToastError = inject('showToastError');
 */
 onMounted(() => {
   if (route.params.id) {
-    loadproducts(route.params.id);
+    loadproducts(route.params.id, 0, true);
     loadCategory(route.params.id);
     loadBreadCrumb(route.params.id);
   }
@@ -47,29 +75,66 @@ onMounted(() => {
 watch(
   () => route.params.id,
   (newId) => {
-    loadproducts(newId);
+    loadproducts(newId, 0, true);
     loadCategory(newId);
     loadBreadCrumb(newId);
   },
 );
 
 /*
+   切換排序類型
+*/
+const toggleSort = (type) => {
+  if (currentSort.value.type === type) {
+    if (currentSort.value.order === 'asc') {
+      currentSort.value.order = 'desc';
+    } else {
+      currentSort.value = { type: null, order: null };
+    }
+  } else {
+    currentSort.value = { type: type, order: 'asc' };
+  }
+  sortBy.value = currentSort.value.type;
+  sortOrder.value = currentSort.value.order;
+  loadproducts(selectedCategory.value ?? route.params.id);
+};
+
+/*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
 */
-const loadproducts = async (parentId, page = 0) => {
+const loadproducts = async (parentId, page = 0, isFirstload = false) => {
   try {
-    showLoading();
-    const res = await getAllProduct({ productCategoryId: parentId, pageIndex: page, pageSize: 12 });
+    // 判斷是不是第一次加載
+    if (isFirstload) {
+      showLoading();
+    } else {
+      isFiltering.value = true;
+    }
+
+    const res = await getAllProduct({
+      productCategoryId: parentId,
+      pageIndex: page,
+      pageSize: 12,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value,
+      rate: rate.value,
+      maxPrice: maxPrice.value,
+      minPrice: minPrice.value,
+    });
     const { data } = res;
 
     if (data.codeStatus === 2000) {
       allProducts.value = data.returnData.products;
       totalCount.value = data.returnData.totalCount;
+    } else if (data.codeStatus === 4001) {
+      allProducts.value = [];
+      totalCount.value = 0;
     }
   } catch (err) {
     console.log(err);
   } finally {
     hideLoading();
+    isFiltering.value = false;
   }
 };
 
@@ -195,50 +260,199 @@ const breadCrumbItem = computed(() => {
             </div>
           </div>
           <!-- #endregion -->
-          <!-- #region  商品-->
+
           <div class="flex-1">
+            <div class="flex flex-1 items-center">
+              <!-- #region  排序-->
+              <button
+                @click="toggleSort('CreateTime')"
+                :class="currentSort.type === 'CreateTime' ? ' text-orange-500' : ' text-gray-700'"
+                class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+              >
+                上架時間
+                <i
+                  v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
+                  class="pi pi-arrow-up text-xs"
+                />
+                <i
+                  v-if="currentSort.type === 'CreateTime' && currentSort.order === 'desc'"
+                  class="pi pi-arrow-down text-xs"
+                />
+              </button>
+
+              <button
+                @click="toggleSort('Rate')"
+                :class="currentSort.type === 'Rate' ? ' text-orange-500' : ' text-gray-700'"
+                class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+              >
+                評價
+                <i
+                  v-if="currentSort.type === 'Rate' && currentSort.order === 'asc'"
+                  class="pi pi-arrow-up text-xs"
+                />
+                <i
+                  v-if="currentSort.type === 'Rate' && currentSort.order === 'desc'"
+                  class="pi pi-arrow-down text-xs"
+                />
+              </button>
+
+              <button
+                @click="toggleSort('ProductsPrice')"
+                :class="
+                  currentSort.type === 'ProductsPrice' ? ' text-orange-500' : ' text-gray-700'
+                "
+                class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+              >
+                價格
+                <i
+                  v-if="currentSort.type === 'ProductsPrice' && currentSort.order === 'asc'"
+                  class="pi pi-arrow-up text-xs"
+                />
+                <i
+                  v-if="currentSort.type === 'ProductsPrice' && currentSort.order === 'desc'"
+                  class="pi pi-arrow-down text-xs"
+                />
+              </button>
+              <!-- #endregion -->
+
+              <!-- #region  篩選-->
+              <button
+                @click="visible = true"
+                class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                <i class="pi pi-filter text-xs" />
+                篩選
+              </button>
+
+              <Dialog v-model:visible="visible" modal header="篩選條件" :style="{ width: '40rem' }">
+                <div class="flex flex-col gap-4 py-2">
+                  <div>
+                    <label class="text-sm text-gray-500 mb-1 block">評分</label>
+                    <Select
+                      v-model="rate"
+                      :options="rateOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="選擇評分"
+                      class="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="text-sm text-gray-500 mb-1 block">價格區間</label>
+                    <div class="flex items-center gap-2">
+                      <InputNumber
+                        v-model="minPrice"
+                        placeholder="最小價格"
+                        :min="0"
+                        :max="maxPrice ?? undefined"
+                        class="w-full"
+                      />
+                      <span class="text-gray-400">—</span>
+                      <InputNumber
+                        v-model="maxPrice"
+                        placeholder="最大價格"
+                        :min="minPrice ?? 0"
+                        class="w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <template #footer>
+                  <div class="flex justify-end gap-2">
+                    <Button
+                      label="清除"
+                      severity="secondary"
+                      @click="
+                        () => {
+                          rate = null;
+                          minPrice = null;
+                          maxPrice = null;
+                        }
+                      "
+                    />
+                    <Button
+                      label="搜尋"
+                      @click="
+                        () => {
+                          visible = false;
+                          loadproducts(selectedCategory ?? route.params.id);
+                        }
+                      "
+                    />
+                  </div>
+                </template>
+              </Dialog>
+              <!-- #endregion -->
+            </div>
+            <!-- #region  商品-->
             <span class="text-2xl m-5">商品</span>
             <div class="grid grid-cols-3 mt-5 gap-4">
-              <div v-for="product in allProducts" :key="product.productsId">
-                <div
-                  class="hover:shadow-xl hover:bg-gray-50 flex flex-col items-center rounded-lg p-3"
-                >
-                  <RouterLink
-                    :to="{ name: 'product-detail', params: { id: product.productsId } }"
-                    class="flex flex-col items-center cursor-pointer w-full"
-                  >
-                    <img
-                      :src="getProductsImg(product)"
-                      alt="Logo"
-                      class="w-full max-w-40 max-h-40 mt-4 object-cover"
-                    />
-                    <span class="mt-3">{{ product.productsName }}</span>
-                    <span class="mt-3">{{ product.productsPrice }}</span>
-                    <span class="mt-3 ms-2 me-2 text-sm text-gray-500">{{
-                      product.productCategoryName
-                    }}</span>
-                  </RouterLink>
+              <template v-if="isFiltering">
+                <div v-for="n in 12" :key="n" class="flex flex-col items-center rounded-lg p-3">
+                  <Skeleton width="100%" height="160px" class="rounded-lg" />
+                  <Skeleton width="80%" height="1rem" class="mt-3" />
+                  <Skeleton width="40%" height="1rem" class="mt-2" />
+                  <Skeleton width="60%" height="0.8rem" class="mt-2" />
                 </div>
-              </div>
+              </template>
+
+              <template v-else>
+                <div
+                  v-if="allProducts.length === 0"
+                  class="col-span-3 flex flex-col items-center justify-center py-16 text-gray-400"
+                >
+                  <i class="pi pi-inbox text-4xl mb-3" />
+                  <span class="text-sm">沒有符合條件的商品</span>
+                </div>
+                <div v-for="product in allProducts" :key="product.productsId">
+                  <div
+                    class="hover:shadow-xl hover:bg-gray-50 flex flex-col items-center rounded-lg p-3"
+                  >
+                    <RouterLink
+                      :to="{ name: 'product-detail', params: { id: product.productsId } }"
+                      class="flex flex-col items-center cursor-pointer w-full"
+                    >
+                      <img
+                        :src="getProductsImg(product)"
+                        alt="Logo"
+                        class="w-full max-w-40 max-h-40 mt-4 object-cover"
+                      />
+                      <span class="mt-3">{{ product.productsName }}</span>
+                      <span class="mt-3">{{ product.productsPrice }}</span>
+                      <span class="mt-3 ms-2 me-2 text-sm text-gray-500">{{
+                        product.productCategoryName
+                      }}</span>
+                    </RouterLink>
+                  </div>
+                </div>
+              </template>
+
+              <!-- #endregion -->
             </div>
           </div>
           <!-- #endregion -->
         </div>
-        <!-- #endregion -->
+
         <!-- #region  頁碼按鈕-->
-        <Paginator
-          :template="{
-            '640px': 'PrevPageLink CurrentPageReport NextPageLink',
-            '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
-            '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
-            default:
-              'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
-          }"
-          :rows="12"
-          :totalRecords="totalCount"
-          @page="pageChange"
-        >
-        </Paginator>
+        <div class="flex flex-1 items-center justify-center mt-5 mb-30">
+          <span>總筆數 : {{ totalCount }}</span>
+          <Paginator
+            :template="{
+              '640px': 'PrevPageLink CurrentPageReport NextPageLink',
+              '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
+              '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+              default:
+                'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
+            }"
+            :rows="12"
+            :totalRecords="totalCount"
+            @page="pageChange"
+          >
+          </Paginator>
+        </div>
+
         <!-- #endregion -->
       </div>
     </div>

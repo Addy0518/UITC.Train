@@ -7,10 +7,40 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    allproduct : 賣家所有商品
    baseUrl : 環境變數裡的圖片基底位址
    router : 控制路由
+   currentSort : 現在的排序
+   sortBy : 分類排序
+   sortOrder : 排序方向
+   maxPrice : 最大價格
+   minPrice = 最少價格
+   rate = 評分
+   visible : Dialog 開關
+   isFiltering : 是否為第一次加載
+   totalCount : 商品數量
 */
 const allproduct = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
+const currentSort = ref({ type: 'CreateTime', order: 'desc' });
+const sortBy = ref('CreateTime');
+const sortOrder = ref('desc');
+const maxPrice = ref();
+const minPrice = ref();
+const rate = ref();
+const visible = ref(false);
+const isFiltering = ref(false);
+const totalCount = ref();
+
+/*
+   評價選項
+*/
+const rateOptions = [
+  { label: '全部', value: null },
+  { label: '5星', value: 5 },
+  { label: '4星以上', value: 4 },
+  { label: '3星以上', value: 3 },
+  { label: '2星以上', value: 2 },
+  { label: '1星以上', value: 1 },
+];
 
 /*
    注入 Loading 跟 Toast
@@ -24,27 +54,63 @@ const showToastError = inject('showToastError');
    初始化時
 */
 onMounted(() => {
-  getSellerProduct();
+  getSellerProduct(true);
 });
+
+/*
+   切換排序類型
+*/
+const toggleSort = (type) => {
+  if (currentSort.value.type === type) {
+    if (currentSort.value.order === 'asc') {
+      currentSort.value.order = 'desc';
+    } else {
+      currentSort.value = { type: null, order: null };
+    }
+  } else {
+    currentSort.value = { type: type, order: 'asc' };
+  }
+  sortBy.value = currentSort.value.type;
+  sortOrder.value = currentSort.value.order;
+  getSellerProduct();
+};
 
 /*
    查看賣家所有商品
 */
-const getSellerProduct = async () => {
+const getSellerProduct = async (isFirstload = false) => {
   try {
+    // 判斷是不是第一次加載
+    if (isFirstload) {
+      showLoading();
+    } else {
+      isFiltering.value = true;
+    }
+
     const request = {
       pageIndex: 0,
       pageSize: 10,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value,
+      rate: rate.value,
+      maxPrice: maxPrice.value,
+      minPrice: minPrice.value,
     };
     const res = await getSellerAllProduct(request);
     const { data } = res;
 
     if (data.codeStatus === 2000) {
       allproduct.value = data.returnData.products;
+      totalCount.value = data.returnData.totalCount;
+    } else if (data.codeStatus === 4001) {
+      allproduct.value = [];
+      totalCount.value = 0;
     }
   } catch (err) {
     console.log(err);
   } finally {
+    hideLoading();
+    isFiltering.value = false;
   }
 };
 
@@ -81,6 +147,125 @@ const deleteProduct = async (productId) => {
     <!-- #region  標題列-->
     <div class="flex items-center justify-between mb-4">
       <p class="text-2xl font-bold m-0">商品管理</p>
+      <!-- #region  排序-->
+      <button
+        @click="toggleSort('CreateTime')"
+        :class="currentSort.type === 'CreateTime' ? ' text-orange-500' : ' text-gray-700'"
+        class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+      >
+        上架時間
+        <i
+          v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
+          class="pi pi-arrow-up text-xs"
+        />
+        <i
+          v-if="currentSort.type === 'CreateTime' && currentSort.order === 'desc'"
+          class="pi pi-arrow-down text-xs"
+        />
+      </button>
+
+      <button
+        @click="toggleSort('Rate')"
+        :class="currentSort.type === 'Rate' ? ' text-orange-500' : ' text-gray-700'"
+        class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+      >
+        評價
+        <i
+          v-if="currentSort.type === 'Rate' && currentSort.order === 'asc'"
+          class="pi pi-arrow-up text-xs"
+        />
+        <i
+          v-if="currentSort.type === 'Rate' && currentSort.order === 'desc'"
+          class="pi pi-arrow-down text-xs"
+        />
+      </button>
+
+      <button
+        @click="toggleSort('ProductsPrice')"
+        :class="currentSort.type === 'ProductsPrice' ? ' text-orange-500' : ' text-gray-700'"
+        class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+      >
+        價格
+        <i
+          v-if="currentSort.type === 'ProductsPrice' && currentSort.order === 'asc'"
+          class="pi pi-arrow-up text-xs"
+        />
+        <i
+          v-if="currentSort.type === 'ProductsPrice' && currentSort.order === 'desc'"
+          class="pi pi-arrow-down text-xs"
+        />
+      </button>
+      <!-- #endregion -->
+      <!-- #region  篩選-->
+      <button
+        @click="visible = true"
+        class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+      >
+        <i class="pi pi-filter text-xs" />
+        篩選
+      </button>
+
+      <Dialog v-model:visible="visible" modal header="篩選條件" :style="{ width: '40rem' }">
+        <div class="flex flex-col gap-4 py-2">
+          <div>
+            <label class="text-sm text-gray-500 mb-1 block">評分</label>
+            <Select
+              v-model="rate"
+              :options="rateOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="選擇評分"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-500 mb-1 block">價格區間</label>
+            <div class="flex items-center gap-2">
+              <InputNumber
+                v-model="minPrice"
+                placeholder="最小價格"
+                :min="0"
+                :max="maxPrice ?? undefined"
+                class="w-full"
+              />
+              <span class="text-gray-400">—</span>
+              <InputNumber
+                v-model="maxPrice"
+                placeholder="最大價格"
+                :min="minPrice ?? 0"
+                class="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <Button
+              label="清除"
+              severity="secondary"
+              @click="
+                () => {
+                  rate = null;
+                  minPrice = null;
+                  maxPrice = null;
+                }
+              "
+            />
+            <Button
+              label="搜尋"
+              @click="
+                () => {
+                  visible = false;
+                  getSellerProduct();
+                }
+              "
+            />
+          </div>
+        </template>
+      </Dialog>
+      <!-- #endregion -->
       <button
         class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm cursor-pointer"
         @click="router.push({ name: 'add-product' })"
@@ -103,35 +288,73 @@ const deleteProduct = async (productId) => {
       </div>
       <!-- #endregion -->
       <!-- #region  商品-->
-      <div
-        v-for="product in allproduct"
-        :key="product.productsId"
-        class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
-      >
-        <img
-          :src="getProductsImg(product)"
-          class="w-14 h-14 object-cover rounded-lg border border-gray-100 cursor-pointer"
-          @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
-        />
-        <span class="text-sm font-medium">{{ product.productsName }}</span>
-        <span class="text-sm text-orange-500 font-medium">$ {{ product.productsPrice }}</span>
-        <span class="text-sm text-gray-400">{{ product.productCategoryName }}</span>
-        <span class="text-sm">{{ product.productsStock }} 件</span>
-        <div class="flex gap-2 justify-end">
-          <button
-            class="px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50"
-            @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
-          >
-            編輯
-          </button>
-          <button
-            class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 cursor-pointer hover:bg-red-50"
-            @click="deleteProduct(product.productsId)"
-          >
-            刪除
-          </button>
+
+      <template v-if="isFiltering">
+        <div v-for="n in 12" :key="n" class="flex flex-col items-center rounded-lg p-3">
+          <Skeleton width="100%" height="160px" class="rounded-lg" />
+          <Skeleton width="80%" height="1rem" class="mt-3" />
+          <Skeleton width="40%" height="1rem" class="mt-2" />
+          <Skeleton width="60%" height="0.8rem" class="mt-2" />
         </div>
+      </template>
+
+      <template v-else>
+        <div
+          v-if="allproduct.length === 0"
+          class="col-span-3 flex flex-col items-center justify-center py-16 text-gray-400"
+        >
+          <i class="pi pi-inbox text-4xl mb-3" />
+          <span class="text-sm">沒有符合條件的商品</span>
+        </div>
+        <div
+          v-for="product in allproduct"
+          :key="product.productsId"
+          class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
+        >
+          <img
+            :src="getProductsImg(product)"
+            class="w-14 h-14 object-cover rounded-lg border border-gray-100 cursor-pointer"
+            @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
+          />
+          <span class="text-sm font-medium">{{ product.productsName }}</span>
+          <span class="text-sm text-orange-500 font-medium">$ {{ product.productsPrice }}</span>
+          <span class="text-sm text-gray-400">{{ product.productCategoryName }}</span>
+          <span class="text-sm">{{ product.productsStock }} 件</span>
+          <div class="flex gap-2 justify-end">
+            <button
+              class="px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50"
+              @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
+            >
+              編輯
+            </button>
+            <button
+              class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 cursor-pointer hover:bg-red-50"
+              @click="deleteProduct(product.productsId)"
+            >
+              刪除
+            </button>
+          </div>
+        </div>
+      </template>
+      <!-- #endregion -->
+      <!-- #region  頁碼按鈕-->
+      <div class="flex flex-1 items-center justify-center mt-5 mb-30">
+        <span>總筆數 : {{ totalCount }}</span>
+        <Paginator
+          :template="{
+            '640px': 'PrevPageLink CurrentPageReport NextPageLink',
+            '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
+            '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+            default:
+              'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
+          }"
+          :rows="12"
+          :totalRecords="totalCount"
+          @page="pageChange"
+        >
+        </Paginator>
       </div>
+
       <!-- #endregion -->
     </div>
   </div>
