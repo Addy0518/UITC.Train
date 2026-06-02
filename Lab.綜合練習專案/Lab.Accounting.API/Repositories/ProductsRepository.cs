@@ -28,6 +28,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
                                  FROM MallProductsRate r 
                                  WHERE r.ProductsId = m.productsid), 0) AS ProductsAVGRate,
+                                 ISNULL((Select Count(o.BoughtQuantity) 
+                                 From MallOrder o
+                                 Where o.ProductsId = m.ProductsId),0) as BoughtQuantity,
                                  Count(*) over() as TotalCount
                         FROM     mallproducts m
                         JOIN     mallproductcategory c

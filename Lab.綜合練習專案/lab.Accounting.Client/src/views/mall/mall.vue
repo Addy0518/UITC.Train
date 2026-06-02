@@ -115,6 +115,13 @@ const getProductsImg = (product) => {
   }
   return defaultImgurl;
 };
+
+const getCategoryImg = (category) => {
+  if (category.productCategoryImg) {
+    return `${baseUrl}/CategoryImg/${category.productCategoryImg}`;
+  }
+  return defaultImgurl;
+};
 </script>
 
 <template>
@@ -162,7 +169,11 @@ const getProductsImg = (product) => {
                 "
                 class="hover:shadow-xl hover:bg-gray-50 h-80 cursor-pointer flex flex-col items-center"
               >
-                <img :src="defaultImgurl" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
+                <img
+                  :src="getCategoryImg(category)"
+                  alt="Logo"
+                  class="w-full max-w-40 max-h-40 mt-4"
+                />
                 <span class="mt-15">{{ category.productCategoryName }}</span>
               </div>
             </div>
@@ -177,26 +188,27 @@ const getProductsImg = (product) => {
       <div class="mt-10 w-300 rounded-lg shadow-sm">
         <div class="justify-between">
           <span class="text-2xl m-5">商品</span>
-          <div class="grid grid-cols-4 mt-5">
-            <div v-for="product in allProducts">
-              <div class="hover:shadow-xl hover:bg-gray-50 h-100 flex flex-col items-center">
-                <RouterLink
-                  :to="{ name: 'product-detail', params: { id: product.productsId } }"
-                  class="flex flex-col items-center cursor-pointer"
-                >
-                  <img
-                    :src="getProductsImg(product)"
-                    alt="Logo"
-                    class="w-full max-w-40 max-h-40 mt-4"
-                  />
-                  <span class="mt-3">{{ product.productsName }}</span>
-                  <span class="mt-3">{{ product.productsPrice }}</span>
-
-                  <span class="mt-3 ms-2 me-2 text-sm text-gray-500">
-                    {{ product.productCategoryName }}
-                  </span>
-                </RouterLink>
-              </div>
+          <div class="grid grid-cols-4 mt-5 gap-4">
+            <div v-for="product in allProducts" :key="product.productsId">
+              <RouterLink
+                :to="{ name: 'product-detail', params: { id: product.productsId } }"
+                class="block bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
+              >
+                <div class="aspect-square bg-gray-50 overflow-hidden">
+                  <img :src="getProductsImg(product)" alt="" class="w-full h-full object-cover" />
+                </div>
+                <div class="p-3 flex flex-col gap-1.5">
+                  <p class="text-sm font-medium truncate">{{ product.productsName }}</p>
+                  <p class="text-base font-medium text-orange-600">$ {{ product.productsPrice }}</p>
+                  <Rating :modelValue="product.productsAVGRate" :stars="5" :readonly="true" />
+                  <div class="flex items-center justify-between mt-1">
+                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                      {{ product.productCategoryName }}
+                    </span>
+                    <span class="text-xs text-gray-400">已售 {{ product.boughtQuantity }} 件</span>
+                  </div>
+                </div>
+              </RouterLink>
             </div>
           </div>
         </div>

@@ -28,6 +28,21 @@ const menuItems = ref([
     icon: 'pi pi-list',
     command: () => router.push('/user-centre/purchase-orders'),
   },
+  {
+    label: '我的錢包',
+    icon: 'pi pi-wallet',
+    command: () => router.push('/user-centre/wallet'),
+  },
+  {
+    label: '更多功能',
+    icon: 'pi pi-info-circle',
+    command: () => router.push('/user-centre/function'),
+  },
+  {
+    label: '服務支援',
+    icon: 'pi pi-question-circle',
+    command: () => router.push('/user-centre/help'),
+  },
 ]);
 
 /*

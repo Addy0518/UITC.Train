@@ -19,7 +19,7 @@ const router = createRouter({
           /*
             主頁 ( 預設導向登入畫面 )
           */
-          path: '',
+          path: 'home',
           name: 'home',
           redirect: { name: 'login' },
           component: () => import('@/views/home.vue'),
@@ -132,7 +132,7 @@ const router = createRouter({
           /*
             商城
           */
-          path: 'mall',
+          path: '',
           name: 'mall',
           meta: {
             isPermissionVerification: false,
@@ -267,6 +267,39 @@ const router = createRouter({
               },
               component: () => import('@/views/user/purchaseOrderRate.vue'),
             },
+            {
+              /*
+                錢包
+              */
+              path: 'wallet',
+              name: 'wallet',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/wallet.vue'),
+            },
+            {
+              /*
+                更多功能
+              */
+              path: 'function',
+              name: 'function',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/function.vue'),
+            },
+            {
+              /*
+                服務支援
+              */
+              path: 'help',
+              name: 'help',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/help.vue'),
+            },
           ],
         },
       ],
@@ -387,7 +420,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore();
 
-  if (to.meta.isPermissionVerification && !authStore.token) {
+  if (to.meta.isPermissionVerification === true && !authStore.token) {
     return { name: 'login' };
   }
   if (to.meta.isSeller && authStore.userRole !== 'Seller') {

@@ -72,7 +72,7 @@ const userLogin = async () => {
     if (data.codeStatus === 2000) {
       authStore.setAuth(data.returnData);
       showToastSuccess('登入成功 !');
-      route.push('mall');
+      route.push({ name: 'mall' });
     }
     if (data.codeStatus === 4000) {
       showToastError('錯誤', getError400Message(data.error400));

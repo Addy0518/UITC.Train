@@ -1,10 +1,28 @@
-﻿using NPOI.POIFS.Properties;
+﻿using NPOI.HPSF;
+using NPOI.POIFS.NIO;
+using NPOI.POIFS.Properties;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lab.Accounting.API.Repositories
 {
     public class PoductsCategoryRepository(DBConnecting connecting) : IPoductsCategoryRepository
     {
+        /// <summary>
+        /// 查看指定類別
+        /// </summary>
+        /// <param name="categoryId">商品類別 ID</param>
+        /// <returns>商品類別</returns>
+        public async Task<MallProductCategory> GetCategories(int categoryId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"select *
+                from MallProductCategory 
+                where ProductCategoryId=@categoryId";
+            return await conn.QueryFirstOrDefaultAsync<MallProductCategory>(sql, new { categoryId = categoryId });
+        }
+
         /// <summary>
         /// 查看指定類別底下的所有層級類別
         /// </summary>
@@ -132,29 +150,46 @@ namespace Lab.Accounting.API.Repositories
         }
 
         /// <summary>
+        /// 新增類別圖片
+        /// </summary>
+        /// <param name = "categoryId" > 商品類別 ID </param >
+        /// <param name = "fileName" > 檔案名稱 </param >
+        /// <returns>影響列數 </returns>
+        public async Task<int> UploadCategoryImg(int categoryId, string fileName)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql1 =
+                @"UPDATE MallProductCategory 
+                  SET ProductCategoryImg = @FileName 
+                  WHERE ProductCategoryId = @CategoryId";
+            return await conn.ExecuteAsync(sql1, new { FileName = fileName, CategoryId = categoryId });
+        }
+
+        /// <summary>
         /// 刪除類別及關連閉鎖表
         /// </summary>
         /// <param name="categoryId">類別 ID </param>
-        /// <returns>新增的類別 ID </returns>
-        public async Task<int> DeleteCategory(int categoryId)
+        /// <returns>刪除的類別資訊 </returns>
+        public async Task<IEnumerable<MallProductCategory>> DeleteCategory(int categoryId)
         {
             using var conn = connecting.CreateConnecting();
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 try
                 {
-                    // 刪除閉鎖表的關聯 ( 除了刪除自己以外也刪除底下的其他類別 , 不然會有孤兒類別 )
-                    var sql1 =
-                        @" Delete from MallProductCategory_Closure 
-                           Where SonId in (Select SonId From MallProductCategory_Closure Where FatherId=@CategoryId)";
-                    await conn.ExecuteAsync(sql1, new { CategoryId = categoryId });
-
                     // 刪除類別
-                    var sql2 =
-                        @"Delete from MallProductCategory Where ProductCategoryId IN (
+                    var sql =
+                        @"Delete from MallProductCategory OUTPUT [DELETED].* Where ProductCategoryId IN (
                                 SELECT SonId FROM MallProductCategory_Closure 
                                 WHERE FatherId = @CategoryId)";
-                    var affectRows = await conn.ExecuteAsync(sql2, new { CategoryId = categoryId });
+                    var affectRows = await conn.QueryAsync<MallProductCategory>(sql, new { CategoryId = categoryId });
+
+                    // 刪除閉鎖表的關聯 ( 除了刪除自己以外也刪除底下的其他類別 , 不然會有孤兒類別 )
+                    var sql2 =
+                        @" Delete from MallProductCategory_Closure 
+                           Where SonId in (Select SonId From MallProductCategory_Closure Where FatherId=@CategoryId)";
+                    await conn.ExecuteAsync(sql2, new { CategoryId = categoryId });
 
                     trxScope.Complete();
                     return affectRows;

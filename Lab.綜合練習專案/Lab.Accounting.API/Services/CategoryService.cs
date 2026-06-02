@@ -1,8 +1,10 @@
-﻿using NPOI.POIFS.Properties;
+﻿using NPOI.HPSF;
+using NPOI.POIFS.Properties;
 
 namespace Lab.Accounting.API.Services
 {
-    public class CategoryService(IPoductsCategoryRepository poductsCategoryRepository) : ICategoryService
+    public class CategoryService(IPoductsCategoryRepository poductsCategoryRepository, IWebHostEnvironment env)
+        : ICategoryService
     {
         /// <summary>
         /// 查看指定類別底下的所有層級類別
@@ -78,11 +80,45 @@ namespace Lab.Accounting.API.Services
         /// <returns>新增的類別 ID </returns>
         public async Task<ApiResponse<int>> AddCategory(CategoryInsertRequest request)
         {
+            if (request.ProductParentId == 0)
+            {
+                request.ProductParentId = null;
+            }
+
+            if (request.ProductParentId == null && request.ProductCategoryImgFile == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "ProductCategoryImgFile", new[] { "頂層類別必須上傳圖片 !" } },
+                };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
             var target = await poductsCategoryRepository.AddCategory(request);
 
             if (target <= 0)
             {
                 return ApiResponseHelper.NotFound<int>();
+            }
+
+            if (request.ProductCategoryImgFile != null)
+            {
+                var filename = await FileUploadHelper.SaveFileAsync(
+                    request.ProductCategoryImgFile,
+                    env.WebRootPath,
+                    "CategoryImg"
+                );
+                if (filename == null)
+                {
+                    return ApiResponseHelper.InternalException<int>("圖片上傳失敗");
+                }
+                var updateResult = await poductsCategoryRepository.UploadCategoryImg(target, filename);
+                if (updateResult <= 0)
+                {
+                    // DB 失敗，把剛存的實體檔案清掉，避免孤兒檔案
+                    FileUploadHelper.DeleteFile(env.WebRootPath, "CategoryImg", filename);
+                    return ApiResponseHelper.InternalException<int>("圖片上傳失敗");
+                }
             }
 
             return ApiResponseHelper.Success(target);
@@ -92,17 +128,22 @@ namespace Lab.Accounting.API.Services
         /// 刪除類別及關連閉鎖表
         /// </summary>
         /// <param name="categoryId">類別 ID </param>
-        /// <returns>新增的類別 ID </returns>
+        /// <returns>刪除了幾筆</returns>
         public async Task<ApiResponse<int>> DeleteCategory(int categoryId)
         {
-            var target = await poductsCategoryRepository.DeleteCategory(categoryId);
+            IEnumerable<MallProductCategory> targets = await poductsCategoryRepository.DeleteCategory(categoryId);
 
-            if (target <= 0)
+            if (!targets.Any())
             {
                 return ApiResponseHelper.NotFound<int>();
             }
 
-            return ApiResponseHelper.Success(target);
+            foreach (var target in targets)
+            {
+                FileUploadHelper.DeleteFile(env.WebRootPath, "CategoryImg", target.ProductCategoryImg);
+            }
+
+            return ApiResponseHelper.Success(targets.Count());
         }
     }
 }

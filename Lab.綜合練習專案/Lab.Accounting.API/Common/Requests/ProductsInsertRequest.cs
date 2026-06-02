@@ -41,6 +41,7 @@ public class ProductsInsertRequest
     /// 商品描述
     /// </summary>
     [Display(Name = "商品描述")]
+    [Required(ErrorMessage = "{0} 必輸")]
     [MaxLength(500, ErrorMessage = "{0} 不可超過 {1} 字!")]
-    public string? ProductsDescription { get; set; }
+    public string ProductsDescription { get; set; }
 }

@@ -15,6 +15,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="fatherCategoryId">商品父類別 ID</param>
         /// <returns>商品類別</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
         public async Task<IActionResult> GetSonCategories([FromQuery] int fatherCategoryId)
         {
@@ -28,6 +29,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="sonCategoryId">商品子類別 ID</param>
         /// <returns>商品類別</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
         public async Task<IActionResult> GetFatherCategories([FromQuery] int sonCategoryId)
         {
@@ -40,6 +42,7 @@ namespace Lab.Accounting.API.Controllers
         /// </summary>
         /// <returns>商品類別</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
         public async Task<IActionResult> GetOneFatherCategory()
         {
@@ -53,6 +56,7 @@ namespace Lab.Accounting.API.Controllers
         /// <param name="fatherCategoryId">商品父類別 ID</param>
         /// <returns>商品類別</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
         public async Task<IActionResult> GetOneSonCategory([FromQuery] int fatherCategoryId)
         {
@@ -67,7 +71,7 @@ namespace Lab.Accounting.API.Controllers
         /// <returns>新增的類別 ID </returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> AddCategory([FromBody] CategoryInsertRequest request)
+        public async Task<IActionResult> AddCategory([FromForm] CategoryInsertRequest request)
         {
             var target = await categoryService.AddCategory(request);
             return Ok(target);

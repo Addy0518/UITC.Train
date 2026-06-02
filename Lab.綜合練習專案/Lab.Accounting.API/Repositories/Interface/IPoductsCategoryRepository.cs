@@ -3,6 +3,13 @@
     public interface IPoductsCategoryRepository
     {
         /// <summary>
+        /// 查看指定類別
+        /// </summary>
+        /// <param name="categoryId">商品類別 ID</param>
+        /// <returns>商品類別</returns>
+        Task<MallProductCategory> GetCategories(int categoryId);
+
+        /// <summary>
         /// 查看指定類別底下的所有層級類別
         /// </summary>
         /// <param name="fatherCategoryId">商品父類別 ID</param>
@@ -37,10 +44,18 @@
         Task<int> AddCategory(CategoryInsertRequest request);
 
         /// <summary>
+        /// 新增類別圖片
+        /// </summary>
+        /// <param name = "categoryId" > 商品類別 ID </param >
+        /// <param name = "fileName" > 檔案名稱 </param >
+        /// <returns>影響列數 </returns>
+        Task<int> UploadCategoryImg(int categoryId, string fileName);
+
+        /// <summary>
         /// 刪除類別及關連閉鎖表
         /// </summary>
         /// <param name="categoryId">類別 ID </param>
-        /// <returns>新增的類別 ID </returns>
-        Task<int> DeleteCategory(int categoryId);
+        /// <returns>刪除的類別資訊 </returns>
+        Task<IEnumerable<MallProductCategory>> DeleteCategory(int categoryId);
     }
 }

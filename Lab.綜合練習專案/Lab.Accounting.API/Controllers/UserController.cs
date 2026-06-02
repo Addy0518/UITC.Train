@@ -77,6 +77,7 @@ public class UserController(IUserService userserivce) : ControllerBase
     /// </summary>
     /// <returns>使用者資訊</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
     public async Task<IActionResult> GetOneUser([FromQuery] int userId)
     {
