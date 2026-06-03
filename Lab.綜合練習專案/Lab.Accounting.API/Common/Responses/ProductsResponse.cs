@@ -63,6 +63,11 @@ public class Product
     public string? ProductsDescription { get; set; }
 
     /// <summary>
+    /// 審核狀態 (例如：1=待審核, 2=審核通過, 3=審核失敗)
+    /// </summary>
+    public ReviewStatusEnum? ReviewStatus { get; set; }
+
+    /// <summary>
     /// 購買數量
     /// </summary>
     public int BoughtQuantity { get; set; }

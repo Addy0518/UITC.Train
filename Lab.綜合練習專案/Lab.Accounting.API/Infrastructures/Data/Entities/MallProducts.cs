@@ -38,6 +38,11 @@ public class MallProducts
     public int ProductCategoryId { get; set; }
 
     /// <summary>
+    /// 審核狀態 (例如：1=待審核, 2=審核通過, 3=審核失敗)
+    /// </summary>
+    public ReviewStatusEnum ReviewStatus { get; set; }
+
+    /// <summary>
     /// 創建時間
     /// </summary>
     public DateTime CreateTime { get; set; }

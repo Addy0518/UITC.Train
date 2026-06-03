@@ -100,6 +100,7 @@ const rules = computed(() => ({
   productPrice: { required },
   productStock: { required },
   finalCategoryId: { required },
+  productDescription: { required },
 }));
 
 /*
@@ -110,7 +111,7 @@ const rules = computed(() => ({
 */
 const v$ = useVuelidate(
   rules,
-  { productName, productPrice, productStock, finalCategoryId },
+  { productName, productPrice, productStock, finalCategoryId, productDescription },
   { $autoDirty: true, $lazy: true, $scope: false },
 );
 
@@ -214,9 +215,8 @@ const updateData = async (productId) => {
             const res = await getOneSonCategory(ancestors[i].productCategoryId);
             const { data } = res;
             if (data.codeStatus === 2000) {
-
               // 把子類別選項塞進 categoryLevels，變成新的一層下拉選單
-              categoryLevels.value.push(data.returnData); 
+              categoryLevels.value.push(data.returnData);
             }
           }
         }
@@ -256,7 +256,7 @@ const createOrUpdateProduct = async () => {
           if (img.file) {
             const fd = new FormData();
             fd.append('productsImgsFiles', img.file);
-            fd.append('productId', data.returnData);
+            fd.append('reviewId', data.returnData);
             await productsImgUpload(fd);
           }
         }
@@ -513,7 +513,15 @@ const uploadDescriptionImage = async (e) => {
                 />
               </label>
             </div>
-            <EditorContent :editor="editor" class="p-3 min-h-32 prose max-w-none" />
+            <EditorContent
+              :editor="editor"
+              class="p-3 min-h-32 prose max-w-none"
+              :invalid="v$.productDescription.$error"
+            />
+            <InValidErrorMessage
+              :errorDto="v$.productDescription.$errors"
+              vaildChiName="商品描述"
+            />
           </div>
         </div>
         <!-- #endregion -->

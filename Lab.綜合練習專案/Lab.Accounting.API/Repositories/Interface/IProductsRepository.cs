@@ -27,7 +27,7 @@ public interface IProductsRepository
     /// 新增單一商品
     /// </summary>
     /// <param name="products">商品資訊</param>
-    /// <returns>影響列數</returns>
+    /// <returns>商品 ID</returns>
     Task<int> CreateProducts(MallProducts products);
 
     /// <summary>
@@ -77,4 +77,12 @@ public interface IProductsRepository
     /// <param name="sellerId">賣家 ID</param>
     /// <returns>影響列數</returns>
     Task<int> DeleteProducts(int productsId, IsDeleteStatusEnum isDelete, int sellerId);
+
+    /// <summary>
+    /// 審核通過後新增審查表的商品 ID
+    /// </summary>
+    /// <param name="reviewId">審查表 ID </param>
+    /// <param name="productsId">商品 ID </param>
+    /// <returns>影響列數</returns>
+    Task<int> UpdateReviewProductsId(int reviewId, int productsId);
 }

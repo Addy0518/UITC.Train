@@ -10,7 +10,12 @@ public class MallProductImg
     /// <summary>
     /// 商品 ID
     /// </summary>
-    public int ProductsId { get; set; }
+    public int? ProductsId { get; set; }
+
+    /// <summary>
+    /// 審核紀錄 ID
+    /// </summary>
+    public int ProductsReviewId { get; set; }
 
     /// <summary>
     /// 商品圖片 URL

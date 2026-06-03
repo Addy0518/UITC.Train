@@ -55,7 +55,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// 新增單一商品 + 類別
     /// </summary>
     /// <param name="productsInsertRequest">新增商品資訊</param>
-    /// <returns>商品資訊</returns>
+    /// <returns>審核表 ID </returns>
     [HttpPost]
     [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
@@ -69,7 +69,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// 更新單一商品
     /// </summary>
     /// <param name="productsUpdateRequest">商品更新資訊</param>
-    /// <returns>影響列數</returns>
+    /// <returns>審核表 ID </returns>
     [HttpPut]
     [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
@@ -109,14 +109,14 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// 商品圖片上傳
     /// </summary>
     /// <param name="productsImgsFiles">商品圖片檔案</param>
-    /// <param name="productId">商品 Id</param>
+    /// <param name="reviewId">審核表 ID</param>
     /// <returns>新增成功的圖片</returns>
     [HttpPost]
     [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> ProductsImgUpload([FromForm] IFormFile productsImgsFiles, [FromForm] int productId)
+    public async Task<IActionResult> ProductsImgUpload([FromForm] IFormFile productsImgsFiles, [FromForm] int reviewId)
     {
-        return Ok(await productsService.ProductsImgUpload(productsImgsFiles, productId));
+        return Ok(await productsService.ProductsImgUpload(productsImgsFiles, reviewId));
     }
 
     /// <summary>

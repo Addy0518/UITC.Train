@@ -48,9 +48,9 @@
         public int ProductCategoryId { get; set; }
 
         /// <summary>
-        /// 審核狀態 (例如：1=待審核, 2=審核通過, 3=審核失敗)
+        /// 審核狀態 (例如：0=待審核, 1=審核通過, 2=審核失敗)
         /// </summary>
-        public int ReviewStatus { get; set; }
+        public ReviewStatusEnum ReviewStatus { get; set; }
 
         /// <summary>
         /// 審核未通過/駁回的原因

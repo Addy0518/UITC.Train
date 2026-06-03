@@ -11,6 +11,7 @@ public class ProductsService(
     IUserRepository userRepository,
     IProductsOrderRepository productsOrderRepository,
     IProductsRepository productsRepository,
+    IProductsReviewRepository productsReviewRepository,
     ICategoryService categoryService,
     IWebHostEnvironment env
 ) : IProductsService
@@ -100,18 +101,18 @@ public class ProductsService(
     /// 新增單一商品 + 類別
     /// </summary>
     /// <param name="productsInsertRequest">商品資訊</param>
-    /// <returns>影響列數</returns>
+    /// <returns>審核表 ID</returns>
     public async Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest)
     {
-        var product = new MallProducts
+        var product = new ProductsReview
         {
             ProductsName = productsInsertRequest.ProductsName,
             ProductsPrice = productsInsertRequest.ProductsPrice,
             ProductsStock = productsInsertRequest.ProductsStock,
             ProductsDescription = productsInsertRequest.ProductsDescription,
             ProductCategoryId = productsInsertRequest.ProductCategoryId,
-            UserId = productsInsertRequest.UserId,
-            IsDelete = IsDeleteStatusEnum.Normal,
+            ReviewStatus = ReviewStatusEnum.Pending,
+            SellerId = productsInsertRequest.UserId,
         };
         var exists = await productsRepository.ExistsProductsName(
             productsInsertRequest.ProductsName,
@@ -125,34 +126,20 @@ public class ProductsService(
             return ApiResponseHelper.RequestError<int>(errors);
         }
 
-        using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-        {
-            var target = await productsRepository.CreateProducts(product);
-            if (target <= 0)
-                return ApiResponseHelper.InternalException<int>("商品新增失敗");
+        var reviewProduct = await productsReviewRepository.CreateInsertProductsReview(product);
+        if (reviewProduct <= 0)
+            return ApiResponseHelper.InternalException<int>("申請審核失敗");
 
-            trxScope.Complete();
-            return ApiResponseHelper.Success(target);
-        }
+        return ApiResponseHelper.Success(reviewProduct);
     }
 
     /// <summary>
     /// 更新單一商品
     /// </summary>
     /// <param name="productsUpdateRequest">商品更新資訊</param>
-    /// <returns>影響列數</returns>
+    /// <returns>審核表 ID </returns>
     public async Task<ApiResponse<int>> UpdateProducts(ProductsUpdateRequest productsUpdateRequest)
     {
-        var updateTarget = new MallProducts
-        {
-            UserId = productsUpdateRequest.UserId,
-            ProductsId = productsUpdateRequest.ProductsId,
-            ProductsName = productsUpdateRequest.ProductsName,
-            ProductsPrice = productsUpdateRequest.ProductsPrice,
-            ProductsStock = productsUpdateRequest.ProductsStock,
-            ProductsDescription = productsUpdateRequest.ProductsDescription,
-            ProductCategoryId = productsUpdateRequest.ProductCategoryId,
-        };
         var exists = await productsRepository.ExistsProductsName(
             productsUpdateRequest.ProductsName,
             productsUpdateRequest.UserId,
@@ -170,23 +157,40 @@ public class ProductsService(
         {
             return ApiResponseHelper.NotFound<int>();
         }
-
-        // 比對商品描述的圖片有沒有在資料夾
-        var oldImgs = ParseDescriptionImgs(target.ProductsDescription);
-        var newImgs = ParseDescriptionImgs(productsUpdateRequest.ProductsDescription);
-
-        // Except 差集 => 顯示舊的有但新的沒有的 , 這裡抓 oldImgs 有的但 newImgs 沒有的
-        var deletedImgs = oldImgs.Except(newImgs);
-
-        // 抓出來刪除
-        foreach (var img in deletedImgs)
+        using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsDescriptionImg", img);
+            // 比對商品描述的圖片有沒有在資料夾
+            var oldImgs = ParseDescriptionImgs(target.ProductsDescription);
+            var newImgs = ParseDescriptionImgs(productsUpdateRequest.ProductsDescription);
+
+            // Except 差集 => 顯示舊的有但新的沒有的 , 這裡抓 oldImgs 有的但 newImgs 沒有的
+            var deletedImgs = oldImgs.Except(newImgs);
+
+            // 抓出來刪除
+            foreach (var img in deletedImgs)
+            {
+                FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsDescriptionImg", img);
+            }
+
+            var review = new ProductsReview
+            {
+                ProductsId = productsUpdateRequest.ProductsId,
+                SellerId = productsUpdateRequest.UserId,
+                ProductsName = productsUpdateRequest.ProductsName,
+                ProductsPrice = productsUpdateRequest.ProductsPrice ?? target.ProductsPrice,
+                ProductsStock = productsUpdateRequest.ProductsStock ?? target.ProductsStock,
+                ProductsDescription = productsUpdateRequest.ProductsDescription,
+                ProductCategoryId = productsUpdateRequest.ProductCategoryId,
+                ReviewStatus = ReviewStatusEnum.Pending,
+                CreateTime = DateTime.Now,
+            };
+
+            var reviewProduct = await productsReviewRepository.CreateInsertProductsReview(review);
+            if (reviewProduct <= 0)
+                return ApiResponseHelper.InternalException<int>("申請審核失敗");
+            trxScope.Complete();
+            return ApiResponseHelper.Success(reviewProduct);
         }
-
-        var result = await productsRepository.UpdateProducts(updateTarget);
-
-        return ApiResponseHelper.Success(result);
     }
 
     /// <summary>
@@ -255,19 +259,15 @@ public class ProductsService(
     /// 商品圖片上傳
     /// </summary>
     /// <param name="productsImgsFiles">商品圖片檔案</param>
-    /// <param name="productId">商品 ID</param>
+    /// <param name="reviewId">審核表 ID</param>
     /// <returns>新增成功的圖片</returns>
     public async Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(
         IFormFile productsImgsFiles,
-        int productId
+        int reviewId
     )
     {
-        var product = await productsRepository.GetProducts(productId);
-        if (product == null)
-            return ApiResponseHelper.NotFound<IEnumerable<MallProductImg>>();
-
         var result = await FileUploadHelper.SaveFileAsync(productsImgsFiles, env.WebRootPath, "ProductsImg");
-        var imgupload = await productsImgRepository.ProductsImgUpload(productId, result);
+        var imgupload = await productsImgRepository.ProductsImgUpload(reviewId, result);
 
         if (imgupload <= 0)
         {
@@ -276,7 +276,7 @@ public class ProductsService(
             return ApiResponseHelper.InternalException<IEnumerable<MallProductImg>>("圖片上傳失敗");
         }
 
-        var newtarget = await productsImgRepository.GetProductsAllImg(productId);
+        var newtarget = await productsImgRepository.GetReviewAllImg(reviewId);
         return ApiResponseHelper.Success(newtarget);
     }
 
@@ -316,6 +316,7 @@ public class ProductsService(
         {
             return ApiResponseHelper.NotFound<MallProductImg>();
         }
+
         FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", result.ProductsImg);
         return ApiResponseHelper.Success(result);
     }

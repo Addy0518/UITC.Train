@@ -6,21 +6,21 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
     /// 商品圖片上傳
     /// </summary>
     /// <param name="productsImgs">圖片</param>
-    /// <param name="productId">商品 ID</param>
+    /// <param name="reviewId">審查表 ID</param>
     /// <returns>影響列數</returns>
-    public async Task<int> ProductsImgUpload(int productId, string productsImgs)
+    public async Task<int> ProductsImgUpload(int reviewId, string productsImgs)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
             @"Insert into
                   ProductImg
-                  (ProductsId, ProductsImg)
+                  (ProductsReviewId, ProductsImg)
                   Values
-                  (@ProductsId, @ProductsImg)
+                  (@ProductsReviewId, @ProductsImg)
                 ";
 
-        return await conn.ExecuteAsync(sql, new { ProductsId = productId, ProductsImg = productsImgs });
+        return await conn.ExecuteAsync(sql, new { ProductsReviewId = reviewId, ProductsImg = productsImgs });
     }
 
     /// <summary>
@@ -51,6 +51,23 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
                 productsImgId = productImgId,
             }
         );
+    }
+
+    /// <summary>
+    /// 查看審查表所有圖片
+    /// </summary>
+    /// <param name="reviewId">審查表 ID </param>
+    /// <returns>商品圖片 URL</returns>
+    public async Task<IEnumerable<MallProductImg>> GetReviewAllImg(int reviewId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"SELECT *
+                FROM   ProductImg
+                WHERE  ProductsReviewId = @ProductsReviewId ";
+
+        return await conn.QueryAsync<MallProductImg>(sql, new { ProductsReviewId = reviewId });
     }
 
     /// <summary>
@@ -88,6 +105,25 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
     }
 
     /// <summary>
+    /// 審核通過後新增圖片的商品 ID
+    /// </summary>
+    /// <param name="reviewId">審查表 ID</param>
+    ///  <param name="productsId">商品 ID</param>
+    /// <returns>刪除的圖片</returns>
+    public async Task<int> UpdateImgsToProductId(int reviewId, int productsId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Update
+                    ProductImg
+                    Set ProductsId=COALESCE(@ProductsId, ProductsId)
+                     Where ProductsReviewId=@ProductsReviewId";
+
+        return await conn.ExecuteAsync(sql, new { ProductsReviewId = reviewId, ProductsId = productsId });
+    }
+
+    /// <summary>
     /// 刪除商品圖片
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
@@ -102,6 +138,6 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
                 Output [DELETED].*
                 WHERE  ProductsImgId = @ProductsImgId ";
 
-        return await conn.QueryFirstAsync<MallProductImg>(sql, new { ProductsImgId = productsImgId });
+        return await conn.QueryFirstOrDefaultAsync<MallProductImg>(sql, new { ProductsImgId = productsImgId });
     }
 }

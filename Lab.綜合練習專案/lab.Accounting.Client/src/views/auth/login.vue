@@ -57,6 +57,14 @@ const test2User = () => {
 };
 
 /*
+  測試用管理員帳號
+*/
+const test3User = () => {
+  account.value = 'aaa@gmail.com';
+  password.value = 'Andy1111';
+};
+
+/*
   呼叫登入使用者 API
 */
 const userLogin = async () => {
@@ -132,6 +140,12 @@ const userLogin = async () => {
         class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
       >
         買家帳號
+      </button>
+      <button
+        @click="test3User"
+        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
+      >
+        管理員帳號
       </button>
       <button
         @click="userLogin"

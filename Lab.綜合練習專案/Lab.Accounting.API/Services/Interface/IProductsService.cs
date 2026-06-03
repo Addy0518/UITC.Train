@@ -57,9 +57,9 @@ public interface IProductsService
     /// 商品圖片上傳
     /// </summary>
     /// <param name="productsImgsFiles">商品圖片檔案</param>
-    /// <param name="productId">商品 ID</param>
+    /// <param name="reviewId">審核表 ID</param>
     /// <returns>新增成功的圖片</returns>
-    Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int productId);
+    Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int reviewId);
 
     /// <summary>
     /// 商品描述的圖片上傳

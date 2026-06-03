@@ -41,6 +41,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         (@UserId is null or m.userId=@UserId) 
                         and  m.isDelete=0
                         and  m.ProductsStock > 0
+                        and  m.ReviewStatus=1
                         and  (@productCategoryId is null or m.ProductCategoryId IN (
                                 SELECT SonId FROM MallProductCategory_Closure
                                 WHERE FatherId = @productCategoryId))
@@ -105,6 +106,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.productsprice,
                                  m.ProductsStock,
                                  m.ProductCategoryId,
+                                 m.ReviewStatus,
                                  m.isDelete,
                                  c.productcategoryname,
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
@@ -197,7 +199,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// 新增單一商品
     /// </summary>
     /// <param name="products">商品資訊</param>
-    /// <returns>影響列數</returns>
+    /// <returns>商品 ID</returns>
     public async Task<int> CreateProducts(MallProducts products)
     {
         using var conn = connecting.CreateConnecting();
@@ -210,6 +212,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      ProductsStock,
                                      ProductsDescription,
                                      ProductCategoryId,
+                                     ReviewStatus,
                                      CreateTime,
                                      UpdateTime,
                                      IsDelete
@@ -220,6 +223,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      @ProductsStock,
                                      @ProductsDescription,
                                      @ProductCategoryId,
+                                     @ReviewStatus,
                                      GetDate(),
                                      GetDate(),
                                      @IsDelete
@@ -248,6 +252,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  ProductsStock = COALESCE(@ProductsStock, ProductsStock),
                                  ProductsDescription = COALESCE(@ProductsDescription, ProductsDescription),
                                  ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId),
+                                 ReviewStatus= COALESCE(@ReviewStatus, ReviewStatus),
                                  UpdateTime    = GetDate()
                         WHERE    productsid = @ProductsId and userId=@UserId;";
         return await conn.ExecuteAsync(sql, products);
@@ -294,6 +299,23 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                     ";
 
         return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = sellerId });
+    }
+
+    /// <summary>
+    /// 審核通過後新增審查表的商品 ID
+    /// </summary>
+    /// <param name="reviewId">審查表 ID </param>
+    /// <param name="productsId">商品 ID </param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateReviewProductsId(int reviewId, int productsId)
+    {
+        using var conn = connecting.CreateConnecting();
+        var sql =
+            @"UPDATE dbo.ProductsReview
+              SET ProductsId = @ProductsId
+              WHERE ProductsReviewId = @ProductsReviewId";
+
+        return await conn.ExecuteAsync(sql, new { ProductsReviewId = reviewId, ProductsId = productsId });
     }
 
     /// <summary>

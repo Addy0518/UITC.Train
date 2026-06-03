@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Common.Requests
 {
-    public class ProductsSearchRequest
+    public class ProductsRiviewSearchRequest
     {
         /// 分頁
         /// ==================================================
@@ -22,13 +22,7 @@
         /// 賣家 ID
         /// </summary>
         [Display(Name = "賣家 ID")]
-        public int? sellerId { get; set; }
-
-        /// <summary>
-        /// 商品類別 ID
-        /// </summary>
-        [Display(Name = "商品類別 ID")]
-        public int? productCategoryId { get; set; }
+        public string? sellerId { get; set; }
 
         /// <summary>
         /// 關鍵字搜尋
@@ -37,10 +31,10 @@
         public string? keyWords { get; set; }
 
         /// <summary>
-        /// 是否為刪除狀態
+        /// 審核狀態
         /// </summary>
-        [Display(Name = "是否為刪除狀態")]
-        public IsDeleteStatusEnum? isDelete { get; set; } = IsDeleteStatusEnum.Normal;
+        [Display(Name = "審核狀態")]
+        public ReviewStatusEnum? ReviewStatus { get; set; }
 
         /// 排序條件
         /// ==================================================
@@ -55,23 +49,5 @@
         /// </summary>
         [Display(Name = "排序方向")]
         public string? sortOrder { get; set; }
-
-        /// <summary>
-        /// 最大價格
-        /// </summary>
-        [Display(Name = "最大價格")]
-        public int? maxPrice { get; set; }
-
-        /// <summary>
-        /// 最小價格
-        /// </summary>
-        [Display(Name = "最小價格")]
-        public int? minPrice { get; set; }
-
-        /// <summary>
-        /// 評價
-        /// </summary>
-        [Display(Name = "評價")]
-        public int? rate { get; set; }
     }
 }
