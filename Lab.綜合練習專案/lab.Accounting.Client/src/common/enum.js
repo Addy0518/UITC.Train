@@ -57,3 +57,10 @@ export const shippingEnum = Object.freeze({
   InTransit: { value: 2, description: '運送中' },
   Arrived: { value: 3, description: '已抵達' },
 });
+
+// 審核狀態
+export const reviewStatusEnum = Object.freeze({
+  Pending: { value: 0, description: '待審核' },
+  Approved: { value: 1, description: '審核通過' },
+  Reject: { value: 2, description: '駁回申請' },
+});

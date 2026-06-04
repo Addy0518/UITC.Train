@@ -13,9 +13,12 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    maxPrice : 最大價格
    minPrice = 最少價格
    rate = 評分
+   keyWords : 關鍵字搜尋
    visible : Dialog 開關
    isFiltering : 是否為第一次加載
    totalCount : 商品數量
+   search : 搜尋
+   suggestions : 搜尋建議
 */
 const allproduct = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
@@ -26,9 +29,12 @@ const sortOrder = ref('desc');
 const maxPrice = ref();
 const minPrice = ref();
 const rate = ref();
+const keyWords = ref();
 const visible = ref(false);
 const isFiltering = ref(false);
 const totalCount = ref();
+const search = ref();
+const suggestions = ref([]);
 
 /*
    評價選項
@@ -95,6 +101,7 @@ const getSellerProduct = async (isFirstload = false) => {
       rate: rate.value,
       maxPrice: maxPrice.value,
       minPrice: minPrice.value,
+      keyWords: keyWords.value ?? null,
     };
     const res = await getSellerAllProduct(request);
     const { data } = res;
@@ -139,6 +146,45 @@ const deleteProduct = async (productId) => {
     console.log(err);
   } finally {
   }
+};
+
+/*
+   換頁
+*/
+const pageChange = (event) => {
+  getSellerProduct(event.page);
+};
+
+/*
+   載入搜尋建議
+*/
+const searchSuggestions = async (event) => {
+  if (!event.query) return [];
+
+  try {
+    const res = await getSellerAllProduct({ keyWords: event.query, pageSize: 10, pageIndex: 0 });
+    const { data } = res;
+    if (data.codeStatus === 2000) {
+      suggestions.value = data.returnData.products.map((p) => p.productsName);
+    } else {
+      suggestions.value = ['查無相關商品'];
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+  }
+};
+
+/*
+   前往搜尋
+*/
+const goSearch = () => {
+  if (!search.value) return;
+  // 這是判斷使用者是選推薦選單的選項還是直接打字
+  // 因為選單可能會選成物件所以取物件裡的 productsname , 直接打字就沒差直接取值就好
+  const keyword = typeof search.value === 'object' ? search.value.productsName : search.value;
+  keyWords.value = keyword;
+  getSellerProduct();
 };
 </script>
 
@@ -266,6 +312,18 @@ const deleteProduct = async (productId) => {
         </template>
       </Dialog>
       <!-- #endregion -->
+      <div class="flex flex-1 items-center justify-center">
+        <AutoComplete
+          v-model="search"
+          :suggestions="suggestions"
+          @complete="searchSuggestions"
+          @keyup.enter="goSearch"
+          @item-select="goSearch"
+          placeholder="搜尋商品"
+          style="width: 500px"
+          fluid
+        />
+      </div>
       <button
         class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm cursor-pointer"
         @click="router.push({ name: 'add-product' })"

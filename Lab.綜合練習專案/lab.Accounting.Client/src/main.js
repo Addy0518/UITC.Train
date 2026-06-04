@@ -32,6 +32,7 @@ import Galleria from 'primevue/galleria';
 import Breadcrumb from 'primevue/breadcrumb';
 import Paginator from 'primevue/paginator';
 import AutoComplete from 'primevue/autocomplete';
+import Skeleton from 'primevue/skeleton';
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -73,6 +74,7 @@ app.component('Galleria', Galleria);
 app.component('Breadcrumb', Breadcrumb);
 app.component('Paginator', Paginator);
 app.component('AutoComplete', AutoComplete);
+app.component('Skeleton', Skeleton);
 app.component('InValidErrorMessage', InValidErrorMessage);
 app.component('Loading', Loading);
 app.use(ToastService);

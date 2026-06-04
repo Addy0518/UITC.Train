@@ -388,14 +388,29 @@ const router = createRouter({
 
         {
           /*
-                商品回收桶
-              */
+              商品回收桶
+          */
           path: 'seller-product-recycling',
           name: 'seller-product-recycling',
           meta: {
             isPermissionVerification: true,
           },
           component: () => import('@/views/backend/seller/sellerProductRecycling.vue'),
+        },
+
+        /*
+            管理員區 ================================================================
+        */
+        {
+          /*
+              審查表列
+          */
+          path: 'admin-review',
+          name: 'admin-review',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminReview.vue'),
         },
       ],
     },
@@ -424,6 +439,9 @@ router.beforeEach((to) => {
     return { name: 'login' };
   }
   if (to.meta.isSeller && authStore.userRole !== 'Seller') {
+    return { name: 'mall', query: { forbidden: 1 } };
+  }
+  if (to.meta.isAdmin && authStore.userRole !== 'Admin') {
     return { name: 'mall', query: { forbidden: 1 } };
   }
 });

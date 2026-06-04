@@ -11,15 +11,6 @@ public interface IProductsImgRepository
     Task<int> ProductsImgUpload(int reviewId, string productsImgs);
 
     /// <summary>
-    /// 商品圖片更新
-    /// </summary>
-    /// <param name="productsImgs">圖片</param>
-    /// <param name="productImgId">商品圖片 ID</param>
-    /// <param name="productId">商品 ID</param>
-    /// <returns>影響列數</returns>
-    Task<int> ProductsImgUpdate(int productId, string productsImgs, int productImgId);
-
-    /// <summary>
     /// 查看審查表所有圖片
     /// </summary>
     /// <param name="reviewId">審查表 ID </param>

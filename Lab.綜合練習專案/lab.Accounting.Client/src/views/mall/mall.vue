@@ -57,6 +57,16 @@ watch(
 );
 
 /*
+   監聽路由守衛擋下的錯誤
+*/
+watch(
+  () => route.query.forbidden,
+  (val) => {
+    if (val) showToastError('你沒有訪問權限');
+  },
+);
+
+/*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
 */
 const loadproducts = async (page = 0) => {
@@ -116,12 +126,17 @@ const getProductsImg = (product) => {
   return defaultImgurl;
 };
 
+/*
+  拿取類別圖片
+*/
 const getCategoryImg = (category) => {
   if (category.productCategoryImg) {
     return `${baseUrl}/CategoryImg/${category.productCategoryImg}`;
   }
   return defaultImgurl;
 };
+
+
 </script>
 
 <template>

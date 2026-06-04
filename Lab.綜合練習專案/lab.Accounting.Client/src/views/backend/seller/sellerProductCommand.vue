@@ -290,8 +290,7 @@ const createOrUpdateProduct = async () => {
           if (img.file) {
             const fd = new FormData();
             fd.append('productsImgsFiles', img.file);
-            fd.append('productId', productsId.value);
-            fd.append('productsImgId', img.productsImgId);
+            fd.append('reviewId', data.returnData);
             await productsImgUpload(fd);
           }
         }

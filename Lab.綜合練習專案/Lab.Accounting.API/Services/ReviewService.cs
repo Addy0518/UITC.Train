@@ -72,10 +72,11 @@ namespace Lab.Accounting.API.Services
                 if (target <= 0)
                     return ApiResponseHelper.InternalException<int>("申請審核失敗");
 
+                // 通過申請
                 if (request.ReviewStatus == ReviewStatusEnum.Approved)
                 {
                     var reviewInfo = await productsReviewRepository.GetProductsReview(request.ProductsReviewId);
-
+                    // 判斷是更新商品還是新增商品 ( Id 是 null 就是新增 )
                     if (reviewInfo.ProductsId == null)
                     {
                         var createInfo = new MallProducts
@@ -120,12 +121,12 @@ namespace Lab.Accounting.API.Services
                         );
                     }
                 }
-
+                // 駁回申請
                 if (request.ReviewStatus == ReviewStatusEnum.Reject)
                 {
                     // 查出這筆審核的所有圖片
                     var imgs = await productsImgRepository.GetReviewAllImg(request.ProductsReviewId);
-
+                    // 全部刪除
                     foreach (var img in imgs)
                     {
                         FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", img.ProductsImg);

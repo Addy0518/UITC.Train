@@ -1,6 +1,6 @@
 <script setup>
 import { logoutApi } from '@/api/userService';
-import { getAllProduct} from '@/api/productsService';
+import { getAllProduct } from '@/api/productsService';
 import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義
@@ -85,6 +85,7 @@ const goSearch = () => {
         <RouterLink :to="{ name: 'backend-layout' }" class="text-white text-2xl"
           >賣家中心</RouterLink
         >
+        <RouterLink :to="{ name: 'admin-review' }" class="text-white text-2xl">管理中心</RouterLink>
       </div>
 
       <div class="flex flex-1 items-center justify-center">

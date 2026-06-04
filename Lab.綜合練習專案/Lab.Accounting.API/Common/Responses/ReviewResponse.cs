@@ -30,12 +30,17 @@ public class Review
     /// <summary>
     /// 賣家名稱
     /// </summary>
-    public string UserName { get; set; }
+    public string SellerName { get; set; }
 
     /// <summary>
     /// 負責審核的管理員 ID (待審核時為 null)
     /// </summary>
     public int? AdminId { get; set; }
+
+    /// <summary>
+    /// 負責審核的管理員名稱
+    /// </summary>
+    public string? AdminName { get; set; }
 
     /// <summary>
     /// 商品名稱

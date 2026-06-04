@@ -30,8 +30,13 @@
             int offset = request.pageIndex * request.pageSize;
 
             var sql =
-                @"Select *,u.UserName, Count(*) over() as TotalCount From dbo.ProductsReview r
+                @"Select r.*,
+                         u.UserName as SellerName,
+                         s.UserName as AdminName, 
+                         Count(*) over() as TotalCount 
+                  From dbo.ProductsReview r
                   Left Join [User] u on r.SellerId = u.UserId
+                  Left Join [User] s on r.AdminId=s.UserId
                   Where 
                   (@ReviewStatus is null or r.ReviewStatus = @reviewStatus)
                   and (@sellerId is null or r.SellerId = @sellerId)
