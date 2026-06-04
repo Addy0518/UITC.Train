@@ -4,7 +4,7 @@ namespace Lab.Accounting.API.Controllers.Admin
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = RolesAuth.管理者)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
     public class ReviewController(IReviewService reviewService) : ControllerBase
@@ -17,7 +17,6 @@ namespace Lab.Accounting.API.Controllers.Admin
         /// <param name="reviewId">審核表 ID </param>
         /// <returns>審核資訊</returns>
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Review>))]
         public async Task<IActionResult> GetProductsReview([FromQuery] int reviewId)
         {
@@ -30,7 +29,6 @@ namespace Lab.Accounting.API.Controllers.Admin
         /// <param name="request">審核表搜尋請求</param>
         /// <returns>審核資訊</returns>
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ReviewResponse>))]
         public async Task<IActionResult> GetAllProductsReview([FromQuery] ProductsRiviewSearchRequest request)
         {
@@ -43,7 +41,6 @@ namespace Lab.Accounting.API.Controllers.Admin
         /// <param name="request">商品審核請求</param>
         /// <returns>影響列數</returns>
         [HttpPut]
-        [Authorize(Roles = RolesAuth.管理者)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
         public async Task<IActionResult> ApproveOrRejectProductsReview([FromBody] ProductsRivewRequest request)
         {

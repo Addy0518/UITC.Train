@@ -12,10 +12,21 @@ public class AdminUserController(IUserService userserivce) : ControllerBase
     /// </summary>
     /// <returns>使用者資訊列表</returns>
     [HttpGet]
-    [Authorize(Roles = RolesAuth.管理者)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<UserResponse>>))]
     public async Task<IActionResult> GetAllUser()
     {
         return Ok(await userserivce.GetAllUser());
+    }
+
+    /// <summary>
+    /// 軟刪除單一用戶
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<UserResponse>>))]
+    public async Task<IActionResult> DeleteUser(int userId)
+    {
+        return Ok(await userserivce.DeleteUser(userId));
     }
 }

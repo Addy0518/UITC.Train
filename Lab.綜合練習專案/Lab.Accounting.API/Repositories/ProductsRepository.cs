@@ -36,7 +36,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
                         
-                        -- 動態條件
+
                         Where 
                         (@UserId is null or m.userId=@UserId) 
                         and  m.isDelete=0
@@ -52,7 +52,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                             FROM MallProductsRate r 
                             WHERE r.ProductsId = m.productsid), 0)>=@rate)
                         
-                        -- 排序
+
                         ORDER BY 
                         case when @sortBy='ProductsPrice' and @sortOrder='asc' then m.productsprice end asc,
                         case when @sortBy='ProductsPrice' and @sortOrder='desc' then m.productsprice end desc,
@@ -125,7 +125,6 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                             FROM MallProductsRate r 
                             WHERE r.ProductsId = m.productsid), 0)>=@rate)
 
-                          -- 排序
                         ORDER BY 
                         case when @sortBy='ProductsPrice' and @sortOrder='asc' then m.productsprice end asc,
                         case when @sortBy='ProductsPrice' and @sortOrder='desc' then m.productsprice end desc,

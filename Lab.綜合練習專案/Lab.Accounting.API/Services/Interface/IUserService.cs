@@ -57,4 +57,11 @@ public interface IUserService
     /// <param name="request">舊密碼</param>
     /// <returns>影響列數</returns>
     Task<ApiResponse<string>> UpdatePassword(UserUpdatePasswordRequest request);
+
+    /// <summary>
+    /// 軟刪除單一用戶
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    Task<ApiResponse<int>> DeleteUser(int userId);
 }

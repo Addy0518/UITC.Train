@@ -104,9 +104,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
     {
         using var conn = connecting.CreateConnecting();
 
-        var sql =
-            @"Select UserId,UserName,UserAccount,UserPhone,UserHeadShot,UserRole,UserAddress From [User]
-             ";
+        var sql = @"Select * From [User]";
 
         return await conn.QueryAsync<UserResponse>(sql);
     }
@@ -193,5 +191,19 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                 UpdateTime = DateTime.Now,
             }
         );
+    }
+
+    /// <summary>
+    /// 軟刪除單一用戶
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> DeleteUser(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var deletesql = @"Update [User] Set IsDelete=1,UpdateTime=GetDate() Where UserId=@UserId;";
+
+        return await conn.ExecuteAsync(deletesql, new { UserId = userId });
     }
 }

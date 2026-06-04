@@ -412,6 +412,17 @@ const router = createRouter({
           },
           component: () => import('@/views/backend/admin/adminReview.vue'),
         },
+        {
+          /*
+              審查表列
+          */
+          path: 'admin-review-details/:id',
+          name: 'admin-review-details',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminReviewDetails.vue'),
+        },
       ],
     },
     /*

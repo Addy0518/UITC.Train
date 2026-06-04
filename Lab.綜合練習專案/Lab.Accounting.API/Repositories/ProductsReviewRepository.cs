@@ -11,8 +11,12 @@
         {
             using var conn = connecting.CreateConnecting();
             var sql =
-                @"Select *,u.UserName From dbo.ProductsReview r
+                @"Select r.*,
+                         u.UserName as SellerName,
+                         s.UserName as AdminName
+                  From dbo.ProductsReview r
                   Left Join [User] u on r.SellerId = u.UserId
+                  Left Join [User] s on r.AdminId=s.UserId
                   Where r.ProductsReviewId = @ProductsReviewId  
                  ";
 
@@ -37,12 +41,15 @@
                   From dbo.ProductsReview r
                   Left Join [User] u on r.SellerId = u.UserId
                   Left Join [User] s on r.AdminId=s.UserId
+
                   Where 
                   (@ReviewStatus is null or r.ReviewStatus = @reviewStatus)
                   and (@sellerId is null or r.SellerId = @sellerId)
                   and  (@keyWords is null 
-                         or  u.UserName like '%' + @keyWords + '%'                         
-                         or  r.ProductsName like '%' + @keyWords + '%')
+                         or  (@searchType='SellerName' and u.UserName like '%' + @keyWords + '%')                         
+                         or  (@searchType='ProductsName' and r.ProductsName like '%' + @keyWords + '%')
+                         or  (@searchType='ProductsReviewId' and r.ProductsReviewId=TRY_CAST(@keyWords as int))
+                  )
 
                   Order By 
                   case when @sortBy='CreateTime' and @sortOrder='asc' then r.CreateTime end asc,
@@ -60,6 +67,7 @@
                     pageSize = request.pageSize,
                     SellerId = request.sellerId,
                     keyWords = request.keyWords,
+                    searchType = request.searchType,
                     reviewStatus = request.ReviewStatus,
                     sortBy = request.sortBy,
                     sortOrder = request.sortOrder,

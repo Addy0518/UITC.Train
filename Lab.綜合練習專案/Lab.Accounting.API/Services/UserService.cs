@@ -263,4 +263,23 @@ public class UserService(
 
         return ApiResponseHelper.Success<string>("更新成功 !");
     }
+
+    /// <summary>
+    /// 軟刪除單一用戶
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<int>> DeleteUser(int userId)
+    {
+        var target = await userrepo.GetUser(userId);
+        if (target == null)
+        {
+            var errors = new Dictionary<string, string[]> { { "User", new[] { "查無用戶" } } };
+        }
+        var delete = await userrepo.DeleteUser(userId);
+
+        if (delete <= 0)
+            return ApiResponseHelper.InternalException<int>("刪除失敗 ! ");
+        return ApiResponseHelper.Success<int>(delete);
+    }
 }

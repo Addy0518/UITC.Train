@@ -5,6 +5,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義
    allproduct : 賣家所有商品
+   currentPage : 目前所在頁數
    baseUrl : 環境變數裡的圖片基底位址
    router : 控制路由
    currentSort : 現在的排序
@@ -21,6 +22,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    suggestions : 搜尋建議
 */
 const allproduct = ref(null);
+const currentPage = ref();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
 const currentSort = ref({ type: 'CreateTime', order: 'desc' });
@@ -94,7 +96,7 @@ const getSellerProduct = async (isFirstload = false) => {
     }
 
     const request = {
-      pageIndex: 0,
+      pageIndex: currentPage.value,
       pageSize: 10,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
@@ -152,7 +154,8 @@ const deleteProduct = async (productId) => {
    換頁
 */
 const pageChange = (event) => {
-  getSellerProduct(event.page);
+  currentPage.value = event.page;
+  getSellerProduct();
 };
 
 /*

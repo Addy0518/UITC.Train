@@ -60,6 +60,7 @@ export const shippingEnum = Object.freeze({
 
 // 審核狀態
 export const reviewStatusEnum = Object.freeze({
+  All: { value: null, description: '全部' },
   Pending: { value: 0, description: '待審核' },
   Approved: { value: 1, description: '審核通過' },
   Reject: { value: 2, description: '駁回申請' },

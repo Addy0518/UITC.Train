@@ -72,4 +72,11 @@ public interface IUserRepository
     /// <param name="userRole">使用者權限 </param>
     /// <returns>影響列數</returns>
     Task<int> UpdateRole(int userId, string userRole);
+
+    /// <summary>
+    /// 軟刪除單一用戶
+    /// </summary>
+    /// <param name="userId">使用者 ID</param>
+    /// <returns>影響列數</returns>
+    Task<int> DeleteUser(int userId);
 }

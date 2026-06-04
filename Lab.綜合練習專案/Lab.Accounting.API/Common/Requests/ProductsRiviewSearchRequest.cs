@@ -25,6 +25,12 @@
         public string? sellerId { get; set; }
 
         /// <summary>
+        /// 搜尋類別
+        /// </summary>
+        [Display(Name = "搜尋類別")]
+        public string? searchType { get; set; }
+
+        /// <summary>
         /// 關鍵字搜尋
         /// </summary>
         [Display(Name = "關鍵字搜尋")]
