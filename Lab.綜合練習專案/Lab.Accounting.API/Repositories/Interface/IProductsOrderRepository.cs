@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories.Interface;
+﻿using Lab.Accounting.API.Common.Requests.Order;
+
+namespace Lab.Accounting.API.Repositories.Interface;
 
 public interface IProductsOrderRepository
 {
@@ -38,6 +40,13 @@ public interface IProductsOrderRepository
     /// <param name="sellerId">賣家 ID</param>
     /// <returns>所有訂單資訊</returns>
     Task<IEnumerable<OrderResponse>> GetSellerOrder(int sellerId);
+
+    /// <summary>
+    /// 查看所有訂單
+    /// </summary>
+    /// <param name="request">訂單搜尋請求</param>
+    /// <returns>所有訂單資訊</returns>
+    Task<IEnumerable<OrderResponse>> GetAllOrder(OrderSearchRequest request);
 
     /// <summary>
     /// 改變運輸狀態

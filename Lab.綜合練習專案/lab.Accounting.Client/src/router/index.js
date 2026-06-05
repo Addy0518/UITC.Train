@@ -414,7 +414,7 @@ const router = createRouter({
         },
         {
           /*
-              審查表列
+              審查細項
           */
           path: 'admin-review-details/:id',
           name: 'admin-review-details',
@@ -422,6 +422,17 @@ const router = createRouter({
             isAdmin: true,
           },
           component: () => import('@/views/backend/admin/adminReviewDetails.vue'),
+        },
+        {
+          /*
+              用戶列表
+          */
+          path: 'admin-alluser',
+          name: 'admin-alluser',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminAllUser.vue'),
         },
       ],
     },

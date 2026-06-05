@@ -17,10 +17,3 @@ export const getSonCategories = (fatherCategoryId) =>
 export const getFatherCategories = (sonCategoryId) =>
   accountApiInstance.get('Category/GetFatherCategories', { params: { sonCategoryId } });
 
-// 新增類別
-export const addCategory = (categoryName, parentId = null) =>
-  accountApiInstance.post('Category/AddCategory', { categoryName, parentId });
-
-// 刪除類別
-export const deleteCategory = (categoryId) =>
-  accountApiInstance.delete('Category/DeleteCategory', { params: { categoryId } });

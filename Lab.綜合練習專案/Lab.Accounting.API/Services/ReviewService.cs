@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Lab.Accounting.API.Common.Requests.Products;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using NPOI.HPSF;
 using NPOI.POIFS.Properties;

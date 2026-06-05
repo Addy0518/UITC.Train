@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories.Interface;
+﻿using Lab.Accounting.API.Common.Requests.Products;
+
+namespace Lab.Accounting.API.Repositories.Interface;
 
 public interface IProductsReviewRepository
 {

@@ -1,4 +1,5 @@
-﻿using UBOT_Domain.Models.Constants;
+﻿using Lab.Accounting.API.Common.Requests.Products;
+using UBOT_Domain.Models.Constants;
 
 namespace Lab.Accounting.API.Controllers;
 

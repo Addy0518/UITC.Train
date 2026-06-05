@@ -1,4 +1,7 @@
-﻿namespace Lab.Accounting.API.Services;
+﻿using Lab.Accounting.API.Common.Requests.Order;
+using Lab.Accounting.API.Common.Requests.Products;
+
+namespace Lab.Accounting.API.Services;
 
 public interface IOrderService
 {
@@ -31,6 +34,13 @@ public interface IOrderService
     /// <param name="sellerId">賣家 ID</param>
     /// <returns>訂單資訊</returns>
     Task<ApiResponse<OrderResponse>> GetSellerOneOrder(int orderId, int sellerId);
+
+    /// <summary>
+    /// 查看所有訂單
+    /// </summary>
+    /// <param name="request">訂單搜尋請求</param>
+    /// <returns>所有訂單資訊</returns>
+    Task<ApiResponse<IEnumerable<OrderResponse>>> GetAllOrder(OrderSearchRequest request);
 
     /// <summary>
     /// 改變運輸狀態

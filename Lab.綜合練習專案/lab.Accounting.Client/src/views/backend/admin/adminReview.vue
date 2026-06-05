@@ -1,5 +1,5 @@
 <script setup>
-import { getProductsReview, getAllProductsReview } from '@/api/reviewService';
+import { getProductsReview, getAllProductsReview } from '@/api/admin/reviewService';
 import { reviewStatusEnum } from '@/common/enum';
 
 /*

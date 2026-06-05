@@ -13,9 +13,19 @@
         public int SellerUserId { get; set; }
 
         /// <summary>
+        /// 賣家名稱
+        /// </summary>
+        public string SellerName { get; set; }
+
+        /// <summary>
         /// 購買者 ID
         /// </summary>
         public int UserId { get; set; }
+
+        /// <summary>
+        /// 購買者名稱
+        /// </summary>
+        public string UserName { get; set; }
 
         /// <summary>
         /// 訂單編號
@@ -86,5 +96,10 @@
         /// 是否為刪除狀態
         /// </summary>
         public IsDeleteStatusEnum? IsDelete { get; set; }
+
+        /// <summary>
+        /// 總筆數
+        /// </summary>
+        public int? TotalCount { get; set; }
     }
 }

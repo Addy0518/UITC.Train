@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Lab.Accounting.API.Common.Requests.Order;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.Data;
 
 namespace Lab.Accounting.API.Services;
@@ -197,14 +198,32 @@ public class UserService(
     }
 
     /// <summary>
+    /// 取得使用者詳細資訊 ( 管理員 )
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>使用者詳細資訊</returns>
+    public async Task<ApiResponse<UserResponse>> GetUserDetails(int userId)
+    {
+        var result = await userrepo.GetUserDetails(userId);
+
+        if (result == null)
+        {
+            return ApiResponseHelper.NotFound<UserResponse>();
+        }
+
+        return ApiResponseHelper.Success(result);
+    }
+
+    /// <summary>
     /// 取得所有使用者資訊
     /// </summary>
+    /// <param name="request">搜尋使用者請求 </param>
     /// <returns>使用者資訊列表</returns>
-    public async Task<ApiResponse<IEnumerable<UserResponse>>> GetAllUser()
+    public async Task<ApiResponse<IEnumerable<UserResponse>>> GetAllUser(UserSearchRequest request)
     {
-        var result = await userrepo.GetAllUser();
+        var result = await userrepo.GetAllUser(request);
 
-        return ApiResponseHelper.Success<IEnumerable<UserResponse>>(result);
+        return ApiResponseHelper.Success(result);
     }
 
     /// <summary>
@@ -267,19 +286,44 @@ public class UserService(
     /// <summary>
     /// 軟刪除單一用戶
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="userId">用戶 ID</param>
+    /// <param name="adminId">管理員 ID</param>
+    /// <param name="deleteReason">停用原因</param>
     /// <returns>影響列數</returns>
-    public async Task<ApiResponse<int>> DeleteUser(int userId)
+    public async Task<ApiResponse<int>> DeleteUser(int userId, int adminId, string deleteReason)
     {
         var target = await userrepo.GetUser(userId);
         if (target == null)
         {
             var errors = new Dictionary<string, string[]> { { "User", new[] { "查無用戶" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
         }
-        var delete = await userrepo.DeleteUser(userId);
+        var delete = await userrepo.DeleteUser(userId, adminId, deleteReason);
 
         if (delete <= 0)
             return ApiResponseHelper.InternalException<int>("刪除失敗 ! ");
+        return ApiResponseHelper.Success<int>(delete);
+    }
+
+    /// <summary>
+    /// 復原已選取的用戶刪除狀態
+    /// </summary>
+    /// <param name="userId">用戶 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<int>> UpdateUserDeleteStatus(int userId)
+    {
+        var target = await userrepo.GetUser(userId);
+        if (target == null)
+        {
+            var errors = new Dictionary<string, string[]> { { "User", new[] { "查無用戶" } } };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+        var delete = await userrepo.UpdateUserDeleteStatus(userId);
+
+        if (delete <= 0)
+            return ApiResponseHelper.InternalException<int>("復原失敗 ! ");
         return ApiResponseHelper.Success<int>(delete);
     }
 }

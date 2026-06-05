@@ -1,5 +1,5 @@
 <script setup>
-import { getProductsReview, approveOrRejectProductsReview } from '@/api/reviewService';
+import { getProductsReview, approveOrRejectProductsReview } from '@/api/admin/reviewService';
 import { reviewStatusEnum } from '@/common/enum';
 import { useRoute } from 'vue-router';
 

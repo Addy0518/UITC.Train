@@ -63,31 +63,5 @@ namespace Lab.Accounting.API.Controllers
             var target = await categoryService.GetOneSonCategory(fatherCategoryId);
             return Ok(target);
         }
-
-        /// <summary>
-        /// 新增類別及關連閉鎖表
-        /// </summary>
-        /// <param name="request">類別新增資訊</param>
-        /// <returns>新增的類別 ID </returns>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> AddCategory([FromForm] CategoryInsertRequest request)
-        {
-            var target = await categoryService.AddCategory(request);
-            return Ok(target);
-        }
-
-        /// <summary>
-        /// 刪除類別及關連閉鎖表
-        /// </summary>
-        /// <param name="categoryId">類別 ID </param>
-        /// <returns>新增的類別 ID </returns>
-        [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-        public async Task<IActionResult> DeleteCategory([FromQuery] int categoryId)
-        {
-            var target = await categoryService.DeleteCategory(categoryId);
-            return Ok(target);
-        }
     }
 }

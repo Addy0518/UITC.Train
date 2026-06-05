@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Lab.Accounting.API.Common.Requests.Products;
+using Microsoft.AspNetCore.Http.HttpResults;
 using UBOT_Domain.Models.Constants;
 
 namespace Lab.Accounting.API.Controllers;

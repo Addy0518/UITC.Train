@@ -1,6 +1,6 @@
-﻿namespace Lab.Accounting.API.Common.Requests
+﻿namespace Lab.Accounting.API.Common.Requests.Order
 {
-    public class ProductsRiviewSearchRequest
+    public class OrderSearchRequest
     {
         /// 分頁
         /// ==================================================
@@ -19,12 +19,6 @@
         /// 搜尋條件
         /// ==================================================
         /// <summary>
-        /// 賣家 ID
-        /// </summary>
-        [Display(Name = "賣家 ID")]
-        public string? sellerId { get; set; }
-
-        /// <summary>
         /// 搜尋類別
         /// </summary>
         [Display(Name = "搜尋類別")]
@@ -37,10 +31,10 @@
         public string? keyWords { get; set; }
 
         /// <summary>
-        /// 審核狀態
+        /// 運輸狀態
         /// </summary>
-        [Display(Name = "審核狀態")]
-        public ReviewStatusEnum? ReviewStatus { get; set; }
+        [Display(Name = "運輸狀態")]
+        public ShippingStatusEnum? ShippingStatus { get; set; }
 
         /// 排序條件
         /// ==================================================

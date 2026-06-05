@@ -1,4 +1,4 @@
-﻿namespace Lab.API.TODO.Common.Requests;
+﻿namespace Lab.Accounting.API.Common.Requests.Ledger;
 
 public class LedgerUpdateRequest
 {

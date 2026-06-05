@@ -1,4 +1,4 @@
-﻿using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+﻿using Lab.Accounting.API.Common.Requests.Products;
 
 namespace Lab.Accounting.API.Repositories;
 
@@ -23,15 +23,18 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.ProductsStock,
                                  m.ProductCategoryId,
                                  c.productcategoryname,
+                               
                                  -- 計算平均評分
                                  -- 外層 ISNULL 是為了當今天回傳值是 null ( 沒有評分 ) 的話就回傳 0
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
                                  FROM MallProductsRate r 
                                  WHERE r.ProductsId = m.productsid), 0) AS ProductsAVGRate,
-                                 ISNULL((Select Count(o.BoughtQuantity) 
+
+                                 ISNULL((Select Count(o.BoughtQuantity)
                                  From MallOrder o
                                  Where o.ProductsId = m.ProductsId),0) as BoughtQuantity,
                                  Count(*) over() as TotalCount
+
                         FROM     mallproducts m
                         JOIN     mallproductcategory c
                         ON       c.productcategoryid= m.ProductCategoryId

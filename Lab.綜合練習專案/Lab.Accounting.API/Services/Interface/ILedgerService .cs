@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Services.Interface;
+﻿using Lab.Accounting.API.Common.Requests.Ledger;
+
+namespace Lab.Accounting.API.Services.Interface;
 
 public interface ILedgerService
 {

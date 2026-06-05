@@ -1,4 +1,8 @@
 ﻿using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
+using Lab.Accounting.API.Common.Requests.Order;
+using NPOI.SS.UserModel;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Lab.Accounting.API.Repositories;
 
@@ -113,6 +117,59 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
             WHERE  m.SellerUserId = @UserId";
 
         return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = sellerId });
+    }
+
+    /// <summary>
+    /// 查看所有訂單
+    /// </summary>
+    /// <param name="request">訂單搜尋請求</param>
+    /// <returns>所有訂單資訊</returns>
+    public async Task<IEnumerable<OrderResponse>> GetAllOrder(OrderSearchRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+        int offset = request.pageIndex * request.pageSize;
+        var sql =
+            @"SELECT    m.*,
+                      s.UserName as SellerName,
+                      u.UserName as UserName,
+                      p.IsDelete,
+                      Count(*) over() as TotalCount
+            FROM      MallOrder m
+            LEFT JOIN MallProducts p ON m.ProductsId = p.ProductsId
+            LEFT JOIN [User] s       ON m.SellerUserId = s.UserId  
+            LEFT JOIN [User] u       ON m.UserId = u.UserId  
+
+            WHERE
+            (
+                @keyWords IS NULL
+                OR (@searchType = 'SellerName'  AND s.UserName    LIKE '%' + @keyWords + '%')
+                OR (@searchType = 'UserName'    AND u.UserName    LIKE '%' + @keyWords + '%')
+                OR (@searchType = 'ProductsName' AND m.ProductsName LIKE '%' + @keyWords + '%')
+            )
+            AND (@ShippingStatus IS NULL OR m.ShippingStatus = @ShippingStatus)
+
+            ORDER BY
+                CASE WHEN @sortBy = 'AccountPrice' AND @sortOrder = 'asc'  THEN m.AccountPrice END ASC,
+                CASE WHEN @sortBy = 'AccountPrice' AND @sortOrder = 'desc' THEN m.AccountPrice END DESC,
+                CASE WHEN @sortBy = 'BoughtTime'   AND @sortOrder = 'asc'  THEN m.BoughtTime   END ASC,
+                CASE WHEN @sortBy = 'BoughtTime'   AND @sortOrder = 'desc' THEN m.BoughtTime   END DESC,
+                m.OrderId
+
+            OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
+
+        return await conn.QueryAsync<OrderResponse>(
+            sql,
+            new
+            {
+                offset = offset,
+                pageSize = request.pageSize,
+                keyWords = request.keyWords,
+                searchType = request.searchType,
+                sortBy = request.sortBy,
+                sortOrder = request.sortOrder,
+                ShippingStatus = request.ShippingStatus,
+            }
+        );
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Lab.Accounting.API.Common.Requests
+﻿namespace Lab.Accounting.API.Common.Requests.Products
 {
     public class ProductsRivewRequest
     {

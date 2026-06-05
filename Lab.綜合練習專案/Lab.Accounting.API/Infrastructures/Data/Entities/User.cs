@@ -66,4 +66,14 @@ public class User
     /// 是否為刪除狀態
     /// </summary>
     public IsDeleteStatusEnum IsDelete { get; set; }
+
+    /// <summary>
+    /// 停用的管理員 ID
+    /// </summary>
+    public int? DeleteAdminId { get; set; }
+
+    /// <summary>
+    /// 停用原因
+    /// </summary>
+    public string? DeleteReason { get; set; }
 }

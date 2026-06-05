@@ -1,8 +1,10 @@
-﻿using NPOI.POIFS.Properties;
+﻿using Lab.Accounting.API.Common.Requests.Products;
+using NPOI.POIFS.Properties;
 
 namespace Lab.Accounting.API.Controllers.Admin
 {
-    [Route("api/[controller]/[action]")]
+    [Tags("Admin-Review")]
+    [Route("api/admin/[controller]/[action]")]
     [ApiController]
     [Authorize(Roles = RolesAuth.管理者)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]

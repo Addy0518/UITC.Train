@@ -97,16 +97,101 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
     }
 
     /// <summary>
-    /// 取得所有使用者資訊
+    /// 取得使用者詳細資訊 ( 管理員 )
     /// </summary>
-    /// <returns>使用者資訊列表</returns>
-    public async Task<IEnumerable<UserResponse>> GetAllUser()
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>使用者詳細資訊</returns>
+    public async Task<UserResponse> GetUserDetails(int userId)
     {
         using var conn = connecting.CreateConnecting();
 
-        var sql = @"Select * From [User]";
+        var sql =
+            @"SELECT       u.useraccount,
+                           u.userid,
+                           u.username,
+                           u.userAddress,
+                           u.userBirthDate,
+                           u.userPhone,
+                           u.userheadshot,
+                           u.usergender,
+                           u.userrole,
+                           u.createtime,
+                           u.updateTime,
+                           u.isdelete,
 
-        return await conn.QueryAsync<UserResponse>(sql);
+                    -- 統計資料
+                    Count(DISTINCT o.OrderId) as TotalOrders,
+                    Count(DISTINCT p.ProductsId) as TotalProducts,
+                    IsNull(Sum(o.AccountPrice),0) as TotalSpent
+
+                    FROM   [user] u
+                    Left Join MallOrder o on o.UserId = u.UserId
+                    Left Join MallProducts p on p.UserId = u.UserId
+                    Where u.UserId = @UserId
+                    GROUP BY u.UserAccount,
+                             u.UserId,
+                             u.UserName,
+                             u.UserAddress,
+                             u.UserBirthDate,
+                             u.UserPhone,
+                             u.UserHeadShot,
+                             u.UserGender,
+                             u.UserRole,
+                             u.CreateTime,
+                             u.UpdateTime,
+                             u.IsDelete";
+
+        return await conn.QueryFirstOrDefaultAsync<UserResponse>(sql, new { UserId = userId });
+    }
+
+    /// <summary>
+    /// 取得所有使用者資訊
+    /// </summary>
+    /// <param name="request">搜尋使用者請求 </param>
+    /// <returns>使用者資訊列表</returns>
+    public async Task<IEnumerable<UserResponse>> GetAllUser(UserSearchRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+        int offset = request.pageIndex * request.pageSize;
+        var sql =
+            @"SELECT useraccount,
+                           userid,
+                           username,
+                           userheadshot,
+                           usergender,
+                           userrole,
+                           createtime,
+                           isdelete,
+                           Count(*) OVER() AS TotalCount
+                    FROM   [user] 
+                    Where 
+                           (@IsDelete is null or IsDelete=@IsDelete)
+                    and    (@UserGender is null or UserGender=@UserGender)
+                    and    (@UserRole is null or UserRole=@UserRole)
+                    and    (@keyWords is null 
+                    or     UserName like '%' + @keyWords + '%')
+                    
+
+                    Order by 
+                    case when @sortBy='CreateTime' and @sortOrder='asc' then CreateTime end asc,
+                    case when @sortBy='CreateTime' and @sortOrder='desc' then CreateTime end desc,
+                    userId
+                    offset @offset rows FETCH next @pageSize rows only";
+
+        return await conn.QueryAsync<UserResponse>(
+            sql,
+            new
+            {
+                offset = offset,
+                pageSize = request.pageSize,
+                keyWords = request.keyWords,
+                sortBy = request.sortBy,
+                sortOrder = request.sortOrder,
+                IsDelete = request.IsDelete,
+                UserGender = request.UserGender,
+                UserRole = request.UserRole,
+            }
+        );
     }
 
     /// <summary>
@@ -196,14 +281,50 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
     /// <summary>
     /// 軟刪除單一用戶
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="userId">用戶 ID</param>
+    /// <param name="adminId">管理員 ID</param>
+    /// <param name="deleteReason">停用原因</param>
     /// <returns>影響列數</returns>
-    public async Task<int> DeleteUser(int userId)
+    public async Task<int> DeleteUser(int userId, int adminId, string deleteReason)
     {
         using var conn = connecting.CreateConnecting();
 
-        var deletesql = @"Update [User] Set IsDelete=1,UpdateTime=GetDate() Where UserId=@UserId;";
+        var deletesql =
+            @"Update [User] 
+                          Set 
+                                 IsDelete=1,
+                                 DeleteAdminId=@DeleteAdminId,
+                                 DeleteReason=@DeleteReason,
+                                 UpdateTime=GetDate()
+                          Where UserId=@UserId;";
 
-        return await conn.ExecuteAsync(deletesql, new { UserId = userId });
+        return await conn.ExecuteAsync(
+            deletesql,
+            new
+            {
+                UserId = userId,
+                DeleteAdminId = adminId,
+                DeleteReason = deleteReason,
+            }
+        );
+    }
+
+    /// <summary>
+    /// 復原已選取的用戶刪除狀態
+    /// </summary>
+    /// <param name="userId">用戶 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateUserDeleteStatus(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"UPDATE [User]
+                        SET     IsDelete = 0 ,
+                                DeleteAdminId=NULL,
+                                DeleteReason=NULL,
+                                UpdateTime   = GetDate()
+                        WHERE   UserId = @UserId";
+        return await conn.ExecuteAsync(sql, new { UserId = userId });
     }
 }

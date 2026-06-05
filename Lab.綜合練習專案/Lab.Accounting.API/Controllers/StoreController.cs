@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Controllers;
+﻿using Lab.Accounting.API.Common.Requests.Store;
+
+namespace Lab.Accounting.API.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]

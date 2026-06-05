@@ -43,6 +43,21 @@ public class UserResponse
     public GenderEnum UserGender { get; set; }
 
     /// <summary>
+    /// 創建時間
+    /// </summary>
+    public DateTime CreateTime { get; set; }
+
+    /// <summary>
+    /// 更新時間
+    /// </summary>
+    public DateTime UpdateTime { get; set; }
+
+    /// <summary>
+    /// 是否為刪除狀態
+    /// </summary>
+    public IsDeleteStatusEnum IsDelete { get; set; }
+
+    /// <summary>
     /// Token
     /// </summary>
     public string? Token { get; set; }
@@ -51,4 +66,9 @@ public class UserResponse
     /// 使用者權限
     /// </summary>
     public string? UserRole { get; set; }
+
+    /// <summary>
+    /// 總筆數
+    /// </summary>
+    public int? TotalCount { get; set; }
 }

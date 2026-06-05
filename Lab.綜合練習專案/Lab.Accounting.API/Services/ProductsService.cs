@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Lab.Accounting.API.Common.Requests.Products;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NPOI.HPSF;
 using Org.BouncyCastle.Asn1.X509;

@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories
+﻿using Lab.Accounting.API.Common.Requests.Products;
+
+namespace Lab.Accounting.API.Repositories
 {
     public class ProductsReviewRepository(DBConnecting connecting) : IProductsReviewRepository
     {

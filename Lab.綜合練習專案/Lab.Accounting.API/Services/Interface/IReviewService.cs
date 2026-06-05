@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Services
+﻿using Lab.Accounting.API.Common.Requests.Products;
+
+namespace Lab.Accounting.API.Services
 {
     public interface IReviewService
     {

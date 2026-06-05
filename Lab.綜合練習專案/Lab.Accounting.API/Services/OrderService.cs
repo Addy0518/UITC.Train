@@ -1,4 +1,6 @@
-﻿using Org.BouncyCastle.Asn1.X509;
+﻿using Lab.Accounting.API.Common.Requests.Order;
+using Lab.Accounting.API.Common.Requests.Products;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace Lab.Accounting.API.Services;
 
@@ -75,6 +77,23 @@ public class OrderService(
         if (target == null)
         {
             return ApiResponseHelper.NotFound<OrderResponse>();
+        }
+
+        return ApiResponseHelper.Success(target);
+    }
+
+    /// <summary>
+    /// 查看所有訂單
+    /// </summary>
+    /// <param name="request">訂單搜尋請求</param>
+    /// <returns>所有訂單資訊</returns>
+    public async Task<ApiResponse<IEnumerable<OrderResponse>>> GetAllOrder(OrderSearchRequest request)
+    {
+        var target = await productsBuyRepositories.GetAllOrder(request);
+
+        if (target == null)
+        {
+            return ApiResponseHelper.NotFound<IEnumerable<OrderResponse>>();
         }
 
         return ApiResponseHelper.Success(target);

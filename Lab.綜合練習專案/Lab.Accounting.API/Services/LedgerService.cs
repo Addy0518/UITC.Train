@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Services;
+﻿using Lab.Accounting.API.Common.Requests.Ledger;
+
+namespace Lab.Accounting.API.Services;
 
 public class LedgerService(
     ILedgerRepository accountrepo,

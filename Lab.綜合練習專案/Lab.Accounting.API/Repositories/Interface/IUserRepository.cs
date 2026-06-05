@@ -39,10 +39,18 @@ public interface IUserRepository
     Task<UserResponse> GetUser(int userId);
 
     /// <summary>
+    /// 取得使用者詳細資訊 ( 管理員 )
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>使用者詳細資訊</returns>
+    Task<UserResponse> GetUserDetails(int userId);
+
+    /// <summary>
     /// 取得所有使用者資訊
     /// </summary>
+    ///  <param name="request">搜尋使用者請求 </param>
     /// <returns>使用者資訊列表</returns>
-    Task<IEnumerable<UserResponse>> GetAllUser();
+    Task<IEnumerable<UserResponse>> GetAllUser(UserSearchRequest request);
 
     /// <summary>
     /// 編輯使用者資訊
@@ -76,7 +84,16 @@ public interface IUserRepository
     /// <summary>
     /// 軟刪除單一用戶
     /// </summary>
-    /// <param name="userId">使用者 ID</param>
+    /// <param name="userId">用戶 ID</param>
+    /// <param name="adminId">管理員 ID</param>
+    /// <param name="deleteReason">停用原因</param>
     /// <returns>影響列數</returns>
-    Task<int> DeleteUser(int userId);
+    Task<int> DeleteUser(int userId, int adminId, string deleteReason);
+
+    /// <summary>
+    /// 復原已選取的用戶刪除狀態
+    /// </summary>
+    /// <param name="userId">用戶 ID</param>
+    /// <returns>影響列數</returns>
+    Task<int> UpdateUserDeleteStatus(int userId);
 }

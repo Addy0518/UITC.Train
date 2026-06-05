@@ -1,11 +1,11 @@
 <script setup>
-import { getProductsReview, getAllProductsReview } from '@/api/reviewService';
-import { reviewStatusEnum } from '@/common/enum';
-
+import { getAllUser } from '@/api/admin/UserService';
+import defaultImgurl from '@/img/oguri-cap-chibi.png';
 /*
    變數名稱代表意義
-   allreview : 所有審查表
+   allUser : 所有使用者
    router : 改變路由
+   baseUrl : 環境變數裡的圖片基底位址
    currentPage : 目前所在頁數
    currentSort : 現在的排序
    sortBy : 分類排序
@@ -18,30 +18,21 @@ import { reviewStatusEnum } from '@/common/enum';
    search : 搜尋
    suggestions : 搜尋建議
    searchType : 搜尋類型
+   userRole : 角色
 */
-const allreview = ref(null);
+const allUser = ref(null);
+const baseUrl = import.meta.env.VITE_IMG_URL;
 const router = useRouter();
 const currentPage = ref();
 const currentSort = ref({ type: 'CreateTime', order: 'desc' });
 const sortBy = ref('CreateTime');
 const sortOrder = ref('desc');
-const reviewStatus = ref();
 const keyWords = ref();
-const sellerId = ref();
 const isFiltering = ref(false);
 const totalCount = ref();
 const search = ref();
 const suggestions = ref([]);
-const searchType = ref('ProductsName');
-
-/*
-   搜尋類型選項
-*/
-const searchTypeOptions = [
-  { label: '商品名稱', value: 'ProductsName' },
-  { label: '賣家名稱', value: 'SellerName' },
-  { label: '審核編號', value: 'ProductsReviewId' },
-];
+const userRole = ref();
 
 /*
    注入 Loading 跟 Toast
@@ -55,7 +46,7 @@ const showToastError = inject('showToastError');
    初始化時
 */
 onMounted(() => {
-  getAllReview(true);
+  getUserAll(true);
 });
 
 /*
@@ -73,13 +64,13 @@ const toggleSort = (type) => {
   }
   sortBy.value = currentSort.value.type;
   sortOrder.value = currentSort.value.order;
-  getAllReview();
+  getUserAll();
 };
 
 /*
    查看所有審查表
 */
-const getAllReview = async (isFirstload = false) => {
+const getUserAll = async (isFirstload = false) => {
   try {
     // 判斷是不是第一次加載
     if (isFirstload) {
@@ -93,17 +84,17 @@ const getAllReview = async (isFirstload = false) => {
       pageSize: 10,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
-      reviewStatus: reviewStatus.value ?? null,
-      searchType: searchType.value,
+      userGender: genderEnum.value?.value ?? null,
       keyWords: keyWords.value ?? null,
-      sellerId: sellerId.value,
+      userRole: userRole.value ?? null,
+      isDelete: isDeleteEnum.value?.value ?? null,
     };
-    const res = await getAllProductsReview(request);
+    const res = await getAllUser(request);
     const { data } = res;
 
     if (data.codeStatus === 2000) {
-      allreview.value = data.returnData.productsReview;
-      totalCount.value = data.returnData.totalCount;
+      allUser.value = data.returnData;
+      totalCount.value = data.returnData[0]?.totalCount ?? 0;
     } else if (data.codeStatus === 4001) {
       allreview.value = [];
       totalCount.value = 0;
@@ -121,7 +112,7 @@ const getAllReview = async (isFirstload = false) => {
 */
 const pageChange = (event) => {
   currentPage.value = event.page;
-  getAllReview();
+  getUserAll();
 };
 
 /*
@@ -131,23 +122,15 @@ const searchSuggestions = async (event) => {
   if (!event.query) return [];
 
   try {
-    const res = await getAllProductsReview({
+    const res = await getAllUser({
       keyWords: event.query,
-      searchType: searchType.value,
       pageSize: 10,
       pageIndex: 0,
     });
     const { data } = res;
 
     if (data.codeStatus === 2000) {
-      const fieldMap = {
-        ProductsName: (r) => r.productsName,
-        SellerName: (r) => r.sellerName,
-        ProductsReviewId: (r) => String(r.productsReviewId),
-      };
-      suggestions.value = [
-        ...new Set(data.returnData.productsReview.map(fieldMap[searchType.value])),
-      ];
+      suggestions.value = [...new Set(data.returnData.map((u) => u.userName))];
     } else {
       suggestions.value = ['查無相關審查資訊'];
     }
@@ -167,27 +150,31 @@ const goSearch = () => {
   keyWords.value = keyword;
   currentPage.value = 0;
   search.value = null;
-  getAllReview();
+  getUserAll();
 };
 
-const changeReviewStatus = (status) => {
-  reviewStatus.value = status;
-  currentPage.value = 0;
-  getAllReview();
+/*
+  讀取商品圖片 , 判斷是否有圖片沒有就回傳預設
+*/
+const getUserImg = (user) => {
+  if (user.userHeadshot) {
+    return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
+  }
+  return defaultImgurl;
 };
 </script>
 
 <template>
-  <div class="flex flex-col w-full p-6" v-if="allreview">
+  <div class="flex flex-col w-full p-6" v-if="allUser">
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
-      <p class="text-2xl font-bold m-0">審查表管理</p>
+      <p class="text-2xl font-bold m-0">用戶管理</p>
       <button
         @click="toggleSort('CreateTime')"
         :class="currentSort.type === 'CreateTime' ? 'text-orange-500' : 'text-gray-700'"
         class="w-28 h-9 cursor-pointer hover:bg-gray-100 rounded-lg text-sm"
       >
-        申請時間
+        註冊時間
         <i
           v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
           class="pi pi-arrow-up text-xs"
@@ -198,44 +185,7 @@ const changeReviewStatus = (status) => {
         />
       </button>
 
-      <button
-        @click="toggleSort('ReviewTime')"
-        :class="currentSort.type === 'ReviewTime' ? 'text-orange-500' : 'text-gray-700'"
-        class="w-28 h-9 cursor-pointer hover:bg-gray-100 rounded-lg text-sm"
-      >
-        審查時間
-        <i
-          v-if="currentSort.type === 'ReviewTime' && currentSort.order === 'asc'"
-          class="pi pi-arrow-up text-xs"
-        />
-        <i
-          v-if="currentSort.type === 'ReviewTime' && currentSort.order === 'desc'"
-          class="pi pi-arrow-down text-xs"
-        />
-      </button>
-
-      <button
-        v-for="option in reviewStatusEnum"
-        :key="option.label"
-        @click="changeReviewStatus(option.value)"
-        :class="
-          reviewStatus === option.value
-            ? 'bg-orange-500 text-white border-orange-500'
-            : 'text-gray-600 border-gray-200 hover:bg-gray-100'
-        "
-        class="px-3 py-1.5 border rounded-lg text-xs cursor-pointer transition-colors"
-      >
-        {{ option.description }}
-      </button>
-
       <div class="flex flex-1 items-center justify-center">
-        <Select
-          v-model="searchType"
-          :options="searchTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          class="w-36"
-        />
         <AutoComplete
           v-model="search"
           :suggestions="suggestions"
@@ -256,14 +206,16 @@ const changeReviewStatus = (status) => {
     <!-- #region  欄位標頭-->
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
       <div
-        class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
       >
-        <span class="text-xs text-gray-400">賣家</span>
-        <span class="text-xs text-gray-400">審核人員</span>
-        <span class="text-xs text-gray-400">商品名稱</span>
-        <span class="text-xs text-gray-400">審核狀態</span>
-        <span class="text-xs text-gray-400">申請時間</span>
-        <span class="text-xs text-gray-400">審核時間</span>
+        <span class="text-xs text-gray-400"></span>
+        <span class="text-xs text-gray-400">用戶 ID</span>
+        <span class="text-xs text-gray-400">用戶名稱</span>
+        <span class="text-xs text-gray-400">帳號</span>
+        <span class="text-xs text-gray-400">性別</span>
+        <span class="text-xs text-gray-400">角色</span>
+        <span class="text-xs text-gray-400">註冊時間</span>
+        <span class="text-xs text-gray-400">狀態</span>
       </div>
 
       <!-- #endregion -->
@@ -273,8 +225,10 @@ const changeReviewStatus = (status) => {
         <div
           v-for="n in 6"
           :key="n"
-          class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-4 border-b border-gray-100 gap-4 items-center"
+          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 gap-4 items-center"
         >
+          <Skeleton height="40px" border-radius="50%" />
+          <Skeleton height="1rem" />
           <Skeleton height="1rem" />
           <Skeleton height="1rem" />
           <Skeleton height="1rem" />
@@ -285,45 +239,63 @@ const changeReviewStatus = (status) => {
       </template>
       <template v-else>
         <div
-          v-if="allreview.length === 0"
+          v-if="allUser.length === 0"
           class="flex flex-col items-center justify-center py-16 text-gray-400"
         >
           <i class="pi pi-inbox text-4xl mb-3" />
-          <span class="text-sm">沒有符合條件的審查表</span>
+          <span class="text-sm">沒有符合條件的用戶</span>
         </div>
         <div
-          v-for="review in allreview"
-          :key="review.productsReviewId"
-          class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 cursor-pointer"
-          @click="
-            router.push({ name: 'admin-review-details', params: { id: review.productsReviewId } })
-          "
+          v-for="user in allUser"
+          :key="user.UserId"
+          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 cursor-pointer"
         >
-          <span class="text-sm font-medium truncate">{{ review.sellerName }}</span>
-          <span class="text-sm text-gray-700 truncate">{{ review.adminName ?? '—' }}</span>
-          <span class="text-sm text-gray-800 truncate">{{ review.productsName }}</span>
+          <img
+            :src="getUserImg(user)"
+            class="w-10 h-10 object-cover rounded-lg border border-gray-100 cursor-pointer"
+          />
+          <span class="text-sm font-medium truncate">{{ user.userId }}</span>
+          <span class="text-sm text-gray-700 truncate">{{ user.userName }}</span>
+          <span class="text-sm text-gray-800 truncate">{{ user.userAccount }}</span>
           <span class="text-sm">
             <span
               class="px-2 py-0.5 rounded-full text-xs"
               :class="{
-                'bg-yellow-100 text-yellow-700': review.reviewStatus === 0,
-                'bg-green-100 text-green-700': review.reviewStatus === 1,
-                'bg-red-100 text-red-700': review.reviewStatus === 2,
+                'bg-pink-100 text-pink-700': user.userGender === 0,
+                'bg-blue-100 text-blue-700': user.userGender === 1,
+                'bg-gray-100 text-gray-700': user.userGender === 2,
               }"
             >
-              {{
-                review.reviewStatus === 0
-                  ? '待審核'
-                  : review.reviewStatus === 1
-                    ? '已通過'
-                    : '已駁回'
-              }}
+              {{ user.userGender === 0 ? '女性' : user.userGender === 1 ? '男性' : '其他' }}
             </span>
           </span>
-          <span class="text-sm text-gray-500">{{ formatDateTimeString(review.createTime) }}</span>
-          <span class="text-sm text-gray-500">{{
-            review.reviewTime ? formatDateTimeString(review.reviewTime) : '—'
-          }}</span>
+          <span
+            class="px-2 py-0.5 rounded-full text-xs w-fit"
+            :class="{
+              'bg-orange-100 text-orange-700': user.userRole === 'Seller',
+              'bg-purple-100 text-purple-700': user.userRole === 'Admin',
+              'bg-gray-100 text-gray-700': !user.userRole,
+            }"
+            >{{
+              user.userRole === 'Seller'
+                ? '賣家'
+                : user.userRole === 'Admin'
+                  ? '管理員'
+                  : '一般用戶'
+            }}</span
+          >
+          <span class="text-sm text-gray-500">{{ formatDateTimeString(user.createTime) }}</span>
+          <span class="text-sm">
+            <span
+              class="px-2 py-0.5 rounded-full text-xs"
+              :class="{
+                'bg-yellow-100 text-green-700': user.isDelete === 0,
+                'bg-green-100 text-red-700': user.isDelete === 1,
+              }"
+            >
+              {{ user.isDelete === 0 ? '正常' : '停用' }}
+            </span>
+          </span>
         </div>
       </template>
       <!-- #endregion -->
