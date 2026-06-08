@@ -71,4 +71,14 @@ public class UserResponse
     /// 總筆數
     /// </summary>
     public int? TotalCount { get; set; }
+
+    /// <summary>
+    /// 停用的管理員 ID
+    /// </summary>
+    public int? DeleteAdminId { get; set; }
+
+    /// <summary>
+    /// 停用原因
+    /// </summary>
+    public string? DeleteReason { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using NPOI.HPSF;
+﻿using Lab.Accounting.API.Common.Requests.Category;
+using NPOI.HPSF;
 using NPOI.POIFS.NIO;
 using NPOI.POIFS.Properties;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,6 +22,37 @@ namespace Lab.Accounting.API.Repositories
                 from MallProductCategory 
                 where ProductCategoryId=@categoryId";
             return await conn.QueryFirstOrDefaultAsync<MallProductCategory>(sql, new { categoryId = categoryId });
+        }
+
+        /// <summary>
+        /// 查看所有類別
+        /// </summary>
+        /// <param name="request">商品類別搜尋請求</param>
+        /// <returns>所有商品類別</returns>
+        public async Task<IEnumerable<CategoryResponse>> GetAllCategories(CategorySearchRequest request)
+        {
+            using var conn = connecting.CreateConnecting();
+            int offset = request.pageIndex * request.pageSize;
+            var sql =
+                @"select *,Count(*) OVER() AS TotalCount
+                from MallProductCategory
+                Where (@keyWords is null 
+                or     ProductCategoryName like '%' + @keyWords + '%') 
+                and    (@parentId is null or ProductParentId=@parentId)
+
+                Order by 
+                ProductCategoryId
+                offset @offset rows FETCH next @pageSize rows only";
+            return await conn.QueryAsync<CategoryResponse>(
+                sql,
+                new
+                {
+                    offset = offset,
+                    pageSize = request.pageSize,
+                    keyWords = request.keyWords,
+                    parentId = request.parentId,
+                }
+            );
         }
 
         /// <summary>

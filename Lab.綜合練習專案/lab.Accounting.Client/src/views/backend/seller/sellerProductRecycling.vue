@@ -5,7 +5,7 @@ import {
   updateProductsDeleteStatus,
 } from '@/api/productsService';
 import { isDeleteEnum } from '@/common/enum';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 import Swal from 'sweetalert2';
 
 /*

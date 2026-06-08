@@ -1,4 +1,5 @@
-﻿using NPOI.POIFS.Properties;
+﻿using Lab.Accounting.API.Common.Requests.Category;
+using NPOI.POIFS.Properties;
 
 namespace Lab.Accounting.API.Controllers.Admin
 {
@@ -10,6 +11,18 @@ namespace Lab.Accounting.API.Controllers.Admin
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
     public class CategoryController(ICategoryService categoryService) : ControllerBase
     {
+        /// <summary>
+        /// 查看所有類別
+        /// </summary>
+        /// <param name="request">商品類別搜尋請求</param>
+        /// <returns>所有商品類別</returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
+        public async Task<IActionResult> GetAllCategories([FromQuery] CategorySearchRequest request)
+        {
+            return Ok(await categoryService.GetAllCategories(request));
+        }
+
         /// <summary>
         /// 新增類別及關連閉鎖表
         /// </summary>

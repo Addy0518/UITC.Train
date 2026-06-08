@@ -1,6 +1,6 @@
 <script setup>
 import { getSellerAllProduct, deleteProducts } from '@/api/productsService';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 
 /*
    變數名稱代表意義

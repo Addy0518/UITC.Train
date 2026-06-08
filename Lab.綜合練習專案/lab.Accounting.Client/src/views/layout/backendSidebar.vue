@@ -56,6 +56,11 @@ onMounted(() => {});
           class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
           ><i class="pi pi-user px-5 ps-5"></i>用戶列表</RouterLink
         >
+        <RouterLink
+          :to="{ name: 'admin-allCategories' }"
+          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+          ><i class="pi pi-sitemap px-5 ps-5"></i>類別列表</RouterLink
+        >
       </template>
       <!-- #endregion -->
     </div>

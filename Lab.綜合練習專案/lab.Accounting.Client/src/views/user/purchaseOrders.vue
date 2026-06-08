@@ -2,7 +2,7 @@
 import { getUserOrder, userRetryBuyProduct } from '@/api//orderService';
 import { getOrderRate } from '@/api/productsService';
 import { shippingEnum } from '@/common/enum';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 
 /*
    變數名稱代表意義

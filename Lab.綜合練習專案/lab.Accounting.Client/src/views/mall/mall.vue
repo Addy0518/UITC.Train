@@ -1,5 +1,5 @@
 <script setup>
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 import advertise1 from '@/img/廣告1.jpg';
 import advertise2 from '@/img/廣告2.jpg';
 import advertise3 from '@/img/廣告3.jpg';
@@ -135,8 +135,6 @@ const getCategoryImg = (category) => {
   }
   return defaultImgurl;
 };
-
-
 </script>
 
 <template>

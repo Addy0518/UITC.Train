@@ -1,6 +1,6 @@
 <script setup>
-import { getAllUser } from '@/api/admin/UserService';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import { getAllUser } from '@/api/admin/userService';
+import defaultImgurl from '@/img/預設圖片.jpg';
 /*
    變數名稱代表意義
    allUser : 所有使用者
@@ -14,7 +14,7 @@ import defaultImgurl from '@/img/oguri-cap-chibi.png';
    keyWords : 關鍵字查詢 ( 商品名稱或賣家名稱 )
    sellerId : 賣家 ID
    isFiltering : 是否為第一次加載
-   totalCount : 審查表數量
+   totalCount : 用戶數量
    search : 搜尋
    suggestions : 搜尋建議
    searchType : 搜尋類型
@@ -68,7 +68,7 @@ const toggleSort = (type) => {
 };
 
 /*
-   查看所有審查表
+   查看所有用戶
 */
 const getUserAll = async (isFirstload = false) => {
   try {
@@ -249,6 +249,7 @@ const getUserImg = (user) => {
           v-for="user in allUser"
           :key="user.UserId"
           class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 cursor-pointer"
+          @click="router.push({ name: 'admin-user-details', params: { id: user.userId } })"
         >
           <img
             :src="getUserImg(user)"

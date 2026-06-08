@@ -1,4 +1,5 @@
-﻿using NPOI.HPSF;
+﻿using Lab.Accounting.API.Common.Requests.Category;
+using NPOI.HPSF;
 using NPOI.POIFS.Properties;
 
 namespace Lab.Accounting.API.Services
@@ -6,6 +7,23 @@ namespace Lab.Accounting.API.Services
     public class CategoryService(IPoductsCategoryRepository poductsCategoryRepository, IWebHostEnvironment env)
         : ICategoryService
     {
+        /// <summary>
+        /// 查看所有類別
+        /// </summary>
+        /// <param name="request">商品類別搜尋請求</param>
+        /// <returns>所有商品類別</returns>
+        public async Task<ApiResponse<IEnumerable<CategoryResponse>>> GetAllCategories(CategorySearchRequest request)
+        {
+            var target = await poductsCategoryRepository.GetAllCategories(request);
+
+            if (!target.Any())
+            {
+                return ApiResponseHelper.NotFound<IEnumerable<CategoryResponse>>();
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
         /// <summary>
         /// 查看指定類別底下的所有層級類別
         /// </summary>

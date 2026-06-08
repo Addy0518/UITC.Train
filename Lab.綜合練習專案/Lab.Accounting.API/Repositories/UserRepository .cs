@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories;
+﻿using Lab.Accounting.API.Common.Requests.Category;
+
+namespace Lab.Accounting.API.Repositories;
 
 public class UserRepository(DBConnecting connecting) : IUserRepository
 {
@@ -118,6 +120,8 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                            u.createtime,
                            u.updateTime,
                            u.isdelete,
+                           u.DeleteAdminId,
+                           u.DeleteReason,
 
                     -- 統計資料
                     Count(DISTINCT o.OrderId) as TotalOrders,
@@ -139,7 +143,9 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                              u.UserRole,
                              u.CreateTime,
                              u.UpdateTime,
-                             u.IsDelete";
+                             u.IsDelete,
+                             u.DeleteAdminId,
+                             u.DeleteReason";
 
         return await conn.QueryFirstOrDefaultAsync<UserResponse>(sql, new { UserId = userId });
     }

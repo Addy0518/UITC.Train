@@ -1,5 +1,5 @@
 <script setup>
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 

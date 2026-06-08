@@ -16,7 +16,7 @@ namespace Lab.Accounting.API.Controllers
         /// <returns>商品類別</returns>
         [HttpGet]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallProductCategory>>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<CategoryResponse>>))]
         public async Task<IActionResult> GetSonCategories([FromQuery] int fatherCategoryId)
         {
             var target = await categoryService.GetSonCategories(fatherCategoryId);

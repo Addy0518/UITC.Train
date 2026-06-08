@@ -1,7 +1,16 @@
-﻿namespace Lab.Accounting.API.Services
+﻿using Lab.Accounting.API.Common.Requests.Category;
+
+namespace Lab.Accounting.API.Services
 {
     public interface ICategoryService
     {
+        /// <summary>
+        /// 查看所有類別
+        /// </summary>
+        /// <param name="request">商品類別搜尋請求</param>
+        /// <returns>所有商品類別</returns>
+        Task<ApiResponse<IEnumerable<CategoryResponse>>> GetAllCategories(CategorySearchRequest request);
+
         /// <summary>
         /// 查看指定類別底下的所有層級類別
         /// </summary>

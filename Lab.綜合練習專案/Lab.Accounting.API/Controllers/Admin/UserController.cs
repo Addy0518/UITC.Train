@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Controllers.Admin;
+﻿using Lab.Accounting.API.Common.Requests.Category;
+
+namespace Lab.Accounting.API.Controllers.Admin;
 
 [Tags("Admin-User")]
 [Route("api/admin/[controller]/[action]")]

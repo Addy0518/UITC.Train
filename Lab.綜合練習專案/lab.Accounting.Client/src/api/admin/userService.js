@@ -11,5 +11,9 @@ export const getUserDetails = (userId) =>
   accountApiInstance.get(`admin/User/GetUserDetails?userId=${userId}`);
 
 //  軟刪除單一用戶
-export const deleteUser = (userId) =>
-  accountApiInstance.put(`admin/User/DeleteUser?userId=${userId}`);
+export const deleteUser = (userId, deleteReason) =>
+  accountApiInstance.put(`admin/User/DeleteUser?userId=${userId}&deleteReason=${deleteReason}`);
+
+//  復原已選取的用戶刪除狀態
+export const updateUserDeleteStatus = (userId) =>
+  accountApiInstance.put(`admin/User/UpdateUserDeleteStatus?userId=${userId}`);

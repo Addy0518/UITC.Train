@@ -1,6 +1,6 @@
 <script setup>
 import { getAllProductsInShoppingCar, deleteProductsInShoppingCar } from '@/api/shoppingcarService';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 import { useOrderStore } from '@/stores/order';
 
 /*

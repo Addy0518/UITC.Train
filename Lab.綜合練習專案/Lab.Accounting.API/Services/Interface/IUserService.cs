@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Services.Interface;
+﻿using Lab.Accounting.API.Common.Requests.Category;
+
+namespace Lab.Accounting.API.Services.Interface;
 
 public interface IUserService
 {

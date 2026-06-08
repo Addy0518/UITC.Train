@@ -1,4 +1,4 @@
-﻿using Lab.Accounting.API.Common.Requests.Order;
+﻿using Lab.Accounting.API.Common.Requests.Category;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.Data;
 

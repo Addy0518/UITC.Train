@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Repositories
+﻿using Lab.Accounting.API.Common.Requests.Category;
+
+namespace Lab.Accounting.API.Repositories
 {
     public interface IPoductsCategoryRepository
     {
@@ -8,6 +10,13 @@
         /// <param name="categoryId">商品類別 ID</param>
         /// <returns>商品類別</returns>
         Task<MallProductCategory> GetCategories(int categoryId);
+
+        /// <summary>
+        /// 查看所有類別
+        /// </summary>
+        /// <param name="request">商品類別搜尋請求</param>
+        /// <returns>所有商品類別</returns>
+        Task<IEnumerable<CategoryResponse>> GetAllCategories(CategorySearchRequest request);
 
         /// <summary>
         /// 查看指定類別底下的所有層級類別

@@ -434,6 +434,39 @@ const router = createRouter({
           },
           component: () => import('@/views/backend/admin/adminAllUser.vue'),
         },
+        {
+          /*
+              用戶資料
+          */
+          path: 'admin-user-details/:id',
+          name: 'admin-user-details',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminUserDetails.vue'),
+        },
+        {
+          /*
+              商品類別列表
+          */
+          path: 'admin-allCategories',
+          name: 'admin-allCategories',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminAllCategories.vue'),
+        },
+        {
+          /*
+              新增商品類別
+          */
+          path: 'admin-addcategory',
+          name: 'admin-addcategory',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminAddCategory.vue'),
+        },
       ],
     },
     /*

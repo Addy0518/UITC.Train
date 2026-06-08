@@ -1,7 +1,7 @@
 <script setup>
 import { logoutApi } from '@/api/userService';
 import { getAllProduct } from '@/api/productsService';
-import defaultImgurl from '@/img/oguri-cap-chibi.png';
+import defaultImgurl from '@/img/預設圖片.jpg';
 /*
    變數名稱代表意義
    authStore : pinia 注入
