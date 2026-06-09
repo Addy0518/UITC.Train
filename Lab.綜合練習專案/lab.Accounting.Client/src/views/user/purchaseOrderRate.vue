@@ -99,7 +99,7 @@ const createRate = async () => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       showToastSuccess('評價成功!');
-      router.push({ name: 'product-detail', params: { id: rateOrder.value.productsId } });
+      router.push({ name: 'purchase-orders' });
     }
     if (data.codeStatus === 4000) {
       showToastError(getError400Message(data.error400));

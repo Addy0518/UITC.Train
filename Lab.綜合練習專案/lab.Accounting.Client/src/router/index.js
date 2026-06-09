@@ -329,6 +329,17 @@ const router = createRouter({
         },
         {
           /*
+            賣家數據
+          */
+          path: 'seller-data',
+          name: 'seller-data',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/backend/seller/sellerData.vue'),
+        },
+        {
+          /*
             賣家查看的賣場
           */
           path: 'seller-product',

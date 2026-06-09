@@ -30,7 +30,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  FROM MallProductsRate r 
                                  WHERE r.ProductsId = m.productsid), 0) AS ProductsAVGRate,
 
-                                 ISNULL((Select Count(o.BoughtQuantity)
+                                 ISNULL((Select SUM(o.BoughtQuantity)
                                  From MallOrder o
                                  Where o.ProductsId = m.ProductsId),0) as BoughtQuantity,
                                  Count(*) over() as TotalCount

@@ -20,6 +20,11 @@ onMounted(() => {});
       <!-- #region  賣家後台區-->
       <template v-if="authStore.userRole == 'Seller'">
         <RouterLink
+          :to="{ name: 'seller-data' }"
+          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+          ><i class="pi pi-chart-scatter px-5 ps-5"></i>賣場數據</RouterLink
+        >
+        <RouterLink
           :to="{ name: 'seller-product' }"
           class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
           ><i class="pi pi-plus px-5 ps-5"></i>商品管理</RouterLink
