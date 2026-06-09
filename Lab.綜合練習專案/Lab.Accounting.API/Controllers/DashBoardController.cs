@@ -5,7 +5,7 @@ namespace Lab.Accounting.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = RolesAuth.賣家)]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
     public class DashBoardController(IDashBoradService dashBoradService) : ControllerBase
