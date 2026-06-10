@@ -112,5 +112,24 @@ namespace Lab.Accounting.API.Repositories.Interface
 
             return await conn.QueryAsync<TopSellingResponse>(sql, new { SellerUserId = sellerUserId });
         }
+
+        /// <summary>
+        /// 查看賣家的所有商品評分分布
+        /// </summary>
+        /// <param name="sellerUserId">賣家 ID</param>
+        /// <returns>評分分布</returns>
+        public async Task<IEnumerable<DashBoardRateResponse>> GetRateDistribution(int sellerUserId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Select [Rating] as RateDistribution,Count(*) as RateCount 
+                From [MallProductsRate] 
+                Where ProductsId in (Select ProductsId from MallProducts where UserId=@SellerUserId)
+                Group by Rating 
+                Order by Rating ";
+
+            return await conn.QueryAsync<DashBoardRateResponse>(sql, new { SellerUserId = sellerUserId });
+        }
     }
 }

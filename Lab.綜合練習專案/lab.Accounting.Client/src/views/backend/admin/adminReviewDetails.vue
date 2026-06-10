@@ -89,7 +89,7 @@ const approveReview = async (status) => {
 
 <template>
   <div class="flex flex-col w-full p-6" v-if="review">
-    <!-- 商品資訊 -->
+    <!--#region  商品資訊-->
     <div class="bg-white rounded-lg border border-gray-100 p-5 mb-3">
       <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
         <i class="pi pi-box text-xs" />商品資訊
@@ -109,8 +109,10 @@ const approveReview = async (status) => {
         </div>
       </div>
     </div>
+    <!-- #endregion -->
 
-    <!-- 審核人員資訊 -->
+    
+    <!--#region  審核人員資訊-->
     <div class="bg-white rounded-lg border border-gray-100 p-5 mb-3">
       <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
         <i class="pi pi-user text-xs" />審核人員資訊
@@ -136,8 +138,9 @@ const approveReview = async (status) => {
         </div>
       </div>
     </div>
+    <!-- #endregion -->
 
-    <!-- 駁回原因（有駁回才顯示） -->
+    <!--#region  駁回原因（有駁回才顯示）-->
     <div
       v-if="review.reviewStatus === 2"
       class="bg-red-50 rounded-lg border border-red-100 p-5 mb-3"
@@ -147,8 +150,9 @@ const approveReview = async (status) => {
       </p>
       <p class="text-sm text-red-700">{{ review.notPassReson }}</p>
     </div>
+      <!-- #endregion -->
 
-    <!-- 審核操作（待審核才顯示） -->
+   <!--#region  審核操作（待審核才顯示）-->
     <div v-if="review.reviewStatus === 0" class="bg-white rounded-lg border border-gray-100 p-5">
       <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
         <i class="pi pi-check-circle text-xs" />審核操作
@@ -176,6 +180,8 @@ const approveReview = async (status) => {
           通過
         </button>
       </div>
+        <!-- #endregion -->
     </div>
+
   </div>
 </template>

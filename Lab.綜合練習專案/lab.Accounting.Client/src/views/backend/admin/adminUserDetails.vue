@@ -108,7 +108,7 @@ const updateUserStatus = async (id) => {
 
 <template>
   <div class="flex flex-col w-full p-6" v-if="userInfo">
-    <!-- 商品資訊 -->
+    <!--#region  用戶資訊 -->
     <div class="bg-white rounded-lg border border-gray-100 p-5 mb-3">
       <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
         <i class="pi pi-user text-xs" />用戶資訊
@@ -188,8 +188,8 @@ const updateUserStatus = async (id) => {
         </div>
       </div>
     </div>
-
-    <!-- 停用 -->
+  <!-- #endregion -->
+    <!--#region  停用或恢復帳號 -->
     <button
       v-if="userInfo.isDelete === 0"
       @click="goDelete = !goDelete"
@@ -238,5 +238,6 @@ const updateUserStatus = async (id) => {
         </button>
       </div>
     </div>
+     <!-- #endregion -->
   </div>
 </template>

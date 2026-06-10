@@ -33,6 +33,7 @@ import Breadcrumb from 'primevue/breadcrumb';
 import Paginator from 'primevue/paginator';
 import AutoComplete from 'primevue/autocomplete';
 import Skeleton from 'primevue/skeleton';
+import Chart from 'primevue/chart';
 const app = createApp(App);
 
 const pinia = createPinia();
@@ -75,6 +76,7 @@ app.component('Breadcrumb', Breadcrumb);
 app.component('Paginator', Paginator);
 app.component('AutoComplete', AutoComplete);
 app.component('Skeleton', Skeleton);
+app.component('Chart', Chart);
 app.component('InValidErrorMessage', InValidErrorMessage);
 app.component('Loading', Loading);
 app.use(ToastService);

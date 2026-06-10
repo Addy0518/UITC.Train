@@ -26,4 +26,9 @@ public class DashBoardResponse
     /// 銷量最好的前五的商品
     /// </summary>
     public IEnumerable<TopSellingResponse> TopSellingProducts { get; set; }
+
+    /// <summary>
+    /// 賣家的所有商品評分分布
+    /// </summary>
+    public IEnumerable<DashBoardRateResponse> RateDistribution { get; set; }
 }

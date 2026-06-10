@@ -44,7 +44,7 @@ onMounted(() => {});
         <RouterLink
           :to="{ name: 'seller-product-recycling' }"
           class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-wallet px-5 ps-5"></i>商品回收</RouterLink
+          ><i class="pi pi-trash px-5 ps-5"></i>商品回收</RouterLink
         >
       </template>
       <!-- #endregion -->

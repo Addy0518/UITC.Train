@@ -14,6 +14,7 @@ public class DashboradService(IDashBoradRepository dashBoradRepository) : IDashB
         var weekSalesTask = dashBoradRepository.GetWeekSales(sellerUserId);
         var lowStockTask = dashBoradRepository.GetLowStockProducts(sellerUserId);
         var topSellingTask = dashBoradRepository.GetTopSellingProducts(sellerUserId);
+        var rateDistributionTask = dashBoradRepository.GetRateDistribution(sellerUserId);
 
         // 同時發出所有查詢
         await Task.WhenAll(totalRevenueTask, monthlyRevenueTask, weekSalesTask, lowStockTask, topSellingTask);
@@ -25,6 +26,7 @@ public class DashboradService(IDashBoradRepository dashBoradRepository) : IDashB
             WeekSales = weekSalesTask.Result,
             LowStockProducts = lowStockTask.Result,
             TopSellingProducts = topSellingTask.Result,
+            RateDistribution = rateDistributionTask.Result,
         };
 
         return ApiResponseHelper.Success(result);

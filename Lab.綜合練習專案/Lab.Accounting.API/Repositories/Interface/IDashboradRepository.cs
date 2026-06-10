@@ -38,4 +38,11 @@ public interface IDashBoradRepository
     /// <param name="sellerUserId">賣家 ID</param>
     /// <returns>商品</returns>
     Task<IEnumerable<TopSellingResponse>> GetTopSellingProducts(int sellerUserId);
+
+    /// <summary>
+    /// 查看賣家的所有商品評分分布
+    /// </summary>
+    /// <param name="sellerUserId">賣家 ID</param>
+    /// <returns>評分分布</returns>
+    Task<IEnumerable<DashBoardRateResponse>> GetRateDistribution(int sellerUserId);
 }

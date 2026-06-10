@@ -26,5 +26,23 @@
         /// 發表時間
         /// </summary>
         public DateTime CreateTime { get; set; }
+
+        /// <summary>
+        /// 評價分布數量
+        /// </summary>
+        public int? RateDistribution { get; set; }
+    }
+
+    public class DashBoardRateResponse
+    {
+        /// <summary>
+        /// 評分分布區域
+        /// </summary>
+        public int RateDistribution { get; set; }
+
+        /// <summary>
+        /// 評分分布數量
+        /// </summary>
+        public int RateCount { get; set; }
     }
 }
