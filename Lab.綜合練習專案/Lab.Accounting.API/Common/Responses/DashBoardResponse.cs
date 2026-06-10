@@ -20,7 +20,7 @@ public class DashBoardResponse
     /// <summary>
     /// 庫存少於五的商品
     /// </summary>
-    public IEnumerable<MallProducts> LowStockProducts { get; set; }
+    public IEnumerable<Infrastructures.Data.Entities.Product> LowStockProducts { get; set; }
 
     /// <summary>
     /// 銷量最好的前五的商品

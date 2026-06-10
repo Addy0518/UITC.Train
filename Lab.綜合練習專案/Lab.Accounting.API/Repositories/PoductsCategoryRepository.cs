@@ -19,7 +19,7 @@ namespace Lab.Accounting.API.Repositories
 
             var sql =
                 @"select *
-                from MallProductCategory 
+                from ProductCategory 
                 where ProductCategoryId=@categoryId";
             return await conn.QueryFirstOrDefaultAsync<MallProductCategory>(sql, new { categoryId = categoryId });
         }
@@ -35,7 +35,7 @@ namespace Lab.Accounting.API.Repositories
             int offset = request.pageIndex * request.pageSize;
             var sql =
                 @"select *,Count(*) OVER() AS TotalCount
-                from MallProductCategory
+                from ProductCategory
                 Where (@keyWords is null 
                 or     ProductCategoryName like '%' + @keyWords + '%') 
                 and    (@parentId is null or ProductParentId=@parentId)
@@ -66,7 +66,7 @@ namespace Lab.Accounting.API.Repositories
 
             var sql =
                 @"select c.*
-                from MallProductCategory c
+                from ProductCategory c
                 Join MallProductCategory_Closure cl on cl.SonId=c.ProductCategoryId
                 where cl.FatherId=@FatherCategoryId
                 and cl.Depth>0";
@@ -84,8 +84,8 @@ namespace Lab.Accounting.API.Repositories
 
             var sql =
                 @"select c.*
-                from MallProductCategory c
-                Join MallProductCategory_Closure cl on cl.FatherId=c.ProductCategoryId
+                from ProductCategory c
+                Join ProductCategory_Closure cl on cl.FatherId=c.ProductCategoryId
                 where cl.SonId=@SonCategoryId
                 order by cl.Depth desc";
             return await conn.QueryAsync<MallProductCategory>(sql, new { SonCategoryId = sonCategoryId });
@@ -101,8 +101,8 @@ namespace Lab.Accounting.API.Repositories
 
             var sql =
                 @"select c.*
-                from MallProductCategory c
-                Join MallProductCategory_Closure cl on cl.SonId=c.ProductCategoryId
+                from ProductCategory c
+                Join ProductCategory_Closure cl on cl.SonId=c.ProductCategoryId
                 where cl.FatherId=cl.SonId
                 and cl.Depth=0
                 and c.ProductParentId is null";
@@ -120,8 +120,8 @@ namespace Lab.Accounting.API.Repositories
 
             var sql =
                 @"select c.*
-                from MallProductCategory c
-                Join MallProductCategory_Closure cl on cl.SonId=c.ProductCategoryId
+                from ProductCategory c
+                Join ProductCategory_Closure cl on cl.SonId=c.ProductCategoryId
                 where cl.FatherId=@FatherCategoryId
                 and cl.Depth=1";
             return await conn.QueryAsync<MallProductCategory>(sql, new { FatherCategoryId = fatherCategoryId });
@@ -141,14 +141,14 @@ namespace Lab.Accounting.API.Repositories
                 {
                     // 新增類別
                     var sql1 =
-                        @" INSERT INTO MallProductCategory (ProductCategoryName, ProductParentId)
+                        @" INSERT INTO ProductCategory (ProductCategoryName, ProductParentId)
                          VALUES (@ProductCategoryName, @ProductParentId);
                          SELECT SCOPE_IDENTITY();";
                     var sonId = await conn.ExecuteScalarAsync<int>(sql1, request);
 
                     // 用剛剛新增的類別的 ID 新增類別關聯閉鎖表
                     var sql2 =
-                        @" INSERT INTO MallProductCategory_Closure (FatherId, SonId, Depth)
+                        @" INSERT INTO ProductCategory_Closure (FatherId, SonId, Depth)
                            VALUES (@SonId, @SonId, 0)";
                     await conn.ExecuteAsync(sql2, new { SonId = sonId });
 
@@ -165,9 +165,9 @@ namespace Lab.Accounting.API.Repositories
                     if (request.ProductParentId.HasValue)
                     {
                         var sql3 =
-                            @" INSERT INTO MallProductCategory_Closure (FatherId, SonId, Depth)
+                            @" INSERT INTO ProductCategory_Closure (FatherId, SonId, Depth)
                              SELECT FatherId, @SonId, Depth + 1
-                             FROM MallProductCategory_Closure
+                             FROM ProductCategory_Closure
                              WHERE SonId = @ParentId;";
                         await conn.ExecuteAsync(sql3, new { SonId = sonId, ParentId = request.ProductParentId });
                     }
@@ -192,7 +192,7 @@ namespace Lab.Accounting.API.Repositories
             using var conn = connecting.CreateConnecting();
 
             var sql1 =
-                @"UPDATE MallProductCategory 
+                @"UPDATE ProductCategory 
                   SET ProductCategoryImg = @FileName 
                   WHERE ProductCategoryId = @CategoryId";
             return await conn.ExecuteAsync(sql1, new { FileName = fileName, CategoryId = categoryId });
@@ -212,15 +212,15 @@ namespace Lab.Accounting.API.Repositories
                 {
                     // 刪除類別
                     var sql =
-                        @"Delete from MallProductCategory OUTPUT [DELETED].* Where ProductCategoryId IN (
-                                SELECT SonId FROM MallProductCategory_Closure 
+                        @"Delete from ProductCategory OUTPUT [DELETED].* Where ProductCategoryId IN (
+                                SELECT SonId FROM ProductCategory_Closure 
                                 WHERE FatherId = @CategoryId)";
                     var affectRows = await conn.QueryAsync<MallProductCategory>(sql, new { CategoryId = categoryId });
 
                     // 刪除閉鎖表的關聯 ( 除了刪除自己以外也刪除底下的其他類別 , 不然會有孤兒類別 )
                     var sql2 =
-                        @" Delete from MallProductCategory_Closure 
-                           Where SonId in (Select SonId From MallProductCategory_Closure Where FatherId=@CategoryId)";
+                        @" Delete from ProductCategory_Closure 
+                           Where SonId in (Select SonId From ProductCategory_Closure Where FatherId=@CategoryId)";
                     await conn.ExecuteAsync(sql2, new { CategoryId = categoryId });
 
                     trxScope.Complete();

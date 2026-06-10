@@ -7,12 +7,12 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     /// </summary>
     /// <param name="productrate">商品評價資訊</param>
     /// <returns>影響列數</returns>
-    public async Task<int> CreateProductRate(MallProductsRate productrate)
+    public async Task<int> CreateProductRate(ProductRate productrate)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"INSERT INTO MallProductsRate
+            @"INSERT INTO ProductRate
                                     (UserId,
                                      ProductsId,
                                      OrderId,
@@ -41,7 +41,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     {
         using var conn = connecting.CreateConnecting();
 
-        var sql = @"Delete From MallProductsRate Where ProductsRateId=@ProductsRateId";
+        var sql = @"Delete From ProductRate Where ProductsRateId=@ProductsRateId";
         return await conn.ExecuteAsync(sql, new { ProductsRateId = productRateId });
     }
 
@@ -62,7 +62,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
                        r.Rating,
                        r.Comment,
                        r.CreateTime
-                FROM   MallProductsRate r
+                FROM   ProductRate r
                 Join   [User] u on r.UserId=u.UserId
                 WHERE  r.OrderId = @OrderId ";
 
@@ -86,7 +86,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
                        r.Rating,
                        r.Comment,
                        r.CreateTime
-                FROM   MallProductsRate r
+                FROM   ProductRate r
                 Join   [User] u on r.UserId=u.UserId
                 WHERE  r.ProductsId = @ProductsId ";
 
@@ -104,8 +104,8 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
 
         var sql =
             @"SELECT   Count(*)
-                FROM   MallProductsRate r
-                Join   mallProducts p 
+                FROM   ProductRate r
+                Join   Product p 
                 on     p.ProductsId=r.ProductsId
                 WHERE  p.UserId = @SellerId";
 
@@ -123,7 +123,7 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
 
         var sql =
             @"SELECT Round(Avg(rating),1)
-                FROM   mallproductsrate
+                FROM   productrate
                 WHERE  productsid = @productsId ";
 
         return await conn.QuerySingleAsync<decimal?>(sql, new { productsId = productId });
@@ -140,8 +140,8 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
 
         var sql =
             @"SELECT Round(Avg(rating),1)
-                FROM   mallproductsrate r
-                Join   mallProducts p 
+                FROM   productrate r
+                Join   Product p 
                 on     p.ProductsId=r.ProductsId
                 WHERE  p.UserId = @SellerId ";
 

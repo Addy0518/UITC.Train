@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities;
 
-public class MallProducts
+public class Product
 {
     /// <summary>
     /// 商品 ID

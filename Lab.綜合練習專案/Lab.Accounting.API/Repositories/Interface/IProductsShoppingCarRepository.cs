@@ -7,7 +7,7 @@ public interface IProductsShoppingCarRepository
     /// </summary>
     /// <param name="userId">使用者 Id</param>
     /// <returns>購物車中的所有商品</returns>
-    Task<IEnumerable<Product>> GetAllProductsInShoppingCar(int userId);
+    Task<IEnumerable<ProductDetails>> GetAllProductsInShoppingCar(int userId);
 
     /// <summary>
     /// 新增單一商品到購物車

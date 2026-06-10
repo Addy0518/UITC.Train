@@ -80,7 +80,7 @@ namespace Lab.Accounting.API.Services
                     // 判斷是更新商品還是新增商品 ( Id 是 null 就是新增 )
                     if (reviewInfo.ProductsId == null)
                     {
-                        var createInfo = new MallProducts
+                        var createInfo = new Infrastructures.Data.Entities.Product
                         {
                             UserId = reviewInfo.SellerId,
                             ProductsName = reviewInfo.ProductsName,
@@ -101,7 +101,7 @@ namespace Lab.Accounting.API.Services
                     }
                     else if (request.ProductsId != null)
                     {
-                        var updateInfo = new MallProducts
+                        var updateInfo = new Infrastructures.Data.Entities.Product
                         {
                             ProductsId = reviewInfo.ProductsId ?? request.ProductsId,
                             UserId = reviewInfo.SellerId,

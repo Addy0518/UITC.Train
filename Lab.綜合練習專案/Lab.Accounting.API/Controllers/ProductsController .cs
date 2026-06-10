@@ -20,7 +20,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     /// <returns>商品資訊</returns>
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Product>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductDetails>))]
     public async Task<IActionResult> GetProducts([FromQuery] int productId)
     {
         return Ok(await productsService.GetProducts(productId));

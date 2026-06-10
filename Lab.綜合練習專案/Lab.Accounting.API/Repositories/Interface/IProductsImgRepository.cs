@@ -15,21 +15,21 @@ public interface IProductsImgRepository
     /// </summary>
     /// <param name="reviewId">審查表 ID </param>
     /// <returns>商品圖片 URL</returns>
-    Task<IEnumerable<MallProductImg>> GetReviewAllImg(int reviewId);
+    Task<IEnumerable<ProductImg>> GetReviewAllImg(int reviewId);
 
     /// <summary>
     /// 查看商品所有圖片
     /// </summary>
     /// <param name="productsId">商品 ID </param>
     /// <returns>商品圖片 URL</returns>
-    Task<IEnumerable<MallProductImg>> GetProductsAllImg(int productsId);
+    Task<IEnumerable<ProductImg>> GetProductsAllImg(int productsId);
 
     /// <summary>
     /// 查看商品圖片
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>商品圖片 URL</returns>
-    Task<MallProductImg> GetProductsImg(int productsImgId);
+    Task<ProductImg> GetProductsImg(int productsImgId);
 
     /// <summary>
     /// 審核通過後新增圖片的商品 ID
@@ -44,5 +44,5 @@ public interface IProductsImgRepository
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>刪除的圖片</returns>
-    Task<MallProductImg> DeleteProductsImg(int productsImgId);
+    Task<ProductImg> DeleteProductsImg(int productsImgId);
 }

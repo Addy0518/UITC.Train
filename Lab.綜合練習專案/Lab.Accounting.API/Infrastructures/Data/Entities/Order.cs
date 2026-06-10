@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities;
 
-public class MallOrder
+public class Order
 {
     /// <summary>
     /// 訂單 ID

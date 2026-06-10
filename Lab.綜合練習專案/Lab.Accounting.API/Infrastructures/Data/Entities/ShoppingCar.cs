@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities;
 
-public class MallShoppingCar
+public class ShoppingCar
 {
     /// <summary>
     /// 購物車 ID

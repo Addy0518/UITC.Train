@@ -16,7 +16,7 @@ namespace Lab.Accounting.API.Repositories
                 @"Select r.*,
                          u.UserName as SellerName,
                          s.UserName as AdminName
-                  From dbo.ProductsReview r
+                  From dbo.ProductReview r
                   Left Join [User] u on r.SellerId = u.UserId
                   Left Join [User] s on r.AdminId=s.UserId
                   Where r.ProductsReviewId = @ProductsReviewId  
@@ -40,7 +40,7 @@ namespace Lab.Accounting.API.Repositories
                          u.UserName as SellerName,
                          s.UserName as AdminName, 
                          Count(*) over() as TotalCount 
-                  From dbo.ProductsReview r
+                  From dbo.ProductReview r
                   Left Join [User] u on r.SellerId = u.UserId
                   Left Join [User] s on r.AdminId=s.UserId
 
@@ -82,11 +82,11 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="productsReview">賣家商品資訊</param>
         /// <returns>審核表 ID </returns>
-        public async Task<int> CreateInsertProductsReview(ProductsReview productsReview)
+        public async Task<int> CreateInsertProductsReview(ProductReview productsReview)
         {
             using var conn = connecting.CreateConnecting();
             var sql =
-                @"INSERT INTO dbo.ProductsReview 
+                @"INSERT INTO dbo.ProductReview 
                 (
                     ProductsId, 
                     SellerId,
@@ -128,7 +128,7 @@ namespace Lab.Accounting.API.Repositories
         {
             using var conn = connecting.CreateConnecting();
             var sql =
-                @"Update dbo.ProductsReview
+                @"Update dbo.ProductReview
                   Set 
                       AdminId=@AdminId,
                       ReviewStatus = @ReviewStatus,

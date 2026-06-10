@@ -1,6 +1,6 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities
 {
-    public class ProductsReview
+    public class ProductReview
     {
         /// <summary>
         /// 審核紀錄 ID

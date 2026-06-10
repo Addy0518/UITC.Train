@@ -28,7 +28,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
     /// </summary>
     /// <param name="reviewId">審查表 ID </param>
     /// <returns>商品圖片 URL</returns>
-    public async Task<IEnumerable<MallProductImg>> GetReviewAllImg(int reviewId)
+    public async Task<IEnumerable<ProductImg>> GetReviewAllImg(int reviewId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -37,7 +37,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
                 FROM   ProductImg
                 WHERE  ProductsReviewId = @ProductsReviewId ";
 
-        return await conn.QueryAsync<MallProductImg>(sql, new { ProductsReviewId = reviewId });
+        return await conn.QueryAsync<ProductImg>(sql, new { ProductsReviewId = reviewId });
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
     /// </summary>
     /// <param name="productsId">商品 ID </param>
     /// <returns>商品圖片 URL</returns>
-    public async Task<IEnumerable<MallProductImg>> GetProductsAllImg(int productsId)
+    public async Task<IEnumerable<ProductImg>> GetProductsAllImg(int productsId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -54,7 +54,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
                 FROM   ProductImg
                 WHERE  ProductsId = @ProductsId ";
 
-        return await conn.QueryAsync<MallProductImg>(sql, new { ProductsId = productsId });
+        return await conn.QueryAsync<ProductImg>(sql, new { ProductsId = productsId });
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>商品圖片 URL</returns>
-    public async Task<MallProductImg> GetProductsImg(int productsImgId)
+    public async Task<ProductImg> GetProductsImg(int productsImgId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -71,7 +71,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
                 FROM   ProductImg
                 WHERE  productsImgId = @productsImgId ";
 
-        return await conn.QueryFirstOrDefaultAsync<MallProductImg>(sql, new { productsImgId = productsImgId });
+        return await conn.QueryFirstOrDefaultAsync<ProductImg>(sql, new { productsImgId = productsImgId });
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>刪除的圖片</returns>
-    public async Task<MallProductImg> DeleteProductsImg(int productsImgId)
+    public async Task<ProductImg> DeleteProductsImg(int productsImgId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -108,6 +108,6 @@ public class ProductsImgRepository(DBConnecting connecting) : IProductsImgReposi
                 Output [DELETED].*
                 WHERE  ProductsImgId = @ProductsImgId ";
 
-        return await conn.QueryFirstOrDefaultAsync<MallProductImg>(sql, new { ProductsImgId = productsImgId });
+        return await conn.QueryFirstOrDefaultAsync<ProductImg>(sql, new { ProductsImgId = productsImgId });
     }
 }

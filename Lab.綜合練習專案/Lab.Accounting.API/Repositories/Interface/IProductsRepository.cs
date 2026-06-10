@@ -9,35 +9,35 @@ public interface IProductsRepository
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<IEnumerable<Product>> GetAllProducts(ProductsSearchRequest request);
+    Task<IEnumerable<ProductDetails>> GetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 賣家查看自己的所有商品
     /// </summary>
     ///  <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    Task<IEnumerable<Product>> SellerGetAllProducts(ProductsSearchRequest request);
+    Task<IEnumerable<ProductDetails>> SellerGetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
     /// 查看單一商品
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    Task<Product> GetProducts(int productId);
+    Task<ProductDetails> GetProducts(int productId);
 
     /// <summary>
     /// 新增單一商品
     /// </summary>
     /// <param name="products">商品資訊</param>
     /// <returns>商品 ID</returns>
-    Task<int> CreateProducts(MallProducts products);
+    Task<int> CreateProducts(Product products);
 
     /// <summary>
     /// 更新單一商品
     /// </summary>
     /// <param name="products">商品資訊</param>
     /// <returns>影響列數</returns>
-    Task<int> UpdateProducts(MallProducts products);
+    Task<int> UpdateProducts(Product products);
 
     /// <summary>
     /// 復原已選取的商品刪除狀態

@@ -7,7 +7,7 @@ public interface IProductsRateRepository
     /// </summary>
     /// <param name="productrate">商品評價資訊</param>
     /// <returns>影響列數</returns>
-    Task<int> CreateProductRate(MallProductsRate productrate);
+    Task<int> CreateProductRate(ProductRate productrate);
 
     /// <summary>
     /// 刪除單一商品評價

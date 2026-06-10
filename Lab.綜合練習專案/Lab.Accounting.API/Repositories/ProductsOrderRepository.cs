@@ -23,8 +23,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
-            FROM   mallorder m
-            Left Join   mallproducts p on m.productsid=p.productsid
+            FROM   [Order] m
+            Left Join   product p on m.productsid=p.productsid
             Where OrderId = @OrderId
             And m.UserId = @UserId";
 
@@ -49,8 +49,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
-            FROM   mallorder m
-            Left Join   mallproducts p on m.productsid=p.productsid
+            FROM   [Order] m
+            Left Join   product p on m.productsid=p.productsid
             Where OrderId = @OrderId
             And m.SellerUserId = @SellerId";
 
@@ -65,16 +65,16 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     /// </summary>
     /// <param name="orderNumber">訂單編號</param>
     /// <returns>多筆訂單資訊</returns>
-    public async Task<IEnumerable<MallOrder>> GetOrderByOrderNumber(string orderNumber)
+    public async Task<IEnumerable<Order>> GetOrderByOrderNumber(string orderNumber)
     {
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"Select * From MallOrder
+            @"Select * From [Order]
                   Where OrderNumber = @OrderNumber
                  ";
 
-        return await conn.QueryAsync<MallOrder>(addBoughtProductsql, new { OrderNumber = orderNumber });
+        return await conn.QueryAsync<Order>(addBoughtProductsql, new { OrderNumber = orderNumber });
     }
 
     /// <summary>
@@ -91,8 +91,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
-            FROM   mallorder m
-            Left Join   mallproducts p on m.productsid=p.productsid
+            FROM   [Order] m
+            Left Join   product p on m.productsid=p.productsid
             WHERE  m.userid = @UserId ";
 
         return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = userId });
@@ -112,8 +112,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                    , (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
-            FROM   mallorder m
-            Left Join   mallproducts p on m.productsid=p.productsid
+            FROM   [Order] m
+            Left Join   product p on m.productsid=p.productsid
             WHERE  m.SellerUserId = @UserId";
 
         return await conn.QueryAsync<OrderResponse>(addBoughtProductsql, new { UserId = sellerId });
@@ -134,8 +134,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                       u.UserName as UserName,
                       p.IsDelete,
                       Count(*) over() as TotalCount
-            FROM      MallOrder m
-            LEFT JOIN MallProducts p ON m.ProductsId = p.ProductsId
+            FROM      [Order] m
+            LEFT JOIN Product p ON m.ProductsId = p.ProductsId
             LEFT JOIN [User] s       ON m.SellerUserId = s.UserId  
             LEFT JOIN [User] u       ON m.UserId = u.UserId  
 
@@ -182,7 +182,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"Update MallOrder Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus)
+            @"Update [Order] Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus)
       
             WHERE  OrderId = @OrderId ";
 
@@ -197,12 +197,12 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     /// </summary>
     /// <param name="order">購買資訊</param>
     /// <returns>訂單 ID</returns>
-    public async Task<int> BuyProducts(MallOrder order)
+    public async Task<int> BuyProducts(Order order)
     {
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"INSERT INTO MallOrder
+            @"INSERT INTO [Order]
                             (OrderNumber,
                              SellerUserId,
                              UserId,
@@ -249,7 +249,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"Update MallOrder
+            @"Update [Order]
                   Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus),
                       PaidType = COALESCE(@PaidType, PaidType),
                       PaidTime = COALESCE(@PaidTime, PaidTime)
@@ -279,7 +279,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
 
         // 更新所有 ID 的訂單編號
         var addBoughtProductsql =
-            @"Update MallOrder
+            @"Update [Order]
                   Set OrderNumber =@NewOrderNumber
                   Where OrderId in @OrderIds";
 

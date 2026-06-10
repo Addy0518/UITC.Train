@@ -23,7 +23,7 @@ public interface IProductsReviewRepository
     /// </summary>
     /// <param name="productsReview">賣家商品資訊</param>
     /// <returns>審核表 ID </returns>
-    Task<int> CreateInsertProductsReview(ProductsReview productsReview);
+    Task<int> CreateInsertProductsReview(ProductReview productsReview);
 
     /// <summary>
     /// 審核通過或駁回

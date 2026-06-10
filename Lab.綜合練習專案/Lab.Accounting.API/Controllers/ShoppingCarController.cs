@@ -17,7 +17,7 @@ public class ShoppingCarController(IShoppingCarService shoppingCarService) : Con
     /// </summary>
     /// <returns>購物車中的所有商品</returns>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<MallShoppingCar>>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ShoppingCar>>))]
     public async Task<IActionResult> GetAllProductsInShoppingCar()
     {
         return Ok(await shoppingCarService.GetAllProductsInShoppingCar(CurrentUserId));

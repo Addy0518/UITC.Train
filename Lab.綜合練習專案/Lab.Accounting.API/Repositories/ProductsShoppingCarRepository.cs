@@ -7,7 +7,7 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
     /// </summary>
     /// <param name="userId">使用者 Id</param>
     /// <returns>購物車中的所有商品</returns>
-    public async Task<IEnumerable<Product>> GetAllProductsInShoppingCar(int userId)
+    public async Task<IEnumerable<ProductDetails>> GetAllProductsInShoppingCar(int userId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -20,10 +20,10 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
                                  m.ProductsStock,
                                  s.boughtquantity,
                                  STRING_AGG(c.productcategoryname, ',') as Productcategoryname
-                        FROM     mallproducts m
-                        JOIN     mallproductcategory c
+                        FROM     product m
+                        JOIN     productcategory c
                         ON       c.productcategoryid=m.ProductCategoryId                       
-                        JOIN      mallshoppingcar s
+                        JOIN     shoppingcar s
                         ON       m.productsid = s.productsid
                 WHERE  s.userid = @UserId and m.IsDelete = 0
                 GROUP BY 
@@ -35,7 +35,7 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
                                m.ProductsStock,   
                                s.boughtquantity";
 
-        return await conn.QueryAsync<Product>(sql, new { UserId = userId });
+        return await conn.QueryAsync<ProductDetails>(sql, new { UserId = userId });
     }
 
     /// <summary>
@@ -51,14 +51,14 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
 
         var sql =
             @"IF EXISTS (
-                    SELECT 1 FROM mallshoppingcar
+                    SELECT 1 FROM shoppingcar
                     WHERE productsid = @productsid AND userid = @userid
                 )
-                    UPDATE mallshoppingcar
+                    UPDATE shoppingcar
                     SET boughtquantity = boughtquantity + @boughtquantity
                     WHERE productsid = @productsid AND userid = @userid
                 ELSE
-                    INSERT INTO mallshoppingcar (userid, productsid, boughtquantity)
+                    INSERT INTO shoppingcar (userid, productsid, boughtquantity)
                     VALUES (@userid, @productsid, @boughtquantity)
 
                 SELECT CAST(@@ROWCOUNT AS INT)";
@@ -85,7 +85,7 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Delete From mallshoppingcar
+            @"Delete From shoppingcar
                 Where productsid = @ProductsId and userid = @UserId";
 
         return await conn.ExecuteAsync(sql, new { ProductsId = productsId, UserId = userId });

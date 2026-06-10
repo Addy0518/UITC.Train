@@ -2,7 +2,7 @@
 
 public class ProductsResponse
 {
-    public IEnumerable<Product> Products { get; set; }
+    public IEnumerable<ProductDetails> Products { get; set; }
 
     /// <summary>
     /// 總筆數
@@ -10,7 +10,7 @@ public class ProductsResponse
     public int? TotalCount { get; set; }
 }
 
-public class Product
+public class ProductDetails
 {
     /// <summary>
     /// 商品 ID
@@ -90,7 +90,7 @@ public class Product
     /// <summary>
     /// 商品圖片 URL
     /// </summary>
-    public IEnumerable<MallProductImg>? ProductsImgs { get; set; }
+    public IEnumerable<ProductImg>? ProductsImgs { get; set; }
 
     /// <summary>
     /// 總筆數

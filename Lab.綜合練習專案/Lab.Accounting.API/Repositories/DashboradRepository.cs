@@ -15,7 +15,7 @@ namespace Lab.Accounting.API.Repositories.Interface
 
             var sql =
                 @"Select Sum([AccountPrice]) as TotalRevenue 
-                  From [MallOrder] 
+                  From [Order] 
                   Where SellerUserId=@SellerUserId";
 
             return await conn.ExecuteScalarAsync<double>(sql, new { SellerUserId = sellerUserId });
@@ -32,7 +32,7 @@ namespace Lab.Accounting.API.Repositories.Interface
 
             var sql =
                 @" Select Sum([AccountPrice]) as TotalRevenue 
-                From [MallOrder] m 
+                From [Order] m 
                 where m.SellerUserId=@SellerUserId
 
                 -- DATEDIFF(MONTH, 起點, 終點) => 計算起點到終點之間的月數差距
@@ -55,7 +55,7 @@ namespace Lab.Accounting.API.Repositories.Interface
             var sql =
                 @"SELECT Cast([boughttime] AS DATE) AS OrderDate,
                          Sum([accountprice])          AS DailyRevenue
-                FROM   [mallorder] m
+                FROM   [order] m
                 WHERE  m.selleruserid = @SellerUserId
                        AND boughttime BETWEEN Dateadd(day, -7, Cast(Getdate() AS DATE)) AND
                                               Dateadd(day, 1, Cast(Getdate() AS DATE))
@@ -70,18 +70,21 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// </summary>
         /// <param name="sellerUserId">賣家 ID</param>
         /// <returns>商品</returns>
-        public async Task<IEnumerable<MallProducts>> GetLowStockProducts(int sellerUserId)
+        public async Task<IEnumerable<Infrastructures.Data.Entities.Product>> GetLowStockProducts(int sellerUserId)
         {
             using var conn = connecting.CreateConnecting();
 
             var sql =
                 @"Select * 
-                From [MallProducts] 
+                From [Product] 
                 WHERE UserId = @SellerUserId
                 AND ProductsStock < 5
                 Order by [ProductsStock] asc";
 
-            return await conn.QueryAsync<MallProducts>(sql, new { SellerUserId = sellerUserId });
+            return await conn.QueryAsync<Infrastructures.Data.Entities.Product>(
+                sql,
+                new { SellerUserId = sellerUserId }
+            );
         }
 
         /// <summary>
@@ -99,8 +102,8 @@ namespace Lab.Accounting.API.Repositories.Interface
                              p.productsprice,
                              p.productsstock,
                              Sum(o.boughtquantity) AS TotalSales
-                FROM   [mallproducts] p
-                       JOIN [mallorder] o
+                FROM   [product] p
+                       JOIN [order] o
                          ON p.productsid = o.productsid
                 WHERE  p.userid = @SellerUserId
                        AND p.isdelete = 0
@@ -124,8 +127,8 @@ namespace Lab.Accounting.API.Repositories.Interface
 
             var sql =
                 @"Select [Rating] as RateDistribution,Count(*) as RateCount 
-                From [MallProductsRate] 
-                Where ProductsId in (Select ProductsId from MallProducts where UserId=@SellerUserId)
+                From [ProductRate] 
+                Where ProductsId in (Select ProductsId from Product where UserId=@SellerUserId)
                 Group by Rating 
                 Order by Rating ";
 

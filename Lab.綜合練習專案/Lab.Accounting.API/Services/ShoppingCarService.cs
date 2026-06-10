@@ -12,19 +12,19 @@ public class ShoppingCarService(
     /// </summary>
     /// <param name="userId">使用者 Id</param>
     /// <returns>購物車中的所有商品</returns>
-    public async Task<ApiResponse<IEnumerable<Product>>> GetAllProductsInShoppingCar(int userId)
+    public async Task<ApiResponse<IEnumerable<ProductDetails>>> GetAllProductsInShoppingCar(int userId)
     {
         var alltarget = await productsShoppingCarRepositories.GetAllProductsInShoppingCar(userId);
         if (alltarget == null || !alltarget.Any())
         {
-            return ApiResponseHelper.NotFound<IEnumerable<Product>>();
+            return ApiResponseHelper.NotFound<IEnumerable<ProductDetails>>();
         }
         foreach (var target in alltarget)
         {
             var imgs = await productsImgRepository.GetProductsAllImg(target.ProductsId);
             target.ProductsImgs = imgs;
         }
-        return ApiResponseHelper.Success<IEnumerable<Product>>(alltarget);
+        return ApiResponseHelper.Success<IEnumerable<ProductDetails>>(alltarget);
     }
 
     /// <summary>

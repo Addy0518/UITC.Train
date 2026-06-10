@@ -9,7 +9,7 @@ public interface IProductsService
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    Task<ApiResponse<Product>> GetProducts(int productId);
+    Task<ApiResponse<ProductDetails>> GetProducts(int productId);
 
     /// <summary>
     /// 查看所有商品 ( 可選擇查看指定賣家的所有商品 )
@@ -61,7 +61,7 @@ public interface IProductsService
     /// <param name="productsImgsFiles">商品圖片檔案</param>
     /// <param name="reviewId">審核表 ID</param>
     /// <returns>新增成功的圖片</returns>
-    Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int reviewId);
+    Task<ApiResponse<IEnumerable<ProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int reviewId);
 
     /// <summary>
     /// 商品描述的圖片上傳
@@ -75,7 +75,7 @@ public interface IProductsService
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>刪除的圖片</returns>
-    Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId);
+    Task<ApiResponse<ProductImg>> DeleteProductsImg(int productsImgId);
 
     /// <summary>
     /// 查看單一訂單評價

@@ -9,7 +9,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<IEnumerable<Product>> GetAllProducts(ProductsSearchRequest request)
+    public async Task<IEnumerable<ProductDetails>> GetAllProducts(ProductsSearchRequest request)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -27,16 +27,16 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  -- 計算平均評分
                                  -- 外層 ISNULL 是為了當今天回傳值是 null ( 沒有評分 ) 的話就回傳 0
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                                 FROM MallProductsRate r 
+                                 FROM ProductRate r 
                                  WHERE r.ProductsId = m.productsid), 0) AS ProductsAVGRate,
 
                                  ISNULL((Select SUM(o.BoughtQuantity)
-                                 From MallOrder o
+                                 From [Order] o
                                  Where o.ProductsId = m.ProductsId),0) as BoughtQuantity,
                                  Count(*) over() as TotalCount
 
-                        FROM     mallproducts m
-                        JOIN     mallproductcategory c
+                        FROM     product m
+                        JOIN     productcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
                         
 
@@ -46,13 +46,13 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         and  m.ProductsStock > 0
                         and  m.ReviewStatus=1
                         and  (@productCategoryId is null or m.ProductCategoryId IN (
-                                SELECT SonId FROM MallProductCategory_Closure
+                                SELECT SonId FROM ProductCategory_Closure
                                 WHERE FatherId = @productCategoryId))
                         and  (@keyWords is null or  m.productsname like '%' + @keyWords + '%')
                         and (@minPrice is null or m.productsprice >= @minPrice)
                         and (@maxPrice is null or m.productsprice <= @maxPrice)
                         and (@rate is null or  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                            FROM MallProductsRate r 
+                            FROM ProductRate r 
                             WHERE r.ProductsId = m.productsid), 0)>=@rate)
                         
 
@@ -63,16 +63,16 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         case when @sortBy='CreateTime' and @sortOrder='desc' then m.CreateTime end desc,
                         case when @sortBy='Rate' and @sortOrder='asc' then 
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                                 FROM MallProductsRate r 
+                                 FROM ProductRate r 
                                  WHERE r.ProductsId = m.productsid), 0) end asc,
                         case when @sortBy='Rate' and @sortOrder='desc' 
                                  then ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                                 FROM MallProductsRate r 
+                                 FROM ProductRate r 
                                  WHERE r.ProductsId = m.productsid), 0) end desc,
                         m.productsid 
                         offset @offset rows FETCH next @pageSize rows only";
 
-        var result = await conn.QueryAsync<Product>(
+        var result = await conn.QueryAsync<ProductDetails>(
             sql,
             new
             {
@@ -96,7 +96,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     ///  <param name="request">搜尋條件</param>
     /// <returns>商品列表</returns>
-    public async Task<IEnumerable<Product>> SellerGetAllProducts(ProductsSearchRequest request)
+    public async Task<IEnumerable<ProductDetails>> SellerGetAllProducts(ProductsSearchRequest request)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -113,11 +113,11 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.isDelete,
                                  c.productcategoryname,
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                                 FROM MallProductsRate r 
+                                 FROM ProductRate r 
                                  WHERE r.ProductsId = m.productsid), 0) AS ProductsAVGRate,
                                  Count(*) over() as TotalCount
-                        FROM     mallproducts m
-                        JOIN     mallproductcategory c
+                        FROM     product m
+                        JOIN     productcategory c
                         ON       c.productcategoryid= m.ProductCategoryId
                         Where (@UserId is null or m.userId=@UserId) 
                         and  (@IsDelete is null or m.IsDelete=@IsDelete) 
@@ -125,7 +125,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         and (@minPrice is null or m.productsprice >= @minPrice)
                         and (@maxPrice is null or m.productsprice <= @maxPrice)
                         and (@rate is null or  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                            FROM MallProductsRate r 
+                            FROM ProductRate r 
                             WHERE r.ProductsId = m.productsid), 0)>=@rate)
 
                         ORDER BY 
@@ -135,16 +135,16 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                         case when @sortBy='CreateTime' and @sortOrder='desc' then m.CreateTime end desc,
                         case when @sortBy='Rate' and @sortOrder='asc' then 
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                                 FROM MallProductsRate r 
+                                 FROM ProductRate r 
                                  WHERE r.ProductsId = m.productsid), 0) end asc,
                         case when @sortBy='Rate' and @sortOrder='desc' 
                                  then ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
-                                 FROM MallProductsRate r 
+                                 FROM ProductRate r 
                                  WHERE r.ProductsId = m.productsid), 0) end desc,
                         m.productsid 
                         offset @offset rows FETCH next @pageSize rows only";
 
-        var result = await conn.QueryAsync<Product>(
+        var result = await conn.QueryAsync<ProductDetails>(
             sql,
             new
             {
@@ -168,7 +168,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    public async Task<Product> GetProducts(int productId)
+    public async Task<ProductDetails> GetProducts(int productId)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -185,14 +185,14 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                c.productcategoryid,        
                                c.ProductParentId,
                                parent.productcategoryname as parentcategoryname
-                        FROM   mallproducts m
-                        left JOIN mallproductcategory c
+                        FROM   product m
+                        left JOIN productcategory c
                             ON c.productcategoryid =  m.ProductCategoryId
-                        left JOIN mallproductcategory parent
+                        left JOIN productcategory parent
                             ON parent.productcategoryid =  c.ProductParentId
                         WHERE  m.ProductsId = @ProductsId";
 
-        var result = await conn.QueryFirstOrDefaultAsync<Product>(sql, new { ProductsId = productId });
+        var result = await conn.QueryFirstOrDefaultAsync<ProductDetails>(sql, new { ProductsId = productId });
 
         return result;
     }
@@ -202,12 +202,12 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="products">商品資訊</param>
     /// <returns>商品 ID</returns>
-    public async Task<int> CreateProducts(MallProducts products)
+    public async Task<int> CreateProducts(Product products)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"INSERT INTO mallproducts
+            @"INSERT INTO product
                                     (userid,
                                      productsname,
                                      productsprice,
@@ -242,12 +242,12 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     /// </summary>
     /// <param name="products">商品資訊</param>
     /// <returns>影響列數</returns>
-    public async Task<int> UpdateProducts(MallProducts products)
+    public async Task<int> UpdateProducts(Product products)
     {
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"UPDATE mallproducts
+            @"UPDATE product
                         SET      
                                  productsname = COALESCE(@ProductsName, productsname),
                                  productsprice = COALESCE(@ProductsPrice, productsprice),
@@ -271,7 +271,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"UPDATE mallproducts
+            @"UPDATE product
                         SET     IsDelete = 0 ,
                                 UpdateTime   = GetDate()
                         WHERE   UserId = @UserId
@@ -294,10 +294,10 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
             isDelete == IsDeleteStatusEnum.Deleted
                 ? @"
                     Delete From ProductImg Where ProductsID=@productsId;
-                    Delete From MallProductsRate Where ProductsID=@productsId;
-                    Delete From MallShoppingCar Where ProductsID=@productsId;
-                    Delete From MallProducts Where ProductsID=@productsId and UserId=@userId;"
-                : @"Update MallProducts Set IsDelete=1,UpdateTime=GetDate() Where ProductsID=@productsId and UserId=@userId;
+                    Delete From ProductRate Where ProductsID=@productsId;
+                    Delete From ShoppingCar Where ProductsID=@productsId;
+                    Delete From Product Where ProductsID=@productsId and UserId=@userId;"
+                : @"Update Product Set IsDelete=1,UpdateTime=GetDate() Where ProductsID=@productsId and UserId=@userId;
                     ";
 
         return await conn.ExecuteAsync(deletesql, new { productsId = productsId, userId = sellerId });
@@ -313,7 +313,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
     {
         using var conn = connecting.CreateConnecting();
         var sql =
-            @"UPDATE dbo.ProductsReview
+            @"UPDATE dbo.ProductReview
               SET ProductsId = @ProductsId
               WHERE ProductsReviewId = @ProductsReviewId";
 
@@ -335,7 +335,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
         var sql =
             @"Select Case When Exists 
               ( 
-                Select 1 From MallProducts 
+                Select 1 From Product 
                 Where  ProductsName=@ProductsName
                 AND    UserId=@SellerId
                 AND    ( @ProductId is Null or ProductsId != @ProductId )
@@ -364,7 +364,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Update mallproducts
+            @"Update product
                     SET 
                           ProductsStock = @purchaseQuantity,
                           UpdateTime   = GetDate()
@@ -383,7 +383,7 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"SELECT COUNT(*) FROM mallproducts 
+            @"SELECT COUNT(*) FROM product
               WHERE UserId = @SellerId AND isDelete = 0";
 
         return await conn.ExecuteScalarAsync<int>(sql, new { SellerId = sellerId });

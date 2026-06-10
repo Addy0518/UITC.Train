@@ -162,7 +162,7 @@ public class OrderService(
                 if (stock <= 0)
                     return ApiResponseHelper.InternalException<List<int>>("庫存更新失敗");
 
-                var buytarget = new MallOrder
+                var buytarget = new Order
                 {
                     OrderNumber = merchantTradeNo,
                     SellerUserId = target.UserId,

@@ -22,13 +22,13 @@ public class ProductsService(
     /// </summary>
     /// <param name="productId">商品 Id</param>
     /// <returns>商品資訊</returns>
-    public async Task<ApiResponse<Product>> GetProducts(int productId)
+    public async Task<ApiResponse<ProductDetails>> GetProducts(int productId)
     {
         var target = await productsRepository.GetProducts(productId);
 
         if (target == null)
         {
-            return ApiResponseHelper.NotFound<Product>();
+            return ApiResponseHelper.NotFound<ProductDetails>();
         }
         target.ProductsImgs = await productsImgRepository.GetProductsAllImg(productId);
 
@@ -105,7 +105,7 @@ public class ProductsService(
     /// <returns>審核表 ID</returns>
     public async Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest)
     {
-        var product = new ProductsReview
+        var product = new ProductReview
         {
             ProductsName = productsInsertRequest.ProductsName,
             ProductsPrice = productsInsertRequest.ProductsPrice,
@@ -173,7 +173,7 @@ public class ProductsService(
                 FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsDescriptionImg", img);
             }
 
-            var review = new ProductsReview
+            var review = new ProductReview
             {
                 ProductsId = productsUpdateRequest.ProductsId,
                 SellerId = productsUpdateRequest.UserId,
@@ -226,7 +226,7 @@ public class ProductsService(
                 return ApiResponseHelper.NotFound<int>();
             }
 
-            IEnumerable<MallProductImg> imgs = new List<MallProductImg>();
+            IEnumerable<ProductImg> imgs = new List<ProductImg>();
             if (target.IsDelete == IsDeleteStatusEnum.Deleted)
             {
                 imgs = await productsImgRepository.GetProductsAllImg(productsId);
@@ -262,10 +262,7 @@ public class ProductsService(
     /// <param name="productsImgsFiles">商品圖片檔案</param>
     /// <param name="reviewId">審核表 ID</param>
     /// <returns>新增成功的圖片</returns>
-    public async Task<ApiResponse<IEnumerable<MallProductImg>>> ProductsImgUpload(
-        IFormFile productsImgsFiles,
-        int reviewId
-    )
+    public async Task<ApiResponse<IEnumerable<ProductImg>>> ProductsImgUpload(IFormFile productsImgsFiles, int reviewId)
     {
         var result = await FileUploadHelper.SaveFileAsync(productsImgsFiles, env.WebRootPath, "ProductsImg");
         var imgupload = await productsImgRepository.ProductsImgUpload(reviewId, result);
@@ -274,7 +271,7 @@ public class ProductsService(
         {
             // DB 失敗，把剛存的實體檔案清掉，避免孤兒檔案
             FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", result);
-            return ApiResponseHelper.InternalException<IEnumerable<MallProductImg>>("圖片上傳失敗");
+            return ApiResponseHelper.InternalException<IEnumerable<ProductImg>>("圖片上傳失敗");
         }
 
         var newtarget = await productsImgRepository.GetReviewAllImg(reviewId);
@@ -310,12 +307,12 @@ public class ProductsService(
     /// </summary>
     /// <param name="productsImgId">商品圖片 ID</param>
     /// <returns>刪除的圖片</returns>
-    public async Task<ApiResponse<MallProductImg>> DeleteProductsImg(int productsImgId)
+    public async Task<ApiResponse<ProductImg>> DeleteProductsImg(int productsImgId)
     {
         var result = await productsImgRepository.DeleteProductsImg(productsImgId);
         if (result == null)
         {
-            return ApiResponseHelper.NotFound<MallProductImg>();
+            return ApiResponseHelper.NotFound<ProductImg>();
         }
 
         FileUploadHelper.DeleteFile(env.WebRootPath, "ProductsImg", result.ProductsImg);
@@ -377,7 +374,7 @@ public class ProductsService(
             return ApiResponseHelper.RequestError<int>(errors);
         }
 
-        var rate = new MallProductsRate
+        var rate = new ProductRate
         {
             UserId = request.UserId,
             ProductsId = request.ProductsId,

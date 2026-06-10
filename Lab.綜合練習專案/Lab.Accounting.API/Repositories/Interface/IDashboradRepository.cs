@@ -30,7 +30,7 @@ public interface IDashBoradRepository
     /// </summary>
     /// <param name="sellerUserId">賣家 ID</param>
     /// <returns>商品</returns>
-    Task<IEnumerable<MallProducts>> GetLowStockProducts(int sellerUserId);
+    Task<IEnumerable<Infrastructures.Data.Entities.Product>> GetLowStockProducts(int sellerUserId);
 
     /// <summary>
     /// 查看賣家銷量最好的前五的商品
