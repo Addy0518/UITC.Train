@@ -38,6 +38,18 @@ namespace Lab.Accounting.API.Controllers.Admin
         }
 
         /// <summary>
+        /// 查看審查表所有圖片
+        /// </summary>
+        /// <param name="reviewId">審查表 ID </param>
+        /// <returns>商品圖片 URL</returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<ProductImg>>))]
+        public async Task<IActionResult> GetReviewAllImg([FromQuery] int reviewId)
+        {
+            return Ok(await reviewService.GetReviewAllImg(reviewId));
+        }
+
+        /// <summary>
         /// 審核通過或駁回
         /// </summary>
         /// <param name="request">商品審核請求</param>

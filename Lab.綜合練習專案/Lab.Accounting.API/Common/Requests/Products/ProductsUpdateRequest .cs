@@ -47,4 +47,23 @@ public class ProductsUpdateRequest
     [MaxLength(500, ErrorMessage = "{0} 不可超過 {1} 字!")]
     [MinLength(1, ErrorMessage = "商品描述不可為空！")]
     public string? ProductsDescription { get; set; }
+
+    /// <summary>
+    /// 商品折扣
+    /// </summary>
+    [Display(Name = "商品折扣")]
+    [Range(0, 100, ErrorMessage = "{0} 必須在 {1} 到 {2} 之間")]
+    public int? Discount { get; set; }
+
+    /// <summary>
+    /// 折扣開始時間
+    /// </summary>
+    [Display(Name = "折扣開始時間")]
+    public DateTime? DiscountStart { get; set; }
+
+    /// <summary>
+    /// 折扣結束時間
+    /// </summary>
+    [Display(Name = "折扣結束時間")]
+    public DateTime? DiscountEnd { get; set; }
 }

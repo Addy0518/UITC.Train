@@ -54,6 +54,23 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
+        /// 查看審查表所有圖片
+        /// </summary>
+        /// <param name="reviewId">審查表 ID </param>
+        /// <returns>商品圖片 URL</returns>
+        public async Task<ApiResponse<IEnumerable<ProductImg>>> GetReviewAllImg(int reviewId)
+        {
+            var result = await productsImgRepository.GetReviewAllImg(reviewId);
+
+            if (result == null)
+            {
+                return ApiResponseHelper.NotFound<IEnumerable<ProductImg>>();
+            }
+
+            return ApiResponseHelper.Success(result);
+        }
+
+        /// <summary>
         /// 審核通過或駁回
         /// </summary>
         /// <param name="request">商品審核請求</param>
@@ -80,7 +97,7 @@ namespace Lab.Accounting.API.Services
                     // 判斷是更新商品還是新增商品 ( Id 是 null 就是新增 )
                     if (reviewInfo.ProductsId == null)
                     {
-                        var createInfo = new Infrastructures.Data.Entities.Product
+                        var createInfo = new Product
                         {
                             UserId = reviewInfo.SellerId,
                             ProductsName = reviewInfo.ProductsName,
@@ -89,6 +106,9 @@ namespace Lab.Accounting.API.Services
                             ProductsDescription = reviewInfo.ProductsDescription,
                             ProductCategoryId = reviewInfo.ProductCategoryId,
                             ReviewStatus = reviewInfo.ReviewStatus,
+                            Discount = reviewInfo.Discount,
+                            DiscountStart = reviewInfo.DiscountStart,
+                            DiscountEnd = reviewInfo.DiscountEnd,
                             CreateTime = DateTime.Now,
                             UpdateTime = DateTime.Now,
                             IsDelete = IsDeleteStatusEnum.Normal,
@@ -110,6 +130,9 @@ namespace Lab.Accounting.API.Services
                             ProductsStock = reviewInfo.ProductsStock,
                             ProductsDescription = reviewInfo.ProductsDescription,
                             ProductCategoryId = reviewInfo.ProductCategoryId,
+                            Discount = reviewInfo.Discount,
+                            DiscountStart = reviewInfo.DiscountStart,
+                            DiscountEnd = reviewInfo.DiscountEnd,
                             ReviewStatus = reviewInfo.ReviewStatus,
                             UpdateTime = DateTime.Now,
                         };

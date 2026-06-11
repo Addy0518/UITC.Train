@@ -99,7 +99,7 @@ public class ProductsService(
     }
 
     /// <summary>
-    /// 新增單一商品 + 類別
+    /// 新增商品審核表
     /// </summary>
     /// <param name="productsInsertRequest">商品資訊</param>
     /// <returns>審核表 ID</returns>
@@ -112,6 +112,9 @@ public class ProductsService(
             ProductsStock = productsInsertRequest.ProductsStock,
             ProductsDescription = productsInsertRequest.ProductsDescription,
             ProductCategoryId = productsInsertRequest.ProductCategoryId,
+            Discount = productsInsertRequest.Discount,
+            DiscountStart = productsInsertRequest.DiscountStart,
+            DiscountEnd = productsInsertRequest.DiscountEnd,
             ReviewStatus = ReviewStatusEnum.Pending,
             SellerId = productsInsertRequest.UserId,
         };
@@ -135,7 +138,7 @@ public class ProductsService(
     }
 
     /// <summary>
-    /// 更新單一商品
+    /// 更新商品審核表
     /// </summary>
     /// <param name="productsUpdateRequest">商品更新資訊</param>
     /// <returns>審核表 ID </returns>
@@ -183,6 +186,9 @@ public class ProductsService(
                 ProductsDescription = productsUpdateRequest.ProductsDescription,
                 ProductCategoryId = productsUpdateRequest.ProductCategoryId,
                 ReviewStatus = ReviewStatusEnum.Pending,
+                Discount = productsUpdateRequest.Discount,
+                DiscountStart = productsUpdateRequest.DiscountStart,
+                DiscountEnd = productsUpdateRequest.DiscountEnd,
                 CreateTime = DateTime.Now,
             };
 

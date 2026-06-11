@@ -43,6 +43,21 @@ public class Product
     public ReviewStatusEnum ReviewStatus { get; set; }
 
     /// <summary>
+    /// 商品折扣
+    /// </summary>
+    public int? Discount { get; set; }
+
+    /// <summary>
+    /// 折扣開始時間
+    /// </summary>
+    public DateTime? DiscountStart { get; set; }
+
+    /// <summary>
+    /// 折扣結束時間
+    /// </summary>
+    public DateTime? DiscountEnd { get; set; }
+
+    /// <summary>
     /// 創建時間
     /// </summary>
     public DateTime CreateTime { get; set; }

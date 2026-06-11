@@ -16,7 +16,7 @@ import {
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 // StarterKit 跟 Image 是 Tiptap 的工具包 , 讓他支援編輯 , 圖片新增等功能
 import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
+import ImageResize from 'tiptap-extension-resize-image';
 import Swal from 'sweetalert2';
 
 /*
@@ -28,6 +28,9 @@ import Swal from 'sweetalert2';
    productPrice : 商品價格
    productStock : 商品庫存
    productDescription : 商品描述
+   productDiscount : 商品折扣趴數
+   productDiscountStart : 折扣開始時間
+   productDiscountEnd : 折扣結束時間
    productsId : 商品 ID
    isAdd : 路由判斷新增或刪除
    baseUrl : 環境變數裡的圖片基底位址
@@ -43,6 +46,9 @@ const productName = ref();
 const productPrice = ref();
 const productStock = ref();
 const productDescription = ref();
+const productDiscount = ref();
+const productDiscountStart = ref();
+const productDiscountEnd = ref();
 const productsId = ref();
 const categoryLevels = ref([]);
 const selectedLevels = ref([]);
@@ -64,7 +70,15 @@ const showToastError = inject('showToastError');
 const editor = useEditor({
   // StarterKit：包含粗體、斜體、清單、段落等基本功能
   // Image：讓編輯器支援插入圖片
-  extensions: [StarterKit, Image],
+  extensions: [
+    StarterKit,
+    ImageResize.configure({
+      // 這裡可以設定預設置入時的圖片寬度，比如預設是 300px 或 50%
+      HTMLAttributes: {
+        style: 'max-width: 100%; width: 300px; height: auto;',
+      },
+    }),
+  ],
 
   // 每次編輯器內容有變動時觸發
   // 把編輯器當下內容轉成 HTML 字串，同步存進 productDescription ref
@@ -171,6 +185,9 @@ const updateData = async (productId) => {
       productPrice.value = item.productsPrice;
       productStock.value = item.productsStock;
       productDescription.value = item.productsDescription ?? '';
+      productDiscount.value = item.discount;
+      productDiscountStart.value = item.discountStart ? new Date(item.discountStart) : null;
+      productDiscountEnd.value = item.discountEnd ? new Date(item.discountEnd) : null;
       nextTick(() => {
         editor.value?.commands.setContent(item.productsDescription ?? '');
       });
@@ -248,6 +265,9 @@ const createOrUpdateProduct = async () => {
         productsPrice: productPrice.value,
         productsStock: productStock.value,
         productsDescription: productDescription.value,
+        discount: productDiscount.value,
+        discountStart: formatUTC8Date(productDiscountStart.value),
+        discountEnd: formatUTC8Date(productDiscountEnd.value),
       };
       const res = await createProducts(createData);
       const { data } = res;
@@ -282,6 +302,9 @@ const createOrUpdateProduct = async () => {
         productsPrice: productPrice.value,
         productsStock: productStock.value,
         productsDescription: productDescription.value,
+        discount: productDiscount.value,
+        discountStart: formatUTC8Date(productDiscountStart.value),
+        discountEnd: formatUTC8Date(productDiscountEnd.value),
       };
       const res = await updateProducts(updateData);
       const { data } = res;
@@ -472,6 +495,40 @@ const uploadDescriptionImage = async (e) => {
             />
             <InValidErrorMessage :errorDto="v$.productStock.$errors" vaildChiName="商品庫存" />
           </div>
+
+          <!-- 折扣 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">商品折扣</label>
+            <InputNumber
+              v-model="productDiscount"
+              placeholder="例如輸入 80 代表 8 折"
+              class="w-full"
+              :min="1"
+              :max="99"
+            />
+          </div>
+
+          <!-- 折扣開始時間 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">折扣開始時間</label>
+            <DatePicker
+              v-model="productDiscountStart"
+              class="w-full"
+              :maxDate="productDiscountEnd"
+              showTime
+            />
+          </div>
+          <!-- 折扣結束時間 -->
+          <div>
+            <label class="text-sm text-gray-400 block mb-1.5">折扣結束時間</label>
+
+            <DatePicker
+              v-model="productDiscountEnd"
+              class="w-full"
+              :minDate="productDiscountStart"
+              showTime
+            />
+          </div>
         </div>
         <!-- #endregion -->
         <!-- #region  商品描述 -->
@@ -514,7 +571,7 @@ const uploadDescriptionImage = async (e) => {
             </div>
             <EditorContent
               :editor="editor"
-              class="p-3 min-h-32 prose max-w-none"
+              class="p-3 min-h-32 prose max-w-none max-h-100 overflow-y-auto [&_img]:max-w-3xl [&_img]:h-auto"
               :invalid="v$.productDescription.$error"
             />
             <InValidErrorMessage
@@ -538,3 +595,13 @@ const uploadDescriptionImage = async (e) => {
     </div>
   </div>
 </template>
+<style>
+/* 讓編輯器裡的圖片點擊時會出現控制外框與手勢 */
+.tiptap .prose img {
+  display: inline-block;
+  float: none;
+}
+.tiptap img.ProseMirror-selectednode {
+  outline: 3px solid #ff7a00; /* 點擊時的外框顏色，這裡配你的橘色系 */
+}
+</style>

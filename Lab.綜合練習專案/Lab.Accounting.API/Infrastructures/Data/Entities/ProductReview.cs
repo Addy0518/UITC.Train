@@ -48,6 +48,21 @@
         public int ProductCategoryId { get; set; }
 
         /// <summary>
+        /// 商品折扣
+        /// </summary>
+        public int? Discount { get; set; }
+
+        /// <summary>
+        /// 折扣開始時間
+        /// </summary>
+        public DateTime? DiscountStart { get; set; }
+
+        /// <summary>
+        /// 折扣結束時間
+        /// </summary>
+        public DateTime? DiscountEnd { get; set; }
+
+        /// <summary>
         /// 審核狀態 (例如：0=待審核, 1=審核通過, 2=審核失敗)
         /// </summary>
         public ReviewStatusEnum ReviewStatus { get; set; }

@@ -19,6 +19,13 @@ namespace Lab.Accounting.API.Services
         Task<ApiResponse<ReviewResponse>> GetAllProductsReview(ProductsRiviewSearchRequest request);
 
         /// <summary>
+        /// 查看審查表所有圖片
+        /// </summary>
+        /// <param name="reviewId">審查表 ID </param>
+        /// <returns>商品圖片 URL</returns>
+        Task<ApiResponse<IEnumerable<ProductImg>>> GetReviewAllImg(int reviewId);
+
+        /// <summary>
         /// 審核通過或駁回
         /// </summary>
         /// <param name="request">商品審核請求</param>

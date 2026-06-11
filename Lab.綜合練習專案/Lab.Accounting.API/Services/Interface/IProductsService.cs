@@ -26,14 +26,14 @@ public interface IProductsService
     Task<ApiResponse<ProductsResponse>> SellerGetAllProducts(ProductsSearchRequest request);
 
     /// <summary>
-    /// 新增單一商品 + 類別
+    /// 新增商品審核表
     /// </summary>
     /// <param name="productsInsertRequest">商品資訊</param>
     /// <returns>影響列數</returns>
     Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest);
 
     /// <summary>
-    /// 更新單一商品
+    /// 更新商品審核表
     /// </summary>
     /// <param name="productsUpdateRequest">商品更新資訊</param>
     /// <returns>影響列數</returns>

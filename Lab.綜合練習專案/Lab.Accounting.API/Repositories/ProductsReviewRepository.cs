@@ -15,10 +15,12 @@ namespace Lab.Accounting.API.Repositories
             var sql =
                 @"Select r.*,
                          u.UserName as SellerName,
-                         s.UserName as AdminName
+                         s.UserName as AdminName,
+                         c.ProductCategoryName
                   From dbo.ProductReview r
                   Left Join [User] u on r.SellerId = u.UserId
                   Left Join [User] s on r.AdminId=s.UserId
+                  LEFT JOIN ProductCategory c ON r.ProductCategoryId = c.ProductCategoryId
                   Where r.ProductsReviewId = @ProductsReviewId  
                  ";
 
@@ -95,6 +97,9 @@ namespace Lab.Accounting.API.Repositories
                     ProductsStock,
                     ProductsDescription,
                     ProductCategoryId,
+                    Discount,
+                    DiscountStart,
+                    DiscountEnd,
                     ReviewStatus,
                     CreateTime
                 )
@@ -107,6 +112,9 @@ namespace Lab.Accounting.API.Repositories
                     @ProductsStock,
                     @ProductsDescription,
                     @ProductCategoryId,
+                    @Discount,
+                    @DiscountStart,
+                    @DiscountEnd,
                     @ReviewStatus,                                     
                     GETDATE()            
              

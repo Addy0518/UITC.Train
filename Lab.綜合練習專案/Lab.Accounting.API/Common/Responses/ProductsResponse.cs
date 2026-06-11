@@ -68,6 +68,34 @@ public class ProductDetails
     public ReviewStatusEnum? ReviewStatus { get; set; }
 
     /// <summary>
+    /// 商品折扣
+    /// </summary>
+    public decimal? Discount { get; set; }
+
+    /// <summary>
+    /// 折扣開始時間
+    /// </summary>
+    public DateTime? DiscountStart { get; set; }
+
+    /// <summary>
+    /// 折扣結束時間
+    /// </summary>
+    public DateTime? DiscountEnd { get; set; }
+
+    /// <summary>
+    /// 是否有打折
+    /// </summary>
+    public bool IsDiscount => Discount.HasValue && DiscountStart <= DateTime.Now && DiscountEnd >= DateTime.Now;
+
+    /// <summary>
+    /// 打折後的價格
+    /// </summary>
+    public decimal FinalPrice =>
+        Discount.HasValue && DiscountStart <= DateTime.Now && DiscountEnd >= DateTime.Now
+            ? ProductsPrice * (Discount.Value / 100)
+            : ProductsPrice;
+
+    /// <summary>
     /// 購買數量
     /// </summary>
     public int BoughtQuantity { get; set; }

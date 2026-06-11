@@ -22,8 +22,11 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.productsprice,
                                  m.ProductsStock,
                                  m.ProductCategoryId,
+                                 m.Discount,
+                                 m.DiscountStart,
+                                 m.DiscountEnd,
                                  c.productcategoryname,
-                               
+                                
                                  -- 計算平均評分
                                  -- 外層 ISNULL 是為了當今天回傳值是 null ( 沒有評分 ) 的話就回傳 0
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
@@ -110,6 +113,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  m.ProductsStock,
                                  m.ProductCategoryId,
                                  m.ReviewStatus,
+                                 m.Discount,
+                                 m.DiscountStart,
+                                 m.DiscountEnd,
                                  m.isDelete,
                                  c.productcategoryname,
                                  ISNULL((SELECT AVG(CAST(r.Rating AS FLOAT)) 
@@ -180,6 +186,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                m.ProductsStock,
                                m.ProductsDescription,
                                m.ProductCategoryId,
+                               m.Discount,
+                               m.DiscountStart,
+                               m.DiscountEnd,
                                m.isDelete,
                                c.productcategoryname,
                                c.productcategoryid,        
@@ -215,6 +224,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      ProductsDescription,
                                      ProductCategoryId,
                                      ReviewStatus,
+                                     Discount,
+                                     DiscountStart,
+                                     DiscountEnd,
                                      CreateTime,
                                      UpdateTime,
                                      IsDelete
@@ -226,6 +238,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                      @ProductsDescription,
                                      @ProductCategoryId,
                                      @ReviewStatus,
+                                     @Discount,
+                                     @DiscountStart,
+                                     @DiscountEnd,
                                      GetDate(),
                                      GetDate(),
                                      @IsDelete
@@ -255,6 +270,9 @@ public class ProductsRepository(DBConnecting connecting) : IProductsRepository
                                  ProductsDescription = COALESCE(@ProductsDescription, ProductsDescription),
                                  ProductCategoryId = COALESCE(@ProductCategoryId, ProductCategoryId),
                                  ReviewStatus= COALESCE(@ReviewStatus, ReviewStatus),
+                                 Discount = COALESCE(@Discount, Discount),
+                                 DiscountStart = COALESCE(@DiscountStart, DiscountStart),
+                                 DiscountEnd = COALESCE(@DiscountEnd, DiscountEnd),
                                  UpdateTime    = GetDate()
                         WHERE    productsid = @ProductsId and userId=@UserId;";
         return await conn.ExecuteAsync(sql, products);

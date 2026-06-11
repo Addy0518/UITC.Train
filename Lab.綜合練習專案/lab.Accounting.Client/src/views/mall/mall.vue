@@ -212,7 +212,18 @@ const getCategoryImg = (category) => {
                 </div>
                 <div class="p-3 flex flex-col gap-1.5">
                   <p class="text-sm font-medium truncate">{{ product.productsName }}</p>
-                  <p class="text-base font-medium text-orange-600">$ {{ product.productsPrice }}</p>
+                  <div v-if="product.isDiscount" class="flex items-center gap-2">
+                    <p class="text-base font-medium text-orange-600">$ {{ product.finalPrice }}</p>
+                    <p class="text-sm font-medium line-through text-gray-400">
+                      $ {{ product.productsPrice }}
+                    </p>
+                  </div>
+                  <div v-else>
+                    <p class="text-base font-medium text-orange-600">
+                      $ {{ product.productsPrice }}
+                    </p>
+                  </div>
+
                   <Rating :modelValue="product.productsAVGRate" :stars="5" :readonly="true" />
                   <div class="flex items-center justify-between mt-1">
                     <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
