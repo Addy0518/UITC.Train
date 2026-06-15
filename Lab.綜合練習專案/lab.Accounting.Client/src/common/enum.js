@@ -65,3 +65,11 @@ export const reviewStatusEnum = Object.freeze({
   Approved: { value: 1, description: '審核通過' },
   Reject: { value: 2, description: '駁回申請' },
 });
+
+// 優惠卷類別
+export const couponTypeEnum = Object.freeze({
+  百分比折扣: { value: 0, description: '百分比折扣' },
+  固定金額折抵: { value: 1, description: '固定金額折抵' },
+  免運券: { value: 2, description: '免運券' },
+  商品特價券: { value: 3, description: '商品特價券' },
+});

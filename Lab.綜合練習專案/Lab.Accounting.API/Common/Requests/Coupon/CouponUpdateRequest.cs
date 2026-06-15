@@ -1,0 +1,59 @@
+﻿namespace Lab.Accounting.API.Common.Requests.Coupon
+{
+    public class CouponUpdateRequest
+    {
+        /// <summary>
+        /// 優惠券 ID
+        /// </summary>
+        [Display(Name = "優惠券 ID")]
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public int CouponId { get; set; }
+
+        /// <summary>
+        /// 優惠券名稱
+        /// </summary>
+        [Display(Name = "優惠券名稱")]
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 優惠券類型 (1: 百分比折扣, 2: 固定金額折抵...)
+        /// </summary>
+        [Display(Name = "優惠券類型")]
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public CouponTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 折扣數值 (打折趴數或折抵金額)
+        /// </summary>
+        [Display(Name = "折扣數值")]
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public decimal Discount { get; set; }
+
+        /// <summary>
+        /// 最低消費門檻
+        /// </summary>
+        [Display(Name = "最低消費門檻")]
+        public decimal? MinimunSpend { get; set; }
+
+        /// <summary>
+        /// 折扣開始時間
+        /// </summary>
+        [Display(Name = "折扣開始時間")]
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public DateTime StartTime { get; set; }
+
+        /// <summary>
+        /// 折扣結束時間
+        /// </summary>
+        [Display(Name = "折扣結束時間")]
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// 是否啟用
+        /// </summary>
+        [Display(Name = "是否啟用")]
+        public bool IsActive { get; set; }
+    }
+}

@@ -420,7 +420,19 @@ const breadCrumbItem = computed(() => {
                         class="w-full max-w-40 max-h-40 mt-4 object-cover"
                       />
                       <span class="mt-3">{{ product.productsName }}</span>
-                      <span class="mt-3">{{ product.productsPrice }}</span>
+                      <div v-if="product.isDiscount" class="flex items-center gap-2">
+                        <p class="text-base font-medium text-orange-600">
+                          $ {{ product.finalPrice }}
+                        </p>
+                        <p class="text-sm font-medium line-through text-gray-400">
+                          $ {{ product.productsPrice }}
+                        </p>
+                      </div>
+                      <div v-else>
+                        <p class="text-base font-medium text-orange-600">
+                          $ {{ product.productsPrice }}
+                        </p>
+                      </div>
                       <span class="mt-3 ms-2 me-2 text-sm text-gray-500">{{
                         product.productCategoryName
                       }}</span>
