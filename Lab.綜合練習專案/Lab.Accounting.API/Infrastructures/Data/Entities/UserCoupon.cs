@@ -8,6 +8,11 @@ public class UserCoupon
     public int UserCouponId { get; set; }
 
     /// <summary>
+    /// 訂單 ID
+    /// </summary>
+    public int? OrderId { get; set; }
+
+    /// <summary>
     /// 使用者 ID
     /// </summary>
     public int UserId { get; set; }

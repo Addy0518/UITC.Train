@@ -6,6 +6,21 @@ namespace Lab.Accounting.API.Repositories;
 public class CouponRepository(DBConnecting connecting) : ICouponRepository
 {
     /// <summary>
+    /// 查看優惠卷
+    /// </summary>
+    /// <param name="couponId">優惠卷 ID </param>
+    /// <returns>優惠卷資訊</returns>
+    public async Task<CouponResponse> GetCoupon(int couponId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Select * From Coupon 
+              WHERE CouponId = @CouponId";
+        return await conn.QueryFirstOrDefaultAsync<CouponResponse>(sql, new { CouponId = couponId });
+    }
+
+    /// <summary>
     /// 查看用戶優惠卷
     /// </summary>
     /// <param name="userId">使用者 ID </param>
@@ -15,7 +30,7 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select * From Coupon c
+            @"Select c.*,uc.UserCouponId,uc.CreateTime,uc.UsedTime From Coupon c
               Join UserCoupon uc On c.CouponId = uc.CouponId
                   WHERE UserId = @UserId";
         return await conn.QueryAsync<CouponResponse>(sql, new { UserId = userId });
@@ -34,11 +49,10 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
             @"SELECT c.*,
                    Count(*) OVER() AS TotalCount
             FROM   Coupon c
-            WHERE  c.CreaterId = @CreaterId
-            AND    (@keyWords IS NULL OR c.Name LIKE '%' + @keyWords + '%')
+            WHERE  (@keyWords IS NULL OR c.Name LIKE '%' + @keyWords + '%')
             AND    (@IsActive IS NULL OR c.IsActive = @IsActive)
             AND    (@Type IS NULL OR c.Type = @Type)
-            ORDER BY c.CreateTime DESC 
+            ORDER BY c.StartTime DESC 
             OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
 
         return await conn.QueryAsync<CouponResponse>(
@@ -92,11 +106,11 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
     }
 
     /// <summary>
-    /// 編輯優惠卷
+    /// 管理員編輯優惠卷
     /// </summary>
     /// <param name="request">優惠卷編輯請求</param>
     /// <returns>影響列數</returns>
-    public async Task<int> UpdateCoupons(CouponUpdateRequest request)
+    public async Task<int> AdminUpdateCoupons(CouponUpdateRequest request)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -106,13 +120,104 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
               SET 
                   Name =  COALESCE(@Name, Name),
                   Type =   COALESCE(@Type, Type),
-                  Discount = @Discount,  COALESCE(@Discount, Discount),
-                  MinimunSpend =   COALESCE(@MinimunSpend, MinimunSpend),
+                  Discount = COALESCE(@Discount, Discount),
+                  MinimunSpend = COALESCE(@MinimunSpend, MinimunSpend),
                   StartTime =  COALESCE(@StartTime, StartTime),
                   EndTime =  COALESCE(@EndTime, EndTime),
                   IsActive= COALESCE(@IsActive, IsActive)
               WHERE 
                   CouponId = @CouponId;";
         return await conn.ExecuteAsync(sql, request);
+    }
+
+    /// <summary>
+    /// 賣家編輯優惠卷
+    /// </summary>
+    /// <param name="request">優惠卷編輯請求</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> SellerUpdateCoupons(CouponUpdateRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+              UPDATE Coupon 
+              SET 
+                  Name =  COALESCE(@Name, Name),
+                  Type =   COALESCE(@Type, Type),
+                  Discount =    COALESCE(@Discount, Discount),
+                  MinimunSpend =   COALESCE(@MinimunSpend, MinimunSpend),
+                  StartTime =  COALESCE(@StartTime, StartTime),
+                  EndTime =  COALESCE(@EndTime, EndTime),
+                  IsActive= COALESCE(@IsActive, IsActive)
+              WHERE 
+                  CouponId = @CouponId
+              AND CreaterId = @CreaterId;";
+        return await conn.ExecuteAsync(sql, request);
+    }
+
+    /// <summary>
+    /// 用戶領取優惠卷
+    /// </summary>
+    /// <param name="request">優惠卷編輯請求</param>
+    /// <returns>優惠卷 ID</returns>
+    public async Task<int> CreateUserCoupon(UserCouponInsertRequest request)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+               INSERT INTO UserCoupon 
+                      (
+                          UserId,
+                          CouponId,
+                          CreateTime
+                      ) 
+                      VALUES (
+                          @UserId,
+                          @CouponId,
+                          @CreateTime
+                      );
+              SELECT CAST(SCOPE_IDENTITY() AS INT);";
+        return await conn.ExecuteScalarAsync<int>(sql, request);
+    }
+
+    /// <summary>
+    /// 訂單建立成功後連結優惠卷
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <param name="userCouponId">用戶優惠卷 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateUserCoupon(int orderId, int userCouponId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+              UPDATE UserCoupon 
+              SET 
+                  OrderId =  @OrderId
+              WHERE 
+                  UserCouponId = @UserCouponId";
+        return await conn.ExecuteAsync(sql, new { OrderId = orderId, UserCouponId = userCouponId });
+    }
+
+    /// <summary>
+    /// 完成優惠卷使用
+    /// </summary>
+    /// <param name="orderNumber">訂單編號</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> CompleteUserCoupon(string orderNumber)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+              UPDATE UserCoupon 
+              SET 
+                  UsedTime=GetDate()
+              WHERE 
+                  OrderId in (SELECT OrderId FROM Orders WHERE OrderNumber = @OrderNumber)";
+        return await conn.ExecuteAsync(sql, new { OrderNumber = orderNumber });
     }
 }

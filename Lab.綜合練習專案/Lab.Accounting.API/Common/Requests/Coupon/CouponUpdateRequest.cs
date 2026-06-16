@@ -10,6 +10,12 @@
         public int CouponId { get; set; }
 
         /// <summary>
+        /// 創建者 ID
+        /// </summary>
+        [Display(Name = "創建者 ID")]
+        public int? CreaterId { get; set; }
+
+        /// <summary>
         /// 優惠券名稱
         /// </summary>
         [Display(Name = "優惠券名稱")]

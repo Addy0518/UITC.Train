@@ -17,6 +17,12 @@ public class ProductsBuyRequest
     public IEnumerable<ProductsItem> Products { get; set; }
 
     /// <summary>
+    /// 優惠券 ID
+    /// </summary>
+    [Display(Name = "優惠券 ID")]
+    public int? CouponId { get; set; }
+
+    /// <summary>
     /// 運送地址
     /// </summary>
     [Display(Name = "運送地址")]

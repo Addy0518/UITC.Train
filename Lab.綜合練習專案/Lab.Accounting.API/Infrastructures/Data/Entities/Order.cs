@@ -43,14 +43,24 @@ public class Order
     public int BoughtQuantity { get; set; }
 
     /// <summary>
-    /// 原始價格
+    /// 原始單品價格
     /// </summary>
     public decimal UnitPrice { get; set; }
 
     /// <summary>
-    /// 最終價格
+    /// 原始總價
     /// </summary>
-    public decimal? AccountPrice { get; set; }
+    public decimal OrginalAmount { get; set; }
+
+    /// <summary>
+    /// 被折扣多少
+    /// </summary>
+    public decimal? PlatformDiscount { get; set; }
+
+    /// <summary>
+    /// 最終總價
+    /// </summary>
+    public decimal AccountAmount { get; set; }
 
     /// <summary>
     /// 購買時間

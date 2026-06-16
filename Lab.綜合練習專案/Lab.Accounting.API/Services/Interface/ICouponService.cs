@@ -6,6 +6,13 @@ namespace Lab.Accounting.API.Services
     public interface ICouponService
     {
         /// <summary>
+        /// 查看優惠卷
+        /// </summary>
+        /// <param name="couponId">優惠卷 ID </param>
+        /// <returns>優惠卷資訊</returns>
+        Task<ApiResponse<CouponResponse>> GetCoupon(int couponId);
+
+        /// <summary>
         /// 查看用戶優惠卷
         /// </summary>
         /// <param name="userId">使用者 ID </param>
@@ -27,10 +34,24 @@ namespace Lab.Accounting.API.Services
         Task<ApiResponse<int>> CreateCoupons(CouponInsertRequest request);
 
         /// <summary>
-        /// 編輯優惠卷
+        /// 管理員編輯優惠卷
         /// </summary>
         /// <param name="request">優惠卷編輯請求</param>
         /// <returns>影響列數</returns>
-        Task<ApiResponse<int>> UpdateCoupons(CouponUpdateRequest request);
+        Task<ApiResponse<int>> AdminUpdateCoupons(CouponUpdateRequest request);
+
+        /// <summary>
+        /// 賣家編輯優惠卷
+        /// </summary>
+        /// <param name="request">優惠卷編輯請求</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> SellerUpdateCoupons(CouponUpdateRequest request);
+
+        /// <summary>
+        /// 用戶領取優惠卷
+        /// </summary>
+        /// <param name="request">優惠卷編輯請求</param>
+        /// <returns>優惠卷 ID</returns>
+        Task<ApiResponse<int>> CreateUserCoupon(UserCouponInsertRequest request);
     }
 }

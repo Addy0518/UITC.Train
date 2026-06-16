@@ -9,7 +9,8 @@ public class OrderService(
     IProductsImgRepository productsImgRepository,
     IProductsRateRepository productsRateRepositories,
     IProductsOrderRepository productsBuyRepositories,
-    IProductsShoppingCarRepository productsShoppingCarRepository
+    IProductsShoppingCarRepository productsShoppingCarRepository,
+    ICouponRepository couponRepository
 ) : IOrderService
 {
     /// <summary>
@@ -128,10 +129,71 @@ public class OrderService(
         //但因為Guid生成時中間會有"-"這種符號,而綠界的訂單編號不允許一些特殊符號,所以轉成字串後replace把它拿掉
         //Substring切除剛剛的Guid碼,因為Guid字元會有32碼,太長了,所以只取前11碼
         string merchantTradeNo = "GN" + Guid.NewGuid().ToString().Replace("-", "").Substring(0, 11);
-        using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+
+        CouponResponse? coupon = null;
+        CouponResponse? targetUserCoupon = null;
+
+        // 原始總金額
+        decimal totalOrginalAmount = 0;
+
+        // 如果有使用優惠券，先驗證優惠券是否有效，再計算總金額是否達到門檻
+        if (Request.CouponId > 0 && Request.CouponId.HasValue)
         {
+            // 驗證優惠券是否存在且有效
+            coupon = await couponRepository.GetCoupon(Request.CouponId.Value);
+
+            if (coupon == null || !coupon.IsActive || DateTime.Now > coupon.EndTime)
+            {
+                var errors = new Dictionary<string, string[]> { { "Coupon", new[] { "優惠卷已過期或不存在!" } } };
+
+                return ApiResponseHelper.RequestError<List<int>>(errors);
+            }
+
+            // 驗證使用者是否持有該優惠券且未使用
+            var userCoupons = await couponRepository.GetUserCoupon(Request.UserId);
+            targetUserCoupon = userCoupons.FirstOrDefault(uc =>
+                uc.CouponId == Request.CouponId.Value && uc.UsedTime == null
+            );
+            if (targetUserCoupon == null || targetUserCoupon.UsedTime != null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Coupon", new[] { "你沒有這張優惠券，或該券已被使用 ! " } },
+                };
+                return ApiResponseHelper.RequestError<List<int>>(errors);
+            }
+
+            // 抓出購物車裡所有商品的原始總金額，來判斷是否達到優惠券使用門檻
             foreach (var product in Request.Products)
             {
+                var item = await productsRepositories.GetProducts(product.ProductsId);
+                if (item != null)
+                {
+                    totalOrginalAmount += item.ProductsPrice * product.BoughtQuantity;
+                }
+            }
+
+            if (totalOrginalAmount < coupon.MinimunSpend)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "MinimunSpend", new[] { $"未達到優惠券使用門檻，最低消費金額為 {coupon.MinimunSpend} 元。" } },
+                };
+                return ApiResponseHelper.RequestError<List<int>>(errors);
+            }
+        }
+
+        using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            // 折扣的額度 , 防止固定金額折抵的優惠券在分攤到每件商品時出現小數點誤差，導致最後一件商品無法完全折抵完剩餘的金額 ( 最後一件商品直接扣不用平均 )
+            decimal remainingDiscount = coupon != null ? coupon.Discount : 0;
+            // 用來計算算到哪件商品了，判斷 remainingDiscount 分攤到最後一件商品時，直接把剩餘的折扣全扣掉
+            int productCounter = 0;
+
+            // 開始處理每一件商品的訂單
+            foreach (var product in Request.Products)
+            {
+                productCounter++;
                 var target = await productsRepositories.GetProducts(product.ProductsId);
 
                 if (target == null)
@@ -158,9 +220,44 @@ public class OrderService(
 
                 var countStock = target.ProductsStock - product.BoughtQuantity;
                 var stock = await productsRepositories.SetStock(product.ProductsId, countStock);
-
                 if (stock <= 0)
                     return ApiResponseHelper.InternalException<List<int>>("庫存更新失敗");
+
+                decimal orginalPrice = target.ProductsPrice * product.BoughtQuantity;
+                decimal currentProductDiscount = 0;
+
+                if (coupon != null)
+                {
+                    // 1. 百分比折抵邏輯
+                    if (coupon.Type == (int)CouponTypeEnum.百分比折扣)
+                    {
+                        decimal discountRate = coupon.Discount / 100; // 80 / 100 = 0.8 (打 8 折)
+                        currentProductDiscount = Math.Round(orginalPrice * (1 - discountRate), 0); // 算出這件商品折掉多少錢
+                    }
+                    // 2. 固定金額按比例分攤邏輯
+                    else if (coupon.Type == (int)CouponTypeEnum.固定金額折抵 && remainingDiscount > 0)
+                    {
+                        if (productCounter < Request.Products.Count())
+                        {
+                            // 公式：(此商品原價 / 購物車總原價) * 優惠券總面額
+                            currentProductDiscount = Math.Round(
+                                (orginalPrice / totalOrginalAmount) * coupon.Discount,
+                                0
+                            );
+                            remainingDiscount -= currentProductDiscount; // 扣掉已被分走的部分
+                        }
+                        else
+                        {
+                            // 最後一件商品直接拿走剩餘所有的折扣，完美防範小數點誤差 Bug
+                            currentProductDiscount = remainingDiscount;
+                            remainingDiscount = 0;
+                        }
+                    }
+                }
+
+                decimal accountPrice = orginalPrice - currentProductDiscount;
+                if (accountPrice < 0)
+                    accountPrice = 0;
 
                 var buytarget = new Order
                 {
@@ -172,13 +269,21 @@ public class OrderService(
                     ProductCategoryId = target.ProductCategoryId,
                     BoughtQuantity = product.BoughtQuantity,
                     UnitPrice = target.ProductsPrice,
-                    AccountPrice = target.ProductsPrice * product.BoughtQuantity,
+                    OrginalAmount = orginalPrice,
+                    PlatformDiscount = currentProductDiscount,
+                    AccountAmount = accountPrice,
                     BoughtTime = DateTime.Now,
                     ShippingAddress = Request.ShippingAddress,
                     ShippingStatus = (int)ShippingStatusEnum.PendingPayment,
                 };
                 var order = await productsBuyRepositories.BuyProducts(buytarget);
                 orderIds.Add(order);
+
+                if (coupon != null && targetUserCoupon?.UserCouponId != null)
+                {
+                    await couponRepository.UpdateUserCoupon(order, targetUserCoupon.UserCouponId.Value);
+                }
+
                 await productsShoppingCarRepository.DeleteProductsInShoppingCar(product.ProductsId, Request.UserId);
             }
 
@@ -208,7 +313,7 @@ public class OrderService(
                 return ApiResponseHelper.NotFound<GreenPayResponse>();
             }
 
-            totalAmount += target.UnitPrice * target.BoughtQuantity;
+            totalAmount += target.AccountAmount;
         }
 
         var ecpay = new Dictionary<string, string>
@@ -288,6 +393,8 @@ public class OrderService(
             //訂單成立之後,開始更新資料庫
             var orderNo = collection["MerchantTradeNo"].ToString();
 
+            var couponCompleted = await couponRepository.CompleteUserCoupon(orderNo);
+
             var buyProduct = await productsBuyRepositories.GetOrderByOrderNumber(orderNo);
             if (buyProduct == null)
             {
@@ -299,7 +406,7 @@ public class OrderService(
             if (!decimal.TryParse(tradeAmt, out decimal totalPrice))
                 return "0|InvalidTradeAmt";
 
-            var totalAmount = buyProduct.Sum(o => o.UnitPrice * o.BoughtQuantity);
+            var totalAmount = buyProduct.Sum(o => o.AccountAmount);
 
             if (totalPrice != totalAmount)
                 //金額不符,可能是資料被竄改了,不處理這筆訂單
@@ -366,7 +473,7 @@ public class OrderService(
                 return ApiResponseHelper.RequestError<GreenPayResponse>(errors);
             }
 
-            totalAmount += target.UnitPrice * target.BoughtQuantity;
+            totalAmount += target.AccountAmount;
         }
         // 重新生成編號
         await productsBuyRepositories.RetryPaidProducts(orderIds, merchantTradeNo);

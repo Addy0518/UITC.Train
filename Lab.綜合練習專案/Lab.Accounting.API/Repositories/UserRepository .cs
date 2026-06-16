@@ -126,7 +126,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                     -- 統計資料
                     Count(DISTINCT o.OrderId) as TotalOrders,
                     Count(DISTINCT p.ProductsId) as TotalProducts,
-                    IsNull(Sum(o.AccountPrice),0) as TotalSpent
+                    IsNull(Sum(o.AccountAmount),0) as TotalSpent
 
                     FROM   [user] u
                     Left Join MallOrder o on o.UserId = u.UserId

@@ -10,6 +10,23 @@ namespace Lab.Accounting.API.Services
     public class CouponService(ICouponRepository couponRepository, IWebHostEnvironment env) : ICouponService
     {
         /// <summary>
+        /// 查看優惠卷
+        /// </summary>
+        /// <param name="couponId">優惠卷 ID </param>
+        /// <returns>優惠卷資訊</returns>
+        public async Task<ApiResponse<CouponResponse>> GetCoupon(int couponId)
+        {
+            var target = await couponRepository.GetCoupon(couponId);
+
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<CouponResponse>();
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
         /// 查看用戶優惠卷
         /// </summary>
         /// <param name="userId">使用者 ID </param>
@@ -62,17 +79,64 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 編輯優惠卷
+        /// 管理員編輯優惠卷
         /// </summary>
         /// <param name="request">優惠卷編輯請求</param>
         /// <returns>影響列數</returns>
-        public async Task<ApiResponse<int>> UpdateCoupons(CouponUpdateRequest request)
+        public async Task<ApiResponse<int>> AdminUpdateCoupons(CouponUpdateRequest request)
         {
-            var target = await couponRepository.UpdateCoupons(request);
+            var coupon = await couponRepository.GetCoupon(request.CouponId);
+
+            if (coupon == null)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+            var target = await couponRepository.AdminUpdateCoupons(request);
 
             if (target <= 0)
             {
-                return ApiResponseHelper.InternalException<int>("新增優惠卷錯誤");
+                return ApiResponseHelper.InternalException<int>("編輯優惠卷錯誤");
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
+        /// 賣家編輯優惠卷
+        /// </summary>
+        /// <param name="request">優惠卷編輯請求</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> SellerUpdateCoupons(CouponUpdateRequest request)
+        {
+            var coupon = await couponRepository.GetCoupon(request.CouponId);
+
+            if (coupon == null)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+
+            var target = await couponRepository.SellerUpdateCoupons(request);
+
+            if (target <= 0)
+            {
+                return ApiResponseHelper.InternalException<int>("編輯優惠卷錯誤");
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
+        /// 用戶領取優惠卷
+        /// </summary>
+        /// <param name="request">優惠卷編輯請求</param>
+        /// <returns>優惠卷 ID</returns>
+        public async Task<ApiResponse<int>> CreateUserCoupon(UserCouponInsertRequest request)
+        {
+            var target = await couponRepository.CreateUserCoupon(request);
+
+            if (target <= 0)
+            {
+                return ApiResponseHelper.InternalException<int>("領取優惠卷錯誤");
             }
 
             return ApiResponseHelper.Success(target);

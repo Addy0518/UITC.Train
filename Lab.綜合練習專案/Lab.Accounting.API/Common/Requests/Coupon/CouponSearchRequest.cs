@@ -37,6 +37,12 @@
         public CouponTypeEnum? Type { get; set; }
 
         /// <summary>
+        /// 折扣開始時間
+        /// </summary>
+        [Display(Name = "折扣開始時間")]
+        public DateTime? StartTime { get; set; }
+
+        /// <summary>
         /// 是否啟用
         /// </summary>
         [Display(Name = "是否啟用")]

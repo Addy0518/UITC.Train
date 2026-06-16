@@ -14,7 +14,7 @@ namespace Lab.Accounting.API.Repositories.Interface
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"Select Sum([AccountPrice]) as TotalRevenue 
+                @"Select Sum([AccountAmount]) as TotalRevenue 
                   From [Order] 
                   Where SellerUserId=@SellerUserId";
 
@@ -31,7 +31,7 @@ namespace Lab.Accounting.API.Repositories.Interface
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @" Select Sum([AccountPrice]) as TotalRevenue 
+                @" Select Sum([AccountAmount]) as TotalRevenue 
                 From [Order] m 
                 where m.SellerUserId=@SellerUserId
 
@@ -54,7 +54,7 @@ namespace Lab.Accounting.API.Repositories.Interface
 
             var sql =
                 @"SELECT Cast([boughttime] AS DATE) AS OrderDate,
-                         Sum([accountprice])          AS DailyRevenue
+                         Sum([AccountAmount])          AS DailyRevenue
                 FROM   [order] m
                 WHERE  m.selleruserid = @SellerUserId
                        AND boughttime BETWEEN Dateadd(day, -7, Cast(Getdate() AS DATE)) AND

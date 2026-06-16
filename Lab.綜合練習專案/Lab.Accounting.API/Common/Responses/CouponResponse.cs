@@ -48,6 +48,11 @@
         public DateTime EndTime { get; set; }
 
         /// <summary>
+        /// 使用者優惠券 ID
+        /// </summary>
+        public int? UserCouponId { get; set; }
+
+        /// <summary>
         /// 領取時間
         /// </summary>
         public DateTime CreateTime { get; set; }

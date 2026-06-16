@@ -149,8 +149,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
             AND (@ShippingStatus IS NULL OR m.ShippingStatus = @ShippingStatus)
 
             ORDER BY
-                CASE WHEN @sortBy = 'AccountPrice' AND @sortOrder = 'asc'  THEN m.AccountPrice END ASC,
-                CASE WHEN @sortBy = 'AccountPrice' AND @sortOrder = 'desc' THEN m.AccountPrice END DESC,
+                CASE WHEN @sortBy = 'AccountAmount' AND @sortOrder = 'asc'  THEN m.AccountAmount END ASC,
+                CASE WHEN @sortBy = 'AccountAmount' AND @sortOrder = 'desc' THEN m.AccountAmount END DESC,
                 CASE WHEN @sortBy = 'BoughtTime'   AND @sortOrder = 'asc'  THEN m.BoughtTime   END ASC,
                 CASE WHEN @sortBy = 'BoughtTime'   AND @sortOrder = 'desc' THEN m.BoughtTime   END DESC,
                 m.OrderId
@@ -211,7 +211,9 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              ProductCategoryId,
                              BoughtQuantity,
                              UnitPrice,
-                             AccountPrice,
+                             OrginalAmount,
+                             PlatformDiscount,
+                             AccountAmount,
                              BoughtTime,
                              ShippingAddress,
                              ShippingStatus)
@@ -224,7 +226,9 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              @ProductCategoryId,
                              @BoughtQuantity,
                              @UnitPrice,
-                             @AccountPrice,
+                             @OrginalAmount,
+                             @PlatformDiscount,
+                             @AccountAmount,
                              @BoughtTime,
                              @ShippingAddress,
                              @ShippingStatus)
