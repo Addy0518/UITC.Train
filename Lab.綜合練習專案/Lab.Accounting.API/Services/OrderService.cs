@@ -303,6 +303,7 @@ public class OrderService(
     {
         // 所有訂單加總的金額
         decimal totalAmount = 0;
+        string orderNumber = "";
         OrderResponse target = new OrderResponse();
         foreach (int Id in orderId)
         {
@@ -312,6 +313,10 @@ public class OrderService(
             {
                 return ApiResponseHelper.NotFound<GreenPayResponse>();
             }
+            if (string.IsNullOrEmpty(orderNumber))
+            {
+                orderNumber = target.OrderNumber;
+            }
 
             totalAmount += target.AccountAmount;
         }
@@ -319,10 +324,10 @@ public class OrderService(
         var ecpay = new Dictionary<string, string>
         {
             { "MerchantID", "3002607" }, //這是測試用的商店編號,固定的
-            { "MerchantTradeNo", target.OrderNumber },
+            { "MerchantTradeNo", orderNumber },
             { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") }, //交易當下時間
             { "PaymentType", "aio" }, //付款類型=>全金流
-            { "TotalAmount", totalAmount.ToString() },
+            { "TotalAmount", Math.Round(totalAmount, 0, MidpointRounding.AwayFromZero).ToString() },
             //先用int類型接收傳過來的變數,在轉成字串丟出去
 
             { "TradeDesc", "商品購買" }, // 交易類型
@@ -484,7 +489,7 @@ public class OrderService(
             { "MerchantTradeNo", merchantTradeNo },
             { "MerchantTradeDate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") },
             { "PaymentType", "aio" },
-            { "TotalAmount", totalAmount.ToString() },
+            { "TotalAmount", Math.Round(totalAmount, 0, MidpointRounding.AwayFromZero).ToString() },
             { "TradeDesc", "商品購買" },
             { "ItemName", "商品名稱" },
             { "ReturnURL", $"{tunnelUrl}/api/Order/EcPayBack" },

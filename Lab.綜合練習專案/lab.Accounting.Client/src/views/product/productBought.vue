@@ -1,5 +1,6 @@
 <script setup>
 import { userBuyProduct } from '@/api//orderService';
+import { getUserCoupon } from '@/api/couponService';
 import defaultImgurl from '@/img/預設圖片.jpg';
 
 /*
@@ -11,6 +12,8 @@ import defaultImgurl from '@/img/預設圖片.jpg';
    boughtQuantity : 購買數量
    address : 地址
    items : 存在 pinia 的購物車選擇的商品
+   allCoupons : 用戶的所有優惠卷
+   coupon : 選擇的優惠卷
 */
 const router = useRouter();
 const baseUrl = import.meta.env.VITE_IMG_URL;
@@ -18,6 +21,8 @@ const authStore = useAuthStore();
 const address = ref();
 const orderStore = useOrderStore();
 const items = orderStore.selectedItems;
+const allCoupons = ref();
+const coupon = ref();
 
 /*
    注入 Loading 跟 Toast
@@ -26,6 +31,13 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
+
+/*
+   初始化
+*/
+onMounted(() => {
+  getMyCoupon();
+});
 
 /*
    加入已經寫好的驗證規則
@@ -62,6 +74,26 @@ const totalPrice = computed(() => {
 });
 
 /*
+   查看用戶優惠卷
+*/
+const getMyCoupon = async () => {
+  try {
+    showLoading();
+
+    const res = await getUserCoupon();
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      allCoupons.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
   使用者購買
 */
 const userBuy = async () => {
@@ -73,6 +105,7 @@ const userBuy = async () => {
       productsId: item.productsId,
       boughtQuantity: item.boughtQuantity,
     })),
+    couponId: coupon.value,
     shippingAddress: authStore.userAddress ?? address.value,
     boughtTime: new Date().toLocaleDateString('en-CA'),
   };

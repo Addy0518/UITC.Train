@@ -36,14 +36,14 @@ public class CouponController(ICouponService couponService) : ControllerBase
     }
 
     /// <summary>
-    /// 新增優惠卷
+    /// 賣家新增優惠卷
     /// </summary>
     /// <param name="request">優惠卷新增請求</param>
     /// <returns>影響列數</returns>
     [HttpPost]
     [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> CreateCoupons([FromBody] CouponInsertRequest request)
+    public async Task<IActionResult> SellerCreateCoupons([FromBody] CouponInsertRequest request)
     {
         request.CreaterId = CurrentUserId;
         return Ok(await couponService.CreateCoupons(request));

@@ -198,7 +198,7 @@ const retryPayment = async () => {
             <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
             <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
             <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
-            <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
+            <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountAmount }}</span>
             <div v-if="tableNow === shippingEnum.Arrived.value">
               <!-- 用 click.stop 防止冒泡 -->
               <div v-if="ratedOrders.has(order.orderId)">

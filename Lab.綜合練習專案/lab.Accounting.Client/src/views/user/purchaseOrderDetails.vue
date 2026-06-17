@@ -68,7 +68,7 @@ const getProductsImg = (product) => {
        <!--#region 訂單資訊 -->
       <div class="mt-40 w-300 rounded-lg shadow-sm" v-if="order">
         <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-        <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountPrice }}</span>
+        <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountAmount }}</span>
         <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
         <span class="mt-3 ms-5 me-5">訂單編號 : {{ order.orderNumber }}</span>
         <span class="mt-3 ms-5 me-5">購買時間 : {{ order.paidTime }}</span>

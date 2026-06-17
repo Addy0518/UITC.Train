@@ -129,7 +129,7 @@ const createRate = async () => {
             <span class="font-semibold text-base">訂單編號 : {{ rateOrder.orderNumber }}</span>
             <span class="font-semibold text-base">{{ rateOrder.productsName }}</span>
             <span class="text-gray-500 text-sm">購買數量 : {{ rateOrder.boughtQuantity }}</span>
-            <span class="text-gray-500 text-sm">訂單金額：NT$ {{ rateOrder.accountPrice }}</span>
+            <span class="text-gray-500 text-sm">訂單金額：NT$ {{ rateOrder.accountAmount }}</span>
           </div>
           <!-- #endregion -->
         </div>

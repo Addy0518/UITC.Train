@@ -217,7 +217,7 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
               SET 
                   UsedTime=GetDate()
               WHERE 
-                  OrderId in (SELECT OrderId FROM Orders WHERE OrderNumber = @OrderNumber)";
+                  OrderId in (SELECT OrderId FROM [Order] WHERE OrderNumber = @OrderNumber)";
         return await conn.ExecuteAsync(sql, new { OrderNumber = orderNumber });
     }
 }

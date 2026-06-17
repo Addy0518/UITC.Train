@@ -1,5 +1,5 @@
 <script setup>
-import { getUserCoupon } from '@/api/admin/couponService';
+import { getUserCoupon } from '@/api/couponService';
 import { onMounted } from 'vue';
 
 /*
@@ -24,33 +24,13 @@ onMounted(() => {
 });
 
 /*
-   加入已經寫好的驗證規則
-*/
-// const rules = computed(() => ({
-//   oldPassword: { vaildLoginPassword, required },
-//   newPassword: { vaildLoginPassword, required },
-// }));
-
-/*
-   加入套件驗證設定
-*/
-// const v$ = useVuelidate(
-//   rules,
-//   { oldPassword, newPassword },
-//   { $autoDirty: true, $lazy: true, $scope: false },
-// );
-
-/*
    查看用戶優惠卷
 */
 const getMyCoupon = async () => {
-  // const isFormCorrect = await v$.value.$validate();
-  // if (!isFormCorrect) return;
   try {
     showLoading();
 
     const res = await getUserCoupon();
-
     const { data } = res;
 
     if (data.codeStatus === 2000) {
@@ -72,7 +52,6 @@ const getCouponTypeName = (type) => {
   <div class="flex flex-col w-full p-6">
     <p class="text-2xl font-bold m-0 mb-4">我的優惠券</p>
 
-    <!-- 空狀態 -->
     <div
       v-if="!allCoupons || allCoupons.length === 0"
       class="flex flex-col items-center justify-center py-16 text-gray-400"
@@ -81,13 +60,16 @@ const getCouponTypeName = (type) => {
       <span class="text-sm">目前沒有優惠券</span>
     </div>
 
-    <!-- 優惠券列表 -->
     <div
       v-for="coupon in allCoupons"
       :key="coupon.couponId"
-      class="bg-white rounded-lg border border-gray-100 p-5 mb-3 flex items-stretch gap-0"
+      class="relative bg-white rounded-lg border border-gray-100 p-5 mb-3 flex items-stretch gap-0"
+      :class="{ 'opacity-50': coupon.usedTime }"
     >
-      <!-- 左側優惠碼 -->
+      <span v-if="coupon.usedTime" class="absolute top-2 right-3 text-xl font-bold text-red-500">
+        已使用
+      </span>
+
       <div
         class="flex flex-col items-center justify-center pr-5 min-w-28 border-r border-dashed border-gray-200"
       >
@@ -99,7 +81,6 @@ const getCouponTypeName = (type) => {
         </div>
       </div>
 
-      <!-- 右側資訊 -->
       <div class="flex-1 pl-5 grid grid-cols-3 gap-3">
         <div>
           <p class="text-xs text-gray-400 mb-1">名稱</p>
@@ -115,9 +96,15 @@ const getCouponTypeName = (type) => {
           <p class="text-xs text-gray-400 mb-1">狀態</p>
           <span
             class="px-2 py-0.5 rounded-full text-xs"
-            :class="coupon.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
+            :class="
+              coupon.usedTime
+                ? 'bg-gray-100 text-gray-400'
+                : coupon.isActive
+                  ? 'bg-green-50 text-green-700'
+                  : 'bg-gray-100 text-gray-500'
+            "
           >
-            {{ coupon.isActive ? '啟用中' : '未啟用' }}
+            {{ coupon.usedTime ? '已使用' : coupon.isActive ? '啟用中' : '未啟用' }}
           </span>
         </div>
         <div>

@@ -96,7 +96,7 @@ const updateStatus = async (id, status) => {
           <div class="flex-1">
             <p class="font-medium text-base m-0 mb-1">{{ order.productsName }}</p>
             <p class="text-sm text-gray-400 m-0 mb-2">數量：{{ order.boughtQuantity }} 件</p>
-            <p class="text-base font-medium text-orange-500 m-0">$ {{ order.accountPrice }}</p>
+            <p class="text-base font-medium text-orange-500 m-0">$ {{ order.accountAmount }}</p>
           </div>
         </div>
         <!-- #endregion -->
@@ -135,7 +135,7 @@ const updateStatus = async (id, status) => {
           </div>
           <div class="text-right">
             <p class="text-xs text-gray-300 m-0 mb-1">訂單金額</p>
-            <p class="text-xl font-medium text-orange-500 m-0">$ {{ order.accountPrice }}</p>
+            <p class="text-xl font-medium text-orange-500 m-0">$ {{ order.accountAmount }}</p>
           </div>
         </div>
         <!-- #endregion -->
