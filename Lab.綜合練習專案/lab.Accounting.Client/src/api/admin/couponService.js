@@ -4,7 +4,7 @@ import accountApiInstance from '@/api/accountInstance.js';
 
 // 查看所有優惠卷
 export const getAllCoupons = (request) =>
-  accountApiInstance.get(`admin/Coupon/GetAllCoupons?request=${request}`);
+  accountApiInstance.get(`admin/Coupon/GetAllCoupons`, { params: request });
 
 // 新增優惠卷
 export const createCoupons = (request) =>
@@ -12,4 +12,4 @@ export const createCoupons = (request) =>
 
 // 編輯優惠卷
 export const updateCoupons = (request) =>
-  accountApiInstance.put('admin/Coupon/UpdateCoupons', request);
+  accountApiInstance.put('admin/Coupon/AdminUpdateCoupons', request);

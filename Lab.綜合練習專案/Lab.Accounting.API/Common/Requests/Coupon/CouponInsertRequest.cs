@@ -6,15 +6,13 @@
         /// 創建者 ID
         /// </summary>
         [Display(Name = "創建者 ID")]
-        [Required(ErrorMessage = "{0} 不能為空!")]
-        public int CreaterId { get; set; }
+        public int? CreaterId { get; set; }
 
         /// <summary>
         /// 優惠券序號 (唯一值)
         /// </summary>
         [Display(Name = "優惠券序號")]
-        [Required(ErrorMessage = "{0} 不能為空!")]
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 優惠券名稱

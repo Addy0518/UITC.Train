@@ -25,7 +25,7 @@ const currentPage = ref();
 const currentSort = ref({ type: 'CreateTime', order: 'desc' });
 const sortBy = ref('CreateTime');
 const sortOrder = ref('desc');
-const reviewStatus = ref();
+const reviewStatus = ref(null);
 const keyWords = ref();
 const sellerId = ref();
 const isFiltering = ref(false);
@@ -73,6 +73,23 @@ const toggleSort = (type) => {
   }
   sortBy.value = currentSort.value.type;
   sortOrder.value = currentSort.value.order;
+  getAllReview();
+};
+
+/*
+   切換查看審查狀態
+*/
+const toggleReviewStatusFilter = () => {
+  if (reviewStatus.value === null || reviewStatus.value === undefined) {
+    reviewStatus.value = 0; // 切換到：待審核
+  } else if (reviewStatus.value === 0) {
+    reviewStatus.value = 1; // 切換到：已通過
+  } else if (reviewStatus.value === 1) {
+    reviewStatus.value = 2; // 切換到：已駁回
+  } else {
+    reviewStatus.value = null; // 切換回：全部
+  }
+  currentPage.value = 0; // 篩選條件改變時，重設頁碼回第一頁
   getAllReview();
 };
 
@@ -182,51 +199,6 @@ const changeReviewStatus = (status) => {
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
       <p class="text-2xl font-bold m-0">審查表管理</p>
-      <button
-        @click="toggleSort('CreateTime')"
-        :class="currentSort.type === 'CreateTime' ? 'text-orange-500' : 'text-gray-700'"
-        class="w-28 h-9 cursor-pointer hover:bg-gray-100 rounded-lg text-sm"
-      >
-        申請時間
-        <i
-          v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
-          class="pi pi-arrow-up text-xs"
-        />
-        <i
-          v-if="currentSort.type === 'CreateTime' && currentSort.order === 'desc'"
-          class="pi pi-arrow-down text-xs"
-        />
-      </button>
-
-      <button
-        @click="toggleSort('ReviewTime')"
-        :class="currentSort.type === 'ReviewTime' ? 'text-orange-500' : 'text-gray-700'"
-        class="w-28 h-9 cursor-pointer hover:bg-gray-100 rounded-lg text-sm"
-      >
-        審查時間
-        <i
-          v-if="currentSort.type === 'ReviewTime' && currentSort.order === 'asc'"
-          class="pi pi-arrow-up text-xs"
-        />
-        <i
-          v-if="currentSort.type === 'ReviewTime' && currentSort.order === 'desc'"
-          class="pi pi-arrow-down text-xs"
-        />
-      </button>
-
-      <button
-        v-for="option in reviewStatusEnum"
-        :key="option.label"
-        @click="changeReviewStatus(option.value)"
-        :class="
-          reviewStatus === option.value
-            ? 'bg-orange-500 text-white border-orange-500'
-            : 'text-gray-600 border-gray-200 hover:bg-gray-100'
-        "
-        class="px-3 py-1.5 border rounded-lg text-xs cursor-pointer transition-colors"
-      >
-        {{ option.description }}
-      </button>
 
       <div class="flex flex-1 items-center justify-center">
         <Select
@@ -261,9 +233,68 @@ const changeReviewStatus = (status) => {
         <span class="text-xs text-gray-400">賣家</span>
         <span class="text-xs text-gray-400">審核人員</span>
         <span class="text-xs text-gray-400">商品名稱</span>
-        <span class="text-xs text-gray-400">審核狀態</span>
-        <span class="text-xs text-gray-400">申請時間</span>
-        <span class="text-xs text-gray-400">審核時間</span>
+        <button
+          @click="toggleReviewStatusFilter"
+          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+          :class="
+            reviewStatus !== null && reviewStatus !== undefined
+              ? 'text-black font-semibold'
+              : 'text-gray-400'
+          "
+        >
+          審核狀態
+          <span
+            v-if="reviewStatus === 0"
+            class="px-1 py-0.5 rounded bg-yellow-50 text-yellow-700 text-[10px]"
+            >待審核</span
+          >
+          <span
+            v-else-if="reviewStatus === 1"
+            class="px-1 py-0.5 rounded bg-green-50 text-green-700 text-[10px]"
+            >已通過</span
+          >
+          <span
+            v-else-if="reviewStatus === 2"
+            class="px-1 py-0.5 rounded bg-red-50 text-red-700 text-[10px]"
+            >已駁回</span
+          >
+          <span v-else class="text-[10px] text-gray-300">(全部)</span>
+        </button>
+        <button
+          @click="toggleSort('CreateTime')"
+          :class="
+            currentSort.type === 'CreateTime' ? 'text-orange-500 font-semibold' : 'text-gray-400'
+          "
+          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+        >
+          申請時間
+          <i
+            v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
+            class="pi pi-arrow-up text-[10px]"
+          />
+          <i
+            v-if="currentSort.type === 'CreateTime' && currentSort.order === 'desc'"
+            class="pi pi-arrow-down text-[10px]"
+          />
+        </button>
+
+        <button
+          @click="toggleSort('ReviewTime')"
+          :class="
+            currentSort.type === 'ReviewTime' ? 'text-orange-500 font-semibold' : 'text-gray-400'
+          "
+          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+        >
+          審核時間
+          <i
+            v-if="currentSort.type === 'ReviewTime' && currentSort.order === 'asc'"
+            class="pi pi-arrow-up text-[10px]"
+          />
+          <i
+            v-if="currentSort.type === 'ReviewTime' && currentSort.order === 'desc'"
+            class="pi pi-arrow-down text-[10px]"
+          />
+        </button>
       </div>
 
       <!-- #endregion -->

@@ -416,12 +416,12 @@ const router = createRouter({
           /*
               審查表列
           */
-          path: 'admin-review',
-          name: 'admin-review',
+          path: 'admin-allreview',
+          name: 'admin-allreview',
           meta: {
             isAdmin: true,
           },
-          component: () => import('@/views/backend/admin/adminReview.vue'),
+          component: () => import('@/views/backend/admin/adminAllReview.vue'),
         },
         {
           /*
@@ -477,6 +477,17 @@ const router = createRouter({
             isAdmin: true,
           },
           component: () => import('@/views/backend/admin/adminAddCategory.vue'),
+        },
+        {
+          /*
+              優惠卷列表
+          */
+          path: 'admin-allcoupons',
+          name: 'admin-allcoupons',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminAllCoupons.vue'),
         },
       ],
     },

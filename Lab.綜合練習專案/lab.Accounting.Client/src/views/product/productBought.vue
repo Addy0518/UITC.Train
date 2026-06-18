@@ -1,7 +1,9 @@
 <script setup>
 import { userBuyProduct } from '@/api//orderService';
 import { getUserCoupon } from '@/api/couponService';
+import { couponTypeEnum } from '@/common/enum';
 import defaultImgurl from '@/img/預設圖片.jpg';
+import { computed } from 'vue';
 
 /*
    變數名稱代表意義
@@ -22,7 +24,7 @@ const address = ref();
 const orderStore = useOrderStore();
 const items = orderStore.selectedItems;
 const allCoupons = ref();
-const coupon = ref();
+const coupon = ref(null);
 
 /*
    注入 Loading 跟 Toast
@@ -72,6 +74,46 @@ const getProductImg = (item) => {
 const totalPrice = computed(() => {
   return (items ?? []).reduce((sum, item) => sum + item.productsPrice * item.boughtQuantity, 0);
 });
+
+/*
+  判斷優惠卷是否可用
+*/
+const isCouponCanUse = (coupon) => {
+  if (coupon.usedTime) return false;
+  if (!coupon.isActive) return false;
+  if (new Date(coupon.StartTime) > new Date() || new Date(coupon.EndTime) < new Date())
+    return false;
+  if (coupon.minimunSpend > 0 && totalPrice.value < coupon.minimunSpend) return false;
+  return true;
+};
+
+/*
+  前端及時判斷優惠價格 ( 僅供前端瀏覽 , 實際以後端為主 )
+*/
+const discountAmount = computed(() => {
+  const selected = allCoupons.value?.find((c) => c.couponId === coupon.value);
+  if (!selected) return 0;
+  if (selected.type === couponTypeEnum.百分比折扣.value) {
+    return Math.round(totalPrice.value * (1 - selected.discount / 100));
+  } else {
+    // Math min 取出兩個數中的最小值 , 這樣當折扣大於金額時就直接回傳總金額 , 就會變成免費而不是負數 , 變成我們還要給他錢
+    return Math.min(selected.discount, totalPrice.value);
+  }
+});
+
+/*
+  最後計算扣除優惠的價格
+*/
+const finalPrice = computed(() => totalPrice.value - discountAmount.value);
+
+/*
+  點選的優惠卷
+*/
+const selectCoupon = (c) => {
+  if (!isCouponCanUse(c)) return;
+  // 再點一次可以取消
+  coupon.value = coupon.value === c.couponId ? null : c.couponId;
+};
 
 /*
    查看用戶優惠卷
@@ -184,6 +226,83 @@ const userBuy = async () => {
     </div>
     <!-- #endregion -->
 
+    <!-- #region  優惠券選擇 -->
+    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-base font-bold text-gray-700">選擇優惠券</h2>
+        <span class="text-xs text-gray-400">{{ allCoupons?.length ?? 0 }} 張可用</span>
+      </div>
+
+      <div
+        v-if="!allCoupons || allCoupons.length === 0"
+        class="text-sm text-gray-400 py-4 text-center"
+      >
+        目前沒有可用的優惠券
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <!-- 不使用優惠券 -->
+        <div
+          class="flex items-center gap-3 p-3 border rounded-md cursor-pointer"
+          :class="coupon === null ? 'border-blue-400 bg-blue-50' : 'border-gray-200'"
+          @click="coupon = null"
+        >
+          <div
+            class="w-4.5 h-4.5 rounded-full border"
+            :class="coupon === null ? 'border-blue-400 bg-blue-400' : 'border-gray-300'"
+          ></div>
+          <span class="text-sm text-gray-500">不使用優惠券</span>
+        </div>
+
+        <div
+          v-for="c in allCoupons"
+          :key="c.couponId"
+          class="flex items-center gap-3 p-3 border rounded-md"
+          :class="[
+            isCouponCanUse(c) ? 'cursor-pointer' : 'cursor-not-allowed opacity-45',
+            coupon === c.couponId && isCouponCanUse(c)
+              ? 'border-blue-400 bg-blue-50'
+              : 'border-gray-200',
+          ]"
+          @click="selectCoupon(c)"
+        >
+          <div
+            class="w-4.5 h-4.5 rounded-full border"
+            :class="
+              coupon === c.couponId && isCouponCanUse(c)
+                ? 'border-blue-400 bg-blue-400'
+                : 'border-gray-300'
+            "
+          ></div>
+          <div
+            class="bg-gray-50 border border-dashed border-gray-300 rounded-md px-2.5 py-1 font-mono text-xs"
+          >
+            {{ c.code }}
+          </div>
+          <div class="flex-1">
+            <p class="text-sm m-0">{{ c.name }}</p>
+            <p class="text-xs text-gray-400 m-0 mt-0.5">
+              {{ c.minimunSpend > 0 ? `滿 $${c.minimunSpend} 可用` : '無門檻' }}
+              ·
+              {{
+                c.usedTime
+                  ? '已使用'
+                  : totalPrice < c.minimunSpend
+                    ? '未達門檻'
+                    : `${formatDateTimeString(c.endTime)} 到期`
+              }}
+            </p>
+          </div>
+          <p class="text-sm font-medium text-orange-500 m-0">
+            {{
+              c.type === couponTypeEnum.百分比折扣.value ? `${c.discount} 折` : `$${c.discount} 元`
+            }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- #endregion -->
+
     <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-5">
       <!-- #region  購買資訊填寫-->
       <h2 class="text-base font-bold text-gray-700">填寫購買資訊</h2>
@@ -205,7 +324,7 @@ const userBuy = async () => {
           <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
         </div>
       </div>
-      <span>總金額 : {{ totalPrice.toLocaleString() }}</span>
+      <span>總金額 : {{ finalPrice.toLocaleString() }}</span>
       <!-- #endregion -->
       <!-- #region  購買按鈕-->
       <div class="flex gap-3">

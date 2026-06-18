@@ -37,15 +37,23 @@
         public CouponTypeEnum? Type { get; set; }
 
         /// <summary>
-        /// 折扣開始時間
-        /// </summary>
-        [Display(Name = "折扣開始時間")]
-        public DateTime? StartTime { get; set; }
-
-        /// <summary>
         /// 是否啟用
         /// </summary>
         [Display(Name = "是否啟用")]
         public bool? IsActive { get; set; }
+
+        /// 排序條件
+        /// ==================================================
+        /// <summary>
+        /// 分類排序
+        /// </summary>
+        [Display(Name = "分類排序")]
+        public string? sortBy { get; set; }
+
+        /// <summary>
+        /// 排序方向
+        /// </summary>
+        [Display(Name = "排序方向")]
+        public string? sortOrder { get; set; }
     }
 }

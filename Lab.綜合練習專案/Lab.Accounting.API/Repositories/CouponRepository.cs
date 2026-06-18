@@ -50,9 +50,13 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
                    Count(*) OVER() AS TotalCount
             FROM   Coupon c
             WHERE  (@keyWords IS NULL OR c.Name LIKE '%' + @keyWords + '%')
+            AND    (@CreaterId IS NULL OR c.CreaterId = @CreaterId)
             AND    (@IsActive IS NULL OR c.IsActive = @IsActive)
             AND    (@Type IS NULL OR c.Type = @Type)
-            ORDER BY c.StartTime DESC 
+            ORDER BY 
+                    case when @sortBy='StartTime' and @sortOrder='asc' then c.StartTime end asc,
+                    case when @sortBy='StartTime' and @sortOrder='desc' then c.StartTime end desc,
+                    couponId
             OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
 
         return await conn.QueryAsync<CouponResponse>(
@@ -65,6 +69,8 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
                 keyWords = request.keyWords,
                 IsActive = request.IsActive,
                 Type = request.Type,
+                sortBy = request.sortBy,
+                sortOrder = request.sortOrder,
             }
         );
     }

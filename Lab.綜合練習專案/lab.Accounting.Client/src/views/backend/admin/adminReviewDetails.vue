@@ -102,7 +102,7 @@ const approveReview = async (status) => {
 
     if (data.codeStatus === 2000) {
       showToastSuccess('成功!');
-      router.push({ name: 'admin-review' });
+      router.push({ name: 'admin-allreview' });
     }
   } catch (err) {
     console.log(err);
@@ -126,7 +126,7 @@ const getProductsImg = (img) => {
     <!--#region  標題列-->
     <div class="flex items-center gap-3 mb-4">
       <button
-        @click="router.push({ name: 'admin-review' })"
+        @click="router.push({ name: 'admin-allreview' })"
         class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
       >
         <i class="pi pi-arrow-left text-sm" />

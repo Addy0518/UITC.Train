@@ -129,8 +129,8 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                     IsNull(Sum(o.AccountAmount),0) as TotalSpent
 
                     FROM   [user] u
-                    Left Join MallOrder o on o.UserId = u.UserId
-                    Left Join MallProducts p on p.UserId = u.UserId
+                    Left Join [Order] o on o.UserId = u.UserId
+                    Left Join Product p on p.UserId = u.UserId
                     Where u.UserId = @UserId
                     GROUP BY u.UserAccount,
                              u.UserId,

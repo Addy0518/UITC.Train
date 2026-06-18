@@ -52,7 +52,7 @@ onMounted(() => {});
       <!-- #region  管理者後台區-->
       <template v-if="authStore.userRole == 'Admin'">
         <RouterLink
-          :to="{ name: 'admin-review' }"
+          :to="{ name: 'admin-allreview' }"
           class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
           ><i class="pi pi-plus px-5 ps-5"></i>審查列表</RouterLink
         >
@@ -65,6 +65,11 @@ onMounted(() => {});
           :to="{ name: 'admin-allCategories' }"
           class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
           ><i class="pi pi-sitemap px-5 ps-5"></i>類別列表</RouterLink
+        >
+        <RouterLink
+          :to="{ name: 'admin-allcoupons' }"
+          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+          ><i class="pi pi-ticket px-5 ps-5"></i>優惠卷列表</RouterLink
         >
       </template>
       <!-- #endregion -->

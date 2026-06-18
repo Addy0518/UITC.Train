@@ -1,6 +1,7 @@
 <script setup>
 import { getAllUser } from '@/api/admin/userService';
 import defaultImgurl from '@/img/預設圖片.jpg';
+import { genderEnum } from '@/common/enum';
 /*
    變數名稱代表意義
    allUser : 所有使用者
@@ -154,7 +155,7 @@ const goSearch = () => {
 };
 
 /*
-  讀取商品圖片 , 判斷是否有圖片沒有就回傳預設
+  讀取用戶圖片 , 判斷是否有圖片沒有就回傳預設
 */
 const getUserImg = (user) => {
   if (user.userHeadshot) {
@@ -169,21 +170,6 @@ const getUserImg = (user) => {
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
       <p class="text-2xl font-bold m-0">用戶管理</p>
-      <button
-        @click="toggleSort('CreateTime')"
-        :class="currentSort.type === 'CreateTime' ? 'text-orange-500' : 'text-gray-700'"
-        class="w-28 h-9 cursor-pointer hover:bg-gray-100 rounded-lg text-sm"
-      >
-        註冊時間
-        <i
-          v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
-          class="pi pi-arrow-up text-xs"
-        />
-        <i
-          v-if="currentSort.type === 'CreateTime' && currentSort.order === 'desc'"
-          class="pi pi-arrow-down text-xs"
-        />
-      </button>
 
       <div class="flex flex-1 items-center justify-center">
         <AutoComplete
@@ -202,7 +188,7 @@ const getUserImg = (user) => {
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
       <!-- #endregion -->
     </div>
- 
+
     <!-- #region  欄位標頭-->
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
       <div
@@ -214,7 +200,23 @@ const getUserImg = (user) => {
         <span class="text-xs text-gray-400">帳號</span>
         <span class="text-xs text-gray-400">性別</span>
         <span class="text-xs text-gray-400">角色</span>
-        <span class="text-xs text-gray-400">註冊時間</span>
+        <button
+          @click="toggleSort('CreateTime')"
+          :class="
+            currentSort.type === 'CreateTime' ? 'text-orange-500 font-semibold' : 'text-gray-400'
+          "
+          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+        >
+          註冊時間
+          <i
+            v-if="currentSort.type === 'CreateTime' && currentSort.order === 'asc'"
+            class="pi pi-arrow-up text-[10px]"
+          />
+          <i
+            v-if="currentSort.type === 'CreateTime' && currentSort.order === 'desc'"
+            class="pi pi-arrow-down text-[10px]"
+          />
+        </button>
         <span class="text-xs text-gray-400">狀態</span>
       </div>
 

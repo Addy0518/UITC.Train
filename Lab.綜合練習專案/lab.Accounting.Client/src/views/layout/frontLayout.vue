@@ -85,7 +85,7 @@ const goSearch = () => {
         <RouterLink :to="{ name: 'backend-layout' }" class="text-white text-2xl"
           >賣家中心</RouterLink
         >
-        <RouterLink :to="{ name: 'admin-review' }" class="text-white text-2xl">管理中心</RouterLink>
+        <RouterLink :to="{ name: 'admin-allreview' }" class="text-white text-2xl">管理中心</RouterLink>
       </div>
 
       <div class="flex flex-1 items-center justify-center">
