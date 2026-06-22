@@ -351,6 +351,17 @@ const router = createRouter({
         },
         {
           /*
+            賣家的優惠卷
+          */
+          path: 'seller-coupons',
+          name: 'seller-coupons',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/backend/seller/sellerCoupons.vue'),
+        },
+        {
+          /*
                 新增商品
               */
           path: 'add-product',

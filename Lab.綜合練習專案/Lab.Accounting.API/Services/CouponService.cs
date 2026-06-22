@@ -61,13 +61,48 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
+        /// 查看用戶可領取的優惠卷
+        /// </summary>
+        /// <param name="userId">使用者 ID </param>
+        /// <returns>可領取優惠卷資訊列表</returns>
+        public async Task<ApiResponse<IEnumerable<CouponResponse>>> GetCanReceiveCoupon(int userId)
+        {
+            var target = await couponRepository.GetCanReceiveCoupon(userId);
+
+            if (!target.Any())
+            {
+                return ApiResponseHelper.NotFound<IEnumerable<CouponResponse>>();
+            }
+
+            return ApiResponseHelper.Success(target);
+        }
+
+        /// <summary>
         /// 新增優惠卷
         /// </summary>
         /// <param name="request">優惠卷新增請求</param>
         /// <returns>影響列數</returns>
         public async Task<ApiResponse<int>> CreateCoupons(CouponInsertRequest request)
         {
+            if (request.Type == CouponTypeEnum.百分比折扣)
+            {
+                if (request.Discount > 100)
+                {
+                    var errors = new Dictionary<string, string[]> { { "Discount", new[] { "折扣不能大於100!" } } };
+
+                    return ApiResponseHelper.RequestError<int>(errors);
+                }
+            }
+
+            if (request.EndTime <= request.StartTime)
+            {
+                var errors = new Dictionary<string, string[]> { { "EndTime", new[] { "結束時間必須晚於開始時間!" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+
             request.Code = Guid.NewGuid().ToString();
+
             var target = await couponRepository.CreateCoupons(request);
 
             if (target <= 0)
@@ -85,6 +120,12 @@ namespace Lab.Accounting.API.Services
         /// <returns>影響列數</returns>
         public async Task<ApiResponse<int>> AdminUpdateCoupons(CouponUpdateRequest request)
         {
+            if (request.EndTime <= request.StartTime)
+            {
+                var errors = new Dictionary<string, string[]> { { "EndTime", new[] { "結束時間必須晚於開始時間!" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
             var coupon = await couponRepository.GetCoupon(request.CouponId);
 
             if (coupon == null)
@@ -108,11 +149,26 @@ namespace Lab.Accounting.API.Services
         /// <returns>影響列數</returns>
         public async Task<ApiResponse<int>> SellerUpdateCoupons(CouponUpdateRequest request)
         {
+            if (request.EndTime <= request.StartTime)
+            {
+                var errors = new Dictionary<string, string[]> { { "EndTime", new[] { "結束時間必須晚於開始時間!" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
             var coupon = await couponRepository.GetCoupon(request.CouponId);
 
             if (coupon == null)
             {
                 return ApiResponseHelper.NotFound<int>();
+            }
+            if (coupon.CreaterId != request.CreaterId)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "CreaterId", new[] { "你沒有權限編輯這張優惠卷!" } },
+                };
+
+                return ApiResponseHelper.RequestError<int>(errors);
             }
 
             var target = await couponRepository.SellerUpdateCoupons(request);
@@ -132,14 +188,47 @@ namespace Lab.Accounting.API.Services
         /// <returns>優惠卷 ID</returns>
         public async Task<ApiResponse<int>> CreateUserCoupon(UserCouponInsertRequest request)
         {
-            var target = await couponRepository.CreateUserCoupon(request);
+            var coupon = await couponRepository.GetCoupon(request.CouponId);
 
-            if (target <= 0)
+            if (coupon == null || !coupon.IsActive || DateTime.Now > coupon.EndTime)
             {
-                return ApiResponseHelper.InternalException<int>("領取優惠卷錯誤");
+                var errors = new Dictionary<string, string[]> { { "Coupon", new[] { "優惠卷已過期或不存在!" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
             }
 
-            return ApiResponseHelper.Success(target);
+            var userCoupon = await couponRepository.GetUserCoupon(request.UserId);
+
+            if (userCoupon.Any(c => c.CouponId == request.CouponId))
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "UserCoupon", new[] { "你已經領取過這張優惠卷了!" } },
+                };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var receive = await couponRepository.SetCouponStock(request.CouponId);
+
+                if (receive <= 0)
+                {
+                    var errors = new Dictionary<string, string[]> { { "Coupon", new[] { "優惠卷已被領取完畢!" } } };
+                    return ApiResponseHelper.RequestError<int>(errors);
+                }
+
+                var target = await couponRepository.CreateUserCoupon(request);
+
+                if (target <= 0)
+                {
+                    return ApiResponseHelper.InternalException<int>("領取優惠卷錯誤");
+                }
+
+                trxScope.Complete();
+                return ApiResponseHelper.Success(target);
+            }
         }
     }
 }

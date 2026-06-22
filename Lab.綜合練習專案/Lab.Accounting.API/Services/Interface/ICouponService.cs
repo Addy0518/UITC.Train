@@ -27,6 +27,13 @@ namespace Lab.Accounting.API.Services
         Task<ApiResponse<IEnumerable<CouponResponse>>> GetAllCoupons(CouponSearchRequest request);
 
         /// <summary>
+        /// 查看用戶可領取的優惠卷
+        /// </summary>
+        /// <param name="userId">使用者 ID </param>
+        /// <returns>可領取優惠卷資訊列表</returns>
+        Task<ApiResponse<IEnumerable<CouponResponse>>> GetCanReceiveCoupon(int userId);
+
+        /// <summary>
         /// 新增優惠卷
         /// </summary>
         /// <param name="request">優惠卷新增請求</param>

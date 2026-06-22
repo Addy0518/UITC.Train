@@ -26,6 +26,13 @@ public interface ICouponRepository
     Task<IEnumerable<CouponResponse>> GetAllCoupons(CouponSearchRequest request);
 
     /// <summary>
+    /// 查看用戶可領取的優惠卷
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>可領取優惠卷資訊列表</returns>
+    Task<IEnumerable<CouponResponse>> GetCanReceiveCoupon(int userId);
+
+    /// <summary>
     /// 新增優惠卷
     /// </summary>
     /// <param name="request">優惠卷新增請求</param>
@@ -67,4 +74,11 @@ public interface ICouponRepository
     /// <param name="orderNumber">訂單編號</param>
     /// <returns>影響列數</returns>
     Task<int> CompleteUserCoupon(string orderNumber);
+
+    /// <summary>
+    /// 扣除優惠卷數量
+    /// </summary>
+    /// <param name="couponId">優惠卷 ID</param>
+    /// <returns>影響列數</returns>
+    Task<int> SetCouponStock(int couponId);
 }

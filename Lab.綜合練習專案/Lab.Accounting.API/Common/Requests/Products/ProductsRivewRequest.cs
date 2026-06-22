@@ -34,6 +34,7 @@
         /// 審核未通過/駁回的原因
         /// </summary>
         [Display(Name = "審核未通過/駁回的原因")]
+        [MaxLength(500, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string? NotPassReson { get; set; }
     }
 }

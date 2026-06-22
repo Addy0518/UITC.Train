@@ -38,6 +38,17 @@ public class Coupon
     public decimal MinimunSpend { get; set; }
 
     /// <summary>
+    /// 發行數量 ( Null 表示無限制 )
+    /// </summary>
+    public int? TotalQuantity { get; set; }
+
+    /// <summary>
+    /// 已領取數量
+    /// </summary>
+    /// </summary>
+    public int ReceiveQuantity { get; set; } = 0;
+
+    /// <summary>
     /// 折扣開始時間
     /// </summary>
     public DateTime StartTime { get; set; }

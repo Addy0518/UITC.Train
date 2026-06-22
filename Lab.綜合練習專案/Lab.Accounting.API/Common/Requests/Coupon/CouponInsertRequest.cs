@@ -19,6 +19,7 @@
         /// </summary>
         [Display(Name = "優惠券名稱")]
         [Required(ErrorMessage = "{0} 不能為空!")]
+        [MaxLength(300, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string Name { get; set; }
 
         /// <summary>
@@ -33,12 +34,14 @@
         /// </summary>
         [Display(Name = "折扣數值")]
         [Required(ErrorMessage = "{0} 不能為空!")]
+        [Range(1, 100, ErrorMessage = "{0} 必須在 {1} 到 {2} 之間!")]
         public decimal Discount { get; set; }
 
         /// <summary>
         /// 最低消費門檻
         /// </summary>
         [Display(Name = "最低消費門檻")]
+        [Range(0, double.MaxValue, ErrorMessage = "{0} 必須大於或等於 {1}!")]
         public decimal? MinimunSpend { get; set; }
 
         /// <summary>

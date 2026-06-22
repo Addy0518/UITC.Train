@@ -9,6 +9,13 @@ export const getCoupon = (couponId) =>
 // 查看用戶優惠卷
 export const getUserCoupon = () => accountApiInstance.get('Coupon/GetUserCoupon');
 
+
+// 查看用戶可領取的優惠卷
+export const getCanReceiveCoupon = () => accountApiInstance.get('Coupon/GetCanReceiveCoupon');
+
+// 賣家查看所有優惠卷
+export const getSellerAllCoupons = () => accountApiInstance.get('Coupon/GetSellerAllCoupons');
+
 // 賣家新增優惠卷
 export const sellerCreateCoupons = (request) =>
   accountApiInstance.post('Coupon/SellerCreateCoupons', request);

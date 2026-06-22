@@ -36,6 +36,30 @@ public class CouponController(ICouponService couponService) : ControllerBase
     }
 
     /// <summary>
+    /// 查看用戶可領取的優惠卷
+    /// </summary>
+    /// <returns>可領取優惠卷資訊列表</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<CouponResponse>>))]
+    public async Task<IActionResult> GetCanReceiveCoupon()
+    {
+        return Ok(await couponService.GetCanReceiveCoupon(CurrentUserId));
+    }
+
+    /// <summary>
+    /// 賣家查看所有優惠卷
+    /// </summary>
+    /// <returns>優惠卷資訊列表</returns>
+    [HttpGet]
+    [Authorize(Roles = RolesAuth.賣家)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<CouponResponse>>))]
+    public async Task<IActionResult> GetSellerAllCoupons([FromQuery] CouponSearchRequest request)
+    {
+        request.CreaterId = CurrentUserId;
+        return Ok(await couponService.GetAllCoupons(request));
+    }
+
+    /// <summary>
     /// 賣家新增優惠卷
     /// </summary>
     /// <param name="request">優惠卷新增請求</param>
@@ -73,6 +97,7 @@ public class CouponController(ICouponService couponService) : ControllerBase
     public async Task<IActionResult> CreateUserCoupon([FromBody] UserCouponInsertRequest request)
     {
         request.UserId = CurrentUserId;
+        request.CreateTime = DateTime.Now;
         return Ok(await couponService.CreateUserCoupon(request));
     }
 }

@@ -37,6 +37,26 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
     }
 
     /// <summary>
+    /// 查看用戶可領取的優惠卷
+    /// </summary>
+    /// <param name="userId">使用者 ID </param>
+    /// <returns>可領取優惠卷資訊列表</returns>
+    public async Task<IEnumerable<CouponResponse>> GetCanReceiveCoupon(int userId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Select c.*
+            from Coupon c 
+            Where c.IsActive=1
+            and c.EndTime>getDate()
+            and not Exists( Select 1 From UserCoupon u
+                            Where u.CouponId=c.CouponId
+                            and u.UserId=@UserId)";
+        return await conn.QueryAsync<CouponResponse>(sql, new { UserId = userId });
+    }
+
+    /// <summary>
     /// 查看所有優惠卷
     /// </summary>
     /// <param name="request">優惠卷搜尋請求</param>
@@ -46,9 +66,11 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
         using var conn = connecting.CreateConnecting();
         int offset = request.pageIndex * request.pageSize;
         var sql =
-            @"SELECT c.*,
+            @"SELECT c.*,u.UserName as CreaterName,
                    Count(*) OVER() AS TotalCount
             FROM   Coupon c
+            Left Join   [User] u 
+            on     c.CreaterId = u.UserId
             WHERE  (@keyWords IS NULL OR c.Name LIKE '%' + @keyWords + '%')
             AND    (@CreaterId IS NULL OR c.CreaterId = @CreaterId)
             AND    (@IsActive IS NULL OR c.IsActive = @IsActive)
@@ -225,5 +247,25 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
               WHERE 
                   OrderId in (SELECT OrderId FROM [Order] WHERE OrderNumber = @OrderNumber)";
         return await conn.ExecuteAsync(sql, new { OrderNumber = orderNumber });
+    }
+
+    /// <summary>
+    /// 扣除優惠卷數量
+    /// </summary>
+    /// <param name="couponId">優惠卷 ID</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> SetCouponStock(int couponId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+              UPDATE Coupon 
+              SET 
+                  ReceiveQuantity = ReceiveQuantity + 1
+              WHERE 
+                  CouponId = @CouponId
+              AND (TotalQuantity is null or ReceiveQuantity<TotalQuantity)";
+        return await conn.ExecuteAsync(sql, new { CouponId = couponId });
     }
 }

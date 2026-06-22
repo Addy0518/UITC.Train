@@ -46,6 +46,13 @@ public class ProductsService(
     /// <returns>商品列表</returns>
     public async Task<ApiResponse<ProductsResponse>> GetAllProducts(ProductsSearchRequest request)
     {
+        if (request.minPrice > request.maxPrice)
+        {
+            var errors = new Dictionary<string, string[]> { { "Price", new[] { "最小價格不能大於最大價格!" } } };
+
+            return ApiResponseHelper.RequestError<ProductsResponse>(errors);
+        }
+
         var products = await productsRepository.GetAllProducts(request);
 
         if (products == null)

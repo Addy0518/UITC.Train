@@ -13,6 +13,7 @@
         /// </summary>
         [Display(Name = "商品類別名稱")]
         [Required(ErrorMessage = "{0} 不能為空!")]
+        [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string ProductCategoryName { get; set; }
 
         /// <summary>

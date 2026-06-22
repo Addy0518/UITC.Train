@@ -21,6 +21,7 @@ public class ProductsInsertRequest
     /// </summary>
     [Display(Name = "商品名稱")]
     [Required(ErrorMessage = "{0} 必輸")]
+    [MaxLength(200, ErrorMessage = "{0} 長度最長為 {1} 字")]
     public string ProductsName { get; set; }
 
     /// <summary>
@@ -28,6 +29,7 @@ public class ProductsInsertRequest
     /// </summary>
     [Display(Name = "商品價格")]
     [Required(ErrorMessage = "{0} 必輸")]
+    [Range(1, double.MaxValue, ErrorMessage = "{0} 必須大於或等於 {1}!")]
     public decimal ProductsPrice { get; set; }
 
     /// <summary>

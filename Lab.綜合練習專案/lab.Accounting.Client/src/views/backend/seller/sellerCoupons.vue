@@ -1,7 +1,7 @@
 <script setup>
-import { getAllCoupons } from '@/api/admin/couponService';
+import { getSellerAllCoupons } from '@/api/couponService';
 import { couponTypeEnum } from '@/common/enum';
-import CouponDialog from '@/dialog/adminCouponCommandDialog.vue';
+import CouponDialog from '@/dialog/sellerCouponCommandDialog.vue';
 
 /*
    變數名稱代表意義
@@ -66,7 +66,7 @@ const getCoupons = async (isFirstload = false) => {
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
     };
-    const res = await getAllCoupons(request);
+    const res = await getSellerAllCoupons(request);
     const { data } = res;
 
     if (data.codeStatus === 2000) {
@@ -132,7 +132,7 @@ const searchSuggestions = async (event) => {
       pageSize: 10,
       pageIndex: 0,
     };
-    const res = await getAllCoupons(request);
+    const res = await getSellerAllCoupons(request);
     const { data } = res;
 
     if (data.codeStatus === 2000) {
@@ -206,11 +206,10 @@ const openEditDialog = async (coupon) => {
     <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
       <!-- #region  欄位標頭-->
       <div
-        class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[90px_1.4fr_1fr_0.9fr_1fr_1.4fr_0.8fr_110px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
       >
         <span class="text-xs text-gray-400">優惠碼</span>
         <span class="text-xs text-gray-400">名稱</span>
-        <span class="text-xs text-gray-400">建立人</span>
         <span class="text-xs text-gray-400">類型</span>
         <span class="text-xs text-gray-400">折扣</span>
         <span class="text-xs text-gray-400">最低消費</span>
@@ -276,11 +275,10 @@ const openEditDialog = async (coupon) => {
         <div
           v-for="coupon in allCoupons"
           :key="coupon.couponId"
-          class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
+          class="grid grid-cols-[90px_1.4fr_1fr_0.9fr_1fr_1.4fr_0.8fr_110px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
         >
           <span class="font-mono text-xs text-gray-500 truncate">{{ coupon.code }}</span>
           <span class="text-sm truncate">{{ coupon.name }}</span>
-          <span class="text-sm truncate">{{ coupon.createrName }}</span>
           <span>
             <span class="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700">
               {{ getEnumDescription(coupon.type) }}

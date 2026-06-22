@@ -20,18 +20,21 @@ public class ProductsUpdateRequest
     /// 商品類別 ID
     /// </summary>
     [Display(Name = "商品類別 ID")]
+    [Required(ErrorMessage = "{0} 必輸")]
     public int ProductCategoryId { get; set; }
 
     /// <summary>
     /// 商品名稱
     /// </summary>
     [Display(Name = "商品名稱")]
+    [MaxLength(200, ErrorMessage = "{0} 長度最長為 {1} 字")]
     public string? ProductsName { get; set; }
 
     /// <summary>
     /// 商品價格
     /// </summary>
     [Display(Name = "商品價格")]
+    [Range(1, double.MaxValue, ErrorMessage = "{0} 必須大於或等於 {1}!")]
     public decimal? ProductsPrice { get; set; }
 
     /// <summary>

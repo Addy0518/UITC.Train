@@ -13,6 +13,11 @@
         public int CreaterId { get; set; }
 
         /// <summary>
+        /// 創建者名稱
+        /// </summary>
+        public string CreaterName { get; set; }
+
+        /// <summary>
         /// 優惠券序號 (唯一值)
         /// </summary>
         public string Code { get; set; }

@@ -42,6 +42,11 @@ onMounted(() => {});
           ><i class="pi pi-wallet px-5 ps-5"></i>訂單管理</RouterLink
         >
         <RouterLink
+          :to="{ name: 'seller-coupons' }"
+          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
+          ><i class="pi pi-ticket px-5 ps-5"></i>優惠卷列表</RouterLink
+        >
+        <RouterLink
           :to="{ name: 'seller-product-recycling' }"
           class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
           ><i class="pi pi-trash px-5 ps-5"></i>商品回收</RouterLink

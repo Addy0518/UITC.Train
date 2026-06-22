@@ -8,12 +8,14 @@
         /// 頁碼
         /// </summary>
         [Display(Name = "頁碼")]
+        [Range(0, int.MaxValue, ErrorMessage = "{0} 不能小於 {1}")]
         public int pageIndex { get; set; } = 0;
 
         /// <summary>
         /// 每頁顯示數量
         /// </summary>
         [Display(Name = "每頁顯示數量")]
+        [Range(1, 100, ErrorMessage = "{0} 必須介於 {1} 到 {2} 之間")]
         public int pageSize { get; set; } = 10;
 
         /// 搜尋條件
@@ -34,6 +36,7 @@
         /// 關鍵字搜尋
         /// </summary>
         [Display(Name = "關鍵字搜尋")]
+        [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string? keyWords { get; set; }
 
         /// <summary>
@@ -48,30 +51,35 @@
         /// 分類排序
         /// </summary>
         [Display(Name = "分類排序")]
+        [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string? sortBy { get; set; }
 
         /// <summary>
         /// 排序方向
         /// </summary>
         [Display(Name = "排序方向")]
+        [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string? sortOrder { get; set; }
 
         /// <summary>
         /// 最大價格
         /// </summary>
         [Display(Name = "最大價格")]
+        [Range(0, int.MaxValue, ErrorMessage = "{0} 不能小於 {1}")]
         public int? maxPrice { get; set; }
 
         /// <summary>
         /// 最小價格
         /// </summary>
         [Display(Name = "最小價格")]
+        [Range(0, int.MaxValue, ErrorMessage = "{0} 不能小於 {1}")]
         public int? minPrice { get; set; }
 
         /// <summary>
         /// 評價
         /// </summary>
         [Display(Name = "評價")]
+        [Range(1, 5, ErrorMessage = "{0} 必須大於或等於 {1}!")]
         public int? rate { get; set; }
     }
 }

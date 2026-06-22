@@ -27,6 +27,7 @@ public class ProductsBuyRequest
     /// </summary>
     [Display(Name = "運送地址")]
     [Required(ErrorMessage = "{0} 必輸")]
+    [MaxLength(300, ErrorMessage = "{0} 長度最長為 {1} 字")]
     public string ShippingAddress { get; set; }
 
     /// <summary>
@@ -51,5 +52,6 @@ public class ProductsItem
     /// </summary>
     [Display(Name = "購買數量")]
     [Required(ErrorMessage = "{0} 必輸")]
+    [Range(1, double.MaxValue, ErrorMessage = "{0} 必須大於或等於 {1}!")]
     public int BoughtQuantity { get; set; }
 }
