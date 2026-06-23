@@ -12,6 +12,7 @@ const emit = defineEmits(['refresh']);
 */
 const showDialog = ref(false);
 const isEdit = ref(false);
+const isLimit = ref(false);
 
 const initForm = {
   code: '',
@@ -39,6 +40,7 @@ const showToastError = inject('showToastError');
 const open = (couponData = null) => {
   if (couponData) {
     isEdit.value = true;
+    isLimit.value = couponData.totalQuantity != null;
     couponForm.value = {
       couponId: couponData.couponId,
       code: couponData.code,
@@ -46,12 +48,14 @@ const open = (couponData = null) => {
       type: couponData.type,
       discount: couponData.discount,
       minimunSpend: couponData.minimunSpend,
+      totalQuantity: couponData.totalQuantity,
       startTime: couponData.startTime ? new Date(couponData.startTime) : null,
       endTime: couponData.endTime ? new Date(couponData.endTime) : null,
       isActive: couponData.isActive,
     };
   } else {
     isEdit.value = false;
+    isLimit.value = false;
     couponForm.value = { ...initForm };
   }
   showDialog.value = true;
@@ -92,6 +96,14 @@ const submitCoupon = async () => {
     showToastError('系統發生錯誤');
   } finally {
     hideLoading();
+  }
+};
+
+/* 切換限制數量 */
+const toggleLimit = () => {
+  isLimit.value = !isLimit.value;
+  if (!isLimit.value) {
+    couponForm.value.totalQuantity = null;
   }
 };
 </script>
@@ -144,7 +156,28 @@ const submitCoupon = async () => {
         <label class="text-sm font-medium text-gray-700">最低消費 (0表示無限制)</label>
         <InputNumber v-model="couponForm.minimunSpend" placeholder="0" />
       </div>
+      <div class="grid grid-cols-2 gap-4 items-end">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700">發行數量</label>
+          <button
+            type="button"
+            class="px-4 py-1.5 rounded-md text-sm border w-fit cursor-pointer transition-colors"
+            :class="
+              isLimit
+                ? 'bg-black text-white border-black'
+                : 'bg-white text-gray-600 border-gray-300'
+            "
+            @click="toggleLimit"
+          >
+            {{ isLimit ? '限制數量' : '不限制數量' }}
+          </button>
+        </div>
 
+        <div class="flex flex-col gap-2" v-if="isLimit">
+          <label class="text-sm font-medium text-gray-700">總數量</label>
+          <InputNumber v-model="couponForm.totalQuantity" placeholder="0" :min="1" />
+        </div>
+      </div>
       <div class="grid grid-cols-2 gap-4">
         <div class="flex flex-col gap-2">
           <label class="text-sm font-medium text-gray-700">開始時間</label>

@@ -281,7 +281,7 @@ const openEditDialog = async (coupon) => {
           <span class="text-sm truncate">{{ coupon.name }}</span>
           <span>
             <span class="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700">
-              {{ getEnumDescription(coupon.type) }}
+              {{ getEnumDescription(couponTypeEnum, coupon.type) }}
             </span>
           </span>
           <span class="text-sm text-orange-500 font-medium">

@@ -45,6 +45,13 @@
         public decimal? MinimunSpend { get; set; }
 
         /// <summary>
+        /// 發行數量 ( Null 表示無限制 )
+        /// </summary>
+        [Display(Name = "發行數量 ( Null 表示無限制 )")]
+        [Range(1, double.MaxValue, ErrorMessage = "{0} 必須大於或等於 {1}!")]
+        public int? TotalQuantity { get; set; }
+
+        /// <summary>
         /// 折扣開始時間
         /// </summary>
         [Display(Name = "折扣開始時間")]

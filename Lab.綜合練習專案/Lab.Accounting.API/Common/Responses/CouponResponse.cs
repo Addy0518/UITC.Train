@@ -43,6 +43,11 @@
         public decimal MinimunSpend { get; set; }
 
         /// <summary>
+        /// 發行數量 ( Null 表示無限制 )
+        /// </summary>
+        public int? TotalQuantity { get; set; }
+
+        /// <summary>
         /// 折扣開始時間
         /// </summary>
         public DateTime StartTime { get; set; }

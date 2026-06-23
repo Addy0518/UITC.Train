@@ -115,6 +115,7 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
                           Type, 
                           Discount, 
                           MinimunSpend, 
+                          TotalQuantity,
                           StartTime, 
                           EndTime,
                           IsActive
@@ -126,6 +127,7 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
                           @Type, 
                           @Discount, 
                           @MinimunSpend, 
+                          @TotalQuantity,
                           @StartTime, 
                           @EndTime,
                           @IsActive
@@ -150,6 +152,7 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
                   Type =   COALESCE(@Type, Type),
                   Discount = COALESCE(@Discount, Discount),
                   MinimunSpend = COALESCE(@MinimunSpend, MinimunSpend),
+                  TotalQuantity = COALESCE(@TotalQuantity, TotalQuantity),
                   StartTime =  COALESCE(@StartTime, StartTime),
                   EndTime =  COALESCE(@EndTime, EndTime),
                   IsActive= COALESCE(@IsActive, IsActive)
@@ -175,6 +178,7 @@ public class CouponRepository(DBConnecting connecting) : ICouponRepository
                   Type =   COALESCE(@Type, Type),
                   Discount =    COALESCE(@Discount, Discount),
                   MinimunSpend =   COALESCE(@MinimunSpend, MinimunSpend),
+                  TotalQuantity = COALESCE(@TotalQuantity, TotalQuantity),
                   StartTime =  COALESCE(@StartTime, StartTime),
                   EndTime =  COALESCE(@EndTime, EndTime),
                   IsActive= COALESCE(@IsActive, IsActive)
