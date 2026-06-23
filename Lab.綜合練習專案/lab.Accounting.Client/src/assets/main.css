@@ -1,3 +1,58 @@
 @import 'tailwindcss';
+
+
+/*
+  surface : 整站骨架色，決定 Header / Footer / 頁面背景這種「容器層級」的視覺
+  跟下面 brand / ink / status 這些「元件層級」顏色分開管理
+  對應 class 範例：bg-surface-dark、text-ink-on-dark、bg-page-bg-soft
+*/
+@theme {
+  --color-surface-dark: #B8473D; /* 全站深色骨架，用於 Header、Footer */
+  --color-ink-on-dark: #FAF7F3; /* 深色骨架上的主要文字，取代 text-white */
+  --color-ink-on-dark-muted: rgb(250 247 243 / 0.8); /* 深色骨架上的次要文字，取代 text-white/80 */
+  --color-ink-on-dark-faint: rgb(250 247 243 / 0.4); /* 深色骨架上的弱化文字/分隔符，取代 text-white/50 */
+  --color-page-bg: #FFFFFF; /* 頁面主背景，內容區域底色 */
+  --color-page-bg-soft: #FAF8F5; /* 頁面次背景，用於跟白色卡片做出層次區隔 */
+
+  /*
+    brand : 品牌主色系，用於促銷、行動呼籲（按鈕、標籤、強調區塊）
+    對應 class 範例：bg-brand-500、text-brand-price
+  */
+  --color-brand-50: #FFF4ED; /* 卡片淡底色 / 大面積背景 */
+  --color-brand-500: #FF6B35; /* 主色，按鈕、icon、新品標籤底色 */
+  --color-brand-tag: #E2231A; /* 標籤底色（熱賣），維持鮮豔 */
+  --color-brand-price: #C9543F; /* 價格文字色，比標籤色淡，避免整頁太多刺眼紅色 */
+
+  /*
+    ink : 文字色階，數字越大代表越深/越主要
+    對應 class 範例：text-ink-900（主要文字）、text-ink-500（次要文字）
+  */
+  --color-ink-900: #2B2B2B; /* 主要文字（商品名稱、標題） */
+  --color-ink-500: #8A8178; /* 次要文字（說明、銷量、日期） */
+  --color-ink-300: #B4ABA3; /* 弱化文字（刪除線原價） */
+
+  /*
+    surface-muted : 大面積背景用的中性底色
+    對應 class 範例：bg-surface-muted
+  */
+  --color-surface-muted: #F5EFE8; /* 圖片載入前的佔位底色 */
+
+  /* border-soft : 卡片邊框專用色，比 Tailwind 內建的 gray 系更貼近品牌調性 */
+  --color-border-soft: #F0E6DE;
+
+  /*
+    status : 系統狀態色，跟上面的品牌色分開管理
+    用於「系統回饋」語境（啟用/停用/警示），不用於促銷文案
+    對應 class 範例：bg-status-success、text-status-warning
+  */
+  --color-status-success: #1D9E75; /* 啟用中、付款成功 */
+  --color-status-warning: #E2231A; /* 待處理、未啟用提示 */
+  --color-status-info: #378ADD; /* 一般資訊提示 */
+  --color-status-neutral: #888780; /* 已停用、已使用（灰階狀態） */
+
+  /* radius-card : 商品卡片、Dialog 卡片統一用這個圓角，比預設的 rounded-lg(12px) 略小 */
+  --radius-card: 10px;
+}
+
 @plugin "tailwindcss-primeui";
 @import 'primeicons/primeicons.css';

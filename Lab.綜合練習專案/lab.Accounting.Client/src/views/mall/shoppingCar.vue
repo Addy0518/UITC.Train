@@ -6,7 +6,7 @@ import { useOrderStore } from '@/stores/order';
 /*
   變數名稱代表意義
   allProductsRaw : 初始資料 ( 全部商品 )
-  products : 全部商品
+  products : 篩選完的全部商品
   baseUrl : 環境變數裡的圖片基底位址
   router : 控制路由
   boughtQuantity : 購買數量
@@ -51,7 +51,7 @@ const loadproducts = async () => {
         在解構的陣列 products 裡面再建立一個陣列 [x.productCategoryName, x] , 為 key 跟 value
         用 map 去除重複的 key 再把陣列轉回 values 陣列
     */
-      products.value = [...new Map(allProductsRaw.value.map((x) => [x.productsName, x])).values()];
+      products.value = [...new Map(allProductsRaw.value.map((x) => [x.productsId, x])).values()];
     } else {
       allProductsRaw.value = [];
       products.value = [];

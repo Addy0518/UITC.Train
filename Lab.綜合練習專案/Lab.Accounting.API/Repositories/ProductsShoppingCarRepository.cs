@@ -19,7 +19,8 @@ public class ProductsShoppingCarRepository(DBConnecting connecting) : IProductsS
                                  m.ProductCategoryId,
                                  m.ProductsStock,
                                  s.boughtquantity,
-                                 STRING_AGG(c.productcategoryname, ',') as Productcategoryname
+                                 STRING_AGG(c.productcategoryname, ',') as Productcategoryname,
+                                 Count(*) over() as TotalCount
                         FROM     product m
                         JOIN     productcategory c
                         ON       c.productcategoryid=m.ProductCategoryId                       

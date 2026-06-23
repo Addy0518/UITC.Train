@@ -3,11 +3,14 @@ import defaultImgurl from '@/img/預設圖片.jpg';
 import advertise1 from '@/img/廣告1.jpg';
 import advertise2 from '@/img/廣告2.jpg';
 import advertise3 from '@/img/廣告3.jpg';
+import { getAllProductsInShoppingCar } from '@/api/shoppingcarService';
 
 /*
   變數名稱代表意義
   route : 獲取路由資訊
   router :　改變路由
+  allProductsRaw : 初始資料 ( 全部商品 )
+  products : 全部商品
   allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
   baseUrl : 環境變數裡的圖片基底位址
   totalCount : 商品數量
@@ -16,6 +19,8 @@ import advertise3 from '@/img/廣告3.jpg';
 */
 const route = useRoute();
 const router = useRouter();
+const products = ref([]);
+const allProductsRaw = ref();
 const allProducts = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const totalCount = ref();
@@ -175,21 +180,19 @@ const getCategoryImg = (category) => {
         <div class="justify-between">
           <span class="text-2xl m-5">分類</span>
           <div class="grid grid-cols-4 mt-5">
-            <div v-for="category in allCategories" :key="category.productCategoryId">
-              <div
-                @click="
-                  router.push({ name: 'mall-category', params: { id: category.productCategoryId } })
-                "
-                class="hover:shadow-xl hover:bg-gray-50 h-80 cursor-pointer flex flex-col items-center"
-              >
-                <img
-                  :src="getCategoryImg(category)"
-                  alt="Logo"
-                  class="w-full max-w-40 max-h-40 mt-4"
-                />
-                <span class="mt-15">{{ category.productCategoryName }}</span>
-              </div>
-            </div>
+            <RouterLink
+              v-for="category in allCategories"
+              :key="category.productCategoryId"
+              :to="{ name: 'mall-category', params: { id: category.productCategoryId } }"
+              class="hover:shadow-xl hover:bg-gray-50 h-80 cursor-pointer flex flex-col items-center"
+            >
+              <img
+                :src="getCategoryImg(category)"
+                alt="Logo"
+                class="w-full max-w-40 max-h-40 mt-4"
+              />
+              <span class="mt-15">{{ category.productCategoryName }}</span>
+            </RouterLink>
           </div>
         </div>
       </div>
