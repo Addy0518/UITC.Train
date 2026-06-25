@@ -143,118 +143,111 @@ const getCategoryImg = (category) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full items-center">
+  <div class="flex flex-col w-full items-center bg-page-bg">
     <!-- #region  廣告-->
-    <div class="border-gray-200h-full">
-      <div class="mt-20 w-300 rounded-lg shadow-sm">
-        <div class="justify-between">
-          <!-- #region 廣告 -->
-
-          <div class="card">
-            <Galleria
-              :value="advertiseImg"
-              :showThumbnails="false"
-              :showIndicators="true"
-              :showItemNavigators="true"
-              :showIndicatorsOnItem="true"
-              indicatorsPosition="bottom"
-            >
-              <template #item="slotProps">
-                <img
-                  :src="slotProps.item.itemImageSrc"
-                  style="width: 100%; height: 400px; display: block; object-fit: contain"
-                />
-              </template>
-            </Galleria>
-          </div>
-          <!-- #endregion -->
-        </div>
+    <div class="w-300 mt-8">
+      <div class="rounded-card overflow-hidden border border-border-soft">
+        <!-- #region 廣告 -->
+        <Galleria
+          :value="advertiseImg"
+          :showThumbnails="false"
+          :showIndicators="true"
+          :showItemNavigators="true"
+          :showIndicatorsOnItem="true"
+          indicatorsPosition="bottom"
+        >
+          <template #item="slotProps">
+            <img
+              :src="slotProps.item.itemImageSrc"
+              style="width: 100%; height: 400px; display: block; object-fit: cover"
+            />
+          </template>
+        </Galleria>
+        <!-- #endregion -->
       </div>
     </div>
     <!-- #endregion -->
 
     <!-- #region  類別 / 商品 -->
     <!-- #region 類別區 -->
-    <div class="border-gray-200h-full">
-      <div class="mt-20 w-300 rounded-lg shadow-sm">
-        <div class="justify-between">
-          <span class="text-2xl m-5">分類</span>
-          <div class="grid grid-cols-4 mt-5">
-            <RouterLink
-              v-for="category in allCategories"
-              :key="category.productCategoryId"
-              :to="{ name: 'mall-category', params: { id: category.productCategoryId } }"
-              class="hover:shadow-xl hover:bg-gray-50 h-80 cursor-pointer flex flex-col items-center"
-            >
-              <img
-                :src="getCategoryImg(category)"
-                alt="Logo"
-                class="w-full max-w-40 max-h-40 mt-4"
-              />
-              <span class="mt-15">{{ category.productCategoryName }}</span>
-            </RouterLink>
+    <div class="w-300 mt-8">
+      <span class="text-xl font-bold text-ink-900 mb-5 block">分類</span>
+      <div class="grid grid-cols-4 gap-4">
+        <RouterLink
+          v-for="category in allCategories"
+          :key="category.productCategoryId"
+          :to="{ name: 'mall-category', params: { id: category.productCategoryId } }"
+          class="bg-page-bg border border-border-soft rounded-card hover:border-ink-300 transition-colors cursor-pointer flex flex-col items-center p-4"
+        >
+          <div class="aspect-square w-full bg-surface-muted rounded-card overflow-hidden">
+            <img :src="getCategoryImg(category)" alt="Logo" class="w-full h-full object-cover" />
           </div>
-        </div>
+          <span class="mt-3 text-sm text-ink-900">{{ category.productCategoryName }}</span>
+        </RouterLink>
       </div>
     </div>
     <!-- #endregion -->
 
     <!-- #region 商品區 -->
-    <div class="border-gray-200h-full">
-      <div class="mt-10 w-300 rounded-lg shadow-sm">
-        <div class="justify-between">
-          <span class="text-2xl m-5">商品</span>
-          <div class="grid grid-cols-4 mt-5 gap-4">
-            <div v-for="product in allProducts" :key="product.productsId">
-              <RouterLink
-                :to="{ name: 'product-detail', params: { id: product.productsId } }"
-                class="block bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
-              >
-                <div class="aspect-square bg-gray-50 overflow-hidden">
-                  <img :src="getProductsImg(product)" alt="" class="w-full h-full object-cover" />
-                </div>
-                <div class="p-3 flex flex-col gap-1.5">
-                  <p class="text-sm font-medium truncate">{{ product.productsName }}</p>
-                  <div v-if="product.isDiscount" class="flex items-center gap-2">
-                    <p class="text-base font-medium text-orange-600">$ {{ product.finalPrice }}</p>
-                    <p class="text-sm font-medium line-through text-gray-400">
-                      $ {{ product.productsPrice }}
-                    </p>
-                  </div>
-                  <div v-else>
-                    <p class="text-base font-medium text-orange-600">
-                      $ {{ product.productsPrice }}
-                    </p>
-                  </div>
+    <div class="w-300 mt-8">
+      <span class="text-xl font-bold text-ink-900 mb-5 block">商品</span>
+      <div class="grid grid-cols-4 gap-4">
+        <RouterLink
+          v-for="product in allProducts"
+          :key="product.productsId"
+          :to="{ name: 'product-detail', params: { id: product.productsId } }"
+          class="block bg-page-bg border border-border-soft rounded-card overflow-hidden hover:border-ink-300 transition-colors cursor-pointer"
+        >
+          <div class="aspect-square bg-surface-muted overflow-hidden">
+            <img :src="getProductsImg(product)" alt="" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-3 flex flex-col gap-1.5">
+            <p class="text-sm font-bold text-ink-900 truncate">{{ product.productsName }}</p>
+            <div v-if="product.isDiscount" class="flex items-center gap-2">
+              <p class="text-base font-bold text-brand-price">$ {{ product.finalPrice }}</p>
+              <p class="text-sm font-medium line-through text-ink-300">
+                $ {{ product.productsPrice }}
+              </p>
+            </div>
+            <div v-else>
+              <p class="text-base font-bold text-brand-price">$ {{ product.productsPrice }}</p>
+            </div>
 
-                  <Rating :modelValue="product.productsAVGRate" :stars="5" :readonly="true" />
-                  <div class="flex items-center justify-between mt-1">
-                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                      {{ product.productCategoryName }}
-                    </span>
-                    <span class="text-xs text-gray-400">已售 {{ product.boughtQuantity }} 件</span>
-                  </div>
-                </div>
-              </RouterLink>
+            <Rating
+              :modelValue="product.productsAVGRate"
+              :stars="5"
+              :readonly="true"
+              :pt="{
+                onIcon: { class: 'text-brand-price' } /* 已點亮星星的顏色 */,
+                offIcon: { class: 'text-slate-300' } /* 未點亮星星的顏色 */,
+              }"
+            />
+            <div class="flex items-center justify-between mt-1">
+              <span class="text-xs text-ink-500 bg-surface-muted px-2 py-0.5 rounded-full">
+                {{ product.productCategoryName }}
+              </span>
+              <span class="text-xs text-ink-500">已售 {{ product.boughtQuantity }} 件</span>
             </div>
           </div>
-        </div>
-        <!-- #region  頁碼按鈕-->
-        <Paginator
-          :template="{
-            '640px': 'PrevPageLink CurrentPageReport NextPageLink',
-            '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
-            '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
-            default:
-              'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
-          }"
-          :rows="12"
-          :totalRecords="totalCount"
-          @page="pageChange"
-        >
-        </Paginator>
-        <!-- #endregion -->
+        </RouterLink>
       </div>
+
+      <!-- #region  頁碼按鈕-->
+      <Paginator
+        :template="{
+          '640px': 'PrevPageLink CurrentPageReport NextPageLink',
+          '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
+          '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+          default:
+            'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
+        }"
+        :rows="12"
+        :totalRecords="totalCount"
+        @page="pageChange"
+        class="mt-6"
+      >
+      </Paginator>
+      <!-- #endregion -->
     </div>
     <!-- #endregion -->
     <!-- #endregion -->

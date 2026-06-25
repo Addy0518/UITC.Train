@@ -81,72 +81,118 @@ const userRegister = async () => {
 </script>
 
 <template>
-  <div class="container mx-auto p-10">
-    <p class="text-center mb-10 text-3xl font-bold">註冊帳號</p>
+  <div class="bg-page-bg-soft py-10 px-4">
+    <div class="max-w-md mx-auto">
+      <!-- #region 註冊卡片 -->
+      <div class="bg-page-bg border border-border-soft rounded-card p-6">
+        <!-- #region 標題 -->
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold text-ink-900 m-0">建立帳號</h1>
 
-    <!-- #region  註冊欄位-->
-    <div class="card grid grid-cols-1 gap-4 gap-y-5">
-      <!-- #region  帳號 / 密碼 -->
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-user"></i>
-        </InputGroupAddon>
-        <InputText v-model="account" placeholder="帳號" :invalid="v$.account.$error" />
-      </InputGroup>
-      <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-unlock"></i>
-        </InputGroupAddon>
-        <InputText
-          :type="tooglePassword ? 'password' : 'text'"
-          v-model="password"
-          placeholder="密碼"
-          :invalid="v$.password.$error"
-        />
-        <InputGroupAddon class="cursor-pointer" @click="tooglePassword = !tooglePassword">
-          <i :class="['pi', tooglePassword ? 'pi-eye' : 'pi-eye-slash']"></i>
-        </InputGroupAddon>
-      </InputGroup>
-      <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
-      <!-- #endregion -->
-      <!-- #region  名稱 / 電話-->
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-id-card"></i>
-        </InputGroupAddon>
-        <InputText v-model="name" placeholder="姓名" :invalid="v$.name.$error" />
-      </InputGroup>
-      <InValidErrorMessage :errorDto="v$.name.$errors" vaildChiName="名稱" />
+          <p class="text-sm text-ink-500 mt-2 mb-0">註冊會員開始購物</p>
+        </div>
+        <!-- #endregion -->
 
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-phone"></i>
-        </InputGroupAddon>
-        <InputText v-model="phone" placeholder="電話" :invalid="v$.phone.$error" />
-      </InputGroup>
-      <InValidErrorMessage :errorDto="v$.phone.$errors" vaildChiName="電話" />
+        <!-- #region 註冊欄位 -->
+        <div class="flex flex-col gap-4">
+          <!-- 帳號 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 帳號 </label>
 
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-home"></i>
-        </InputGroupAddon>
-        <InputText v-model="address" placeholder="地址" :invalid="v$.address.$error" />
-      </InputGroup>
-      <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="地址" />
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-user"></i>
+              </InputGroupAddon>
+
+              <InputText v-model="account" placeholder="請輸入帳號" :invalid="v$.account.$error" />
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
+          </div>
+
+          <!-- 密碼 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 密碼 </label>
+
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-lock"></i>
+              </InputGroupAddon>
+
+              <InputText
+                :type="tooglePassword ? 'password' : 'text'"
+                v-model="password"
+                placeholder="請輸入密碼"
+                :invalid="v$.password.$error"
+              />
+
+              <InputGroupAddon class="cursor-pointer" @click="tooglePassword = !tooglePassword">
+                <i :class="['pi', tooglePassword ? 'pi-eye-slash' : 'pi-eye']" />
+              </InputGroupAddon>
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
+          </div>
+
+          <!-- 姓名 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 姓名 </label>
+
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-id-card"></i>
+              </InputGroupAddon>
+
+              <InputText v-model="name" placeholder="請輸入姓名" :invalid="v$.name.$error" />
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.name.$errors" vaildChiName="名稱" />
+          </div>
+
+          <!-- 電話 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 電話 </label>
+
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-phone"></i>
+              </InputGroupAddon>
+
+              <InputText v-model="phone" placeholder="請輸入電話" :invalid="v$.phone.$error" />
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.phone.$errors" vaildChiName="電話" />
+          </div>
+
+          <!-- 地址 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 地址 </label>
+
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-home"></i>
+              </InputGroupAddon>
+
+              <InputText v-model="address" placeholder="請輸入地址" :invalid="v$.address.$error" />
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="地址" />
+          </div>
+        </div>
+        <!-- #endregion -->
+
+        <!-- #region 註冊按鈕 -->
+        <div class="mt-8">
+          <button
+            @click="userRegister"
+            class="w-full py-3 rounded-card bg-brand-500 text-white font-medium cursor-pointer transition-opacity hover:opacity-90"
+          >
+            建立帳號
+          </button>
+        </div>
+        <!-- #endregion -->
+      </div>
       <!-- #endregion -->
     </div>
-    <!-- #endregion -->
-    <!-- #region  儲存按鈕-->
-    <div class="justify-end flex mt-5">
-      <button
-        @click="userRegister"
-        label="Save"
-        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer"
-      >
-        註冊
-      </button>
-    </div>
-    <!-- #endregion -->
   </div>
 </template>

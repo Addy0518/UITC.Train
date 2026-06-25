@@ -76,45 +76,53 @@ const updateStatus = async (id, status) => {
 <template>
   <div class="flex flex-col w-full p-6 mt-10" v-if="order">
     <div class="max-w-4xl mx-auto w-full">
-      <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+      <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
         <!-- #region  訂單編號 / 購買商品資訊-->
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div class="px-6 py-4 border-b border-border-soft flex items-center justify-between">
           <div>
-            <p class="text-xs text-gray-500 m-0">訂單編號</p>
-            <p class="text-sm font-medium mt-1 m-0">{{ order.orderNumber }}</p>
+            <p class="text-xs text-ink-500 m-0">訂單編號</p>
+            <p class="text-sm font-medium mt-1 m-0 text-ink-900">{{ order.orderNumber }}</p>
           </div>
-          <span class="text-xs px-3 py-1 rounded-md bg-yellow-50 text-yellow-700">
+          <span
+            class="text-xs px-3 py-1 rounded-card"
+            :class="{
+              'bg-status-warning/10 text-status-warning': order.shippingStatus === 0,
+              'bg-status-info/10 text-status-info': order.shippingStatus === 1,
+              'bg-brand-50 text-brand-500': order.shippingStatus === 2,
+              'bg-status-success/10 text-status-success': order.shippingStatus === 3,
+            }"
+          >
             {{ getEnumDescription(shippingEnum, order.shippingStatus) }}
           </span>
         </div>
 
-        <div class="px-6 py-5 border-b border-gray-100 flex gap-5">
+        <div class="px-6 py-5 border-b border-border-soft flex gap-5">
           <img
             :src="getProductsImg(order)"
-            class="w-20 h-20 rounded-lg object-cover border border-gray-100"
+            class="w-20 h-20 rounded-card object-cover border border-border-soft"
           />
           <div class="flex-1">
-            <p class="font-medium text-base m-0 mb-1">{{ order.productsName }}</p>
-            <p class="text-sm text-gray-400 m-0 mb-2">數量：{{ order.boughtQuantity }} 件</p>
-            <p class="text-base font-medium text-orange-500 m-0">$ {{ order.accountAmount }}</p>
+            <p class="font-medium text-base m-0 mb-1 text-ink-900">{{ order.productsName }}</p>
+            <p class="text-sm text-ink-500 m-0 mb-2">數量：{{ order.boughtQuantity }} 件</p>
+            <p class="text-base font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>
           </div>
         </div>
         <!-- #endregion -->
         <!-- #region  訂單資訊-->
-        <div class="px-6 py-5 border-b border-gray-100">
-          <p class="text-xs font-medium text-gray-600 mb-3">訂單資訊</p>
+        <div class="px-6 py-5 border-b border-border-soft">
+          <p class="text-xs font-medium text-ink-500 mb-3">訂單資訊</p>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <p class="text-xs text-gray-500 m-0 mb-1">購買時間</p>
-              <p class="text-sm m-0">{{ formatDateTimeString(order.paidTime) }}</p>
+              <p class="text-xs text-ink-500 m-0 mb-1">購買時間</p>
+              <p class="text-sm m-0 text-ink-900">{{ formatDateTimeString(order.paidTime) }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 m-0 mb-1">付款方式</p>
-              <p class="text-sm m-0">{{ order.paidType }}</p>
+              <p class="text-xs text-ink-500 m-0 mb-1">付款方式</p>
+              <p class="text-sm m-0 text-ink-900">{{ order.paidType }}</p>
             </div>
             <div class="col-span-2">
-              <p class="text-xs text-gray-500 m-0 mb-1">寄送地址</p>
-              <p class="text-sm m-0">{{ order.shippingAddress }}</p>
+              <p class="text-xs text-ink-500 m-0 mb-1">寄送地址</p>
+              <p class="text-sm m-0 text-ink-900">{{ order.shippingAddress }}</p>
             </div>
           </div>
         </div>
@@ -122,9 +130,9 @@ const updateStatus = async (id, status) => {
         <!-- #region  更新狀態 / 總金額-->
         <div class="px-6 py-5 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <p class="text-sm text-gray-400 m-0">更新運送狀態</p>
+            <p class="text-sm text-ink-500 m-0">更新運送狀態</p>
             <select
-              class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm cursor-pointer"
+              class="border border-border-soft rounded-card px-3 py-1.5 text-sm cursor-pointer text-ink-900"
               :value="order.shippingStatus"
               @change="updateStatus(order.orderId, Number($event.target.value))"
             >
@@ -134,8 +142,8 @@ const updateStatus = async (id, status) => {
             </select>
           </div>
           <div class="text-right">
-            <p class="text-xs text-gray-300 m-0 mb-1">訂單金額</p>
-            <p class="text-xl font-medium text-orange-500 m-0">$ {{ order.accountAmount }}</p>
+            <p class="text-xs text-ink-300 m-0 mb-1">訂單金額</p>
+            <p class="text-xl font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>
           </div>
         </div>
         <!-- #endregion -->

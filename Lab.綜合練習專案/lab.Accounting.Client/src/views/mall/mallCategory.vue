@@ -238,12 +238,12 @@ const breadCrumbItem = computed(() => {
         <Breadcrumb :home="home" :model="breadCrumbItem" />
       </div>
       <!-- #endregion -->
-      <div class="mt-20 w-300 rounded-lg shadow-sm">
+      <div class="mt-8 w-300 rounded-card border border-border-soft bg-page-bg">
         <!-- #region  類別 / 商品-->
         <div class="flex gap-4">
           <!-- #region  類別-->
-          <div class="w-50 shrink-0">
-            <span class="text-2xl m-5 font-bold">分類</span>
+          <div class="w-50 shrink-0 p-10">
+            <span class="text-2xl m-5 font-bold text-ink-900">分類</span>
             <div class="flex flex-col mt-5 gap-2">
               <div v-for="category in allCategories" :key="category.productCategoryId">
                 <span
@@ -251,8 +251,8 @@ const breadCrumbItem = computed(() => {
                   class="cursor-pointer m-5"
                   :class="
                     selectedCategory === category.productCategoryId
-                      ? 'text-orange-500 font-medium'
-                      : 'text-gray-700'
+                      ? 'text-brand-500 font-medium'
+                      : 'text-ink-500'
                   "
                   >{{ category.productCategoryName }}</span
                 >
@@ -261,13 +261,13 @@ const breadCrumbItem = computed(() => {
           </div>
           <!-- #endregion -->
 
-          <div class="flex-1">
+          <div class="flex-1 p-7">
             <div class="flex flex-1 items-center">
               <!-- #region  排序-->
               <button
                 @click="toggleSort('CreateTime')"
-                :class="currentSort.type === 'CreateTime' ? ' text-orange-500' : ' text-gray-700'"
-                class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+                :class="currentSort.type === 'CreateTime' ? ' text-brand-500' : ' text-ink-500'"
+                class="me-5 w-30 h-15 cursor-pointer hover:bg-surface-muted rounded-card"
               >
                 上架時間
                 <i
@@ -282,8 +282,8 @@ const breadCrumbItem = computed(() => {
 
               <button
                 @click="toggleSort('Rate')"
-                :class="currentSort.type === 'Rate' ? ' text-orange-500' : ' text-gray-700'"
-                class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+                :class="currentSort.type === 'Rate' ? ' text-brand-500' : ' text-ink-500'"
+                class="me-5 w-30 h-15 cursor-pointer hover:bg-surface-muted rounded-card"
               >
                 評價
                 <i
@@ -298,10 +298,8 @@ const breadCrumbItem = computed(() => {
 
               <button
                 @click="toggleSort('ProductsPrice')"
-                :class="
-                  currentSort.type === 'ProductsPrice' ? ' text-orange-500' : ' text-gray-700'
-                "
-                class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+                :class="currentSort.type === 'ProductsPrice' ? ' text-brand-500' : ' text-ink-500'"
+                class="me-5 w-30 h-15 cursor-pointer hover:bg-surface-muted rounded-card"
               >
                 價格
                 <i
@@ -318,7 +316,7 @@ const breadCrumbItem = computed(() => {
               <!-- #region  篩選-->
               <button
                 @click="visible = true"
-                class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+                class="flex items-center gap-1 px-3 py-1.5 rounded-card text-sm cursor-pointer transition-colors bg-surface-muted text-ink-900 hover:bg-brand-50"
               >
                 <i class="pi pi-filter text-xs" />
                 篩選
@@ -327,7 +325,7 @@ const breadCrumbItem = computed(() => {
               <Dialog v-model:visible="visible" modal header="篩選條件" :style="{ width: '40rem' }">
                 <div class="flex flex-col gap-4 py-2">
                   <div>
-                    <label class="text-sm text-gray-500 mb-1 block">評分</label>
+                    <label class="text-sm text-ink-500 mb-1 block">評分</label>
                     <Select
                       v-model="rate"
                       :options="rateOptions"
@@ -339,7 +337,7 @@ const breadCrumbItem = computed(() => {
                   </div>
 
                   <div>
-                    <label class="text-sm text-gray-500 mb-1 block">價格區間</label>
+                    <label class="text-sm text-ink-500 mb-1 block">價格區間</label>
                     <div class="flex items-center gap-2">
                       <InputNumber
                         v-model="minPrice"
@@ -348,7 +346,7 @@ const breadCrumbItem = computed(() => {
                         :max="maxPrice ?? undefined"
                         class="w-full"
                       />
-                      <span class="text-gray-400">—</span>
+                      <span class="text-ink-300">—</span>
                       <InputNumber
                         v-model="maxPrice"
                         placeholder="最大價格"
@@ -387,11 +385,11 @@ const breadCrumbItem = computed(() => {
               <!-- #endregion -->
             </div>
             <!-- #region  商品-->
-            <span class="text-2xl m-5">商品</span>
+            <span class="text-2xl m-5 font-bold text-ink-900">商品</span>
             <div class="grid grid-cols-3 mt-5 gap-4">
               <template v-if="isFiltering">
-                <div v-for="n in 12" :key="n" class="flex flex-col items-center rounded-lg p-3">
-                  <Skeleton width="100%" height="160px" class="rounded-lg" />
+                <div v-for="n in 12" :key="n" class="flex flex-col items-center rounded-card p-3">
+                  <Skeleton width="100%" height="160px" class="rounded-card" />
                   <Skeleton width="80%" height="1rem" class="mt-3" />
                   <Skeleton width="40%" height="1rem" class="mt-2" />
                   <Skeleton width="60%" height="0.8rem" class="mt-2" />
@@ -401,39 +399,45 @@ const breadCrumbItem = computed(() => {
               <template v-else>
                 <div
                   v-if="allProducts.length === 0"
-                  class="col-span-3 flex flex-col items-center justify-center py-16 text-gray-400"
+                  class="col-span-3 flex flex-col items-center justify-center py-16 text-ink-500"
                 >
                   <i class="pi pi-inbox text-4xl mb-3" />
                   <span class="text-sm">沒有符合條件的商品</span>
                 </div>
                 <div v-for="product in allProducts" :key="product.productsId">
                   <div
-                    class="hover:shadow-xl hover:bg-gray-50 flex flex-col items-center rounded-lg p-3"
+                    class="border border-border-soft hover:border-ink-300 transition-colors flex flex-col items-center rounded-card p-3"
                   >
                     <RouterLink
                       :to="{ name: 'product-detail', params: { id: product.productsId } }"
                       class="flex flex-col items-center cursor-pointer w-full"
                     >
-                      <img
-                        :src="getProductsImg(product)"
-                        alt="Logo"
-                        class="w-full max-w-40 max-h-40 mt-4 object-cover"
-                      />
-                      <span class="mt-3">{{ product.productsName }}</span>
+                      <div
+                        class="w-full aspect-square bg-surface-muted rounded-card overflow-hidden mt-1"
+                      >
+                        <img
+                          :src="getProductsImg(product)"
+                          alt="Logo"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span class="mt-3 text-sm font-bold text-ink-900">{{
+                        product.productsName
+                      }}</span>
                       <div v-if="product.isDiscount" class="flex items-center gap-2">
-                        <p class="text-base font-medium text-orange-600">
+                        <p class="text-base font-bold text-brand-price">
                           $ {{ product.finalPrice }}
                         </p>
-                        <p class="text-sm font-medium line-through text-gray-400">
+                        <p class="text-sm font-medium line-through text-ink-300">
                           $ {{ product.productsPrice }}
                         </p>
                       </div>
                       <div v-else>
-                        <p class="text-base font-medium text-orange-600">
+                        <p class="text-base font-bold text-brand-price">
                           $ {{ product.productsPrice }}
                         </p>
                       </div>
-                      <span class="mt-3 ms-2 me-2 text-sm text-gray-500">{{
+                      <span class="mt-3 ms-2 me-2 text-sm text-ink-500">{{
                         product.productCategoryName
                       }}</span>
                     </RouterLink>
@@ -449,7 +453,7 @@ const breadCrumbItem = computed(() => {
 
         <!-- #region  頁碼按鈕-->
         <div class="flex flex-1 items-center justify-center mt-5 mb-30">
-          <span>總筆數 : {{ totalCount }}</span>
+          <span class="text-ink-500">總筆數 : {{ totalCount }}</span>
           <Paginator
             :template="{
               '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -464,7 +468,6 @@ const breadCrumbItem = computed(() => {
           >
           </Paginator>
         </div>
-
         <!-- #endregion -->
       </div>
     </div>

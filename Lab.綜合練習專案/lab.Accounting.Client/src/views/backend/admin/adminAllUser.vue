@@ -169,7 +169,7 @@ const getUserImg = (user) => {
   <div class="flex flex-col w-full p-6" v-if="allUser">
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
-      <p class="text-2xl font-bold m-0">用戶管理</p>
+      <p class="text-2xl font-bold m-0 text-ink-900">用戶管理</p>
 
       <div class="flex flex-1 items-center justify-center">
         <AutoComplete
@@ -184,28 +184,25 @@ const getUserImg = (user) => {
         />
       </div>
     </div>
-
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
-      <!-- #endregion -->
-    </div>
+    <!-- #endregion -->
 
     <!-- #region  欄位標頭-->
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <div
-        class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-2.5 bg-surface-muted border-b border-border-soft"
       >
-        <span class="text-xs text-gray-400"></span>
-        <span class="text-xs text-gray-400">用戶 ID</span>
-        <span class="text-xs text-gray-400">用戶名稱</span>
-        <span class="text-xs text-gray-400">帳號</span>
-        <span class="text-xs text-gray-400">性別</span>
-        <span class="text-xs text-gray-400">角色</span>
+        <span class="text-xs text-ink-500"></span>
+        <span class="text-xs text-ink-500">用戶 ID</span>
+        <span class="text-xs text-ink-500">用戶名稱</span>
+        <span class="text-xs text-ink-500">帳號</span>
+        <span class="text-xs text-ink-500">性別</span>
+        <span class="text-xs text-ink-500">角色</span>
         <button
           @click="toggleSort('CreateTime')"
           :class="
-            currentSort.type === 'CreateTime' ? 'text-orange-500 font-semibold' : 'text-gray-400'
+            currentSort.type === 'CreateTime' ? 'text-brand-500 font-semibold' : 'text-ink-500'
           "
-          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+          class="text-xs text-left cursor-pointer hover:text-ink-900 flex items-center gap-1 focus:outline-none"
         >
           註冊時間
           <i
@@ -217,9 +214,8 @@ const getUserImg = (user) => {
             class="pi pi-arrow-down text-[10px]"
           />
         </button>
-        <span class="text-xs text-gray-400">狀態</span>
+        <span class="text-xs text-ink-500">狀態</span>
       </div>
-
       <!-- #endregion -->
       <!-- #region  商品-->
 
@@ -227,7 +223,7 @@ const getUserImg = (user) => {
         <div
           v-for="n in 6"
           :key="n"
-          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 gap-4 items-center"
+          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-border-soft gap-4 items-center"
         >
           <Skeleton height="40px" border-radius="50%" />
           <Skeleton height="1rem" />
@@ -242,7 +238,7 @@ const getUserImg = (user) => {
       <template v-else>
         <div
           v-if="allUser.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-gray-400"
+          class="flex flex-col items-center justify-center py-16 text-ink-500"
         >
           <i class="pi pi-inbox text-4xl mb-3" />
           <span class="text-sm">沒有符合條件的用戶</span>
@@ -250,51 +246,39 @@ const getUserImg = (user) => {
         <div
           v-for="user in allUser"
           :key="user.UserId"
-          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 cursor-pointer"
+          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-border-soft items-center hover:bg-surface-muted cursor-pointer"
           @click="router.push({ name: 'admin-user-details', params: { id: user.userId } })"
         >
           <img
             :src="getUserImg(user)"
-            class="w-10 h-10 object-cover rounded-lg border border-gray-100 cursor-pointer"
+            class="w-10 h-10 object-cover rounded-card border border-border-soft cursor-pointer"
           />
-          <span class="text-sm font-medium truncate">{{ user.userId }}</span>
-          <span class="text-sm text-gray-700 truncate">{{ user.userName }}</span>
-          <span class="text-sm text-gray-800 truncate">{{ user.userAccount }}</span>
+          <span class="text-sm font-medium text-ink-900 truncate">{{ user.userId }}</span>
+          <span class="text-sm text-ink-900 truncate">{{ user.userName }}</span>
+          <span class="text-sm text-ink-900 truncate">{{ user.userAccount }}</span>
           <span class="text-sm">
-            <span
-              class="px-2 py-0.5 rounded-full text-xs"
-              :class="{
-                'bg-pink-100 text-pink-700': user.userGender === 0,
-                'bg-blue-100 text-blue-700': user.userGender === 1,
-                'bg-gray-100 text-gray-700': user.userGender === 2,
-              }"
-            >
+            <span class="px-2 py-0.5 rounded-full text-xs bg-surface-muted text-ink-500">
               {{ user.userGender === 0 ? '女性' : user.userGender === 1 ? '男性' : '其他' }}
             </span>
           </span>
-          <span
-            class="px-2 py-0.5 rounded-full text-xs w-fit"
-            :class="{
-              'bg-orange-100 text-orange-700': user.userRole === 'Seller',
-              'bg-purple-100 text-purple-700': user.userRole === 'Admin',
-              'bg-gray-100 text-gray-700': !user.userRole,
-            }"
-            >{{
+          <span class="px-2 py-0.5 rounded-full text-xs w-fit bg-surface-muted text-ink-500">
+            {{
               user.userRole === 'Seller'
                 ? '賣家'
                 : user.userRole === 'Admin'
                   ? '管理員'
                   : '一般用戶'
-            }}</span
-          >
-          <span class="text-sm text-gray-500">{{ formatDateTimeString(user.createTime) }}</span>
+            }}
+          </span>
+          <span class="text-sm text-ink-500">{{ formatDateTimeString(user.createTime) }}</span>
           <span class="text-sm">
             <span
               class="px-2 py-0.5 rounded-full text-xs"
-              :class="{
-                'bg-yellow-100 text-green-700': user.isDelete === 0,
-                'bg-green-100 text-red-700': user.isDelete === 1,
-              }"
+              :class="
+                user.isDelete === 0
+                  ? 'bg-status-success/10 text-status-success'
+                  : 'bg-surface-muted text-status-neutral'
+              "
             >
               {{ user.isDelete === 0 ? '正常' : '停用' }}
             </span>
@@ -304,7 +288,7 @@ const getUserImg = (user) => {
       <!-- #endregion -->
       <!-- #region  頁碼按鈕-->
       <div class="flex items-center justify-center gap-4 py-4">
-        <span class="text-sm text-gray-400">總筆數：{{ totalCount }}</span>
+        <span class="text-sm text-ink-500">總筆數：{{ totalCount }}</span>
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -318,7 +302,6 @@ const getUserImg = (user) => {
           @page="pageChange"
         />
       </div>
-
       <!-- #endregion -->
     </div>
   </div>

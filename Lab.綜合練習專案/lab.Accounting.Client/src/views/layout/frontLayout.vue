@@ -10,7 +10,7 @@ import FrontFooter from '@/views/footer/frontFooter.vue';
    route : 獲取路由資訊
    allProductsRaw : 初始資料 ( 全部購物車商品 )
    products : 篩選完的全部購物車商品
-   baseUrl : 圖片基底位址 
+   baseUrl : 圖片基底位址
    search : 搜尋
    suggestions : 搜尋建議
 */
@@ -190,7 +190,7 @@ const loadShopingCarProducts = async () => {
             <i class="pi pi-shopping-cart" style="font-size: 1.5rem"></i>
             <span
               v-if="products.length > 0"
-              class="absolute -top-1.5 -right-2 bg-brand-tag text-white text-[10px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1"
+              class="absolute -top-1.5 -right-2 bg-brand-tag text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1"
             >
               {{ products.length > 99 ? '99+' : products.length }}
             </span>

@@ -197,28 +197,28 @@ const userBuy = async () => {
 <template>
   <div class="flex flex-col w-full items-center mt-20" v-if="items">
     <!-- #region  正在購買的商品資訊 -->
-    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
-      <h2 class="text-base font-bold mb-4 text-gray-700">正在購買</h2>
+    <div class="w-300 rounded-card border border-border-soft p-6 mb-4 bg-page-bg">
+      <h2 class="text-base font-bold mb-4 text-ink-900">正在購買</h2>
       <div
         v-for="item in items"
         :key="item.productsId"
-        class="w-full rounded-lg shadow-sm border border-gray-200 p-6 mb-4"
+        class="w-full rounded-card border border-border-soft p-6 mb-4"
       >
         <div class="flex flex-row gap-5 items-center">
           <img
             :src="getProductImg(item)"
             alt="商品圖片"
-            class="w-24 h-24 object-cover rounded-md border border-gray-100"
+            class="w-24 h-24 object-cover rounded-card border border-border-soft"
           />
           <div class="flex flex-col gap-2">
-            <span class="font-semibold text-base">{{ item.productsName }}</span>
-            <span class="text-gray-500 text-sm">單價：NT$ {{ item.productsPrice }}</span>
+            <span class="font-semibold text-base text-ink-900">{{ item.productsName }}</span>
+            <span class="text-ink-500 text-sm">單價：NT$ {{ item.productsPrice }}</span>
           </div>
         </div>
 
         <!-- 小計 -->
-        <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-          <span class="font-bold text-lg">
+        <div class="flex justify-between items-center border-t border-border-soft pt-4">
+          <span class="font-bold text-lg text-brand-price">
             小計 NT$ {{ (item.productsPrice * item.boughtQuantity).toLocaleString() }}
           </span>
         </div>
@@ -227,15 +227,15 @@ const userBuy = async () => {
     <!-- #endregion -->
 
     <!-- #region  優惠券選擇 -->
-    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+    <div class="w-300 rounded-card border border-border-soft p-6 mb-4 bg-page-bg">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-base font-bold text-gray-700">選擇優惠券</h2>
-        <span class="text-xs text-gray-400">{{ allCoupons?.length ?? 0 }} 張可用</span>
+        <h2 class="text-base font-bold text-ink-900">選擇優惠券</h2>
+        <span class="text-xs text-ink-500">{{ allCoupons?.length ?? 0 }} 張可用</span>
       </div>
 
       <div
         v-if="!allCoupons || allCoupons.length === 0"
-        class="text-sm text-gray-400 py-4 text-center"
+        class="text-sm text-ink-500 py-4 text-center"
       >
         目前沒有可用的優惠券
       </div>
@@ -243,26 +243,26 @@ const userBuy = async () => {
       <div class="flex flex-col gap-2">
         <!-- 不使用優惠券 -->
         <div
-          class="flex items-center gap-3 p-3 border rounded-md cursor-pointer"
-          :class="coupon === null ? 'border-blue-400 bg-blue-50' : 'border-gray-200'"
+          class="flex items-center gap-3 p-3 border rounded-card cursor-pointer"
+          :class="coupon === null ? 'border-selection bg-selection-50' : 'border-border-soft'"
           @click="coupon = null"
         >
           <div
             class="w-4.5 h-4.5 rounded-full border"
-            :class="coupon === null ? 'border-blue-400 bg-blue-400' : 'border-gray-300'"
+            :class="coupon === null ? 'border-selection bg-selection' : 'border-ink-300'"
           ></div>
-          <span class="text-sm text-gray-500">不使用優惠券</span>
+          <span class="text-sm text-ink-500">不使用優惠券</span>
         </div>
 
         <div
           v-for="c in allCoupons"
           :key="c.couponId"
-          class="flex items-center gap-3 p-3 border rounded-md"
+          class="flex items-center gap-3 p-3 border rounded-card"
           :class="[
             isCouponCanUse(c) ? 'cursor-pointer' : 'cursor-not-allowed opacity-45',
             coupon === c.couponId && isCouponCanUse(c)
-              ? 'border-blue-400 bg-blue-50'
-              : 'border-gray-200',
+              ? 'border-selection bg-selection-50'
+              : 'border-border-soft',
           ]"
           @click="selectCoupon(c)"
         >
@@ -270,18 +270,19 @@ const userBuy = async () => {
             class="w-4.5 h-4.5 rounded-full border"
             :class="
               coupon === c.couponId && isCouponCanUse(c)
-                ? 'border-blue-400 bg-blue-400'
-                : 'border-gray-300'
+                ? 'border-selection bg-selection'
+                : 'border-ink-300'
             "
           ></div>
+
           <div
-            class="bg-gray-50 border border-dashed border-gray-300 rounded-md px-2.5 py-1 font-mono text-xs"
+            class="bg-surface-muted border border-dashed border-ink-300 rounded-card px-2.5 py-1 font-mono text-xs text-ink-500"
           >
             {{ c.code }}
           </div>
           <div class="flex-1">
-            <p class="text-sm m-0">{{ c.name }}</p>
-            <p class="text-xs text-gray-400 m-0 mt-0.5">
+            <p class="text-sm m-0 text-ink-900">{{ c.name }}</p>
+            <p class="text-xs text-ink-500 m-0 mt-0.5">
               {{ c.minimunSpend > 0 ? `滿 $${c.minimunSpend} 可用` : '無門檻' }}
               ·
               {{
@@ -293,7 +294,7 @@ const userBuy = async () => {
               }}
             </p>
           </div>
-          <p class="text-sm font-medium text-orange-500 m-0">
+          <p class="text-sm font-medium text-brand-price m-0">
             {{
               c.type === couponTypeEnum.百分比折扣.value ? `${c.discount} 折` : `$${c.discount} 元`
             }}
@@ -303,16 +304,16 @@ const userBuy = async () => {
     </div>
     <!-- #endregion -->
 
-    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-5">
+    <div class="w-300 rounded-card border border-border-soft p-6 flex flex-col gap-5 bg-page-bg">
       <!-- #region  購買資訊填寫-->
-      <h2 class="text-base font-bold text-gray-700">填寫購買資訊</h2>
+      <h2 class="text-base font-bold text-ink-900">填寫購買資訊</h2>
 
       <div class="flex flex-col gap-1">
-        <label class="text-sm mb-3">收件地址</label>
+        <label class="text-sm mb-3 text-ink-900">收件地址</label>
         <div v-if="authStore.userAddress">
           <InputText
             v-model="authStore.userAddress"
-            class="text-sm rounded-md p-3 text-gray-700"
+            class="text-sm rounded-card p-3 text-ink-500"
             readonly
           >
           </InputText>
@@ -324,18 +325,23 @@ const userBuy = async () => {
           <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
         </div>
       </div>
-      <span>總金額 : {{ finalPrice.toLocaleString() }}</span>
+      <span class="text-ink-900 font-medium"
+        >總金額 :
+        <span class="text-brand-price font-bold text-lg">{{
+          finalPrice.toLocaleString()
+        }}</span></span
+      >
       <!-- #endregion -->
       <!-- #region  購買按鈕-->
       <div class="flex gap-3">
         <button
-          class="flex-1 border border-gray-300 text-gray-600 p-3 rounded-2xl cursor-pointer"
+          class="flex-1 border border-border-soft text-ink-500 p-3 rounded-card cursor-pointer hover:bg-surface-muted transition-colors"
           @click="router.back()"
         >
           返回
         </button>
         <button
-          class="flex-1 bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+          class="flex-1 bg-brand-500 text-white p-3 rounded-card cursor-pointer font-bold"
           @click="userBuy"
         >
           前往付款

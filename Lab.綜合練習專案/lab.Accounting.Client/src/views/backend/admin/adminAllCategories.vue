@@ -205,10 +205,10 @@ const deleteOneCategory = async (id) => {
   <div class="flex flex-col w-full p-6" v-if="allCategories">
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
-      <p class="text-2xl font-bold m-0">類別管理</p>
+      <p class="text-2xl font-bold m-0 text-ink-900">類別管理</p>
 
       <div class="flex flex-1 items-center justify-center">
-        <p class="me-5">父類別搜尋 :</p>
+        <p class="me-5 text-ink-500">父類別搜尋 :</p>
         <Select
           v-model="selectParent"
           :options="[{ productCategoryName: '全部', productCategoryId: null }, ...parentCategories]"
@@ -229,7 +229,7 @@ const deleteOneCategory = async (id) => {
           fluid
         />
         <button
-          class="flex items-center gap-1.5 px-4 py-2 ms-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm cursor-pointer whitespace-nowrap"
+          class="flex items-center gap-1.5 px-4 py-2 ms-2 bg-brand-500 hover:opacity-90 text-white rounded-card text-sm cursor-pointer whitespace-nowrap"
           @click="router.push({ name: 'admin-addcategory' })"
         >
           <i class="pi pi-plus text-xs" />
@@ -238,29 +238,24 @@ const deleteOneCategory = async (id) => {
       </div>
     </div>
 
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
-      <!-- #endregion -->
-    </div>
-
     <!-- #region  欄位標頭-->
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <div
-        class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[64px_100px_1fr_1fr_100px] px-5 py-2.5 bg-surface-muted border-b border-border-soft"
       >
-        <span class="text-xs text-gray-400"></span>
-        <span class="text-xs text-gray-400">類別 ID</span>
-        <span class="text-xs text-gray-400">類別名稱</span>
-        <span class="text-xs text-gray-400">父類別 ID</span>
-        <span class="text-xs text-gray-400"></span>
+        <span class="text-xs text-ink-500"></span>
+        <span class="text-xs text-ink-500">類別 ID</span>
+        <span class="text-xs text-ink-500">類別名稱</span>
+        <span class="text-xs text-ink-500">父類別 ID</span>
+        <span class="text-xs text-ink-500 text-right">操作</span>
       </div>
-
       <!-- #endregion -->
       <!-- #region  類別-->
       <template v-if="isFiltering">
         <div
           v-for="n in 6"
           :key="n"
-          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 gap-4 items-center"
+          class="grid grid-cols-[64px_100px_1fr_1fr_100px] px-5 py-4 border-b border-border-soft gap-4 items-center"
         >
           <Skeleton height="40px" border-radius="50%" />
           <Skeleton height="1rem" />
@@ -271,7 +266,7 @@ const deleteOneCategory = async (id) => {
       <template v-else>
         <div
           v-if="allCategories.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-gray-400"
+          class="flex flex-col items-center justify-center py-16 text-ink-500"
         >
           <i class="pi pi-inbox text-4xl mb-3" />
           <span class="text-sm">沒有符合條件的類別</span>
@@ -279,28 +274,34 @@ const deleteOneCategory = async (id) => {
         <div
           v-for="cate in allCategories"
           :key="cate.ProductCategoryId"
-          class="grid grid-cols-[56px_56px_1fr_1fr_80px_90px_150px_80px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 cursor-pointer"
+          class="grid grid-cols-[64px_100px_1fr_1fr_100px] px-5 py-4 border-b border-border-soft items-center hover:bg-surface-muted"
         >
           <img
             :src="getCategoryImg(cate)"
-            class="w-10 h-10 object-cover rounded-lg border border-gray-100 cursor-pointer"
+            class="w-10 h-10 object-cover rounded-card border border-border-soft cursor-pointer"
           />
-          <span class="text-sm font-medium truncate">{{ cate.productCategoryId }}</span>
-          <span class="text-sm font-medium truncate">{{ cate.productCategoryName }}</span>
-          <span class="text-sm text-gray-700 truncate">{{ cate.productParentId }}</span>
+          <span class="text-sm font-medium text-ink-900 truncate">{{
+            cate.productCategoryId
+          }}</span>
+          <span class="text-sm font-medium text-ink-900 truncate">{{
+            cate.productCategoryName
+          }}</span>
+          <span class="text-sm text-ink-500 truncate">{{ cate.productParentId }}</span>
 
-          <button
-            @click="deleteOneCategory(cate.productCategoryId)"
-            class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 cursor-pointer hover:bg-red-50"
-          >
-            刪除
-          </button>
+          <div class="flex justify-end">
+            <button
+              @click="deleteOneCategory(cate.productCategoryId)"
+              class="px-3 py-1.5 border border-action-danger/30 rounded-card text-xs text-action-danger cursor-pointer hover:bg-action-danger-50"
+            >
+              刪除
+            </button>
+          </div>
         </div>
       </template>
       <!-- #endregion -->
       <!-- #region  頁碼按鈕-->
       <div class="flex items-center justify-center gap-4 py-4">
-        <span class="text-sm text-gray-400">總筆數：{{ totalCount }}</span>
+        <span class="text-sm text-ink-500">總筆數：{{ totalCount }}</span>
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -314,7 +315,6 @@ const deleteOneCategory = async (id) => {
           @page="pageChange"
         />
       </div>
-
       <!-- #endregion -->
     </div>
   </div>

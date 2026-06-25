@@ -137,26 +137,26 @@ const removeImage = () => {
 
 <template>
   <div class="flex flex-col w-full p-6">
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <!-- #region  標題 / 類別圖片-->
-      <div class="px-6 py-4 border-b border-gray-100">
-        <p class="text-2xl font-bold m-0">新增類別</p>
+      <div class="px-6 py-4 border-b border-border-soft">
+        <p class="text-2xl font-bold m-0 text-ink-900">新增類別</p>
       </div>
 
       <div class="p-6 flex flex-col gap-6">
         <div v-if="!selectParent">
           <div>
-            <p class="text-sm text-gray-400 mb-2">類別圖片</p>
+            <p class="text-sm text-ink-500 mb-2">類別圖片</p>
             <div class="flex flex-wrap gap-2.5">
               <!-- 有圖片就顯示 -->
               <div v-if="imgs" class="relative w-40 h-40">
                 <img
                   :src="imgs.url"
-                  class="w-full h-full object-cover rounded-lg border border-gray-100"
+                  class="w-full h-full object-cover rounded-card border border-border-soft"
                 />
                 <button
                   @click="removeImage"
-                  class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
+                  class="absolute -top-1.5 -right-1.5 bg-action-danger text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
                 >
                   ✕
                 </button>
@@ -165,10 +165,10 @@ const removeImage = () => {
               <!-- 沒圖片才顯示上傳 -->
               <label
                 v-else
-                class="w-40 h-40 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 gap-1"
+                class="w-40 h-40 border border-dashed border-ink-300 rounded-card flex flex-col items-center justify-center cursor-pointer hover:bg-surface-muted gap-1"
               >
-                <i class="pi pi-plus text-gray-400 text-sm"></i>
-                <span class="text-xs text-gray-400">上傳圖片</span>
+                <i class="pi pi-plus text-ink-500 text-sm"></i>
+                <span class="text-xs text-ink-500">上傳圖片</span>
                 <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
               </label>
             </div>
@@ -179,7 +179,7 @@ const removeImage = () => {
         <div class="grid grid-cols-2 gap-4">
           <!-- 類別名稱 -->
           <div class="col-span-2">
-            <label class="text-sm text-gray-400 block mb-1.5">類別名稱</label>
+            <label class="text-sm text-ink-500 block mb-1.5">類別名稱</label>
             <InputText
               v-model="categoryName"
               placeholder="輸入類別名稱"
@@ -191,7 +191,7 @@ const removeImage = () => {
 
           <!-- 父類別 -->
           <div class="col-span-2">
-            <label class="text-sm text-gray-400 block mb-1.5">父類別（不選代表頂層類別）</label>
+            <label class="text-sm text-ink-500 block mb-1.5">父類別（不選代表頂層類別）</label>
             <Select
               v-model="selectParent"
               @change="changeParent"
@@ -209,10 +209,10 @@ const removeImage = () => {
         <!-- #endregion -->
 
         <!-- #region  儲存按鍵-->
-        <div class="flex justify-end pt-4 border-t border-gray-100">
+        <div class="flex justify-end pt-4 border-t border-border-soft">
           <button
             @click="createCategory"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2.5 rounded-lg text-xl font-medium cursor-pointer transition-colors"
+            class="bg-brand-500 hover:opacity-90 text-white px-8 py-2.5 rounded-card text-xl font-medium cursor-pointer transition-colors"
           >
             儲存
           </button>

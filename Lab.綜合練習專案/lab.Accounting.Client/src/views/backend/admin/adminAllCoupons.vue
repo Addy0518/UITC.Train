@@ -178,7 +178,7 @@ const openEditDialog = async (coupon) => {
   <div class="flex flex-col w-full p-6" v-if="allCoupons">
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
-      <p class="text-2xl font-bold m-0">優惠券管理</p>
+      <p class="text-2xl font-bold m-0 text-ink-900">優惠券管理</p>
 
       <div class="flex flex-1 items-center justify-center">
         <AutoComplete
@@ -194,7 +194,7 @@ const openEditDialog = async (coupon) => {
       </div>
 
       <button
-        class="flex items-center gap-1.5 bg-black text-white px-4 h-9 rounded-lg text-sm cursor-pointer"
+        class="flex items-center gap-1.5 bg-brand-500 hover:opacity-90 text-white px-4 h-9 rounded-card text-sm cursor-pointer"
         @click="openCreateDialog"
       >
         <i class="pi pi-plus text-xs" />
@@ -203,21 +203,21 @@ const openEditDialog = async (coupon) => {
     </div>
     <!-- #endregion -->
 
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <!-- #region  欄位標頭-->
       <div
-        class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-2.5 bg-surface-muted border-b border-border-soft"
       >
-        <span class="text-xs text-gray-400">優惠碼</span>
-        <span class="text-xs text-gray-400">名稱</span>
-        <span class="text-xs text-gray-400">建立人</span>
-        <span class="text-xs text-gray-400">類型</span>
-        <span class="text-xs text-gray-400">折扣</span>
-        <span class="text-xs text-gray-400">最低消費</span>
+        <span class="text-xs text-ink-500">優惠碼</span>
+        <span class="text-xs text-ink-500">名稱</span>
+        <span class="text-xs text-ink-500">建立人</span>
+        <span class="text-xs text-ink-500">類型</span>
+        <span class="text-xs text-ink-500">折扣</span>
+        <span class="text-xs text-ink-500">最低消費</span>
         <button
           @click="toggleSort('StartTime')"
-          :class="sortBy === 'StartTime' ? 'text-orange-500' : 'text-gray-400'"
-          class="text-xs text-left cursor-pointer hover:text-gray-700"
+          :class="sortBy === 'StartTime' ? 'text-brand-500' : 'text-ink-500'"
+          class="text-xs text-left cursor-pointer hover:text-ink-900"
         >
           有效期限
           <i v-if="sortBy === 'StartTime' && sortOrder === 'asc'" class="pi pi-arrow-up text-xs" />
@@ -228,23 +228,23 @@ const openEditDialog = async (coupon) => {
         </button>
         <button
           @click="toggleActiveFilter"
-          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
-          :class="isActive !== null ? 'text-black font-semibold' : 'text-gray-400'"
+          class="text-xs text-left cursor-pointer hover:text-ink-900 flex items-center gap-1 focus:outline-none"
+          :class="isActive !== null ? 'text-ink-900 font-semibold' : 'text-ink-500'"
         >
           狀態
           <span
             v-if="isActive === true"
-            class="px-1 py-0.5 rounded bg-green-50 text-green-700 text-[10px]"
+            class="px-1 py-0.5 rounded bg-status-success/10 text-status-success text-[10px]"
             >已啟用</span
           >
           <span
             v-else-if="isActive === false"
-            class="px-1 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px]"
+            class="px-1 py-0.5 rounded bg-surface-muted text-status-neutral text-[10px]"
             >未啟用</span
           >
-          <span v-else class="text-[10px] text-gray-300">(全部)</span>
+          <span v-else class="text-[10px] text-ink-300">(全部)</span>
         </button>
-        <span class="text-xs text-gray-400 text-right">操作</span>
+        <span class="text-xs text-ink-500 text-right">操作</span>
       </div>
       <!-- #endregion -->
 
@@ -253,7 +253,7 @@ const openEditDialog = async (coupon) => {
         <div
           v-for="n in 6"
           :key="n"
-          class="grid grid-cols-[90px_1.4fr_1fr_0.9fr_1fr_1.4fr_0.8fr_110px] px-5 py-4 border-b border-gray-100 gap-4 items-center"
+          class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-4 border-b border-border-soft gap-4 items-center"
         >
           <Skeleton height="1rem" />
           <Skeleton height="1rem" />
@@ -268,7 +268,7 @@ const openEditDialog = async (coupon) => {
       <template v-else>
         <div
           v-if="allCoupons.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-gray-400"
+          class="flex flex-col items-center justify-center py-16 text-ink-500"
         >
           <i class="pi pi-inbox text-4xl mb-3" />
           <span class="text-sm">沒有符合條件的優惠券</span>
@@ -276,44 +276,48 @@ const openEditDialog = async (coupon) => {
         <div
           v-for="coupon in allCoupons"
           :key="coupon.couponId"
-          class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
+          class="grid grid-cols-[90px_1.2fr_0.8fr_1fr_0.8fr_0.9fr_1.3fr_0.8fr_70px] px-5 py-4 border-b border-border-soft items-center hover:bg-surface-muted"
         >
-          <span class="font-mono text-xs text-gray-500 truncate">{{ coupon.code }}</span>
-          <span class="text-sm truncate">{{ coupon.name }}</span>
-          <span class="text-sm truncate">{{ coupon.createrName }}</span>
+          <span class="font-mono text-xs text-ink-500 truncate">{{ coupon.code }}</span>
+          <span class="text-sm text-ink-900 truncate">{{ coupon.name }}</span>
+          <span class="text-sm text-ink-900 truncate">{{ coupon.createrName }}</span>
           <span>
-            <span class="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700">
+            <span class="px-2 py-0.5 rounded-full text-xs bg-status-info/10 text-status-info">
               {{ getEnumDescription(couponTypeEnum, coupon.type) }}
             </span>
           </span>
-          <span class="text-sm text-orange-500 font-medium">
+          <span class="text-sm text-brand-price font-medium">
             {{
               coupon.type === couponTypeEnum.百分比折扣.value
                 ? `${coupon.discount} 折`
                 : `$${coupon.discount} 元`
             }}
           </span>
-          <span class="text-sm">
+          <span class="text-sm text-ink-900">
             {{ coupon.minimunSpend > 0 ? `$${coupon.minimunSpend}` : '無限制' }}
           </span>
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-ink-500">
             {{ formatDateTimeString(coupon.startTime) }} ～
             {{ formatDateTimeString(coupon.endTime) }}
           </span>
           <span>
             <span
               class="px-2 py-0.5 rounded-full text-xs"
-              :class="coupon.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
+              :class="
+                coupon.isActive
+                  ? 'bg-status-success/10 text-status-success'
+                  : 'bg-surface-muted text-status-neutral'
+              "
             >
               {{ coupon.isActive ? '啟用中' : '未啟用' }}
             </span>
           </span>
           <div class="flex gap-1 justify-end">
             <button
-              class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 cursor-pointer"
+              class="w-8 h-8 flex items-center justify-center rounded-card hover:bg-surface-muted cursor-pointer"
               @click="openEditDialog(coupon)"
             >
-              <i class="pi pi-pencil text-sm text-gray-600" />
+              <i class="pi pi-pencil text-sm text-ink-500" />
             </button>
           </div>
         </div>
@@ -322,7 +326,7 @@ const openEditDialog = async (coupon) => {
 
       <!-- #region  頁碼按鈕-->
       <div class="flex items-center justify-center gap-4 py-4">
-        <span class="text-sm text-gray-400">總筆數：{{ totalCount }}</span>
+        <span class="text-sm text-ink-500">總筆數：{{ totalCount }}</span>
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',

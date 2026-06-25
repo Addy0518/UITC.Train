@@ -198,7 +198,7 @@ const changeReviewStatus = (status) => {
   <div class="flex flex-col w-full p-6" v-if="allreview">
     <!-- #region  標題列-->
     <div class="flex items-center gap-4 mb-4">
-      <p class="text-2xl font-bold m-0">審查表管理</p>
+      <p class="text-2xl font-bold m-0 text-ink-900">審查表管理</p>
 
       <div class="flex flex-1 items-center justify-center">
         <Select
@@ -220,52 +220,49 @@ const changeReviewStatus = (status) => {
         />
       </div>
     </div>
-
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
-      <!-- #endregion -->
-    </div>
+    <!-- #endregion -->
 
     <!-- #region  欄位標頭-->
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <div
-        class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-2.5 bg-surface-muted border-b border-border-soft"
       >
-        <span class="text-xs text-gray-400">賣家</span>
-        <span class="text-xs text-gray-400">審核人員</span>
-        <span class="text-xs text-gray-400">商品名稱</span>
+        <span class="text-xs text-ink-500">賣家</span>
+        <span class="text-xs text-ink-500">審核人員</span>
+        <span class="text-xs text-ink-500">商品名稱</span>
         <button
           @click="toggleReviewStatusFilter"
-          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+          class="text-xs text-left cursor-pointer hover:text-ink-900 flex items-center gap-1 focus:outline-none"
           :class="
             reviewStatus !== null && reviewStatus !== undefined
-              ? 'text-black font-semibold'
-              : 'text-gray-400'
+              ? 'text-ink-900 font-semibold'
+              : 'text-ink-500'
           "
         >
           審核狀態
           <span
             v-if="reviewStatus === 0"
-            class="px-1 py-0.5 rounded bg-yellow-50 text-yellow-700 text-[10px]"
+            class="px-1 py-0.5 rounded bg-status-warning/10 text-status-warning text-[10px]"
             >待審核</span
           >
           <span
             v-else-if="reviewStatus === 1"
-            class="px-1 py-0.5 rounded bg-green-50 text-green-700 text-[10px]"
+            class="px-1 py-0.5 rounded bg-status-success/10 text-status-success text-[10px]"
             >已通過</span
           >
           <span
             v-else-if="reviewStatus === 2"
-            class="px-1 py-0.5 rounded bg-red-50 text-red-700 text-[10px]"
+            class="px-1 py-0.5 rounded bg-action-danger-50 text-action-danger text-[10px]"
             >已駁回</span
           >
-          <span v-else class="text-[10px] text-gray-300">(全部)</span>
+          <span v-else class="text-[10px] text-ink-300">(全部)</span>
         </button>
         <button
           @click="toggleSort('CreateTime')"
           :class="
-            currentSort.type === 'CreateTime' ? 'text-orange-500 font-semibold' : 'text-gray-400'
+            currentSort.type === 'CreateTime' ? 'text-brand-500 font-semibold' : 'text-ink-500'
           "
-          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+          class="text-xs text-left cursor-pointer hover:text-ink-900 flex items-center gap-1 focus:outline-none"
         >
           申請時間
           <i
@@ -281,9 +278,9 @@ const changeReviewStatus = (status) => {
         <button
           @click="toggleSort('ReviewTime')"
           :class="
-            currentSort.type === 'ReviewTime' ? 'text-orange-500 font-semibold' : 'text-gray-400'
+            currentSort.type === 'ReviewTime' ? 'text-brand-500 font-semibold' : 'text-ink-500'
           "
-          class="text-xs text-left cursor-pointer hover:text-gray-700 flex items-center gap-1 focus:outline-none"
+          class="text-xs text-left cursor-pointer hover:text-ink-900 flex items-center gap-1 focus:outline-none"
         >
           審核時間
           <i
@@ -296,7 +293,6 @@ const changeReviewStatus = (status) => {
           />
         </button>
       </div>
-
       <!-- #endregion -->
       <!-- #region  商品-->
 
@@ -304,7 +300,7 @@ const changeReviewStatus = (status) => {
         <div
           v-for="n in 6"
           :key="n"
-          class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-4 border-b border-gray-100 gap-4 items-center"
+          class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-4 border-b border-border-soft gap-4 items-center"
         >
           <Skeleton height="1rem" />
           <Skeleton height="1rem" />
@@ -317,7 +313,7 @@ const changeReviewStatus = (status) => {
       <template v-else>
         <div
           v-if="allreview.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-gray-400"
+          class="flex flex-col items-center justify-center py-16 text-ink-500"
         >
           <i class="pi pi-inbox text-4xl mb-3" />
           <span class="text-sm">沒有符合條件的審查表</span>
@@ -325,21 +321,21 @@ const changeReviewStatus = (status) => {
         <div
           v-for="review in allreview"
           :key="review.productsReviewId"
-          class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 cursor-pointer"
+          class="grid grid-cols-[100px_100px_1fr_110px_150px_150px] px-5 py-4 border-b border-border-soft items-center hover:bg-surface-muted cursor-pointer"
           @click="
             router.push({ name: 'admin-review-details', params: { id: review.productsReviewId } })
           "
         >
-          <span class="text-sm font-medium truncate">{{ review.sellerName }}</span>
-          <span class="text-sm text-gray-700 truncate">{{ review.adminName ?? '—' }}</span>
-          <span class="text-sm text-gray-800 truncate">{{ review.productsName }}</span>
+          <span class="text-sm font-medium text-ink-900 truncate">{{ review.sellerName }}</span>
+          <span class="text-sm text-ink-900 truncate">{{ review.adminName ?? '—' }}</span>
+          <span class="text-sm text-ink-900 truncate">{{ review.productsName }}</span>
           <span class="text-sm">
             <span
               class="px-2 py-0.5 rounded-full text-xs"
               :class="{
-                'bg-yellow-100 text-yellow-700': review.reviewStatus === 0,
-                'bg-green-100 text-green-700': review.reviewStatus === 1,
-                'bg-red-100 text-red-700': review.reviewStatus === 2,
+                'bg-status-warning/10 text-status-warning': review.reviewStatus === 0,
+                'bg-status-success/10 text-status-success': review.reviewStatus === 1,
+                'bg-action-danger-50 text-action-danger': review.reviewStatus === 2,
               }"
             >
               {{
@@ -351,8 +347,8 @@ const changeReviewStatus = (status) => {
               }}
             </span>
           </span>
-          <span class="text-sm text-gray-500">{{ formatDateTimeString(review.createTime) }}</span>
-          <span class="text-sm text-gray-500">{{
+          <span class="text-sm text-ink-500">{{ formatDateTimeString(review.createTime) }}</span>
+          <span class="text-sm text-ink-500">{{
             review.reviewTime ? formatDateTimeString(review.reviewTime) : '—'
           }}</span>
         </div>
@@ -360,7 +356,7 @@ const changeReviewStatus = (status) => {
       <!-- #endregion -->
       <!-- #region  頁碼按鈕-->
       <div class="flex items-center justify-center gap-4 py-4">
-        <span class="text-sm text-gray-400">總筆數：{{ totalCount }}</span>
+        <span class="text-sm text-ink-500">總筆數：{{ totalCount }}</span>
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -374,7 +370,6 @@ const changeReviewStatus = (status) => {
           @page="pageChange"
         />
       </div>
-
       <!-- #endregion -->
     </div>
   </div>

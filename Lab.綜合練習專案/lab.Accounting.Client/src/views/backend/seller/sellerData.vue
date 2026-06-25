@@ -271,17 +271,17 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full p-6 bg-gray-50/50 min-h-screen">
+  <div class="flex flex-col w-full p-6 bg-page-bg-soft min-h-screen">
     <!--#region  標題列-->
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 m-0">數據中心</h1>
-        <p class="text-xs text-gray-400 mt-1">即時掌握店鋪營運狀態與商品銷量</p>
+        <h1 class="text-2xl font-bold text-ink-900 m-0">數據中心</h1>
+        <p class="text-xs text-ink-500 mt-1">即時掌握店鋪營運狀態與商品銷量</p>
       </div>
       <button
         @click="getSellerData(false)"
         :disabled="isFiltering"
-        class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm text-gray-600 hover:bg-gray-50 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+        class="flex items-center gap-2 px-4 py-2 border border-border-soft rounded-card bg-page-bg text-sm text-ink-500 hover:bg-surface-muted cursor-pointer transition-all active:scale-95 disabled:opacity-50"
       >
         <i :class="['pi pi-refresh text-xs', { 'pi-spin': isFiltering }]" />
         重新整理
@@ -291,13 +291,13 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
     <!--#region  加載骨架 -->
     <template v-if="isFiltering">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <Skeleton width="100%" height="96px" class="rounded-xl" />
-        <Skeleton width="100%" height="96px" class="rounded-xl" />
+        <Skeleton width="100%" height="96px" class="rounded-card" />
+        <Skeleton width="100%" height="96px" class="rounded-card" />
       </div>
-      <Skeleton width="100%" height="240px" class="rounded-xl mb-6" />
+      <Skeleton width="100%" height="240px" class="rounded-card mb-6" />
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Skeleton width="100%" height="320px" class="rounded-xl" />
-        <Skeleton width="100%" height="320px" class="rounded-xl" />
+        <Skeleton width="100%" height="320px" class="rounded-card" />
+        <Skeleton width="100%" height="320px" class="rounded-card" />
       </div>
     </template>
     <!-- #endregion -->
@@ -306,32 +306,32 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
       <!--#region  銷售額區 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div
-          class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between"
+          class="bg-page-bg p-6 rounded-card border border-border-soft flex items-center justify-between"
         >
           <div class="space-y-2">
-            <span class="text-sm font-medium text-gray-400 block">累積總銷售額</span>
-            <span class="text-3xl font-bold text-gray-900 block"
+            <span class="text-sm font-medium text-ink-500 block">累積總銷售額</span>
+            <span class="text-3xl font-bold text-ink-900 block"
               >$ {{ dashboardData.totalRevenue?.toLocaleString() }}</span
             >
           </div>
           <div
-            class="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500"
+            class="w-12 h-12 rounded-card bg-brand-50 flex items-center justify-center text-brand-500"
           >
             <i class="pi pi-wallet text-xl" />
           </div>
         </div>
 
         <div
-          class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between"
+          class="bg-page-bg p-6 rounded-card border border-border-soft flex items-center justify-between"
         >
           <div class="space-y-2">
-            <span class="text-sm font-medium text-gray-400 block">本月份銷售額</span>
-            <span class="text-3xl font-bold text-orange-500 block"
+            <span class="text-sm font-medium text-ink-500 block">本月份銷售額</span>
+            <span class="text-3xl font-bold text-brand-price block"
               >$ {{ dashboardData.monthlyRevenue?.toLocaleString() }}</span
             >
           </div>
           <div
-            class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500"
+            class="w-12 h-12 rounded-card bg-brand-50 flex items-center justify-center text-brand-500"
           >
             <i class="pi pi-chart-bar text-xl" />
           </div>
@@ -339,10 +339,10 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
       </div>
       <!-- #endregion -->
       <!--#region  近七天銷售額圖表 -->
-      <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mb-6">
+      <div class="bg-page-bg p-6 rounded-card border border-border-soft mb-6">
         <div class="flex items-center justify-between mb-4">
-          <span class="text-base font-bold text-gray-800">近七天個別銷售額</span>
-          <span class="text-xs text-gray-400">最近一週的每日營收波動</span>
+          <span class="text-base font-bold text-ink-900">近七天個別銷售額</span>
+          <span class="text-xs text-ink-500">最近一週的每日營收波動</span>
         </div>
 
         <div class="h-100 w-full">
@@ -353,7 +353,7 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
             :options="weekSalesChartOptions"
             class="h-full w-full"
           />
-          <div v-else class="h-full flex flex-col items-center justify-center text-gray-400">
+          <div v-else class="h-full flex flex-col items-center justify-center text-ink-500">
             <i class="pi pi-calendar-times text-4xl mb-2" />
             <span>暫無近七日營收數據</span>
           </div>
@@ -364,14 +364,16 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!--#region  銷量區 -->
         <div
-          class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col"
+          class="bg-page-bg rounded-card border border-border-soft overflow-hidden flex flex-col"
         >
-          <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <span class="text-base font-bold text-gray-800 flex items-center gap-2">
-              <i class="pi pi-crown text-amber-500" /> 銷量最好前五商品
+          <div
+            class="p-5 border-b border-border-soft flex items-center justify-between bg-surface-muted"
+          >
+            <span class="text-base font-bold text-ink-900 flex items-center gap-2">
+              <i class="pi pi-crown text-brand-500" /> 銷量最好前五商品
             </span>
           </div>
-          <div class="divide-y divide-gray-100 flex-1">
+          <div class="divide-y divide-border-soft flex-1">
             <div class="h-100 w-full flex-1 flex items-center justify-center">
               <Chart
                 v-if="dashboardData.topSellingProducts?.length > 0"
@@ -380,41 +382,44 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
                 :options="topSellingChartOptions"
                 class="h-full w-full"
               />
-              <div v-else class="text-gray-400 text-sm py-12">暫無銷售數據</div>
+              <div v-else class="text-ink-500 text-sm py-12">暫無銷售數據</div>
             </div>
           </div>
         </div>
         <!-- #endregion -->
         <!--#region  庫存區 -->
         <div
-          class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col"
+          class="bg-page-bg rounded-card border border-border-soft overflow-hidden flex flex-col"
         >
-          <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <span class="text-base font-bold text-gray-800 flex items-center gap-2">
-              <i class="pi pi-exclamation-triangle text-red-500" /> 庫存告急警報
+          <div
+            class="p-5 border-b border-border-soft flex items-center justify-between bg-surface-muted"
+          >
+            <span class="text-base font-bold text-ink-900 flex items-center gap-2">
+              <i class="pi pi-exclamation-triangle text-action-danger" /> 庫存告急警報
             </span>
-            <span class="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium"
+            <span
+              class="text-xs bg-action-danger-50 text-action-danger px-2 py-0.5 rounded-full font-medium"
               >庫存 &lt; 5</span
             >
           </div>
-          <div class="divide-y divide-gray-100 flex-1">
+          <div class="divide-y divide-border-soft flex-1">
             <div
               v-if="!dashboardData.lowStockProducts || dashboardData.lowStockProducts.length === 0"
-              class="py-12 text-center text-sm flex flex-col items-center justify-center gap-2 text-gray-400"
+              class="py-12 text-center text-sm flex flex-col items-center justify-center gap-2 text-ink-500"
             >
-              <i class="pi pi-check-circle text-green-500 text-xl" />
-              <span class="text-green-600 font-medium">目前庫存十分充足！</span>
+              <i class="pi pi-check-circle text-status-success text-xl" />
+              <span class="text-status-success font-medium">目前庫存十分充足！</span>
             </div>
             <div
               v-for="product in dashboardData.lowStockProducts"
               :key="product.productsId"
-              class="flex items-center justify-between p-4 hover:bg-gray-50/50 transition-colors"
+              class="flex items-center justify-between p-4 hover:bg-surface-muted transition-colors"
             >
               <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-sm font-medium text-gray-700 truncate">{{
+                <span class="text-sm font-medium text-ink-900 truncate">{{
                   product.productsName
                 }}</span>
-                <span class="text-xs text-gray-400"
+                <span class="text-xs text-ink-500"
                   >商品 ID: #{{ product.productsId }} | 售價: ${{ product.productsPrice }}</span
                 >
               </div>
@@ -422,10 +427,10 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
                 <span
                   :class="
                     product.productsStock === 0
-                      ? 'text-red-500 bg-red-50 border border-red-100'
-                      : 'text-orange-500 bg-orange-50 border border-orange-100'
+                      ? 'text-action-danger bg-action-danger-50 border border-action-danger/20'
+                      : 'text-status-warning bg-status-warning/10 border border-status-warning/20'
                   "
-                  class="text-xs font-bold px-2.5 py-1 rounded-lg inline-block"
+                  class="text-xs font-bold px-2.5 py-1 rounded-card inline-block"
                 >
                   剩餘 {{ product.productsStock }} 件
                 </span>
@@ -438,14 +443,16 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!--#region  評分區 -->
         <div
-          class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col"
+          class="bg-page-bg rounded-card border border-border-soft overflow-hidden flex flex-col"
         >
-          <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <span class="text-base font-bold text-gray-800 flex items-center gap-2">
-              <i class="pi pi-star text-yellow-500" /> 評分分布
+          <div
+            class="p-5 border-b border-border-soft flex items-center justify-between bg-surface-muted"
+          >
+            <span class="text-base font-bold text-ink-900 flex items-center gap-2">
+              <i class="pi pi-star text-brand-500" /> 評分分布
             </span>
           </div>
-          <div class="divide-y divide-gray-100 flex-1">
+          <div class="divide-y divide-border-soft flex-1">
             <div class="h-100 w-full flex-1 flex items-center justify-center">
               <Chart
                 v-if="dashboardData.rateDistribution?.length > 0"
@@ -454,7 +461,7 @@ const setBarChartOptions = (textColorSecondary, surfaceBorder, unit = '') => {
                 :options="rateChartOptions"
                 class="h-full w-full"
               />
-              <div v-else class="text-gray-400 text-sm py-12">暫無評分</div>
+              <div v-else class="text-ink-500 text-sm py-12">暫無評分</div>
             </div>
           </div>
         </div>

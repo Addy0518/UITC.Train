@@ -41,6 +41,15 @@
   --color-border-soft: #F0E6DE;
 
   /*
+    操作語意色 : 跟品牌色、狀態色分開管理，專門表達「使用者主動觸發的動作/選擇」
+    對應 class 範例：text-action-danger、border-selection、bg-selection-50
+  */
+  --color-action-danger: #C9362B; /* 危險操作文字（移除、刪除、取消） */
+  --color-action-danger-50: #FCEBEB; /* 危險操作淡底，搭配 action-danger 文字使用 */
+  --color-selection: #6B8CAE; /* 選取狀態邊框/圖示，優惠券、篩選卡片選中專用 */
+  --color-selection-50: #EDF2F7; /* 選取狀態淡底，搭配 selection 邊框使用 */
+
+  /*
     status : 系統狀態色，跟上面的品牌色分開管理
     用於「系統回饋」語境（啟用/停用/警示），不用於促銷文案
     對應 class 範例：bg-status-success、text-status-warning

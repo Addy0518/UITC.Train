@@ -96,65 +96,105 @@ const userLogin = async () => {
 };
 </script>
 
+```vue
 <template>
-  <div class="container mx-auto p-10">
-    <p class="text-center mb-10 text-3xl font-bold">登入帳號</p>
+  <div class="bg-page-bg-soft py-10 px-4">
+    <div class="max-w-md mx-auto">
+      <!-- #region 登入卡片 -->
+      <div class="bg-page-bg border border-border-soft rounded-card p-6">
+        <!-- #region 標題 -->
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold text-ink-900 m-0">登入帳號</h1>
 
-    <!-- #region  帳號 / 密碼-->
-    <div class="card grid grid-cols-1 gap-4 gap-y-10">
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-user"></i>
-        </InputGroupAddon>
-        <InputText v-model="account" placeholder="帳號" :invalid="v$.account.$error" />
-      </InputGroup>
+          <p class="text-sm text-ink-500 mt-2 mb-0">歡迎回來</p>
+        </div>
+        <!-- #endregion -->
 
-      <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
-      <InputGroup>
-        <InputGroupAddon>
-          <i class="pi pi-unlock"></i>
-        </InputGroupAddon>
-        <InputText
-          :type="tooglePassword ? 'password' : 'text'"
-          v-model="password"
-          placeholder="密碼"
-          :invalid="v$.password.$error"
-        />
-        <InputGroupAddon class="cursor-pointer" @click="tooglePassword = !tooglePassword">
-          <i :class="['pi', tooglePassword ? 'pi-eye' : 'pi-eye-slash']"></i>
-        </InputGroupAddon>
-      </InputGroup>
-      <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
+        <!-- #region 登入欄位 -->
+        <div class="flex flex-col gap-4">
+          <!-- 帳號 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 帳號 </label>
+
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-user"></i>
+              </InputGroupAddon>
+
+              <InputText v-model="account" placeholder="請輸入帳號" :invalid="v$.account.$error" />
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.account.$errors" vaildChiName="帳號" />
+          </div>
+
+          <!-- 密碼 -->
+          <div>
+            <label class="block text-sm font-medium text-ink-900 mb-2"> 密碼 </label>
+
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-lock"></i>
+              </InputGroupAddon>
+
+              <InputText
+                :type="tooglePassword ? 'password' : 'text'"
+                v-model="password"
+                placeholder="請輸入密碼"
+                :invalid="v$.password.$error"
+              />
+
+              <InputGroupAddon class="cursor-pointer" @click="tooglePassword = !tooglePassword">
+                <i :class="['pi', tooglePassword ? 'pi-eye-slash' : 'pi-eye']" />
+              </InputGroupAddon>
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.password.$errors" vaildChiName="密碼" />
+          </div>
+        </div>
+        <!-- #endregion -->
+
+        <!-- #region 測試帳號 -->
+        <div class="mt-8">
+          <p class="text-sm font-medium text-ink-900 mb-3">測試帳號</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button
+              @click="testUser"
+              class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
+            >
+              賣家帳號
+            </button>
+
+            <button
+              @click="test2User"
+              class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
+            >
+              買家帳號
+            </button>
+
+            <button
+              @click="test3User"
+              class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
+            >
+              管理員帳號
+            </button>
+          </div>
+        </div>
+        <!-- #endregion -->
+
+        <!-- #region 登入按鈕 -->
+        <div class="mt-8">
+          <button
+            @click="userLogin"
+            class="w-full py-3 rounded-card bg-brand-500 text-white font-medium cursor-pointer transition-opacity hover:opacity-90"
+          >
+            登入
+          </button>
+        </div>
+        <!-- #endregion -->
+      </div>
+      <!-- #endregion -->
     </div>
-    <!-- #endregion -->
-    <!-- #region  按鈕區-->
-    <div class="justify-end flex mt-5">
-      <button
-        @click="testUser"
-        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
-      >
-        賣家帳號
-      </button>
-      <button
-        @click="test2User"
-        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
-      >
-        買家帳號
-      </button>
-      <button
-        @click="test3User"
-        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer me-4"
-      >
-        管理員帳號
-      </button>
-      <button
-        @click="userLogin"
-        label="Save"
-        class="bg-black text-white p-4 rounded-2xl px-5 cursor-pointer"
-      >
-        登入
-      </button>
-    </div>
-    <!-- #endregion -->
   </div>
 </template>
+```

@@ -127,46 +127,46 @@ const getProductsImg = (img) => {
     <div class="flex items-center gap-3 mb-4">
       <button
         @click="router.push({ name: 'admin-allreview' })"
-        class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+        class="p-2 rounded-card hover:bg-surface-muted cursor-pointer text-ink-500"
       >
         <i class="pi pi-arrow-left text-sm" />
       </button>
-      <p class="text-2xl font-bold m-0">審查詳細</p>
+      <p class="text-2xl font-bold m-0 text-ink-900">審查詳細</p>
       <span
         class="px-2 py-0.5 rounded-full text-xs"
         :class="{
-          'bg-yellow-100 text-yellow-700': review.reviewStatus === 0,
-          'bg-green-100 text-green-700': review.reviewStatus === 1,
-          'bg-red-100 text-red-700': review.reviewStatus === 2,
+          'bg-status-warning/10 text-status-warning': review.reviewStatus === 0,
+          'bg-status-success/10 text-status-success': review.reviewStatus === 1,
+          'bg-action-danger-50 text-action-danger': review.reviewStatus === 2,
         }"
       >
         {{ review.reviewStatus === 0 ? '待審核' : review.reviewStatus === 1 ? '已通過' : '已駁回' }}
       </span>
-      <span class="text-sm text-gray-400 ml-auto"># {{ review.productsReviewId }}</span>
+      <span class="text-sm text-ink-500 ml-auto"># {{ review.productsReviewId }}</span>
     </div>
     <!-- #endregion -->
 
     <!--#region  審核人員資訊-->
-    <div class="bg-white rounded-lg border border-gray-100 p-5 mb-3">
-      <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
+    <div class="bg-page-bg rounded-card border border-border-soft p-5 mb-3">
+      <p class="text-sm text-ink-500 flex items-center gap-1 mb-4">
         <i class="pi pi-user text-xs" />審核人員資訊
       </p>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <p class="text-xs text-gray-400 mb-1">賣家</p>
-          <p class="text-sm">{{ review.sellerName ?? '—' }}</p>
+          <p class="text-xs text-ink-500 mb-1">賣家</p>
+          <p class="text-sm text-ink-900">{{ review.sellerName ?? '—' }}</p>
         </div>
         <div>
-          <p class="text-xs text-gray-400 mb-1">審核人員</p>
-          <p class="text-sm">{{ review.adminName ?? '—' }}</p>
+          <p class="text-xs text-ink-500 mb-1">審核人員</p>
+          <p class="text-sm text-ink-900">{{ review.adminName ?? '—' }}</p>
         </div>
         <div>
-          <p class="text-xs text-gray-400 mb-1">申請時間</p>
-          <p class="text-sm text-gray-500">{{ formatDateTimeString(review.createTime) }}</p>
+          <p class="text-xs text-ink-500 mb-1">申請時間</p>
+          <p class="text-sm text-ink-500">{{ formatDateTimeString(review.createTime) }}</p>
         </div>
         <div>
-          <p class="text-xs text-gray-400 mb-1">審核時間</p>
-          <p class="text-sm text-gray-500">
+          <p class="text-xs text-ink-500 mb-1">審核時間</p>
+          <p class="text-sm text-ink-500">
             {{ review.reviewTime ? formatDateTimeString(review.reviewTime) : '—' }}
           </p>
         </div>
@@ -174,102 +174,102 @@ const getProductsImg = (img) => {
     </div>
     <!-- #endregion -->
     <!--#region  商品變更比對 ( 有 productsId , 代表更新商品 ,  無 productsId , 代表新增商品 )-->
-    <div class="bg-white rounded-lg border border-gray-100 p-5 mb-3">
-      <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
+    <div class="bg-page-bg rounded-card border border-border-soft p-5 mb-3">
+      <p class="text-sm text-ink-500 flex items-center gap-1 mb-4">
         <i class="pi pi-box text-xs" />{{ review.productsId ? '商品變更比對' : '商品新增' }}
       </p>
 
       <!-- 比對標頭（更新才顯示） -->
       <div
         v-if="review.productsId"
-        class="grid grid-cols-[120px_1fr_1fr] mb-2 pb-2 border-b border-gray-100"
+        class="grid grid-cols-[120px_1fr_1fr] mb-2 pb-2 border-b border-border-soft"
       >
         <span></span>
-        <span class="text-xs text-gray-400 font-medium">舊商品</span>
-        <span class="text-xs text-gray-400 font-medium">申請變更</span>
+        <span class="text-xs text-ink-500 font-medium">舊商品</span>
+        <span class="text-xs text-ink-500 font-medium">申請變更</span>
       </div>
 
       <!-- 商品名稱 -->
-      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-gray-50 items-start">
-        <span class="text-xs text-gray-400">商品名稱</span>
+      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-border-soft items-start">
+        <span class="text-xs text-ink-500">商品名稱</span>
         <span v-if="review.productsId">
           <span
             v-if="oldProduct?.productsName !== review.productsName"
-            class="px-1.5 py-0.5 rounded text-xs bg-red-50 text-red-700 line-through"
+            class="px-1.5 py-0.5 rounded text-xs bg-action-danger-50 text-action-danger"
           >
             {{ oldProduct?.productsName }}
           </span>
-          <span v-else class="text-sm text-gray-600">{{ oldProduct?.productsName }}</span>
+          <span v-else class="text-sm text-ink-500">{{ oldProduct?.productsName }}</span>
         </span>
         <span>
           <span
             v-if="review.productsId && oldProduct?.productsName !== review.productsName"
-            class="px-1.5 py-0.5 rounded text-xs bg-green-50 text-green-700"
+            class="px-1.5 py-0.5 rounded text-xs bg-status-success/10 text-status-success"
           >
             {{ review.productsName }}
           </span>
-          <span v-else class="text-sm text-gray-600">{{ review.productsName }}</span>
+          <span v-else class="text-sm text-ink-500">{{ review.productsName }}</span>
         </span>
       </div>
 
       <!-- 商品價格 -->
-      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-gray-50 items-start">
-        <span class="text-xs text-gray-400">商品價格</span>
+      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-border-soft items-start">
+        <span class="text-xs text-ink-500">商品價格</span>
         <span v-if="review.productsId">
           <span
             v-if="oldProduct?.productsPrice !== review.productsPrice"
-            class="px-1.5 py-0.5 rounded text-xs bg-red-50 text-red-700 line-through"
+            class="px-1.5 py-0.5 rounded text-xs bg-action-danger-50 text-action-danger"
           >
             $ {{ oldProduct?.productsPrice }}
           </span>
-          <span v-else class="text-sm text-gray-600">$ {{ oldProduct?.productsPrice }}</span>
+          <span v-else class="text-sm text-ink-500">$ {{ oldProduct?.productsPrice }}</span>
         </span>
         <span>
           <span
             v-if="review.productsId && oldProduct?.productsPrice !== review.productsPrice"
-            class="px-1.5 py-0.5 rounded text-xs bg-green-50 text-green-700"
+            class="px-1.5 py-0.5 rounded text-xs bg-status-success/10 text-status-success"
           >
             $ {{ review.productsPrice }}
           </span>
-          <span v-else class="text-sm text-gray-600">$ {{ review.productsPrice }}</span>
+          <span v-else class="text-sm text-ink-500">$ {{ review.productsPrice }}</span>
         </span>
       </div>
 
       <!-- 庫存 -->
-      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-gray-50 items-start">
-        <span class="text-xs text-gray-400">庫存</span>
+      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-border-soft items-start">
+        <span class="text-xs text-ink-500">庫存</span>
         <span v-if="review.productsId">
           <span
             v-if="oldProduct?.productsStock !== review.productsStock"
-            class="px-1.5 py-0.5 rounded text-xs bg-red-50 text-red-700 line-through"
+            class="px-1.5 py-0.5 rounded text-xs bg-action-danger-50 text-action-danger"
           >
             {{ oldProduct?.productsStock }} 件
           </span>
-          <span v-else class="text-sm text-gray-600">{{ oldProduct?.productsStock }} 件</span>
+          <span v-else class="text-sm text-ink-500">{{ oldProduct?.productsStock }} 件</span>
         </span>
         <span>
           <span
             v-if="review.productsId && oldProduct?.productsStock !== review.productsStock"
-            class="px-1.5 py-0.5 rounded text-xs bg-green-50 text-green-700"
+            class="px-1.5 py-0.5 rounded text-xs bg-status-success/10 text-status-success"
           >
             {{ review.productsStock }} 件
           </span>
-          <span v-else class="text-sm text-gray-600">{{ review.productsStock }} 件</span>
+          <span v-else class="text-sm text-ink-500">{{ review.productsStock }} 件</span>
         </span>
       </div>
 
       <!-- 類別 -->
-      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-gray-50 items-start">
-        <span class="text-xs text-gray-400">類別</span>
+      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-border-soft items-start">
+        <span class="text-xs text-ink-500">類別</span>
         <span v-if="review.productsId">
           <span
             v-if="oldProduct?.productCategoryId !== review.productCategoryId"
-            class="px-1.5 py-0.5 rounded text-xs bg-red-50 text-red-700 line-through"
+            class="px-1.5 py-0.5 rounded text-xs bg-action-danger-50 text-action-danger"
           >
             {{ oldProduct?.parentCategoryName ? `${oldProduct.parentCategoryName} › ` : ''
             }}{{ oldProduct?.productCategoryName }}
           </span>
-          <span v-else class="text-sm text-gray-600">
+          <span v-else class="text-sm text-ink-500">
             {{ oldProduct?.parentCategoryName ? `${oldProduct.parentCategoryName} › ` : ''
             }}{{ oldProduct?.productCategoryName }}
           </span>
@@ -277,70 +277,70 @@ const getProductsImg = (img) => {
         <span>
           <span
             v-if="review.productsId && oldProduct?.productCategoryId !== review.productCategoryId"
-            class="px-1.5 py-0.5 rounded text-xs bg-green-50 text-green-700"
+            class="px-1.5 py-0.5 rounded text-xs bg-status-success/10 text-status-success"
           >
             {{ review.productCategoryName }}
           </span>
-          <span v-else class="text-sm text-gray-600">{{ review.productCategoryName }}</span>
+          <span v-else class="text-sm text-ink-500">{{ review.productCategoryName }}</span>
         </span>
       </div>
 
       <!-- 折扣 -->
-      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-gray-50 items-start">
-        <span class="text-xs text-gray-400">折扣</span>
+      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-border-soft items-start">
+        <span class="text-xs text-ink-500">折扣</span>
         <span v-if="review.productsId">
           <span
             v-if="oldProduct?.discount !== review.discount"
-            class="px-1.5 py-0.5 rounded text-xs bg-red-50 text-red-700 line-through"
+            class="px-1.5 py-0.5 rounded text-xs bg-action-danger-50 text-action-danger"
           >
             {{ oldProduct?.discount ? `${oldProduct.discount} 折` : '無折扣' }}
           </span>
-          <span v-else class="text-sm text-gray-600">{{
+          <span v-else class="text-sm text-ink-500">{{
             oldProduct?.discount ? `${oldProduct.discount} 折` : '無折扣'
           }}</span>
         </span>
         <span>
           <span
             v-if="review.productsId && oldProduct?.discount !== review.discount"
-            class="px-1.5 py-0.5 rounded text-xs bg-green-50 text-green-700"
+            class="px-1.5 py-0.5 rounded text-xs bg-status-success/10 text-status-success"
           >
             {{ review.discount ? `${review.discount} 折` : '無折扣' }}
           </span>
-          <span v-else class="text-sm text-gray-600">{{
+          <span v-else class="text-sm text-ink-500">{{
             review.discount ? `${review.discount} 折` : '無折扣'
           }}</span>
         </span>
       </div>
 
       <!-- 折扣期間 -->
-      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-gray-50 items-start">
-        <span class="text-xs text-gray-400">折扣期間</span>
-        <span v-if="review.productsId" class="text-xs text-gray-600">
+      <div class="grid grid-cols-[120px_1fr_1fr] py-2 border-b border-border-soft items-start">
+        <span class="text-xs text-ink-500">折扣期間</span>
+        <span v-if="review.productsId" class="text-xs text-ink-500">
           {{ oldProduct?.discountStart ? formatDateTimeString(oldProduct.discountStart) : '—' }}
           {{ oldProduct?.discountEnd ? ` ～ ${formatDateTimeString(oldProduct.discountEnd)}` : '' }}
         </span>
-        <span class="text-xs text-gray-600">
+        <span class="text-xs text-ink-500">
           {{ review.discountStart ? formatDateTimeString(review.discountStart) : '—' }}
           {{ review.discountEnd ? ` ～ ${formatDateTimeString(review.discountEnd)}` : '' }}
         </span>
       </div>
 
       <!-- 商品描述 -->
-      <div class="mt-4 pt-4 border-t border-gray-100">
+      <div class="mt-4 pt-4 border-t border-border-soft">
         <div :class="review.productsId ? 'grid grid-cols-2 gap-4' : ''">
           <div v-if="review.productsId">
-            <p class="text-xs text-gray-400 mb-2">商品描述（舊）</p>
+            <p class="text-xs text-ink-500 mb-2">商品描述（舊）</p>
             <div
-              class="bg-gray-50 rounded-lg p-3 text-sm prose max-w-none max-h-100 overflow-y-auto [&_img]:max-w-2xl [&_img]:max-h-80"
+              class="bg-surface-muted rounded-card p-3 text-sm prose max-w-none max-h-100 overflow-y-auto [&_img]:max-w-2xl [&_img]:max-h-80 text-ink-900"
               v-html="oldProduct?.productsDescription ?? '—'"
             />
           </div>
           <div>
-            <p class="text-xs text-gray-400 mb-2">
+            <p class="text-xs text-ink-500 mb-2">
               {{ review.productsId ? '商品描述（申請變更）' : '商品描述' }}
             </p>
             <div
-              class="bg-gray-50 rounded-lg p-3 text-sm prose max-w-none max-h-100 overflow-y-auto [&_img]:max-w-2xl [&_img]:max-h-80"
+              class="bg-surface-muted rounded-card p-3 text-sm prose max-w-none max-h-100 overflow-y-auto [&_img]:max-w-2xl [&_img]:max-h-80 text-ink-900"
               v-html="review.productsDescription ?? '—'"
             />
           </div>
@@ -348,17 +348,17 @@ const getProductsImg = (img) => {
       </div>
 
       <!-- 商品圖片 -->
-      <div class="mt-4 pt-4 border-t border-gray-100">
-        <p class="text-xs text-gray-400 mb-2">商品圖片（現有）</p>
+      <div class="mt-4 pt-4 border-t border-border-soft">
+        <p class="text-xs text-ink-500 mb-2">商品圖片（現有）</p>
         <div class="flex flex-wrap gap-2">
           <template v-if="review.productsId">
             <img
               v-for="img in oldProduct?.productsImgs"
               :key="img.productsImgId"
               :src="getProductsImg(img)"
-              class="w-50 h-50 object-cover rounded-lg border border-gray-100"
+              class="w-50 h-50 object-cover rounded-card border border-border-soft"
             />
-            <span v-if="!oldProduct?.productsImgs?.length" class="text-sm text-gray-400"
+            <span v-if="!oldProduct?.productsImgs?.length" class="text-sm text-ink-500"
               >無圖片</span
             >
           </template>
@@ -367,9 +367,9 @@ const getProductsImg = (img) => {
               v-for="img in reviewImgs"
               :key="img.productsImgId"
               :src="getProductsImg(img)"
-              class="w-50 h-50 object-cover rounded-lg border border-gray-100"
+              class="w-50 h-50 object-cover rounded-card border border-border-soft"
             />
-            <span v-if="!reviewImgs.length" class="text-sm text-gray-400">無圖片</span>
+            <span v-if="!reviewImgs.length" class="text-sm text-ink-500">無圖片</span>
           </template>
         </div>
       </div>
@@ -379,25 +379,28 @@ const getProductsImg = (img) => {
     <!--#region  駁回原因（有駁回才顯示）-->
     <div
       v-if="review.reviewStatus === 2"
-      class="bg-red-50 rounded-lg border border-red-100 p-5 mb-3"
+      class="bg-action-danger-50 rounded-card border border-action-danger/20 p-5 mb-3"
     >
-      <p class="text-sm text-red-400 flex items-center gap-1 mb-2">
+      <p class="text-sm text-action-danger flex items-center gap-1 mb-2">
         <i class="pi pi-times-circle text-xs" />駁回原因
       </p>
-      <p class="text-sm text-red-700">{{ review.notPassReson }}</p>
+      <p class="text-sm text-ink-900">{{ review.notPassReson }}</p>
     </div>
     <!-- #endregion -->
 
     <!--#region  審核操作（待審核才顯示）-->
-    <div v-if="review.reviewStatus === 0" class="bg-white rounded-lg border border-gray-100 p-5">
-      <p class="text-sm text-gray-400 flex items-center gap-1 mb-4">
+    <div
+      v-if="review.reviewStatus === 0"
+      class="bg-page-bg rounded-card border border-border-soft p-5"
+    >
+      <p class="text-sm text-ink-500 flex items-center gap-1 mb-4">
         <i class="pi pi-check-circle text-xs" />審核操作
       </p>
       <div class="mb-4">
-        <p class="text-xs text-gray-400 mb-1">駁回原因（駁回時必填）</p>
+        <p class="text-xs text-ink-500 mb-1">駁回原因（駁回時必填）</p>
         <textarea
           v-model="notPassReson"
-          class="w-full border border-gray-200 rounded-lg p-2 text-sm resize-y min-h-20 outline-none focus:border-gray-400"
+          class="w-full border border-border-soft rounded-card p-2 text-sm resize-y min-h-20 outline-none focus:border-ink-300 text-ink-900"
           placeholder="請輸入駁回原因..."
         />
         <InValidErrorMessage :errorDto="v$.notPassReson.$errors" vaildChiName="駁回原因" />
@@ -405,18 +408,18 @@ const getProductsImg = (img) => {
       <div class="flex justify-end gap-2">
         <button
           @click="approveReview(reviewStatusEnum.Reject.value)"
-          class="px-4 py-2 border border-red-200 text-red-500 rounded-lg text-sm cursor-pointer hover:bg-red-50"
+          class="px-4 py-2 border border-action-danger/30 text-action-danger rounded-card text-sm cursor-pointer hover:bg-action-danger-50"
         >
           駁回
         </button>
         <button
           @click="approveReview(reviewStatusEnum.Approved.value)"
-          class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm cursor-pointer"
+          class="px-4 py-2 bg-brand-500 hover:opacity-90 text-white rounded-card text-sm cursor-pointer"
         >
           通過
         </button>
       </div>
-      <!-- #endregion -->
     </div>
+    <!-- #endregion -->
   </div>
 </template>

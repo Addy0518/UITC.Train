@@ -116,16 +116,16 @@ const totalPrice = computed(() =>
 <template>
   <div class="flex flex-col w-full mt-20">
     <div class="max-w-5xl mx-auto w-full">
-      <div class="border border-gray-200 rounded-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
-          <span class="font-medium">購物車</span>
+      <div class="border border-border-soft rounded-card overflow-hidden bg-page-bg">
+        <div class="px-5 py-4 border-b border-border-soft flex items-center gap-2">
+          <span class="font-medium text-ink-900">購物車</span>
         </div>
 
         <!-- #region  商品列表-->
         <div
           v-for="product in products"
           :key="product.productsId"
-          class="px-5 py-4 border-b border-gray-100 flex items-center gap-4"
+          class="px-5 py-4 border-b border-border-soft flex items-center gap-4"
         >
           <input
             type="checkbox"
@@ -136,30 +136,30 @@ const totalPrice = computed(() =>
 
           <img
             :src="getProductsImg(product)"
-            class="w-30 h-30 rounded-lg object-cover cursor-pointer bg-gray-100"
+            class="w-30 h-30 rounded-card object-cover cursor-pointer bg-surface-muted"
             @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
           />
 
           <!-- #region  商品細項-->
           <div class="flex-1 min-w-0">
-            <p class="text-xl font-medium mb-2">{{ product.productsName }}</p>
-            <p class="text-sm text-gray-400 mb-2">
+            <p class="text-xl font-medium mb-2 text-ink-900">{{ product.productsName }}</p>
+            <p class="text-sm text-ink-500 mb-2">
               NT$ {{ product.productsPrice }}　｜　
               <span>{{ product.productCategoryName }}</span>
             </p>
             <div class="flex items-center gap-2">
-              <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+              <div class="flex items-center border border-border-soft rounded-card overflow-hidden">
                 <button
-                  class="px-2 py-1 text-gray-500 hover:bg-gray-100 cursor-pointer"
+                  class="px-2 py-1 text-ink-500 hover:bg-surface-muted cursor-pointer"
                   @click="product.boughtQuantity = Math.max(1, product.boughtQuantity - 1)"
                 >
                   −
                 </button>
-                <span class="px-3 py-1 text-sm border-x border-gray-200">{{
+                <span class="px-3 py-1 text-sm border-x border-border-soft text-ink-900">{{
                   product.boughtQuantity
                 }}</span>
                 <button
-                  class="px-2 py-1 text-gray-500 hover:bg-gray-100 cursor-pointer"
+                  class="px-2 py-1 text-ink-500 hover:bg-surface-muted cursor-pointer"
                   @click="
                     product.boughtQuantity = Math.min(
                       product.productsStock,
@@ -170,7 +170,7 @@ const totalPrice = computed(() =>
                   +
                 </button>
               </div>
-              <span class="text-xs text-gray-400">{{
+              <span class="text-xs text-ink-500">{{
                 product.productsStock ? '尚有庫存' : '已售罄'
               }}</span>
             </div>
@@ -178,11 +178,11 @@ const totalPrice = computed(() =>
           <!-- #endregion -->
           <!-- #region  價格 / 移除按鈕-->
           <div class="flex flex-col items-end gap-2">
-            <span class="text-xl font-medium"
+            <span class="text-xl font-medium text-brand-price"
               >NT$ {{ (product.productsPrice * product.boughtQuantity).toLocaleString() }}</span
             >
             <button
-              class="text-sm text-red-400 flex items-center gap-1 cursor-pointer"
+              class="text-sm text-action-danger flex items-center gap-1 cursor-pointer"
               @click="deleteProductsInCar(product.productsId)"
             >
               移除
@@ -193,16 +193,16 @@ const totalPrice = computed(() =>
         <!-- #endregion -->
         <!-- #region  底部結算-->
         <div class="px-5 py-4 flex justify-between items-center">
-          <span class="text-sm text-gray-400">已選 {{ selectProducts.length }} 件</span>
+          <span class="text-sm text-ink-500">已選 {{ selectProducts.length }} 件</span>
           <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-500">
-              總金額：<span class="text-base font-medium text-gray-900"
+            <span class="text-sm text-ink-500">
+              總金額：<span class="text-base font-medium text-brand-price"
                 >NT$ {{ totalPrice.toLocaleString() }}</span
               >
             </span>
 
             <button
-              class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
+              class="bg-brand-500 text-white text-sm font-medium px-5 py-2 rounded-card cursor-pointer"
               @click="goToOrder"
             >
               前往訂單
