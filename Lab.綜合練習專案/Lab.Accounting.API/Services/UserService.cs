@@ -8,6 +8,7 @@ public class UserService(
     IUserRepository userrepo,
     TokenHelper tokenHelper,
     PasswordSecureHelper passwordSecureHelper,
+    SendEmailHelper sendEmailHelper,
     ITokenBlacklistRepository tokenBlacklistRepositories,
     IWebHostEnvironment env
 ) : IUserService
@@ -282,6 +283,23 @@ public class UserService(
 
         return ApiResponseHelper.Success<string>("更新成功 !");
     }
+
+    /// <summary>
+    /// 寄送隨機驗證碼並驗證
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<string>> SendVerfiyCode(UserUpdatePasswordRequest request)
+    {
+        await sendEmailHelper.SendEmail(dbuser.UserAccount, "1234");
+    }
+
+    /// <summary>
+    /// 忘記密碼重新更新密碼
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<string>> ForgetPassword(UserUpdatePasswordRequest request) { }
 
     /// <summary>
     /// 軟刪除單一用戶

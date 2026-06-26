@@ -3,13 +3,18 @@
 public static class DiConfig
 {
     //管理註冊
-    public static void AddDiConfig(this IServiceCollection services)
+    public static void AddDiConfig(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<TokenHelper>();
 
         services.AddSingleton<DBConnecting>();
 
         services.AddScoped<PasswordSecureHelper>();
+
+        services.AddScoped<SendEmailHelper>();
+
+        // 綁定 EmailSettings
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
         //將Service結尾且生命週期相同的物件, 統一註冊
         services.Scan(scan =>

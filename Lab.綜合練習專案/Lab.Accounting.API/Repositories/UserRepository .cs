@@ -233,7 +233,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserPassword From [User]
+            @"Select UserAccount,UserPassword From [User]
                   WHERE UserId = @UserId";
 
         return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserId = userId });

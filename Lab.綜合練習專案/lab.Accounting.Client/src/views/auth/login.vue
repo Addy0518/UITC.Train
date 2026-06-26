@@ -52,7 +52,7 @@ const testUser = () => {
   測試用買家帳號
 */
 const test2User = () => {
-  account.value = 'bbb@gmail.com';
+  account.value = 'anggininder@gmail.com';
   password.value = 'Andy1111';
 };
 

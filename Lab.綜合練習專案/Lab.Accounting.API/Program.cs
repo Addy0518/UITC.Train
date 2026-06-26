@@ -145,7 +145,7 @@ try
     builder.Services.AddEndpointsApiExplorer();
 
     // 自訂的 DI 設定
-    builder.Services.AddDiConfig();
+    builder.Services.AddDiConfig(builder.Configuration);
 
     // 根據前面的設定建立 WebApplication 物件
     // Build() 之後就不能再修改 Services 了
