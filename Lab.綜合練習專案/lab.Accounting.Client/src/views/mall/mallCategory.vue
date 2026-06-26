@@ -231,7 +231,7 @@ const breadCrumbItem = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full ">
     <div class="flex flex-col items-center">
       <!-- #region  麵包屑-->
       <div class="card flex justify-start">

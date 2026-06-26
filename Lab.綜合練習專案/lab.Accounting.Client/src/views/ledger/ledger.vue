@@ -1,7 +1,6 @@
 <script setup>
 import { getAllLedger, deleteLedger } from '@/api/ledgerService';
 
-
 /*
    變數名稱代表意義
    ledger : 所有帳本項目

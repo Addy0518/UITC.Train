@@ -119,56 +119,61 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-screen p-5">
-    <!-- 使用 flex 並設為項目置頂對齊 -->
+  <!--#region 統計頁面 -->
+  <div class="w-full p-5 bg-page-bg">
     <div class="flex items-start gap-10">
-      <!-- 左側第一組：類別金額統計 -->
-      <div class="w-1/2 border-r border-gray-100">
-        <h3 class="text-lg font-bold mb-4 text-center">類別統計</h3>
+      <!--#region 類別統計 -->
+      <div class="w-1/2 border-r border-border-soft">
+        <h3 class="text-xl font-bold mb-4 text-center text-ink-900">類別統計</h3>
         <div class="flex flex-col items-center">
           <!-- 圖表 -->
           <div ref="categoryChartRef" style="width: 100%; height: 350px"></div>
+
           <!-- 數據清單 -->
-          <div class="mt-40 w-100 bg-gray-50 p-5 rounded-lg shadow-sm">
-            <div class="flex justify-between mb-2 border-b border-gray-200 pb-1">
-              <span class="text-gray-600"> 類別</span>
-              <span class="text-gray-600"> 價格</span>
+          <div class="mt-8 w-100 bg-page-bg-soft border border-border-soft p-4 rounded-card">
+            <div class="flex justify-between mb-2 border-b border-border-soft pb-1">
+              <span class="text-ink-500">類別</span>
+              <span class="text-ink-500">價格</span>
             </div>
             <div
               v-for="item in chartData"
               :key="item.name"
-              class="flex justify-between mb-2 border-b border-gray-200 pb-1"
+              class="flex justify-between mb-2 border-b border-border-soft pb-1"
             >
-              <span class="text-gray-600"> {{ item.name }}</span>
-              <span class="font-bold text-blue-600">${{ item.value }}</span>
+              <span class="text-ink-500">{{ item.name }}</span>
+              <span class="font-bold text-ink-900">${{ item.value }}</span>
             </div>
           </div>
         </div>
       </div>
+      <!-- #endregion -->
 
-      <!-- 右側第二組：細項金額統計 -->
+      <!--#region 細項統計 -->
       <div class="w-1/2">
-        <h3 class="text-lg font-bold mb-4 text-center">細項統計</h3>
+        <h3 class="text-xl font-bold mb-4 text-center text-ink-900">細項統計</h3>
         <div class="flex flex-col items-center">
           <!-- 圖表 -->
           <div ref="itemChartRef" style="width: 100%; height: 350px"></div>
+
           <!-- 數據清單 -->
-          <div class="mt-40 w-100 bg-gray-50 p-5 rounded-lg shadow-sm">
-            <div class="flex justify-between mb-2 border-b border-gray-200 pb-1">
-              <span class="text-gray-600"> 項目</span>
-              <span class="text-gray-600"> 價格</span>
+          <div class="mt-8 w-100 bg-page-bg-soft border border-border-soft p-4 rounded-card">
+            <div class="flex justify-between mb-2 border-b border-border-soft pb-1">
+              <span class="text-ink-500">項目</span>
+              <span class="text-ink-500">價格</span>
             </div>
             <div
               v-for="item in chartData2"
               :key="item.name"
-              class="flex justify-between mb-2 border-b border-gray-200 pb-1"
+              class="flex justify-between mb-2 border-b border-border-soft pb-1"
             >
-              <span class="text-gray-600">{{ item.name }}</span>
-              <span class="font-bold text-blue-600">${{ item.value }}</span>
+              <span class="text-ink-500">{{ item.name }}</span>
+              <span class="font-bold text-ink-900">${{ item.value }}</span>
             </div>
           </div>
         </div>
       </div>
+      <!-- #endregion -->
     </div>
   </div>
+  <!-- #endregion -->
 </template>

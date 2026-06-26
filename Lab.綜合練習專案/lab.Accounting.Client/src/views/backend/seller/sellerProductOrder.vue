@@ -68,11 +68,11 @@ const getProductsImg = (product) => {
 
 <template>
   <div class="flex flex-col w-full">
-    <div class="border-gray-200h-full flex flex-col items-center">
+    <div class="flex flex-col items-center">
       <!-- #region  訂單列表-->
-      <div class="mt-40 w-300 rounded-lg shadow-sm">
+      <div class="mt-8 w-300 rounded-card border border-border-soft bg-page-bg overflow-hidden">
         <!-- #region  Tab 列-->
-        <div class="flex border-b border-gray-200">
+        <div class="flex border-b border-border-soft">
           <button
             v-for="tab in shippingEnum"
             :key="tab.value"
@@ -80,8 +80,8 @@ const getProductsImg = (product) => {
             class="flex-1 py-3 text-center text-sm transition-colors cursor-pointer"
             :class="
               tableNow === tab.value
-                ? 'border-b-2 border-orange-500 text-orange-500 font-medium'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-brand-500 text-brand-500 font-medium'
+                : 'text-ink-500 hover:text-ink-900'
             "
           >
             {{ tab.description }}
@@ -92,24 +92,43 @@ const getProductsImg = (product) => {
         <!-- #region  沒有訂單時顯示 -->
         <div
           v-if="filtTable.length === 0"
-          class="flex justify-center items-center h-40 text-gray-400"
+          class="flex justify-center items-center h-40 text-ink-500"
         >
           目前沒有訂單
         </div>
         <!-- #endregion -->
 
         <!-- #region  有訂單時顯示-->
-        <div v-for="order in filtTable">
-          <div
-            class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
-            @click="router.push({ name: 'seller-orders-details', params: { id: order.orderId } })"
-          >
-            <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-            <span class="mt-3 ms-5 me-5">訂單編號 : {{ order.orderNumber }}</span>
-            <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
-            <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
-            <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
-            <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountAmount }}</span>
+        <div
+          v-for="order in filtTable"
+          :key="order.orderId"
+          class="border-b border-border-soft hover:bg-surface-muted transition-colors flex flex-row items-center px-6 py-4 cursor-pointer gap-5"
+          @click="router.push({ name: 'seller-orders-details', params: { id: order.orderId } })"
+        >
+          <img
+            :src="getProductsImg(order)"
+            alt="商品圖片"
+            class="w-16 h-16 object-cover rounded-card border border-border-soft flex-shrink-0"
+          />
+          <div class="flex-1 grid grid-cols-4 gap-3 items-center">
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">訂單編號</p>
+              <p class="text-sm text-ink-900 m-0 truncate">{{ order.orderNumber }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">商品名稱</p>
+              <p class="text-sm text-ink-900 m-0 truncate">{{ order.productsName }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">購買數量</p>
+              <p class="text-sm text-ink-900 m-0">
+                {{ order.boughtQuantity }} 件 (單價 ${{ order.unitPrice }})
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">訂單金額</p>
+              <p class="text-sm font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>
+            </div>
           </div>
         </div>
         <!-- #endregion -->

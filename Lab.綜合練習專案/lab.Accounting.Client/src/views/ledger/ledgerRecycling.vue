@@ -180,51 +180,58 @@ const deleteAll = async () => {
 </script>
 
 <template>
-  <!-- 主區域 -->
-  <div v-if="isItem" class="w-full mx-auto max-w-screen-2xl">
+  <!--#region 回收桶頁面 -->
+  <div v-if="isItem" class="w-full mx-auto max-w-screen-2xl bg-page-bg">
     <div class="container mx-auto text-xl mt-10 mb-auto">
-      <div class="justify-items-end pe-50 pt-10">
-        <div class="justify-items-end">
-          <Button class="bg-red-500" @click="deleteAll">刪除所有已刪除狀態項目</Button>
-        </div>
+      <!--#region 批次刪除按鈕區 -->
+      <div class="max-w-6xl mx-auto flex justify-end pt-10">
+        <Button
+          class="bg-action-danger hover:opacity-90 text-white px-6 py-3 rounded-card text-sm font-medium transition-colors"
+          @click="deleteAll"
+        >
+          刪除所有已刪除狀態項目
+        </Button>
       </div>
-      <div class="flex justify-center items-center gap-10 mt-10">
+      <!-- #endregion -->
+
+      <!--#region 篩選工具區 -->
+      <div class="flex justify-center items-center gap-6 mt-10">
         <!-- 選擇顯示項目 -->
-        <div class="card">
-          <TreeSelect
-            v-model="selectedValue"
-            :options="category"
-            selectionMode="multiple"
-            display="chip"
-            placeholder="選擇類別"
-            class="md:w-80"
-            showClear
-          />
-        </div>
+        <TreeSelect
+          v-model="selectedValue"
+          :options="category"
+          selectionMode="multiple"
+          display="chip"
+          placeholder="選擇類別"
+          class="md:w-80"
+          showClear
+        />
+
         <!-- 選擇顯示日期 -->
-        <div>
-          <DatePicker
-            v-model="date"
-            placeholder="選擇日期"
-            dateFormat="yy-mm-dd"
-            class="md:w-80 h-11.5"
-            :placeholder="font - size"
-            showClear
-          />
-        </div>
+        <DatePicker
+          v-model="date"
+          placeholder="選擇日期"
+          dateFormat="yy-mm-dd"
+          class="md:w-80 h-11.5"
+          showClear
+        />
       </div>
-      <!-- 顯示所有帳本 -->
-      <div style="margin-top: 50px">
-        <div class="card max-w-6xl mx-auto px-10">
+      <!-- #endregion -->
+
+      <!--#region 帳本列表區 -->
+      <div class="mt-12">
+        <div class="bg-white border border-border-soft rounded-card p-4 max-w-6xl mx-auto">
           <DataTable :value="ledger" scrollable scrollHeight="430px" size="large">
             <Column field="itemId" header="編號"></Column>
             <Column field="itemName" header="項目名稱"></Column>
             <Column field="categoryName" header="類別"></Column>
+
             <Column field="itemCost" header="花費">
               <template #body="slotProps">
                 {{ slotProps.data.itemCost ? slotProps.data.itemCost : 0 }}
               </template>
             </Column>
+
             <Column field="itemCreateDate" header="建立日期">
               <template #body="slotProps">
                 {{
@@ -232,34 +239,41 @@ const deleteAll = async () => {
                 }}
               </template>
             </Column>
-            <!-- 按鈕區 -->
-            <Column
-              ><template #body="slotProps">
+
+            <!--#region 操作欄位 -->
+            <Column>
+              <template #body="slotProps">
                 <div class="flex justify-start gap-3 ml-10">
                   <button
-                    @click="reserve(slotProps.data)"
-                    class="text-white p-3 rounded-2xl cursor-pointer bg-amber-500 font-bold"
                     v-if="slotProps.data.isDelete"
+                    @click="reserve(slotProps.data)"
+                    class="bg-status-info hover:opacity-90 text-white px-4 py-2 rounded-card cursor-pointer text-sm font-medium transition-colors"
                   >
                     復原
                   </button>
+
                   <button
                     @click="deleteChange(slotProps.data.itemId)"
-                    class="text-white p-3 rounded-2xl cursor-pointer bg-red-500 font-bold"
+                    class="bg-action-danger hover:opacity-90 text-white px-4 py-2 rounded-card cursor-pointer text-sm font-medium transition-colors"
                   >
                     確定刪除
                   </button>
                 </div>
-              </template></Column
-            >
+              </template>
+            </Column>
+            <!-- #endregion -->
           </DataTable>
         </div>
       </div>
+      <!-- #endregion -->
     </div>
   </div>
 
+  <!--#region 查無資料畫面 -->
   <div
     v-else
-    class="w-full mx-auto max-w-screen-2xl bg-[url(../img/查無資料.png)] bg-no-repeat bg-size-[auto_350px] bg-center"
+    class="w-full mx-auto max-w-screen-2xl min-h-[500px] bg-page-bg bg-[url(../img/查無資料.png)] bg-no-repeat bg-size-[auto_350px] bg-center"
   ></div>
+  <!-- #endregion -->
+  <!-- #endregion -->
 </template>

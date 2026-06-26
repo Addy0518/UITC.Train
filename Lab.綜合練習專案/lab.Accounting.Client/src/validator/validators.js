@@ -31,3 +31,6 @@ export const vaildCellPhone = helpers.withMessage(
   '請符合手機號碼格式 0912345678',
   helpers.regex(/^09[\d]{8}$/),
 );
+
+export const sameAsPassword = (newPasswordRef) =>
+  helpers.withMessage('兩次輸入的密碼不一致', (value) => value === newPasswordRef.value);

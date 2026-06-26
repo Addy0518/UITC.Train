@@ -34,10 +34,10 @@ const imgUrl = computed(() => {
 </script>
 
 <template>
-  <div class="w-screen bg-black">
+  <div class="w-screen bg-surface-dark">
     <!-- #region  Layout 區-->
     <div class="container flex mx-auto h-20 items-center justify-center gap-6">
-      <RouterLink :to="{ name: 'mall' }" class="text-white text-2xl">回到商城</RouterLink>
+      <RouterLink :to="{ name: 'mall' }" class="text-ink-on-dark text-2xl">回到商城</RouterLink>
 
       <div class="flex-1 flex items-center justify-end gap-6">
         <!-- #region  已登入：顯示用戶名跟登出-->
@@ -45,24 +45,26 @@ const imgUrl = computed(() => {
           <div class="relative group">
             <div class="cursor-pointer flex items-center">
               <img :src="imgUrl" alt="頭貼" class="w-10 h-10 rounded-full object-cover" />
-              <span class="text-white ps-3 text-xl">{{ authStore.userName }}</span>
+              <span class="text-ink-on-dark ps-3 text-xl">{{ authStore.userName }}</span>
             </div>
-            <div class="invisible group-hover:visible z-50 absolute bg-white w-40 -mt-1">
+            <div
+              class="invisible group-hover:visible z-50 absolute bg-page-bg w-40 -mt-1 rounded-card border border-border-soft overflow-hidden"
+            >
               <RouterLink
                 :to="{ name: 'user-centre' }"
-                class="block px-4 py-3 hover:bg-gray-100 text-sm"
+                class="block px-4 py-3 hover:bg-surface-muted text-sm text-ink-900"
               >
                 用戶中心
               </RouterLink>
               <RouterLink
                 :to="{ name: 'ledger-centre' }"
-                class="block px-4 py-3 hover:bg-gray-100 text-sm"
+                class="block px-4 py-3 hover:bg-surface-muted text-sm text-ink-900"
               >
                 帳本管理
               </RouterLink>
               <button
                 @click="logout"
-                class="block w-full text-left px-4 py-3 hover:bg-gray-100 text-sm"
+                class="block w-full text-left px-4 py-3 hover:bg-surface-muted text-sm text-ink-900 cursor-pointer"
               >
                 登出
               </button>
@@ -73,11 +75,11 @@ const imgUrl = computed(() => {
         <!-- #region  未登入：顯示註冊登入-->
         <template v-else>
           <RouterLink :to="{ name: 'login' }">
-            <strong class="text-white text-xl">登入</strong>
+            <strong class="text-ink-on-dark text-xl">登入</strong>
           </RouterLink>
-          <strong class="text-white text-xl">/</strong>
+          <strong class="text-ink-on-dark-faint text-xl">/</strong>
           <RouterLink :to="{ name: 'create-account' }">
-            <strong class="text-white text-xl">註冊</strong>
+            <strong class="text-ink-on-dark text-xl">註冊</strong>
           </RouterLink>
         </template>
         <!-- #endregion -->
@@ -85,7 +87,7 @@ const imgUrl = computed(() => {
     </div>
     <!-- #endregion -->
   </div>
-  <div class="flex">
+  <div class="flex bg-page-bg">
     <backendSidebar class="w-80 h-screen" />
 
     <RouterView />

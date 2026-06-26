@@ -16,41 +16,53 @@ onMounted(() => {});
 
 <template>
   <div class="w-80">
-    <div class="w-80 h-full shadow-xl">
+    <div class="w-80 h-full border-r border-border-soft bg-page-bg p-3 flex flex-col gap-1">
       <!-- #region  賣家後台區-->
       <template v-if="authStore.userRole == 'Seller'">
         <RouterLink
           :to="{ name: 'seller-data' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-chart-scatter px-5 ps-5"></i>賣場數據</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-chart-scatter"></i>賣場數據
+        </RouterLink>
         <RouterLink
           :to="{ name: 'seller-product' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-plus px-5 ps-5"></i>商品管理</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-box"></i>商品管理
+        </RouterLink>
 
         <RouterLink
           :to="{ name: 'add-product' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-book px-5 ps-5"></i>新增商品</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-plus"></i>新增商品
+        </RouterLink>
 
         <RouterLink
           :to="{ name: 'seller-product-order' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-wallet px-5 ps-5"></i>訂單管理</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-wallet"></i>訂單管理
+        </RouterLink>
         <RouterLink
           :to="{ name: 'seller-coupons' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-ticket px-5 ps-5"></i>優惠卷列表</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-ticket"></i>優惠卷列表
+        </RouterLink>
         <RouterLink
           :to="{ name: 'seller-product-recycling' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-trash px-5 ps-5"></i>商品回收</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-trash"></i>商品回收
+        </RouterLink>
       </template>
       <!-- #endregion -->
 
@@ -58,24 +70,32 @@ onMounted(() => {});
       <template v-if="authStore.userRole == 'Admin'">
         <RouterLink
           :to="{ name: 'admin-allreview' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-plus px-5 ps-5"></i>審查列表</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-list-check"></i>審查列表
+        </RouterLink>
         <RouterLink
           :to="{ name: 'admin-alluser' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-user px-5 ps-5"></i>用戶列表</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-user"></i>用戶列表
+        </RouterLink>
         <RouterLink
           :to="{ name: 'admin-allCategories' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-sitemap px-5 ps-5"></i>類別列表</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-sitemap"></i>類別列表
+        </RouterLink>
         <RouterLink
           :to="{ name: 'admin-allcoupons' }"
-          class="w-auto p-3 text-xl flex align-center items-center rounded-lg hover:bg-gray-200 hover:text-2xl font-mono"
-          ><i class="pi pi-ticket px-5 ps-5"></i>優惠卷列表</RouterLink
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
         >
+          <i class="pi pi-ticket"></i>優惠卷列表
+        </RouterLink>
       </template>
       <!-- #endregion -->
     </div>

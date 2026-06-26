@@ -405,33 +405,35 @@ const uploadDescriptionImage = async (e) => {
 
 <template>
   <div class="flex flex-col w-full p-6">
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <!-- #region  標題 / 商品圖片-->
-      <div class="px-6 py-4 border-b border-gray-100">
-        <p class="text-2xl font-bold m-0">{{ route.params.id ? '編輯商品' : '新增商品' }}</p>
+      <div class="px-6 py-4 border-b border-border-soft">
+        <p class="text-2xl font-bold m-0 text-ink-900">
+          {{ route.params.id ? '編輯商品' : '新增商品' }}
+        </p>
       </div>
 
       <div class="p-6 flex flex-col gap-6">
         <div>
-          <p class="text-sm text-gray-400 mb-2">商品圖片</p>
+          <p class="text-sm text-ink-500 mb-2">商品圖片</p>
           <div class="flex flex-wrap gap-2.5">
             <div v-for="(img, index) in imgs" :key="index" class="relative w-80 h-80">
               <img
                 :src="img.url"
-                class="w-full h-full object-cover rounded-lg border border-gray-100"
+                class="w-full h-full object-cover rounded-card border border-border-soft"
               />
               <button
                 @click="removeImage(index)"
-                class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
+                class="absolute -top-1.5 -right-1.5 bg-action-danger text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
             <label
-              class="w-80 h-80 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 gap-1"
+              class="w-80 h-80 border border-dashed border-ink-300 rounded-card flex flex-col items-center justify-center cursor-pointer hover:bg-surface-muted gap-1"
             >
-              <i class="pi pi-plus text-gray-400 text-sm"></i>
-              <span class="text-xs text-gray-400">上傳照片</span>
+              <i class="pi pi-plus text-ink-500 text-sm"></i>
+              <span class="text-xs text-ink-500">上傳照片</span>
               <input type="file" @change="uploadFile" accept="image/*" class="hidden" multiple />
             </label>
           </div>
@@ -441,7 +443,7 @@ const uploadDescriptionImage = async (e) => {
         <div class="grid grid-cols-2 gap-4">
           <!-- 商品名稱 -->
           <div class="col-span-2">
-            <label class="text-sm text-gray-400 block mb-1.5">商品名稱</label>
+            <label class="text-sm text-ink-500 block mb-1.5">商品名稱</label>
             <InputText
               v-model="productName"
               placeholder="輸入商品名稱"
@@ -452,10 +454,8 @@ const uploadDescriptionImage = async (e) => {
           </div>
 
           <!-- 類別（動態多層） -->
-          <!-- index=0 → options=[男士,女士,娛樂] -->
-          <!-- index=1 → options=[衣服,褲子,鞋子] -->
           <div v-for="(options, index) in categoryLevels" :key="index">
-            <label class="text-sm text-gray-400 block mb-1.5">
+            <label class="text-sm text-ink-500 block mb-1.5">
               {{ index === 0 ? '類別' : `子類別 ${index}` }}
             </label>
             <Select
@@ -471,7 +471,7 @@ const uploadDescriptionImage = async (e) => {
 
           <!-- 價格 -->
           <div>
-            <label class="text-sm text-gray-400 block mb-1.5">商品價格</label>
+            <label class="text-sm text-ink-500 block mb-1.5">商品價格</label>
             <InputGroup>
               <InputNumber
                 v-model="productPrice"
@@ -486,7 +486,7 @@ const uploadDescriptionImage = async (e) => {
 
           <!-- 庫存 -->
           <div>
-            <label class="text-sm text-gray-400 block mb-1.5">商品庫存</label>
+            <label class="text-sm text-ink-500 block mb-1.5">商品庫存</label>
             <InputNumber
               v-model="productStock"
               placeholder="0"
@@ -498,7 +498,7 @@ const uploadDescriptionImage = async (e) => {
 
           <!-- 折扣 -->
           <div>
-            <label class="text-sm text-gray-400 block mb-1.5">商品折扣</label>
+            <label class="text-sm text-ink-500 block mb-1.5">商品折扣</label>
             <InputNumber
               v-model="productDiscount"
               placeholder="例如輸入 80 代表 8 折"
@@ -510,7 +510,7 @@ const uploadDescriptionImage = async (e) => {
 
           <!-- 折扣開始時間 -->
           <div>
-            <label class="text-sm text-gray-400 block mb-1.5">折扣開始時間</label>
+            <label class="text-sm text-ink-500 block mb-1.5">折扣開始時間</label>
             <DatePicker
               v-model="productDiscountStart"
               class="w-full"
@@ -520,7 +520,7 @@ const uploadDescriptionImage = async (e) => {
           </div>
           <!-- 折扣結束時間 -->
           <div>
-            <label class="text-sm text-gray-400 block mb-1.5">折扣結束時間</label>
+            <label class="text-sm text-ink-500 block mb-1.5">折扣結束時間</label>
 
             <DatePicker
               v-model="productDiscountEnd"
@@ -533,33 +533,35 @@ const uploadDescriptionImage = async (e) => {
         <!-- #endregion -->
         <!-- #region  商品描述 -->
         <div>
-          <label class="text-sm text-gray-400 block mb-1.5">商品描述</label>
-          <div class="border border-gray-200 rounded-lg overflow-hidden">
-            <div class="flex gap-1 p-2 bg-gray-50 border-b border-gray-200">
+          <label class="text-sm text-ink-500 block mb-1.5">商品描述</label>
+          <div class="border border-border-soft rounded-card overflow-hidden">
+            <div class="flex gap-1 p-2 bg-surface-muted border-b border-border-soft">
               <button
                 type="button"
                 @click="editor.chain().focus().toggleBold().run()"
-                :class="editor?.isActive('bold') ? 'bg-gray-200' : ''"
-                class="px-2 py-1 rounded text-sm font-bold hover:bg-gray-200"
+                :class="editor?.isActive('bold') ? 'bg-border-soft' : ''"
+                class="px-2 py-1 rounded-card text-sm font-bold hover:bg-border-soft text-ink-900"
               >
                 B
               </button>
               <button
                 type="button"
                 @click="editor.chain().focus().toggleItalic().run()"
-                :class="editor?.isActive('italic') ? 'bg-gray-200' : ''"
-                class="px-2 py-1 rounded text-sm italic hover:bg-gray-200"
+                :class="editor?.isActive('italic') ? 'bg-border-soft' : ''"
+                class="px-2 py-1 rounded-card text-sm italic hover:bg-border-soft text-ink-900"
               >
                 I
               </button>
               <button
                 type="button"
                 @click="editor.chain().focus().toggleBulletList().run()"
-                class="px-2 py-1 rounded text-sm hover:bg-gray-200"
+                class="px-2 py-1 rounded-card text-sm hover:bg-border-soft text-ink-900"
               >
                 • 清單
               </button>
-              <label class="px-2 py-1 rounded text-sm hover:bg-gray-200 cursor-pointer">
+              <label
+                class="px-2 py-1 rounded-card text-sm hover:bg-border-soft cursor-pointer text-ink-900"
+              >
                 🖼 插入圖片
                 <input
                   type="file"
@@ -582,10 +584,10 @@ const uploadDescriptionImage = async (e) => {
         </div>
         <!-- #endregion -->
         <!-- #region  儲存按鍵-->
-        <div class="flex justify-end pt-4 border-t border-gray-100">
+        <div class="flex justify-end pt-4 border-t border-border-soft">
           <button
             @click="createOrUpdateProduct()"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2.5 rounded-lg text-xl font-medium cursor-pointer transition-colors"
+            class="bg-brand-500 hover:opacity-90 text-white px-8 py-2.5 rounded-card text-xl font-medium cursor-pointer transition-colors"
           >
             儲存
           </button>
@@ -602,6 +604,6 @@ const uploadDescriptionImage = async (e) => {
   float: none;
 }
 .tiptap img.ProseMirror-selectednode {
-  outline: 3px solid #ff7a00; /* 點擊時的外框顏色，這裡配你的橘色系 */
+  outline: 3px solid #b8473d; /* 點擊時的外框顏色，改成規範的品牌主色 */
 }
 </style>

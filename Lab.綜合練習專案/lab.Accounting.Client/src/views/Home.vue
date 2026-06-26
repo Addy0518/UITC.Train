@@ -18,32 +18,29 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="min-h-screen w-full bg-page-bg flex items-center justify-center">
-    <!--#region 首頁 -->
+  <div class="min-h-screen w-full bg-page-bg-soft flex items-center justify-center font-sans">
     <div
-      class="container mx-auto flex flex-col md:flex-row items-center justify-start px-10 md:pl-24"
+      class="container mx-auto flex flex-col md:flex-row items-center justify-start px-10 md:pl-24 gap-10 md:gap-0"
     >
       <div class="hidden md:flex flex-1 justify-center items-center">
-        <!-- 圖片預留位置，建議放品牌插圖或購物主題視覺，比例可參考規範的廣告 Banner 16:6 或自由方形構圖 -->
-        <div
-          class="w-full max-w-lg aspect-square rounded-card bg-surface-muted flex items-center justify-center"
-        >
-          <span class="text-sm text-ink-500">圖片預留位置</span>
-        </div>
+        <img
+          src="@/img/登入頁面插圖.png"
+          alt="品牌插圖"
+          class="w-full  aspect-square object-contain"
+        />
       </div>
       <div class="flex-1 flex justify-center">
-        <!--#region 登入註冊 -->
         <div
-          class="w-full max-w-xl p-8 border border-border-soft rounded-card overflow-hidden bg-page-bg"
+          class="w-full max-w-xl p-8 border border-border-soft rounded-card overflow-hidden bg-page-bg shadow-none"
         >
           <div class="flex mb-8 border-b border-border-soft w-full">
             <RouterLink
               :to="{ name: 'login' }"
               :class="[
-                'flex-1 py-3 text-center transition-all',
+                'flex-1 py-3 text-center transition-all cursor-pointer',
                 isLogin
-                  ? 'border-b-4 border-brand-500 font-bold text-xl text-ink-900'
-                  : 'text-ink-300',
+                  ? 'border-b-4 border-brand-500 font-bold text-20px text-ink-900'
+                  : 'text-ink-300 hover:text-ink-500',
               ]"
             >
               登入
@@ -52,21 +49,18 @@ onMounted(() => {
             <RouterLink
               :to="{ name: 'create-account' }"
               :class="[
-                'flex-1 py-3 text-center transition-all',
+                'flex-1 py-3 text-center transition-all cursor-pointer',
                 isRegister
-                  ? 'border-b-4 border-brand-500 font-bold text-xl text-ink-900'
-                  : 'text-ink-300',
+                  ? 'border-b-4 border-brand-500 font-bold text-20px text-ink-900'
+                  : 'text-ink-300 hover:text-ink-500',
               ]"
             >
               註冊
             </RouterLink>
           </div>
-
           <RouterView></RouterView>
         </div>
-        <!-- #endregion -->
       </div>
     </div>
-    <!-- #endregion -->
   </div>
 </template>

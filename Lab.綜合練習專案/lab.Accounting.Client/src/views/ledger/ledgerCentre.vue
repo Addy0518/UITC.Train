@@ -16,17 +16,21 @@ const menuItems = ref([
 </script>
 
 <template>
-  <div class="container mx-auto">
+  <!--#region 整體版面 -->
+  <div class="container mx-auto bg-page-bg">
     <div class="flex gap-6 p-6">
-      <!-- 側邊欄 -->
-      <aside class="w-60 shrink-0">
+      <!--#region 側邊欄 -->
+      <aside class="w-60 shrink-0 border-r border-border-soft pr-4">
         <PanelMenu :model="menuItems" />
       </aside>
+      <!-- #endregion -->
 
-      <!-- 內容區 -->
+      <!--#region 內容區 -->
       <main class="flex-1">
         <RouterView />
       </main>
+      <!-- #endregion -->
     </div>
   </div>
+  <!-- #endregion -->
 </template>

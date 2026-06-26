@@ -150,10 +150,10 @@ const retryPayment = async () => {
 
 <template>
   <div class="flex flex-col w-full">
-    <div class="border-gray-200h-full flex flex-col items-center">
-      <div class="mt-40 w-300 rounded-lg shadow-sm">
+    <div class="flex flex-col items-center">
+      <div class="mt-8 w-300 rounded-card border border-border-soft bg-page-bg overflow-hidden">
         <!--#region Tab -->
-        <div class="flex border-b border-gray-200">
+        <div class="flex border-b border-border-soft">
           <button
             v-for="tab in shippingEnum"
             :key="tab.value"
@@ -161,8 +161,8 @@ const retryPayment = async () => {
             class="flex-1 py-3 text-center text-sm transition-colors cursor-pointer"
             :class="
               tableNow === tab.value
-                ? 'border-b-2 border-orange-500 text-orange-500 font-medium'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-brand-500 text-brand-500 font-medium'
+                : 'text-ink-500 hover:text-ink-900'
             "
           >
             {{ tab.description }}
@@ -173,55 +173,69 @@ const retryPayment = async () => {
         <!--#region 訂單列表 / 沒有訂單時顯示 -->
         <div
           v-if="filtTable.length === 0"
-          class="flex justify-center items-center h-40 text-gray-400"
+          class="flex justify-center items-center h-40 text-ink-500"
         >
           目前沒有訂單
         </div>
         <!-- #endregion -->
 
         <!--#region 有訂單時顯示 -->
-        <div v-for="order in filtTable">
-          <div
-            class="hover:shadow-xl hover:bg-gray-50 h-80 flex flex-row ps-10 cursor-pointer items-center"
-            @click="router.push({ name: 'purchase-orders-details', params: { id: order.orderId } })"
-          >
-            <div v-if="tableNow === shippingEnum.PendingPayment.value">
-              <input
-                type="checkbox"
-                v-model="selectProducts"
-                :value="order.orderId"
-                @click.stop
-                class="w-5 h-5 me-2"
-              />
+        <div
+          v-for="order in filtTable"
+          :key="order.orderId"
+          class="border-b border-border-soft hover:bg-surface-muted transition-colors flex flex-row items-center px-6 py-4 cursor-pointer gap-5"
+          @click="router.push({ name: 'purchase-orders-details', params: { id: order.orderId } })"
+        >
+          <div v-if="tableNow === shippingEnum.PendingPayment.value" @click.stop>
+            <input
+              type="checkbox"
+              v-model="selectProducts"
+              :value="order.orderId"
+              class="w-5 h-5"
+            />
+          </div>
+          <img
+            :src="getProductsImg(order)"
+            alt="商品圖片"
+            class="w-16 h-16 object-cover rounded-card border border-border-soft flex-shrink-0"
+          />
+          <div class="flex-1 grid grid-cols-3 gap-3 items-center">
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">商品名稱</p>
+              <p class="text-sm text-ink-900 m-0 truncate">{{ order.productsName }}</p>
             </div>
-            <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-            <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
-            <span class="mt-3 ms-5 me-5">購買價格 : {{ order.unitPrice }}</span>
-            <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
-            <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountAmount }}</span>
-            <div v-if="tableNow === shippingEnum.Arrived.value">
-              <!-- 用 click.stop 防止冒泡 -->
-              <div v-if="ratedOrders.has(order.orderId)">
-                <span class="text-sm font-medium px-5 py-2 text-red-500">已評價</span>
-              </div>
-              <div v-else>
-                <button
-                  class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
-                  @click.stop="
-                    router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })
-                  "
-                >
-                  去評價
-                </button>
-              </div>
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">購買數量</p>
+              <p class="text-sm text-ink-900 m-0">
+                {{ order.boughtQuantity }} 件 (單價 ${{ order.unitPrice }})
+              </p>
             </div>
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">訂單金額</p>
+              <p class="text-sm font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>
+            </div>
+          </div>
+          <div v-if="tableNow === shippingEnum.Arrived.value" @click.stop class="flex-shrink-0">
+            <span
+              v-if="ratedOrders.has(order.orderId)"
+              class="text-sm font-medium px-4 py-2 text-status-neutral"
+            >
+              已評價
+            </span>
+            <button
+              v-else
+              class="bg-brand-500 hover:opacity-90 text-white text-sm font-medium px-4 py-2 rounded-card cursor-pointer"
+              @click="router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })"
+            >
+              去評價
+            </button>
           </div>
         </div>
         <!-- #endregion -->
         <!--#region 按鈕區 -->
-        <div v-if="selectProducts.length > 0" class="flex justify-end mt-3">
+        <div v-if="selectProducts.length > 0" class="flex justify-end px-6 py-4">
           <button
-            class="bg-black text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer"
+            class="bg-brand-500 hover:opacity-90 text-white text-sm font-medium px-5 py-2 rounded-card cursor-pointer"
             @click="retryPayment"
           >
             重新付款

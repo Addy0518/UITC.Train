@@ -5,9 +5,11 @@ import { updatePassword } from '@/api/userService';
    變數名稱代表意義
    oldPassword : 舊密碼
    newPassword : 新密碼
+   confirmPassword : 確認密碼
 */
 const oldPassword = ref();
 const newPassword = ref();
+const confirmPassword = ref();
 /*
    注入 Loading 跟 Toast
 */
@@ -22,6 +24,10 @@ const showToastError = inject('showToastError');
 const rules = computed(() => ({
   oldPassword: { vaildLoginPassword, required },
   newPassword: { vaildLoginPassword, required },
+  confirmPassword: {
+    required,
+    sameAsPassword: sameAsPassword(newPassword),
+  },
 }));
 
 /*
@@ -29,7 +35,7 @@ const rules = computed(() => ({
 */
 const v$ = useVuelidate(
   rules,
-  { oldPassword, newPassword },
+  { oldPassword, newPassword, confirmPassword },
   { $autoDirty: true, $lazy: true, $scope: false },
 );
 
@@ -69,28 +75,60 @@ const updateMyPassword = async () => {
 </script>
 
 <template>
-  <div class="container">
-    <div class="flex flex-col w-full">
-      <!--#region 新舊密碼輸入欄位 -->
-      <div class="flex justify-end p-20">
-        <InputGroup>
-          <InputText v-model="oldPassword" placeholder="舊密碼" :invalid="v$.oldPassword.$error" />
-        </InputGroup>
-        <InValidErrorMessage :errorDto="v$.oldPassword.$errors" vaildChiName="舊密碼" />
-        <InputGroup>
-          <InputText v-model="newPassword" placeholder="新密碼" :invalid="v$.newPassword.$error" />
-        </InputGroup>
-        <InValidErrorMessage :errorDto="v$.newPassword.$errors" vaildChiName="新密碼" />
-      </div>
-      <!-- #endregion -->
-      <!--#region 按鈕區 -->
-      <div class="flex justify-end mt-5">
-        <button
-          @click="updateMyPassword"
-          class="bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
-        >
-          修改密碼
-        </button>
+  <div class="container mx-auto">
+    <div class="flex flex-col w-full p-8">
+      <p class="text-2xl font-bold m-0 mb-4 text-ink-900">修改密碼</p>
+
+      <!--#region 密碼輸入欄位 -->
+      <div class="bg-page-bg rounded-card border border-border-soft w-full p-6 max-w-2xl mx-auto">
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="text-sm text-ink-500 block mb-1.5">目前密碼</label>
+            <InputText
+              v-model="oldPassword"
+              type="password"
+              placeholder="請輸入目前密碼"
+              :invalid="v$.oldPassword.$error"
+              class="w-full"
+            />
+            <InValidErrorMessage :errorDto="v$.oldPassword.$errors" vaildChiName="舊密碼" />
+          </div>
+
+          <div>
+            <label class="text-sm text-ink-500 block mb-1.5">新密碼</label>
+            <InputText
+              v-model="newPassword"
+              type="password"
+              placeholder="請輸入新密碼"
+              :invalid="v$.newPassword.$error"
+              class="w-full"
+            />
+            <InValidErrorMessage :errorDto="v$.newPassword.$errors" vaildChiName="新密碼" />
+          </div>
+
+          <div>
+            <label class="text-sm text-ink-500 block mb-1.5">確認新密碼</label>
+            <InputText
+              v-model="confirmPassword"
+              type="password"
+              placeholder="請再次輸入新密碼"
+              :invalid="v$.confirmPassword.$error"
+              class="w-full"
+            />
+            <InValidErrorMessage :errorDto="v$.confirmPassword.$errors" vaildChiName="確認新密碼" />
+          </div>
+        </div>
+
+        <!--#region 按鈕區 -->
+        <div class="flex justify-end mt-6 pt-4 border-t border-border-soft">
+          <button
+            @click="updateMyPassword"
+            class="bg-brand-500 hover:opacity-90 text-white px-8 py-2.5 rounded-card cursor-pointer text-sm font-medium transition-colors"
+          >
+            修改密碼
+          </button>
+        </div>
+        <!-- #endregion -->
       </div>
       <!-- #endregion -->
     </div>

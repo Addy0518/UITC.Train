@@ -42,7 +42,6 @@ const getOneOrder = async (id) => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       order.value = data.returnData;
-
     }
   } catch (err) {
     console.log(err);
@@ -64,22 +63,62 @@ const getProductsImg = (product) => {
 
 <template>
   <div class="flex flex-col w-full">
-    <div class="border-gray-200h-full flex flex-col items-center">
-       <!--#region 訂單資訊 -->
-      <div class="mt-40 w-300 rounded-lg shadow-sm" v-if="order">
-        <img :src="getProductsImg(order)" alt="Logo" class="w-full max-w-40 max-h-40 mt-4" />
-        <span class="mt-3 ms-5 me-5">訂單金額 : ${{ order.accountAmount }}</span>
-        <span class="mt-3 ms-5 me-5">購買數量 : {{ order.boughtQuantity }}</span>
-        <span class="mt-3 ms-5 me-5">訂單編號 : {{ order.orderNumber }}</span>
-        <span class="mt-3 ms-5 me-5">購買時間 : {{ order.paidTime }}</span>
-        <span class="mt-3 ms-5 me-5">付款方式 : {{ order.paidType }}</span>
-        <span class="mt-3 ms-5 me-5">寄送地址 : {{ order.shippingAddress }}</span>
-        <span class="mt-3 ms-5 me-5"
-          >運送狀態 : {{ getEnumDescription(shippingEnum, order.shippingStatus) }}</span
-        >
-        <span class="mt-3 ms-5 me-5">商品名稱 : {{ order.productsName }}</span>
+    <div class="flex flex-col items-center">
+      <!--#region 訂單資訊 -->
+      <div
+        class="mt-8 w-300 rounded-card border border-border-soft bg-page-bg overflow-hidden"
+        v-if="order"
+      >
+        <div class="px-6 py-4 border-b border-border-soft flex items-center justify-between">
+          <div>
+            <p class="text-xs text-ink-500 m-0">訂單編號</p>
+            <p class="text-sm font-medium mt-1 m-0 text-ink-900">{{ order.orderNumber }}</p>
+          </div>
+          <span
+            class="text-xs px-3 py-1 rounded-card"
+            :class="{
+              'bg-status-warning/10 text-status-warning': order.shippingStatus === 0,
+              'bg-status-info/10 text-status-info': order.shippingStatus === 1,
+              'bg-brand-50 text-brand-500': order.shippingStatus === 2,
+              'bg-status-success/10 text-status-success': order.shippingStatus === 3,
+            }"
+          >
+            {{ getEnumDescription(shippingEnum, order.shippingStatus) }}
+          </span>
+        </div>
+
+        <div class="px-6 py-5 border-b border-border-soft flex gap-5">
+          <img
+            :src="getProductsImg(order)"
+            alt="商品圖片"
+            class="w-20 h-20 rounded-card object-cover border border-border-soft"
+          />
+          <div class="flex-1">
+            <p class="font-medium text-base m-0 mb-1 text-ink-900">{{ order.productsName }}</p>
+            <p class="text-sm text-ink-500 m-0 mb-2">數量：{{ order.boughtQuantity }} 件</p>
+            <p class="text-base font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>
+          </div>
+        </div>
+
+        <div class="px-6 py-5">
+          <p class="text-xs font-medium text-ink-500 mb-3">訂單資訊</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">購買時間</p>
+              <p class="text-sm m-0 text-ink-900">{{ formatDateTimeString(order.paidTime) }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">付款方式</p>
+              <p class="text-sm m-0 text-ink-900">{{ order.paidType }}</p>
+            </div>
+            <div class="col-span-2">
+              <p class="text-xs text-ink-500 m-0 mb-1">寄送地址</p>
+              <p class="text-sm m-0 text-ink-900">{{ order.shippingAddress }}</p>
+            </div>
+          </div>
+        </div>
       </div>
-       <!-- #endregion -->
+      <!-- #endregion -->
     </div>
   </div>
 </template>

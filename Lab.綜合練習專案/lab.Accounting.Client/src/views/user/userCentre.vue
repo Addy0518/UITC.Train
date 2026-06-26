@@ -95,21 +95,19 @@ const uploadFile = async (event) => {
   <div class="container mx-auto">
     <div class="flex gap-6 p-6">
       <!-- #region  側邊攔 -->
-      <aside class="w-60 p-5 bg-black rounded-xl">
+      <aside class="w-60 p-5 bg-surface-dark rounded-card">
         <div class="flex justify-end mb-10 mt-10">
           <!-- #region  頭貼 -->
           <label class="relative cursor-pointer group">
             <img
               :src="imgUrl"
               alt="User Avatar"
-              class="w-50 h-50 rounded-full object-cover border-2 border-gray-200 group-hover:opacity-75 transition-opacity"
+              class="w-50 h-50 rounded-full object-cover border-2 border-ink-on-dark-faint group-hover:opacity-75 transition-opacity"
             />
             <div
               class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
             >
-              <span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded"
-                >更換照片</span
-              >
+              <span class="bg-black/50 text-white text-xs px-2 py-1 rounded-card">更換照片</span>
             </div>
             <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
           </label>

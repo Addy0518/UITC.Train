@@ -195,12 +195,12 @@ const goSearch = () => {
   <div class="flex flex-col w-full p-6" v-if="allproduct">
     <!-- #region  標題列-->
     <div class="flex items-center justify-between mb-4">
-      <p class="text-2xl font-bold m-0">商品管理</p>
+      <p class="text-2xl font-bold m-0 text-ink-900">商品管理</p>
       <!-- #region  排序-->
       <button
         @click="toggleSort('CreateTime')"
-        :class="currentSort.type === 'CreateTime' ? ' text-orange-500' : ' text-gray-700'"
-        class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+        :class="currentSort.type === 'CreateTime' ? ' text-brand-500' : ' text-ink-500'"
+        class="me-5 w-30 h-15 cursor-pointer hover:bg-surface-muted rounded-card"
       >
         上架時間
         <i
@@ -215,8 +215,8 @@ const goSearch = () => {
 
       <button
         @click="toggleSort('Rate')"
-        :class="currentSort.type === 'Rate' ? ' text-orange-500' : ' text-gray-700'"
-        class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+        :class="currentSort.type === 'Rate' ? ' text-brand-500' : ' text-ink-500'"
+        class="me-5 w-30 h-15 cursor-pointer hover:bg-surface-muted rounded-card"
       >
         評價
         <i
@@ -231,8 +231,8 @@ const goSearch = () => {
 
       <button
         @click="toggleSort('ProductsPrice')"
-        :class="currentSort.type === 'ProductsPrice' ? ' text-orange-500' : ' text-gray-700'"
-        class="me-5 w-30 h-15 cursor-pointer hover:bg-gray-100 rounded-lg"
+        :class="currentSort.type === 'ProductsPrice' ? ' text-brand-500' : ' text-ink-500'"
+        class="me-5 w-30 h-15 cursor-pointer hover:bg-surface-muted rounded-card"
       >
         價格
         <i
@@ -248,7 +248,7 @@ const goSearch = () => {
       <!-- #region  篩選-->
       <button
         @click="visible = true"
-        class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+        class="flex items-center gap-1 px-3 py-1.5 rounded-card text-sm cursor-pointer transition-colors bg-surface-muted text-ink-900 hover:bg-brand-50"
       >
         <i class="pi pi-filter text-xs" />
         篩選
@@ -257,7 +257,7 @@ const goSearch = () => {
       <Dialog v-model:visible="visible" modal header="篩選條件" :style="{ width: '40rem' }">
         <div class="flex flex-col gap-4 py-2">
           <div>
-            <label class="text-sm text-gray-500 mb-1 block">評分</label>
+            <label class="text-sm text-ink-500 mb-1 block">評分</label>
             <Select
               v-model="rate"
               :options="rateOptions"
@@ -269,7 +269,7 @@ const goSearch = () => {
           </div>
 
           <div>
-            <label class="text-sm text-gray-500 mb-1 block">價格區間</label>
+            <label class="text-sm text-ink-500 mb-1 block">價格區間</label>
             <div class="flex items-center gap-2">
               <InputNumber
                 v-model="minPrice"
@@ -278,7 +278,7 @@ const goSearch = () => {
                 :max="maxPrice ?? undefined"
                 class="w-full"
               />
-              <span class="text-gray-400">—</span>
+              <span class="text-ink-300">—</span>
               <InputNumber
                 v-model="maxPrice"
                 placeholder="最大價格"
@@ -328,7 +328,7 @@ const goSearch = () => {
         />
       </div>
       <button
-        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm cursor-pointer"
+        class="bg-brand-500 hover:opacity-90 text-white px-5 py-2 rounded-card text-sm cursor-pointer"
         @click="router.push({ name: 'add-product' })"
       >
         + 新增商品
@@ -336,23 +336,23 @@ const goSearch = () => {
     </div>
     <!-- #endregion -->
     <!-- #region  欄位標頭-->
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <div
-        class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-2.5 bg-surface-muted border-b border-border-soft"
       >
-        <span class="text-xs text-gray-400">圖片</span>
-        <span class="text-xs text-gray-400">商品名稱</span>
-        <span class="text-xs text-gray-400">價格</span>
-        <span class="text-xs text-gray-400">類別</span>
-        <span class="text-xs text-gray-400">庫存</span>
-        <span class="text-xs text-gray-400 text-right">操作</span>
+        <span class="text-xs text-ink-500">圖片</span>
+        <span class="text-xs text-ink-500">商品名稱</span>
+        <span class="text-xs text-ink-500">價格</span>
+        <span class="text-xs text-ink-500">類別</span>
+        <span class="text-xs text-ink-500">庫存</span>
+        <span class="text-xs text-ink-500 text-right">操作</span>
       </div>
       <!-- #endregion -->
       <!-- #region  商品-->
 
       <template v-if="isFiltering">
-        <div v-for="n in 12" :key="n" class="flex flex-col items-center rounded-lg p-3">
-          <Skeleton width="100%" height="160px" class="rounded-lg" />
+        <div v-for="n in 12" :key="n" class="flex flex-col items-center rounded-card p-3">
+          <Skeleton width="100%" height="160px" class="rounded-card" />
           <Skeleton width="80%" height="1rem" class="mt-3" />
           <Skeleton width="40%" height="1rem" class="mt-2" />
           <Skeleton width="60%" height="0.8rem" class="mt-2" />
@@ -362,7 +362,7 @@ const goSearch = () => {
       <template v-else>
         <div
           v-if="allproduct.length === 0"
-          class="col-span-3 flex flex-col items-center justify-center py-16 text-gray-400"
+          class="col-span-3 flex flex-col items-center justify-center py-16 text-ink-500"
         >
           <i class="pi pi-inbox text-4xl mb-3" />
           <span class="text-sm">沒有符合條件的商品</span>
@@ -370,26 +370,26 @@ const goSearch = () => {
         <div
           v-for="product in allproduct"
           :key="product.productsId"
-          class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50"
+          class="grid grid-cols-[80px_1fr_100px_100px_120px_160px] px-5 py-4 border-b border-border-soft items-center hover:bg-surface-muted"
         >
           <img
             :src="getProductsImg(product)"
-            class="w-14 h-14 object-cover rounded-lg border border-gray-100 cursor-pointer"
+            class="w-14 h-14 object-cover rounded-card border border-border-soft cursor-pointer"
             @click="router.push({ name: 'product-detail', params: { id: product.productsId } })"
           />
-          <span class="text-sm font-medium">{{ product.productsName }}</span>
-          <span class="text-sm text-orange-500 font-medium">$ {{ product.productsPrice }}</span>
-          <span class="text-sm text-gray-400">{{ product.productCategoryName }}</span>
-          <span class="text-sm">{{ product.productsStock }} 件</span>
+          <span class="text-sm font-medium text-ink-900">{{ product.productsName }}</span>
+          <span class="text-sm text-brand-price font-medium">$ {{ product.productsPrice }}</span>
+          <span class="text-sm text-ink-500">{{ product.productCategoryName }}</span>
+          <span class="text-sm text-ink-900">{{ product.productsStock }} 件</span>
           <div class="flex gap-2 justify-end">
             <button
-              class="px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50"
+              class="px-3 py-1.5 border border-border-soft rounded-card text-xs cursor-pointer hover:bg-surface-muted text-ink-900"
               @click="router.push({ name: 'edit-product', params: { id: product.productsId } })"
             >
               編輯
             </button>
             <button
-              class="px-3 py-1.5 border border-red-200 rounded-lg text-xs text-red-500 cursor-pointer hover:bg-red-50"
+              class="px-3 py-1.5 border border-action-danger/30 rounded-card text-xs text-action-danger cursor-pointer hover:bg-action-danger-50"
               @click="deleteProduct(product.productsId)"
             >
               刪除
@@ -400,7 +400,7 @@ const goSearch = () => {
       <!-- #endregion -->
       <!-- #region  頁碼按鈕-->
       <div class="flex flex-1 items-center justify-center mt-5 mb-30">
-        <span>總筆數 : {{ totalCount }}</span>
+        <span class="text-ink-500">總筆數 : {{ totalCount }}</span>
         <Paginator
           :template="{
             '640px': 'PrevPageLink CurrentPageReport NextPageLink',
@@ -415,7 +415,6 @@ const goSearch = () => {
         >
         </Paginator>
       </div>
-
       <!-- #endregion -->
     </div>
   </div>

@@ -115,21 +115,23 @@ const createRate = async () => {
 <template>
   <div class="flex flex-col w-full items-center mt-20" v-if="rateOrder">
     <!--#region 正在評價的訂單資訊 -->
-    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
-      <h2 class="text-base font-bold mb-4 text-gray-700">正在評價</h2>
-      <div class="w-full rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+    <div class="w-300 rounded-card border border-border-soft p-6 mb-4 bg-page-bg">
+      <h2 class="text-base font-bold mb-4 text-ink-900">正在評價</h2>
+      <div class="w-full rounded-card border border-border-soft p-6">
         <div class="flex flex-row gap-5 items-center">
           <!--#region 資訊細項 -->
           <img
             :src="getProductImg(rateOrder)"
             alt="商品圖片"
-            class="w-24 h-24 object-cover rounded-md border border-gray-100"
+            class="w-24 h-24 object-cover rounded-card border border-border-soft"
           />
           <div class="flex flex-col gap-2">
-            <span class="font-semibold text-base">訂單編號 : {{ rateOrder.orderNumber }}</span>
-            <span class="font-semibold text-base">{{ rateOrder.productsName }}</span>
-            <span class="text-gray-500 text-sm">購買數量 : {{ rateOrder.boughtQuantity }}</span>
-            <span class="text-gray-500 text-sm">訂單金額：NT$ {{ rateOrder.accountAmount }}</span>
+            <span class="font-semibold text-base text-ink-900"
+              >訂單編號 : {{ rateOrder.orderNumber }}</span
+            >
+            <span class="font-semibold text-base text-ink-900">{{ rateOrder.productsName }}</span>
+            <span class="text-ink-500 text-sm">購買數量 : {{ rateOrder.boughtQuantity }}</span>
+            <span class="text-ink-500 text-sm">訂單金額：NT$ {{ rateOrder.accountAmount }}</span>
           </div>
           <!-- #endregion -->
         </div>
@@ -137,17 +139,17 @@ const createRate = async () => {
     </div>
     <!-- #endregion -->
     <!--#region 購買資訊填寫 -->
-    <div class="w-300 rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-5">
-      <h2 class="text-base font-bold text-gray-700">填寫評價</h2>
+    <div class="w-300 rounded-card border border-border-soft p-6 flex flex-col gap-5 bg-page-bg">
+      <h2 class="text-base font-bold text-ink-900">填寫評價</h2>
 
       <div>
         <InputGroup class="mb-5">
-          <label class="me-3">評分</label>
+          <label class="me-3 text-ink-900">評分</label>
           <Rating v-model="rate" :stars="5"></Rating>
         </InputGroup>
         <InValidErrorMessage :errorDto="v$.rate.$errors" vaildChiName="評分" />
         <InputGroup>
-          <label class="me-3">評論</label>
+          <label class="me-3 text-ink-900">評論</label>
           <InputText v-model="comment"></InputText>
         </InputGroup>
         <InValidErrorMessage :errorDto="v$.comment.$errors" vaildChiName="評論" />
@@ -156,13 +158,13 @@ const createRate = async () => {
       <!--#region 按鈕區 -->
       <div class="flex gap-3">
         <button
-          class="flex-1 border border-gray-300 text-gray-600 p-3 rounded-2xl cursor-pointer"
+          class="flex-1 border border-border-soft text-ink-500 p-3 rounded-card cursor-pointer hover:bg-surface-muted transition-colors"
           @click="router.back()"
         >
           返回
         </button>
         <button
-          class="flex-1 bg-black text-white p-3 rounded-2xl cursor-pointer font-bold"
+          class="flex-1 bg-brand-500 hover:opacity-90 text-white p-3 rounded-card cursor-pointer font-bold"
           @click="createRate"
         >
           送出

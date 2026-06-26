@@ -49,6 +49,10 @@ const getSellerProduct = async () => {
     if (data.codeStatus === 2000) {
       allproduct.value = data.returnData.products;
     }
+
+    if (data.codeStatus === 4001) {
+      allproduct.value = [];
+    }
   } catch (err) {
     console.log(err);
   } finally {
@@ -124,9 +128,9 @@ const rollbackAll = async (target) => {
     const { data } = res;
     if (data.codeStatus === 2000) {
       selectIds.value = [];
-      await getSellerProduct();
 
       showToastSuccess('商品已復原');
+      await getSellerProduct();
     }
   } catch (err) {
     console.log(err);
@@ -139,16 +143,16 @@ const rollbackAll = async (target) => {
   <div class="flex flex-col w-full p-6">
     <!-- #region  標題列-->
     <div class="flex items-center justify-between mb-4">
-      <p class="text-lg font-medium m-0">商品回收桶</p>
+      <p class="text-lg font-medium m-0 text-ink-900">商品回收桶</p>
       <div class="flex gap-2" v-if="selectIds.length > 0">
         <button
-          class="px-4 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50"
+          class="px-4 py-2 border border-border-soft rounded-card text-sm cursor-pointer hover:bg-surface-muted text-ink-900"
           @click="rollbackAll(selectIds)"
         >
           復原商品
         </button>
         <button
-          class="px-4 py-2 border border-red-200 rounded-lg text-sm text-red-500 cursor-pointer hover:bg-red-50"
+          class="px-4 py-2 border border-action-danger/30 rounded-card text-sm text-action-danger cursor-pointer hover:bg-action-danger-50"
           @click="deleteProduct()"
         >
           刪除商品
@@ -158,24 +162,24 @@ const rollbackAll = async (target) => {
     <!-- #endregion -->
 
     <!-- #region  所有商品-->
-    <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+    <div class="bg-page-bg rounded-card border border-border-soft overflow-hidden">
       <!-- #region  欄位刊頭-->
       <div
-        class="grid grid-cols-[40px_80px_1fr_100px_120px] px-5 py-2.5 bg-gray-50 border-b border-gray-100"
+        class="grid grid-cols-[40px_80px_1fr_100px_120px] px-5 py-2.5 bg-surface-muted border-b border-border-soft"
       >
         <span></span>
-        <span class="text-xs text-gray-400">圖片</span>
-        <span class="text-xs text-gray-400">商品名稱</span>
-        <span class="text-xs text-gray-400">價格</span>
-        <span class="text-xs text-gray-400">類別</span>
+        <span class="text-xs text-ink-500">圖片</span>
+        <span class="text-xs text-ink-500">商品名稱</span>
+        <span class="text-xs text-ink-500">價格</span>
+        <span class="text-xs text-ink-500">類別</span>
       </div>
       <!-- #endregion -->
       <!-- #region  商品列表-->
       <label
         v-for="product in allproduct"
         :key="product.productsId"
-        class="grid grid-cols-[40px_80px_1fr_100px_120px] px-5 py-4 border-b border-gray-100 items-center cursor-pointer hover:bg-gray-50"
-        :class="selectIds.includes(product.productsId) ? 'bg-orange-50' : ''"
+        class="grid grid-cols-[40px_80px_1fr_100px_120px] px-5 py-4 border-b border-border-soft items-center cursor-pointer hover:bg-surface-muted"
+        :class="selectIds.includes(product.productsId) ? 'bg-brand-50' : ''"
       >
         <input
           type="checkbox"
@@ -185,15 +189,15 @@ const rollbackAll = async (target) => {
         />
         <img
           :src="getProductsImg(product)"
-          class="w-14 h-14 object-cover rounded-lg border border-gray-100"
+          class="w-14 h-14 object-cover rounded-card border border-border-soft"
         />
-        <span class="text-sm font-medium">{{ product.productsName }}</span>
-        <span class="text-sm text-gray-400">$ {{ product.productsPrice }}</span>
+        <span class="text-sm font-medium text-ink-900">{{ product.productsName }}</span>
+        <span class="text-sm text-brand-price font-medium">$ {{ product.productsPrice }}</span>
         <div class="flex flex-wrap gap-1">
           <span
             v-for="cate in productscategory(product.productCategoryName)"
             :key="cate"
-            class="text-xs text-gray-400"
+            class="text-xs px-2 py-0.5 rounded-full bg-surface-muted text-ink-500"
             >{{ cate }}</span
           >
         </div>
@@ -203,7 +207,7 @@ const rollbackAll = async (target) => {
     <!-- #endregion -->
 
     <!-- #region  已選取提示-->
-    <p class="text-xs text-gray-400 mt-3" v-if="selectIds.length > 0">
+    <p class="text-xs text-ink-500 mt-3" v-if="selectIds.length > 0">
       已選取 {{ selectIds.length }} 件商品
     </p>
     <!-- #endregion -->

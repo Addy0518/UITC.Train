@@ -90,110 +90,112 @@ const updateMyUser = async () => {
 </script>
 
 <template>
-  <div class="container">
-    <div class="flex flex-col w-full">
+  <div class="container mx-auto">
+    <div class="flex flex-col">
       <!-- #region  表單區 -->
       <div class="p-8" v-if="userInfo">
-        <p class="text-2xl font-bold mb-5 ml-24">我的個人資料</p>
+        <p class="text-2xl font-bold mb-5 text-ink-900">我的個人資料</p>
 
-        <div class="flex flex-col gap-4 max-w-lg">
-          <!-- #region  帳號 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm text-gray-400 w-20 text-right shrink-0">帳號</label>
-            <div class="flex-1">
-              <InputText
-                v-model="userInfo.userAccount"
-                placeholder="使用者帳號"
-                :invalid="v$.userAccount.$error"
-                class="w-full"
-              />
-              <InValidErrorMessage :errorDto="v$.userAccount.$errors" vaildChiName="使用者帳號" />
+        <div class="bg-page-bg rounded-card border border-border-soft p-6 max-w-2xl mx-auto">
+          <div class="flex flex-col gap-4">
+            <!-- #region  帳號 -->
+            <div class="flex items-center gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0">帳號</label>
+              <div class="flex-1">
+                <InputText
+                  v-model="userInfo.userAccount"
+                  placeholder="使用者帳號"
+                  :invalid="v$.userAccount.$error"
+                  class="w-full"
+                />
+                <InValidErrorMessage :errorDto="v$.userAccount.$errors" vaildChiName="使用者帳號" />
+              </div>
             </div>
+            <!-- #endregion -->
+            <!-- #region  姓名 -->
+            <div class="flex items-center gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0">姓名</label>
+              <div class="flex-1">
+                <InputText
+                  v-model="userInfo.userName"
+                  placeholder="姓名"
+                  :invalid="v$.userName.$error"
+                  class="w-full"
+                />
+                <InValidErrorMessage :errorDto="v$.userName.$errors" vaildChiName="姓名" />
+              </div>
+            </div>
+            <!-- #endregion -->
+            <!-- #region  電話 -->
+            <div class="flex items-center gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0">電話</label>
+              <div class="flex-1">
+                <InputText
+                  v-model="userInfo.userPhone"
+                  placeholder="電話"
+                  :invalid="v$.userPhone.$error"
+                  class="w-full"
+                />
+                <InValidErrorMessage :errorDto="v$.userPhone.$errors" vaildChiName="電話" />
+              </div>
+            </div>
+            <!-- #endregion -->
+            <!-- #region  地址 -->
+            <div class="flex items-center gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0">地址</label>
+              <div class="flex-1">
+                <InputText
+                  v-model="userInfo.userAddress"
+                  placeholder="地址"
+                  :invalid="v$.userAddress.$error"
+                  class="w-full"
+                />
+                <InValidErrorMessage :errorDto="v$.userAddress.$errors" vaildChiName="地址" />
+              </div>
+            </div>
+            <!-- #endregion -->
+            <!-- #region  生日 -->
+            <div class="flex items-center gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0">生日</label>
+              <div class="flex-1">
+                <DatePicker
+                  v-model="userInfo.userBirthDate"
+                  placeholder="生日"
+                  dateFormat="yy-mm-dd"
+                  class="w-full"
+                />
+              </div>
+            </div>
+            <!-- #endregion -->
+            <!-- #region  性別 -->
+            <div class="flex items-center gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0">性別</label>
+              <div class="flex gap-5">
+                <label
+                  v-for="g in genderEnum"
+                  :key="g.value"
+                  class="flex items-center gap-2 cursor-pointer text-sm text-ink-900"
+                >
+                  <input type="radio" :value="g.value" v-model="userInfo.userGender" />
+                  {{ g.description }}
+                </label>
+              </div>
+            </div>
+            <!-- #endregion -->
           </div>
-          <!-- #endregion -->
-          <!-- #region  姓名 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm text-gray-400 w-20 text-right shrink-0">姓名</label>
-            <div class="flex-1">
-              <InputText
-                v-model="userInfo.userName"
-                placeholder="姓名"
-                :invalid="v$.userName.$error"
-                class="w-full"
-              />
-              <InValidErrorMessage :errorDto="v$.userName.$errors" vaildChiName="姓名" />
-            </div>
-          </div>
-          <!-- #endregion -->
-          <!-- #region  電話 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm text-gray-400 w-20 text-right shrink-0">電話</label>
-            <div class="flex-1">
-              <InputText
-                v-model="userInfo.userPhone"
-                placeholder="電話"
-                :invalid="v$.userPhone.$error"
-                class="w-full"
-              />
-              <InValidErrorMessage :errorDto="v$.userPhone.$errors" vaildChiName="電話" />
-            </div>
-          </div>
-          <!-- #endregion -->
-          <!-- #region  地址 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm text-gray-400 w-20 text-right shrink-0">地址</label>
-            <div class="flex-1">
-              <InputText
-                v-model="userInfo.userAddress"
-                placeholder="地址"
-                :invalid="v$.userAddress.$error"
-                class="w-full"
-              />
-              <InValidErrorMessage :errorDto="v$.userAddress.$errors" vaildChiName="地址" />
-            </div>
-          </div>
-          <!-- #endregion -->
-          <!-- #region  生日 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm text-gray-400 w-20 text-right shrink-0">生日</label>
-            <div class="flex-1">
-              <DatePicker
-                v-model="userInfo.userBirthDate"
-                placeholder="生日"
-                dateFormat="yy-mm-dd"
-                class="w-full"
-              />
-            </div>
-          </div>
-          <!-- #endregion -->
-          <!-- #region  性別 -->
-          <div class="flex items-center gap-4">
-            <label class="text-sm text-gray-400 w-20 text-right shrink-0">性別</label>
-            <div class="flex gap-5">
-              <label
-                v-for="g in genderEnum"
-                :key="g.value"
-                class="flex items-center gap-2 cursor-pointer text-sm text-gray-700"
-              >
-                <input type="radio" :value="g.value" v-model="userInfo.userGender" />
-                {{ g.description }}
-              </label>
-            </div>
+          <!-- #region  送出按鈕 -->
+          <div class="flex justify-end mt-6 pt-4 border-t border-border-soft">
+            <button
+              @click="updateMyUser"
+              class="bg-brand-500 hover:opacity-90 text-white px-8 py-2 rounded-card cursor-pointer text-sm font-medium transition-colors"
+            >
+              儲存
+            </button>
           </div>
           <!-- #endregion -->
         </div>
-        <!-- #endregion -->
-        <!-- #region  送出按鈕 -->
-        <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
-          <button
-            @click="updateMyUser"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2 rounded cursor-pointer text-sm font-medium transition-colors"
-          >
-            儲存
-          </button>
-        </div>
-        <!-- #endregion -->
       </div>
+      <!-- #endregion -->
     </div>
   </div>
 </template>
