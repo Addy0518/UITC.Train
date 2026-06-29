@@ -13,6 +13,8 @@ public static class DiConfig
 
         services.AddScoped<SendEmailHelper>();
 
+        services.AddScoped<VerifyCodeHelper>();
+
         // 綁定 EmailSettings
         services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 

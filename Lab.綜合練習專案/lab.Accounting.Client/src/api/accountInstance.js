@@ -66,6 +66,10 @@ instance.interceptors.response.use(
         toast.add({ severity: 'error', summary: '登入過期', detail: '請重新登入', life: 5000 });
         router.push({ name: 'login' });
         break;
+      case httpCodeStatusEnum.ManyRequest:
+        toast.add({ severity: 'warn', summary: '請求過於頻繁', detail: '請稍後再試', life: 5000 });
+        router.push({ name: 'login' });
+        break;
       case httpCodeStatusEnum.Forbidden:
         toast.add({ severity: 'error', summary: '認證失敗', detail: '你沒有訪問權限', life: 5000 });
         router.push({ name: 'mall' });

@@ -1,3 +1,5 @@
+using System.Threading.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 加入剛剛設定的 SerilogConfig , 在系統初始化時就先執行 Serilog , 確保系統沒啟動也能夠記錄起來
@@ -100,6 +102,58 @@ try
         );
     });
 
+    // 速率限制 , 用來防止 API 被濫用或重複呼叫
+    builder.Services.AddRateLimiter(options =>
+    {
+        // 擋下來的話就回傳 429 狀態碼 ( 太多請求 )
+        options.RejectionStatusCode = 429;
+
+        // AddPolicy：註冊一條「具名規則」，"api" 是這條規則的名字
+        // 之後在 Controller 上用 [EnableRateLimiting("api")] 就是指定套用這一條
+        options.AddPolicy(
+            "api",
+            httpContext =>
+                // GetFixedWindowLimiter 建立一個固定時間窗口限制器 , 意思就是每一段時間被切成一個窗口 ( 這裡設定 10 秒一段 )
+                // 每個窗口內最多允許 10 次請求，超過就會被拒絕
+                RateLimitPartition.GetFixedWindowLimiter(
+                    // partitionKey 是用來區分不同的限制器實例，這裡用呼叫者的 IP 來區分
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    // factory：當某個 partitionKey（某個 IP）第一次出現時，
+                    // 要用什麼設定幫它建立一個新的限制器，_ 代表「這個參數沒用到，故意忽略」
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        // Window：這個固定窗口的時間長度是多久
+                        Window = TimeSpan.FromSeconds(10),
+
+                        // PermitLimit：在一個窗口時間內，最多允許通過幾次請求
+                        PermitLimit = 10,
+
+                        // QueueLimit：超過上面的限制後，要不要讓請求排隊等待，而不是直接拒絕
+                        // 設成 0 代表「不排隊，超過就直接擋掉」
+                        // （如果設成例如 5，代表超過額度的請求最多讓 5 個排隊，等額度恢復後依序處理，而不是馬上回 429）
+                        QueueLimit = 0,
+                    }
+                )
+        );
+
+        // 第二條規則，名字叫 "forgetPassword"，給忘記密碼相關的 API 專用
+        // 邏輯結構跟上面一模一樣，只是數字設定不同（更嚴格：時間拉長、次數變少）
+        options.AddPolicy(
+            "forgetPassword",
+            httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    // 呼叫者的 IP
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        Window = TimeSpan.FromMinutes(1),
+                        PermitLimit = 5,
+                        QueueLimit = 0,
+                    }
+                )
+        );
+    });
+
     builder
         .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
@@ -143,6 +197,9 @@ try
     builder.Services.AddProblemDetails();
 
     builder.Services.AddEndpointsApiExplorer();
+
+    // 快取
+    builder.Services.AddMemoryCache();
 
     // 自訂的 DI 設定
     builder.Services.AddDiConfig(builder.Configuration);
@@ -202,6 +259,7 @@ try
     app.UseAuthentication();
     app.UseMiddleware<TokenBlackListMiddleware>();
     app.UseAuthorization();
+    app.UseRateLimiter();
 
     app.MapControllers();
 

@@ -152,7 +152,15 @@ const userLogin = async () => {
           </div>
         </div>
         <!-- #endregion -->
-
+        <!-- #region 忘記密碼 -->
+        <div class="mt-8 flex justify-end">
+          <RouterLink
+            class="text-sm font-medium text-ink-900 mb-3"
+            :to="{ name: 'forget-password' }"
+            >忘記密碼 ?</RouterLink
+          >
+        </div>
+        <!-- #endregion -->
         <!-- #region 測試帳號 -->
         <div class="mt-8">
           <p class="text-sm font-medium text-ink-900 mb-3">測試帳號</p>

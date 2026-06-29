@@ -9,6 +9,7 @@ public class UserService(
     TokenHelper tokenHelper,
     PasswordSecureHelper passwordSecureHelper,
     SendEmailHelper sendEmailHelper,
+    VerifyCodeHelper verifyCodelHelper,
     ITokenBlacklistRepository tokenBlacklistRepositories,
     IWebHostEnvironment env
 ) : IUserService
@@ -253,7 +254,7 @@ public class UserService(
     }
 
     /// <summary>
-    /// 更新使用者密碼
+    /// 更新使用者密碼 ( 已登入 )
     /// </summary>
     /// <param name="request">舊密碼</param>
     /// <returns>影響列數</returns>
@@ -279,27 +280,58 @@ public class UserService(
 
         dbuser.UserPassword = null;
         request.NewUserPassword = passwordSecureHelper.HashPassword(request.NewUserPassword);
-        var result = await userrepo.UpdatePassword(request);
+        await userrepo.UpdatePasswordById(request.UserId, request.NewUserPassword);
 
         return ApiResponseHelper.Success<string>("更新成功 !");
     }
 
     /// <summary>
-    /// 寄送隨機驗證碼並驗證
+    /// 寄送忘記密碼的驗證碼
     /// </summary>
-    /// <param name="request">舊密碼</param>
+    /// <param name="request">使用者帳號</param>
     /// <returns>影響列數</returns>
-    public async Task<ApiResponse<string>> SendVerfiyCode(UserUpdatePasswordRequest request)
+    public async Task<ApiResponse<string>> SendVerfiyCode(SendVerifyCodeRequest request)
     {
-        await sendEmailHelper.SendEmail(dbuser.UserAccount, "1234");
+        var dbuser = await userrepo.GetUserByAccount(request.UserAccount);
+
+        if (dbuser == null)
+        {
+            return ApiResponseHelper.NotFound<string>();
+        }
+
+        // 生成六位數隨機碼當驗證碼
+        var code = Random.Shared.Next(100000, 999999).ToString();
+
+        // 儲存驗證碼到快取 , 設定過期時間
+        verifyCodelHelper.SetCode(request.UserAccount, code, TimeSpan.FromMinutes(10));
+
+        // 生成隨機驗證碼,然後寄給使用者
+        await sendEmailHelper.SendEmail(dbuser.UserAccount, code);
+
+        return ApiResponseHelper.Success<string>("驗證碼已寄送至您的信箱,請注意查收 !");
     }
 
     /// <summary>
-    /// 忘記密碼重新更新密碼
+    /// 更新使用者密碼 ( 忘記密碼 )
     /// </summary>
     /// <param name="request">舊密碼</param>
     /// <returns>影響列數</returns>
-    public async Task<ApiResponse<string>> ForgetPassword(UserUpdatePasswordRequest request) { }
+    public async Task<ApiResponse<string>> ForgetUpdatePassword(UserForgetPasswordRequest request)
+    {
+        if (!verifyCodelHelper.TryGetCode(request.UserAccount, out var code) || code != request.code)
+        {
+            var errors = new Dictionary<string, string[]> { { "Code", new[] { "驗證碼錯誤或已過期 , 請重新申請 !" } } };
+
+            return ApiResponseHelper.RequestError<string>(errors);
+        }
+
+        request.NewUserPassword = passwordSecureHelper.HashPassword(request.NewUserPassword);
+        await userrepo.UpdatePasswordByAccount(request.UserAccount, request.NewUserPassword);
+
+        verifyCodelHelper.RemoveCode(request.UserAccount);
+
+        return ApiResponseHelper.Success<string>("密碼設定成功 !");
+    }
 
     /// <summary>
     /// 軟刪除單一用戶

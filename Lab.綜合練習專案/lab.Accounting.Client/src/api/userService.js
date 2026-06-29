@@ -22,5 +22,12 @@ export const getOneUser = (id) => accountApiInstance.get(`User/GetOneUser?userId
 // 更新使用者資訊
 export const updateUser = (request) => accountApiInstance.put(`User/UpdateUser`, request);
 
-// 更新使用者密碼
+// 更新使用者密碼 ( 已登入 )
 export const updatePassword = (request) => accountApiInstance.put(`User/UpdatePassword`, request);
+
+// 更新使用者密碼 ( 忘記密碼 )
+export const forgetUpdatePassword = (request) =>
+  accountApiInstance.post(`User/ForgetUpdatePassword`, request);
+
+// 寄送忘記密碼的驗證碼
+export const sendVerfiyCode = (request) => accountApiInstance.post(`User/SendVerfiyCode`, request);

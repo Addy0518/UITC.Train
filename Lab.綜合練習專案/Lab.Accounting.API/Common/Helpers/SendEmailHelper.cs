@@ -13,8 +13,15 @@ namespace Lab.Accounting.API.Common.Helpers
             _settings = options.Value;
         }
 
+        /// <summary>
+        ///  使用 SendGrid 寄送驗證碼到使用者的 Email
+        /// </summary>
+        /// <param name="userEmail">使用者的 Email</param>
+        /// <param name="verificationCode">驗證碼</param>
+        /// <returns></returns>
         public async Task SendEmail(string userEmail, string verificationCode)
         {
+            // 建立 SendGridClient，使用 API Key 進行身份驗證
             var client = new SendGridClient(_settings.ApiKey);
 
             var from = new EmailAddress(_settings.SenderEmail, _settings.SenderName);

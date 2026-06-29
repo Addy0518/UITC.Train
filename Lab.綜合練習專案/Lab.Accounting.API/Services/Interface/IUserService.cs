@@ -69,6 +69,20 @@ public interface IUserService
     Task<ApiResponse<string>> UpdatePassword(UserUpdatePasswordRequest request);
 
     /// <summary>
+    /// 寄送忘記密碼的驗證碼
+    /// </summary>
+    /// <param name="request">使用者帳號</param>
+    /// <returns>影響列數</returns>
+    Task<ApiResponse<string>> SendVerfiyCode(SendVerifyCodeRequest request);
+
+    /// <summary>
+    /// 更新使用者密碼 ( 忘記密碼 )
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    Task<ApiResponse<string>> ForgetUpdatePassword(UserForgetPasswordRequest request);
+
+    /// <summary>
     /// 軟刪除單一用戶
     /// </summary>
     /// <param name="userId">用戶 ID</param>

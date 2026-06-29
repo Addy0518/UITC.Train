@@ -49,6 +49,17 @@ const router = createRouter({
               },
               component: () => import('@/views/auth/createAccount.vue'),
             },
+            {
+              /*
+                 忘記密碼
+              */
+              path: '/forget-password',
+              name: 'forget-password',
+              meta: {
+                isPermissionVerification: false,
+              },
+              component: () => import('@/views/auth/forgetPassword.vue'),
+            },
           ],
         },
 

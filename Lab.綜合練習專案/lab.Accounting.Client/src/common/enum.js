@@ -21,6 +21,7 @@ export const httpCodeStatusEnum = Object.freeze({
   Forbidden: 403,
   NotFound: 404,
   MethodNotAllowed: 405,
+  ManyRequest: 429,
   InternalServerError: 500,
   ServiceUnavailable: 503,
 });

@@ -41,6 +41,13 @@ public interface IUserRepository
     Task<UserResponse> GetUser(int userId);
 
     /// <summary>
+    /// 依據帳號取得使用者資訊
+    /// </summary>
+    /// <param name="userAccount">使用者帳號</param>
+    /// <returns>使用者資訊</returns>
+    Task<UserResponse> GetUserByAccount(string userAccount);
+
+    /// <summary>
     /// 取得使用者詳細資訊 ( 管理員 )
     /// </summary>
     /// <param name="userId">使用者 ID </param>
@@ -69,11 +76,20 @@ public interface IUserRepository
     Task<User> GetUserPassword(int userId);
 
     /// <summary>
-    /// 更新使用者密碼
+    /// 根據 ID 更新使用者密碼
     /// </summary>
-    /// <param name="request">舊密碼</param>
+    /// <param name="userId">使用者 ID</param>
+    /// <param name="NewUserPassword">新密碼</param>
     /// <returns>影響列數</returns>
-    Task<int> UpdatePassword(UserUpdatePasswordRequest request);
+    Task<int> UpdatePasswordById(int userId, string NewUserPassword);
+
+    /// <summary>
+    /// 根據帳號更新使用者密碼
+    /// </summary>
+    /// <param name="userAccount">使用者帳號</param>
+    /// <param name="NewUserPassword">新密碼</param>
+    /// <returns>影響列數</returns>
+    Task<int> UpdatePasswordByAccount(string userAccount, string NewUserPassword);
 
     /// <summary>
     /// 改變權限變賣家

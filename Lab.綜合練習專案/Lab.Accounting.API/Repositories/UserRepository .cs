@@ -99,6 +99,22 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
     }
 
     /// <summary>
+    /// 依據帳號取得使用者資訊
+    /// </summary>
+    /// <param name="userAccount">使用者帳號</param>
+    /// <returns>使用者資訊</returns>
+    public async Task<UserResponse> GetUserByAccount(string userAccount)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Select UserAccount,UserId,UserName From [User]
+              Where  UserAccount = @UserAccount";
+
+        return await conn.QueryFirstOrDefaultAsync<UserResponse>(sql, new { UserAccount = userAccount });
+    }
+
+    /// <summary>
     /// 取得使用者詳細資訊 ( 管理員 )
     /// </summary>
     /// <param name="userId">使用者 ID </param>
@@ -235,16 +251,16 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         var sql =
             @"Select UserAccount,UserPassword From [User]
                   WHERE UserId = @UserId";
-
         return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserId = userId });
     }
 
     /// <summary>
-    /// 更新使用者密碼
+    /// 根據 ID 更新使用者密碼
     /// </summary>
-    /// <param name="request">舊密碼</param>
+    /// <param name="userId">使用者 ID</param>
+    /// <param name="NewUserPassword">新密碼</param>
     /// <returns>影響列數</returns>
-    public async Task<int> UpdatePassword(UserUpdatePasswordRequest request)
+    public async Task<int> UpdatePasswordById(int userId, string NewUserPassword)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -255,7 +271,27 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                   UpdateTime    = GetDate()
                   WHERE UserId = @UserId";
 
-        return await conn.ExecuteAsync(sql, request);
+        return await conn.ExecuteAsync(sql, new { UserId = userId, NewUserPassword = NewUserPassword });
+    }
+
+    /// <summary>
+    /// 根據帳號更新使用者密碼
+    /// </summary>
+    /// <param name="userAccount">使用者帳號</param>
+    /// <param name="NewUserPassword">新密碼</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdatePasswordByAccount(string userAccount, string NewUserPassword)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"UPDATE [User]
+                  SET
+                  UserPassword = @NewUserPassword,
+                  UpdateTime    = GetDate()
+                  WHERE UserAccount = @UserAccount";
+
+        return await conn.ExecuteAsync(sql, new { UserAccount = userAccount, NewUserPassword = NewUserPassword });
     }
 
     /// <summary>

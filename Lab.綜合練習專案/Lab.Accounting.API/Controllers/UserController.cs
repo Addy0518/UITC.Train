@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Controllers;
+﻿using Microsoft.AspNetCore.RateLimiting;
+
+namespace Lab.Accounting.API.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
@@ -98,7 +100,7 @@ public class UserController(IUserService userserivce) : ControllerBase
     }
 
     /// <summary>
-    /// 更新使用者密碼
+    /// 更新使用者密碼 ( 已登入 )
     /// </summary>
     /// <param name="request">舊密碼</param>
     /// <returns>影響列數</returns>
@@ -108,5 +110,33 @@ public class UserController(IUserService userserivce) : ControllerBase
     {
         request.UserId = CurrentUserId;
         return Ok(await userserivce.UpdatePassword(request));
+    }
+
+    /// <summary>
+    /// 寄送忘記密碼的驗證碼
+    /// </summary>
+    /// <param name="request">使用者帳號</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+    [EnableRateLimiting("forgetPassword")]
+    public async Task<IActionResult> SendVerfiyCode([FromBody] SendVerifyCodeRequest request)
+    {
+        return Ok(await userserivce.SendVerfiyCode(request));
+    }
+
+    /// <summary>
+    /// 更新使用者密碼 ( 忘記密碼 )
+    /// </summary>
+    /// <param name="request">舊密碼</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+    [EnableRateLimiting("forgetPassword")]
+    public async Task<IActionResult> ForgetUpdatePassword([FromBody] UserForgetPasswordRequest request)
+    {
+        return Ok(await userserivce.ForgetUpdatePassword(request));
     }
 }

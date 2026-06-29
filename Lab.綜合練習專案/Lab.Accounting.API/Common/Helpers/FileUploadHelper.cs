@@ -2,7 +2,13 @@
 
 public class FileUploadHelper
 {
-    // 儲存檔案 , 需要放進實體檔案 , 檔案路徑 , 要放在哪個資料夾
+    /// <summary>
+    /// 儲存實體檔案
+    /// </summary>
+    /// <param name="file">上傳的檔案</param>
+    /// <param name="rootPath">根路徑</param>
+    /// <param name="folder">資料夾名稱</param>
+    /// <returns>檔案名稱</returns>
     public static async Task<string> SaveFileAsync(IFormFile file, string rootPath, string folder)
     {
         if (file == null || file.Length == 0)
@@ -27,7 +33,13 @@ public class FileUploadHelper
         return fileName;
     }
 
-    // 刪除檔案 , 需要根路徑 , 資料夾名稱 , 檔案名稱
+    /// <summary>
+    /// 刪除實體檔案
+    /// </summary>
+    /// <param name="fileName">檔案名稱</param>
+    /// <param name="rootPath">根路徑</param>
+    /// <param name="folder">資料夾名稱</param>
+    /// <returns></returns>
     public static void DeleteFile(string rootPath, string folder, string fileName)
     {
         if (string.IsNullOrEmpty(fileName))

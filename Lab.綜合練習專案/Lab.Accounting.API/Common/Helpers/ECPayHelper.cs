@@ -2,8 +2,11 @@
 
 public class ECPayHelper
 {
-    //在這裡建立一個靜態方法用來製作檢查瑪,讓綠界知道說這筆交易是由我傳出的
-    //傳入所有關於綠界需要的資料(包含商品,金額等等..)
+    /// <summary>
+    /// 製作檢查瑪並附上這筆交易 ( 類似識別證 )
+    /// </summary>
+    /// <param name="order">訂單資訊</param>
+    /// <returns>檢查碼</returns>
     public static string GetCheckMacValue(Dictionary<string, string> order)
     {
         //排序參數,讓參數依照字母A-Z排序,為了對應雙方的加密字串
@@ -45,9 +48,11 @@ public class ECPayHelper
         return GetSHA256(checkValue).ToUpper();
     }
 
-    //這就是把檢查碼加密的方法
-    //基本上這段流程是固定的,所以之後有需要用到SHA256加密,就能用這套流程
-    //也要理解這套流程=>文字=>位元組 => 演算法計算 => 十六進位字串
+    /// <summary>
+    /// 把檢查碼加密 ( SHA256 )
+    /// </summary>
+    /// <param name="value">檢查碼</param>
+    /// <returns>加密後的檢查碼</returns>
     private static string GetSHA256(string value)
     {
         //建立一個轉成字串變數,待會用於把亂碼轉成字串
