@@ -53,6 +53,11 @@ public class User
     public string? UserRole { get; set; }
 
     /// <summary>
+    /// 使用者註冊方式
+    /// </summary>
+    public RegisterMethodEnum UserRegisterMethod { get; set; }
+
+    /// <summary>
     /// 創建時間
     /// </summary>
     public DateTime CreateTime { get; set; }

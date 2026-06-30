@@ -39,6 +39,19 @@ public class UserController(IUserService userserivce) : ControllerBase
     }
 
     /// <summary>
+    /// Google 第三方登入
+    /// </summary>
+    /// <param name="request">Google Id_Token</param>
+    /// <returns>登入成功</returns>
+    [HttpPost]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        return Ok(await userserivce.GoogleLogin(request));
+    }
+
+    /// <summary>
     /// 使用者登出
     /// </summary>
     /// <returns>是否成功登出</returns>

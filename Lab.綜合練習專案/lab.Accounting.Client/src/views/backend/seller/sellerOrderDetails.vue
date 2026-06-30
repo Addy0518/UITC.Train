@@ -111,7 +111,11 @@ const updateStatus = async (id, status) => {
         <!-- #region  訂單資訊-->
         <div class="px-6 py-5 border-b border-border-soft">
           <p class="text-xs font-medium text-ink-500 mb-3">訂單資訊</p>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-ink-500 m-0 mb-1">購買人</p>
+              <p class="text-sm m-0 text-ink-900">{{ order.userName }}</p>
+            </div>
             <div>
               <p class="text-xs text-ink-500 m-0 mb-1">購買時間</p>
               <p class="text-sm m-0 text-ink-900">{{ formatDateTimeString(order.paidTime) }}</p>
@@ -120,7 +124,7 @@ const updateStatus = async (id, status) => {
               <p class="text-xs text-ink-500 m-0 mb-1">付款方式</p>
               <p class="text-sm m-0 text-ink-900">{{ order.paidType }}</p>
             </div>
-            <div class="col-span-2">
+            <div>
               <p class="text-xs text-ink-500 m-0 mb-1">寄送地址</p>
               <p class="text-sm m-0 text-ink-900">{{ order.shippingAddress }}</p>
             </div>

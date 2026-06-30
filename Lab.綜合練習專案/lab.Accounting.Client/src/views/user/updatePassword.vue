@@ -6,10 +6,14 @@ import { updatePassword } from '@/api/userService';
    oldPassword : 舊密碼
    newPassword : 新密碼
    confirmPassword : 確認密碼
+   tooglePassword　：　切換密碼顯示或隱藏
 */
 const oldPassword = ref();
 const newPassword = ref();
 const confirmPassword = ref();
+const tooglePassword1 = ref(true);
+const tooglePassword2 = ref(true);
+const tooglePassword3 = ref(true);
 /*
    注入 Loading 跟 Toast
 */
@@ -84,37 +88,55 @@ const updateMyPassword = async () => {
         <div class="flex flex-col gap-4">
           <div>
             <label class="text-sm text-ink-500 block mb-1.5">目前密碼</label>
-            <InputText
-              v-model="oldPassword"
-              type="password"
-              placeholder="請輸入目前密碼"
-              :invalid="v$.oldPassword.$error"
-              class="w-full"
-            />
+            <InputGroup>
+              <InputText
+                v-model="oldPassword"
+                :type="tooglePassword1 ? 'password' : 'text'"
+                placeholder="請輸入目前密碼"
+                :invalid="v$.oldPassword.$error"
+                class="w-full" /><InputGroupAddon
+                class="cursor-pointer"
+                @click="tooglePassword1 = !tooglePassword1"
+              >
+                <i :class="['pi', tooglePassword1 ? 'pi-eye-slash' : 'pi-eye']" /> </InputGroupAddon
+            ></InputGroup>
+
             <InValidErrorMessage :errorDto="v$.oldPassword.$errors" vaildChiName="舊密碼" />
           </div>
 
           <div>
             <label class="text-sm text-ink-500 block mb-1.5">新密碼</label>
-            <InputText
-              v-model="newPassword"
-              type="password"
-              placeholder="請輸入新密碼"
-              :invalid="v$.newPassword.$error"
-              class="w-full"
-            />
+
+            <InputGroup
+              ><InputText
+                v-model="newPassword"
+                :type="tooglePassword2 ? 'password' : 'text'"
+                placeholder="請輸入新密碼"
+                :invalid="v$.newPassword.$error"
+                class="w-full" /><InputGroupAddon
+                class="cursor-pointer"
+                @click="tooglePassword2 = !tooglePassword2"
+              >
+                <i :class="['pi', tooglePassword2 ? 'pi-eye-slash' : 'pi-eye']" /> </InputGroupAddon
+            ></InputGroup>
             <InValidErrorMessage :errorDto="v$.newPassword.$errors" vaildChiName="新密碼" />
           </div>
 
           <div>
             <label class="text-sm text-ink-500 block mb-1.5">確認新密碼</label>
-            <InputText
-              v-model="confirmPassword"
-              type="password"
-              placeholder="請再次輸入新密碼"
-              :invalid="v$.confirmPassword.$error"
-              class="w-full"
-            />
+            <InputGroup>
+              <InputText
+                v-model="confirmPassword"
+                :type="tooglePassword3 ? 'password' : 'text'"
+                placeholder="請再次輸入新密碼"
+                :invalid="v$.confirmPassword.$error"
+                class="w-full" /><InputGroupAddon
+                class="cursor-pointer"
+                @click="tooglePassword3 = !tooglePassword3"
+              >
+                <i :class="['pi', tooglePassword3 ? 'pi-eye-slash' : 'pi-eye']" /> </InputGroupAddon
+            ></InputGroup>
+
             <InValidErrorMessage :errorDto="v$.confirmPassword.$errors" vaildChiName="確認新密碼" />
           </div>
         </div>

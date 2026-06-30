@@ -49,11 +49,14 @@ const logout = async () => {
    載入頭貼
 */
 const imgUrl = computed(() => {
-  if (authStore.userHeadshot) {
-    return `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
-  } else {
+  const headshot = authStore.userHeadshot;
+  if (!headshot) {
     return defaultImgurl;
   }
+  if (headshot.includes('googleusercontent.com')) {
+    return headshot;
+  }
+  return `${baseUrl}/UserHeadShot/${headshot}`;
 });
 
 /*

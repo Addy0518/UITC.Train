@@ -1,6 +1,8 @@
-﻿using Lab.Accounting.API.Common.Requests.Category;
+﻿using Google.Apis.Auth;
+using Lab.Accounting.API.Common.Requests.Category;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.Extensions.Options;
 
 namespace Lab.Accounting.API.Services;
 
@@ -11,9 +13,12 @@ public class UserService(
     SendEmailHelper sendEmailHelper,
     VerifyCodeHelper verifyCodelHelper,
     ITokenBlacklistRepository tokenBlacklistRepositories,
+    IOptions<GoogleAuthSetting> googleAuthOptions,
     IWebHostEnvironment env
 ) : IUserService
 {
+    private readonly GoogleAuthSetting googleAuthSettings = googleAuthOptions.Value;
+
     /// <summary>
     /// 使用者註冊
     /// </summary>
@@ -28,7 +33,8 @@ public class UserService(
             UserPhone = registerRequest.UserPhone,
             UserPassword = passwordSecureHelper.HashPassword(registerRequest.UserPassword),
             UserAddress = registerRequest.UserAddress,
-            IsDelete = IsDeleteStatusEnum.Normal,
+            UserRegisterMethod = (int)RegisterMethodEnum.本網站註冊,
+            IsDelete = (int)IsDeleteStatusEnum.Normal,
         };
         var exist = await userrepo.ExistRegister(user);
 
@@ -99,6 +105,86 @@ public class UserService(
             UserAddress = dbuser?.UserAddress,
         };
 
+        return ApiResponseHelper.Success(userresponse, "成功");
+    }
+
+    /// <summary>
+    /// Google 第三方登入
+    /// </summary>
+    /// <param name="request">Google Id_Token</param>
+    /// <returns>登入成功</returns>
+    public async Task<ApiResponse<UserResponse>> GoogleLogin(GoogleLoginRequest request)
+    {
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new[] { googleAuthSettings.ClientId },
+            };
+            payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, settings);
+        }
+        catch
+        {
+            var errors = new Dictionary<string, string[]> { { "IdToken", new[] { "Google 驗證失敗，請重新登入!" } } };
+            return ApiResponseHelper.RequestError<UserResponse>(errors);
+        }
+
+        // 這裡都是 Google 帳號自帶的資訊
+        var email = payload.Email;
+        var googleName = payload.Name;
+        var pic = payload.Picture;
+
+        var dbUser = await userrepo.GetUserByAccount(email);
+
+        // 第一次用 Google 登入，自動建立帳號
+        if (dbUser == null)
+        {
+            var password = passwordSecureHelper.HashPassword(Guid.NewGuid().ToString());
+            await userrepo.GoogleUserLogin(email, password, googleName, pic);
+            dbUser = await userrepo.GetUserByAccount(email);
+        }
+        else if (dbUser.UserRegisterMethod != RegisterMethodEnum.Google登入)
+        {
+            // 這個 email 已經存在，但是是用「一般帳密」註冊的
+            // 不能直接讓 Google 登入直接進去這個帳號！
+            var errors = new Dictionary<string, string[]>
+            {
+                { "Email", new[] { "此信箱已使用一般帳號註冊，請改用帳號密碼登入!" } },
+            };
+            return ApiResponseHelper.RequestError<UserResponse>(errors);
+        }
+        else
+        {
+            // 判斷本來有沒有頭貼 , 隨時同步跟 Google 一樣的頭貼圖片
+            // 不用存實體檔案 , google 頭貼是用公開網址
+            if (dbUser.UserHeadshot != pic)
+            {
+                await userrepo.UserHeadShotUpload(pic, dbUser.UserId);
+
+                dbUser.UserHeadshot = pic;
+            }
+        }
+
+        // 發 JWT Token，後續流程跟一般登入完全一樣
+        var token = tokenHelper.GeneratedToken(
+            dbUser.UserId,
+            dbUser.UserName,
+            dbUser.UserRole,
+            dbUser.UserAddress ?? ""
+        );
+
+        var userheadshot = await userrepo.GetUser(dbUser.UserId);
+
+        var userresponse = new UserResponse
+        {
+            Token = token,
+            UserId = dbUser.UserId,
+            UserName = dbUser.UserName,
+            UserHeadshot = userheadshot?.UserHeadshot,
+            UserRole = dbUser.UserRole,
+            UserAddress = dbUser?.UserAddress,
+        };
         return ApiResponseHelper.Success(userresponse, "成功");
     }
 

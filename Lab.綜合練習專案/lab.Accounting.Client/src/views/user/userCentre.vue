@@ -4,13 +4,11 @@ import defaultImgurl from '@/img/預設圖片.jpg';
 /*
    變數名稱代表意義
    router : 改變路由
-   imgUrl : 大頭照圖片路徑
    baseUrl : 基底位址
    authStore : localstorage
    menuItems : 清單列表
 */
 const router = useRouter();
-let imgUrl = ref();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
 const menuItems = ref([
@@ -42,6 +40,10 @@ const menuItems = ref([
     label: '服務支援',
     icon: 'pi pi-question-circle',
     command: () => router.push('/user-centre/help'),
+    items: [
+      { label: '常見問題', command: () => router.push('/user-centre/faq') },
+      { label: '服務條款', command: () => router.push('/user-centre/terms-privacy') },
+    ],
   },
 ]);
 
@@ -54,14 +56,17 @@ const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
 /*
-   載入頭像
+   載入頭貼
 */
-onMounted(() => {
-  if (authStore.userHeadshot) {
-    imgUrl.value = `${baseUrl}/UserHeadShot/${authStore.userHeadshot}`;
-  } else {
-    imgUrl.value = defaultImgurl;
+const imgUrl = computed(() => {
+  const headshot = authStore.userHeadshot;
+  if (!headshot) {
+    return defaultImgurl;
   }
+  if (headshot.includes('googleusercontent.com')) {
+    return headshot;
+  }
+  return `${baseUrl}/UserHeadShot/${headshot}`;
 });
 
 /*

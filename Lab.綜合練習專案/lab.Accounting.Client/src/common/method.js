@@ -7,5 +7,3 @@ export const getError400Message = (error400) => {
   if (!error400) return '';
   return Object.values(error400).flat().join('\n');
 };
-
-

@@ -166,11 +166,14 @@ const openGalleria = (index) => {
    載入評論區頭貼
 */
 const userImg = (user) => {
-  if (user) {
-    return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
-  } else {
+  const headshot = user.userHeadshot;
+  if (!headshot) {
     return defaultImgurl;
   }
+  if (headshot.includes('googleusercontent.com')) {
+    return headshot;
+  }
+  return `${baseUrl}/UserHeadShot/${headshot}`;
 };
 
 /*

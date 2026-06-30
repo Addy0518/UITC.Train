@@ -1,5 +1,5 @@
 <script setup>
-import { loginApi } from '@/api/userService';
+import { loginApi, googleLoginApi } from '@/api/userService';
 
 /*
    注入 Loading 跟 Toast
@@ -19,7 +19,7 @@ const showToastError = inject('showToastError');
 
 */
 const authStore = useAuthStore();
-const route = useRouter();
+const router = useRouter();
 const account = ref(null);
 const password = ref(null);
 const tooglePassword = ref(true);
@@ -65,6 +65,25 @@ const test3User = () => {
 };
 
 /*
+   頁面掛載後初始化 Google Identity Services
+   把你的 Client ID 填進去
+*/
+onMounted(() => {
+  window.google?.accounts.id.initialize({
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    callback: handleGoogleLogin,
+  });
+
+  window.google?.accounts.id.renderButton(document.getElementById('google-login-btn'), {
+    theme: 'outline',
+    size: 'large',
+    width: '100%',
+    text: 'signin_with',
+    locale: 'zh_TW',
+  });
+});
+
+/*
   呼叫登入使用者 API
 */
 const userLogin = async () => {
@@ -80,7 +99,7 @@ const userLogin = async () => {
     if (data.codeStatus === 2000) {
       authStore.setAuth(data.returnData);
       showToastSuccess('登入成功 !');
-      route.push({ name: 'mall' });
+      router.push({ name: 'mall' });
     }
     if (data.codeStatus === 4000) {
       showToastError('錯誤', getError400Message(data.error400));
@@ -90,6 +109,37 @@ const userLogin = async () => {
     }
   } catch (error) {
     console.error('使用者登入錯誤 ', error.response);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
+   Google 登入：由 Google Identity Services JS library 呼叫
+*/
+const handleGoogleLogin = async (response) => {
+  try {
+    showLoading();
+    //  credential：Google 回傳的 id_token 字串
+    const request = {
+      IdToken: response.credential,
+    };
+    const res = await googleLoginApi(request);
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      authStore.setAuth(data.returnData);
+      showToastSuccess('登入成功 !');
+      router.push({ name: 'mall' });
+    }
+    if (data.codeStatus === 4000) {
+      showToastError('錯誤', getError400Message(data.error400));
+    }
+    if (data.codeStatus === 4001) {
+      showToastError('錯誤', data.message);
+    }
+  } catch (error) {
+    console.error('Google 登入錯誤 ', error.response);
   } finally {
     hideLoading();
   }
@@ -161,6 +211,11 @@ const userLogin = async () => {
           >
         </div>
         <!-- #endregion -->
+
+        <!-- #region Google 登入按鈕（由 Google Identity Services 自動渲染） -->
+        <div id="google-login-btn" class="w-full"></div>
+        <!-- #endregion -->
+
         <!-- #region 測試帳號 -->
         <div class="mt-8">
           <p class="text-sm font-medium text-ink-900 mb-3">測試帳號</p>

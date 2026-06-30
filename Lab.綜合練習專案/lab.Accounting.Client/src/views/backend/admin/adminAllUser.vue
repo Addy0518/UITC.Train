@@ -158,10 +158,14 @@ const goSearch = () => {
   讀取用戶圖片 , 判斷是否有圖片沒有就回傳預設
 */
 const getUserImg = (user) => {
-  if (user.userHeadshot) {
-    return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
+  const headshot = user.userHeadshot;
+  if (!headshot) {
+    return defaultImgurl;
   }
-  return defaultImgurl;
+  if (headshot.includes('googleusercontent.com')) {
+    return headshot;
+  }
+  return `${baseUrl}/UserHeadShot/${headshot}`;
 };
 </script>
 

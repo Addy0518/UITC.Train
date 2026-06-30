@@ -18,6 +18,9 @@ public static class DiConfig
         // 綁定 EmailSettings
         services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
+        // 綁定 GoogleAuthSetting
+        services.Configure<GoogleAuthSetting>(configuration.GetSection("GoogleAuth"));
+
         //將Service結尾且生命週期相同的物件, 統一註冊
         services.Scan(scan =>
             scan.FromAssemblyOf<Program>() // 1.遍歷Program類別所在程序集中的所有類別

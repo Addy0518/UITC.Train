@@ -19,6 +19,13 @@ public interface IUserService
     Task<ApiResponse<UserResponse>> Login(UserLoginRequest loginRequest);
 
     /// <summary>
+    /// Google 第三方登入
+    /// </summary>
+    /// <param name="request">Google Id_Token</param>
+    /// <returns>登入成功</returns>
+    Task<ApiResponse<UserResponse>> GoogleLogin(GoogleLoginRequest request);
+
+    /// <summary>
     /// 使用者登出
     /// </summary>
     /// <param name="Token">登出的 Token</param>

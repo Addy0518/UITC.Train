@@ -310,6 +310,29 @@ const router = createRouter({
                 isPermissionVerification: true,
               },
               component: () => import('@/views/user/help.vue'),
+              redirect: { name: 'faq' },
+            },
+            {
+              /*
+                 常見問題 Q & A
+              */
+              path: 'faq',
+              name: 'faq',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/faq.vue'),
+            },
+            {
+              /*
+                服務條款
+              */
+              path: 'terms-privacy',
+              name: 'terms-privacy',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/termsPrivacy.vue'),
             },
           ],
         },

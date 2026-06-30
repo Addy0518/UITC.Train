@@ -65,11 +65,14 @@ const getSellerInfo = async (id) => {
    載入賣家頭貼
 */
 const sellerImg = (user) => {
-  if (user) {
-    return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
-  } else {
+  const headshot = user.userHeadshot;
+  if (!headshot) {
     return defaultImgurl;
   }
+  if (headshot.includes('googleusercontent.com')) {
+    return headshot;
+  }
+  return `${baseUrl}/UserHeadShot/${headshot}`;
 };
 
 /*

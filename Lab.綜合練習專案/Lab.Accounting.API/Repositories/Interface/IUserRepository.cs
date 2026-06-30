@@ -19,6 +19,16 @@ public interface IUserRepository
     Task<User> Login(User userInformation);
 
     /// <summary>
+    /// Google 登入註冊
+    /// </summary>
+    /// <param name="email">電子郵件</param>
+    /// <param name="password">密碼</param>
+    /// <param name="userName">使用者名稱</param>
+    /// <param name="pic">使用者 Google 頭貼照片</param>
+    /// <returns>使用者 ID</returns>
+    Task<int> GoogleUserLogin(string email, string password, string userName, string pic);
+
+    /// <summary>
     /// 檢查使用者是否註冊過
     /// </summary>
     /// <param name="userInformation">使用者註冊資訊</param>

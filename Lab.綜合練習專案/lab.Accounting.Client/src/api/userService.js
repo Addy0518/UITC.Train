@@ -6,6 +6,9 @@ import accountApiInstance from '@/api/accountInstance.js';
 export const registerApi = (userRegister) => accountApiInstance.post(`User/Register`, userRegister);
 // 使用者登入
 export const loginApi = (userLogin) => accountApiInstance.post(`User/Login`, userLogin);
+// Google 第三方登入
+export const googleLoginApi = (request) =>
+  accountApiInstance.post(`User/GoogleLogin`, request);
 // 使用者登出
 export const logoutApi = () => accountApiInstance.post(`User/Logout`);
 

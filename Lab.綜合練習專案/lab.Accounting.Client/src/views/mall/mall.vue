@@ -191,6 +191,13 @@ const getCategoryImg = (category) => {
     <!-- #region 商品區 -->
     <div class="w-300 mt-8">
       <span class="text-xl font-bold text-ink-900 mb-5 block">商品</span>
+      <div
+        v-if="allProducts.length === 0"
+        class="col-span-3 flex flex-col items-center justify-center py-16 text-ink-500"
+      >
+        <i class="pi pi-inbox text-4xl mb-3" />
+        <span class="text-sm">沒有符合條件的商品</span>
+      </div>
       <div class="grid grid-cols-4 gap-4">
         <RouterLink
           v-for="product in allProducts"
@@ -233,20 +240,22 @@ const getCategoryImg = (category) => {
       </div>
 
       <!-- #region  頁碼按鈕-->
-      <Paginator
-        :template="{
-          '640px': 'PrevPageLink CurrentPageReport NextPageLink',
-          '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
-          '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
-          default:
-            'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
-        }"
-        :rows="12"
-        :totalRecords="totalCount"
-        @page="pageChange"
-        class="mt-6"
-      >
-      </Paginator>
+      <div class="flex flex-1 items-center justify-center mt-5 mb-30">
+        <span class="text-ink-500">總筆數 : {{ totalCount }}</span>
+        <Paginator
+          :template="{
+            '640px': 'PrevPageLink CurrentPageReport NextPageLink',
+            '960px': 'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink',
+            '1300px': 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink',
+            default:
+              'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
+          }"
+          :rows="12"
+          :totalRecords="totalCount"
+          @page="pageChange"
+        >
+        </Paginator>
+      </div>
       <!-- #endregion -->
     </div>
     <!-- #endregion -->
