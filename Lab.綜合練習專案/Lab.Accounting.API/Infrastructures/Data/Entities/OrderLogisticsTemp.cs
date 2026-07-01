@@ -1,16 +1,16 @@
 ﻿namespace Lab.Accounting.API.Infrastructures.Data.Entities
 {
-    public class OrderLogistics
+    public class OrderLogisticsTemp
     {
         /// <summary>
-        /// 物流單 ID
+        /// 物流暫存單 ID
         /// </summary>
-        public int LogisticsId { get; set; }
+        public int LogisticsTempId { get; set; }
 
         /// <summary>
-        /// 訂單 ID
+        /// 訂單編號
         /// </summary>
-        public int OrderId { get; set; }
+        public string SessionKey { get; set; }
 
         /// <summary>
         /// 物流方式 (CVS: 超商 / Home: 宅配)
@@ -53,38 +53,8 @@
         public string? ReceiverAddress { get; set; }
 
         /// <summary>
-        /// 物流訂單編號 (傳給綠界用)
+        /// 過期時間 ( 未付款自動過期 )
         /// </summary>
-        public string MerchantTradeNo { get; set; }
-
-        /// <summary>
-        /// 綠界回傳的物流追蹤編號
-        /// </summary>
-        public string LogisticsTrackingNo { get; set; }
-
-        /// <summary>
-        /// 物流狀態 (Created / Shipped / InTransit / Delivered / PickedUp / Cancelled)
-        /// </summary>
-        public LogisticsStatusEnum LogisticsStatus { get; set; }
-
-        /// <summary>
-        /// 物流資料建立時間
-        /// </summary>
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 賣家出貨時間
-        /// </summary>
-        public DateTime? ShippedAt { get; set; }
-
-        /// <summary>
-        /// 送達門市或簽收時間
-        /// </summary>
-        public DateTime? DeliveredAt { get; set; }
-
-        /// <summary>
-        /// 買家完成取件時間
-        /// </summary>
-        public DateTime? PickedUpAt { get; set; }
+        public DateTime ExpiredAt { get; set; }
     }
 }

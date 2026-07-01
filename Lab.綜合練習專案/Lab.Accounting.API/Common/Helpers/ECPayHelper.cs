@@ -3,7 +3,7 @@
 public class ECPayHelper
 {
     /// <summary>
-    /// 製作檢查瑪並附上這筆交易 ( 類似識別證 )
+    /// 製作金流檢查瑪並附上這筆交易 ( 類似識別證 )
     /// </summary>
     /// <param name="order">訂單資訊</param>
     /// <returns>檢查碼</returns>
@@ -46,6 +46,35 @@ public class ECPayHelper
 
         //雜湊=>把最終結果丟進SHA256演算法,讓她變成一串亂碼,這就是最終的檢查碼
         return GetSHA256(checkValue).ToUpper();
+    }
+
+    /// <summary>
+    /// 製作物流檢查碼 ( MD5，物流 API 使用，跟金流的 SHA256 不同 )
+    /// </summary>
+    /// <param name="order">物流參數</param>
+    /// <param name="hashKey">物流 HashKey</param>
+    /// <param name="hashIV">物流 HashIV</param>
+    public static string GetCheckMacValueMD5(Dictionary<string, string> order, string hashKey, string hashIV)
+    {
+        // 前面這幾步跟金流版本完全一樣
+        var param = order.Keys.OrderBy(x => x).Select(key => key + "=" + order[key]).ToList();
+        string checkValue = string.Join("&", param);
+        checkValue = $"HashKey={hashKey}&{checkValue}&HashIV={hashIV}";
+        checkValue = HttpUtility.UrlEncode(checkValue).ToLower();
+        checkValue = checkValue
+            .Replace("%20", "+")
+            .Replace("%2d", "-")
+            .Replace("%5f", "_")
+            .Replace("%2e", ".")
+            .Replace("%21", "!")
+            .Replace("%2a", "*")
+            .Replace("%28", "(")
+            .Replace("%29", ")");
+
+        // 只有這裡不同：換成 MD5
+        using var md5 = MD5.Create();
+        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(checkValue));
+        return BitConverter.ToString(hash).Replace("-", "").ToUpper();
     }
 
     /// <summary>

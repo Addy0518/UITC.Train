@@ -21,6 +21,9 @@ public static class DiConfig
         // 綁定 GoogleAuthSetting
         services.Configure<GoogleAuthSetting>(configuration.GetSection("GoogleAuth"));
 
+        // 綁定 EcpayLogisticsSettings
+        services.Configure<EcpayLogisticsSettings>(configuration.GetSection("EcpayLogistics"));
+
         //將Service結尾且生命週期相同的物件, 統一註冊
         services.Scan(scan =>
             scan.FromAssemblyOf<Program>() // 1.遍歷Program類別所在程序集中的所有類別

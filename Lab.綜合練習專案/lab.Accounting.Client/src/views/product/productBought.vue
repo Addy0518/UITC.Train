@@ -33,7 +33,8 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
-
+const shippingType = ref('Home'); // Home 或 CVS
+const selectedStore = ref(null); // 儲存選回來的門市資訊
 /*
    初始化
 */
@@ -67,6 +68,27 @@ const getProductImg = (item) => {
   }
   return defaultImgurl;
 };
+
+// 呼叫你的 API 取得地圖網址
+const goToCvsMap = async () => {
+  // 1. 呼叫你後端的 GetCvsMapUrl
+  const res = await getCvsMapUrl({
+    merchantTradeNo: 'TEST' + Date.now(), // 確保唯一性
+    logisticsSubType: 'UNIMART',
+  });
+
+  // 2. 跳轉到綠界地圖
+  if (res.data) {
+    window.location.href = res.data.returnData;
+  }
+};
+
+// 處理門市資料 (這通常會在頁面重新載入後從 localStorage 或 Pinia 拿回)
+// 如果你是從 CvsStoreCallback 回來，記得把資料存入 localStorage 後再導回此頁面
+onMounted(() => {
+  const savedStore = localStorage.getItem('selectedStore');
+  if (savedStore) selectedStore.value = JSON.parse(savedStore);
+});
 
 /*
   計算總金額
@@ -307,24 +329,71 @@ const userBuy = async () => {
     <div class="w-300 rounded-card border border-border-soft p-6 flex flex-col gap-5 bg-page-bg">
       <!-- #region  購買資訊填寫-->
       <h2 class="text-base font-bold text-ink-900">填寫購買資訊</h2>
-
       <div class="flex flex-col gap-1">
-        <label class="text-sm mb-3 text-ink-900">收件地址</label>
-        <div v-if="authStore.userAddress">
-          <InputText
-            v-model="authStore.userAddress"
-            class="text-sm rounded-card p-3 text-ink-500"
-            readonly
+        <label class="text-sm mb-3 text-ink-900">配送方式</label>
+
+        <div class="flex gap-4 mb-4">
+          <button
+            @click="shippingType = 'Home'"
+            :class="[
+              shippingType === 'Home' ? 'border-selection bg-selection-50' : 'border-border-soft',
+            ]"
+            class="flex-1 border p-3 rounded-card"
           >
-          </InputText>
+            宅配到府
+          </button>
+          <button
+            @click="shippingType = 'CVS'"
+            :class="[
+              shippingType === 'CVS' ? 'border-selection bg-selection-50' : 'border-border-soft',
+            ]"
+            class="flex-1 border p-3 rounded-card"
+          >
+            超商取貨
+          </button>
         </div>
+
+        <div v-if="shippingType === 'CVS'" class="flex flex-col gap-2">
+          <div
+            v-if="!selectedStore"
+            @click="goToCvsMap"
+            class="cursor-pointer border border-dashed border-selection text-selection p-4 rounded-card text-center hover:bg-selection-50 transition-colors"
+          >
+            + 點擊選擇超商門市
+          </div>
+          <div
+            v-else
+            class="border border-selection bg-selection-50 p-4 rounded-card flex flex-col gap-1"
+          >
+            <span class="font-bold text-ink-900">{{ selectedStore.storeName }}</span>
+            <span class="text-sm text-ink-500">{{ selectedStore.storeAddress }}</span>
+            <button @click="goToCvsMap" class="text-xs text-selection mt-2 underline">
+              重新選擇門市
+            </button>
+          </div>
+        </div>
+
         <div v-else>
-          <InputGroup>
-            <InputText v-model="address" placeholder="收件地址" :invalid="v$.address.$error" />
-          </InputGroup>
-          <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm mb-3 text-ink-900">收件地址</label>
+            <div v-if="authStore.userAddress">
+              <InputText
+                v-model="authStore.userAddress"
+                class="text-sm rounded-card p-3 text-ink-500"
+                readonly
+              >
+              </InputText>
+            </div>
+            <div v-else>
+              <InputGroup>
+                <InputText v-model="address" placeholder="收件地址" :invalid="v$.address.$error" />
+              </InputGroup>
+              <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
+            </div>
+          </div>
         </div>
       </div>
+
       <span class="text-ink-900 font-medium"
         >總金額 :
         <span class="text-brand-price font-bold text-lg">{{
