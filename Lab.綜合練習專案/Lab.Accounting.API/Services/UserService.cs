@@ -102,6 +102,7 @@ public class UserService(
             UserName = dbuser.UserName,
             UserHeadshot = userheadshot?.UserHeadshot,
             UserRole = dbuser.UserRole,
+            UserPhone = dbuser.UserPhone,
             UserAddress = dbuser?.UserAddress,
         };
 

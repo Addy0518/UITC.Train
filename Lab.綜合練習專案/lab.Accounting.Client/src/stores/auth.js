@@ -8,6 +8,7 @@ export const useAuthStore = defineStore(
     const userId = ref(null);
     const userName = ref(null);
     const userHeadshot = ref(null);
+    const userPhone = ref(null);
     const userAddress = ref(null);
     const userRole = ref(null);
     /*
@@ -18,6 +19,7 @@ export const useAuthStore = defineStore(
       userId.value = data.userId;
       userName.value = data.userName;
       userHeadshot.value = data.userHeadshot;
+      userPhone.value = data.userPhone;
       userAddress.value = data.userAddress;
       userRole.value = data.userRole;
     }
@@ -29,13 +31,24 @@ export const useAuthStore = defineStore(
       userId.value = null;
       userName.value = null;
       userHeadshot.value = null;
+      userPhone.value = null;
       userAddress.value = null;
       userRole.value = null;
     }
     /*
       重要 => 記得回傳這些資料並 export 傳出去 , 供其他地方使用
     */
-    return { token, userId, userName, userHeadshot, userRole, userAddress, setAuth, clearAuth };
+    return {
+      token,
+      userId,
+      userName,
+      userHeadshot,
+      userRole,
+      userPhone,
+      userAddress,
+      setAuth,
+      clearAuth,
+    };
   },
   /*
     使用 pinia-plugin-persistedstate , 自動把 pinia 的資料存到 localstorage

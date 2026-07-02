@@ -60,6 +60,7 @@ public class ECPayHelper
         var param = order.Keys.OrderBy(x => x).Select(key => key + "=" + order[key]).ToList();
         string checkValue = string.Join("&", param);
         checkValue = $"HashKey={hashKey}&{checkValue}&HashIV={hashIV}";
+
         checkValue = HttpUtility.UrlEncode(checkValue).ToLower();
         checkValue = checkValue
             .Replace("%20", "+")

@@ -54,7 +54,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserId,UserName,UserRole,UserPassword,UserAddress From [User] Where UserAccount=@UserAccount";
+            @"Select UserId,UserName,UserRole,UserPassword,UserPhone,UserAddress From [User] Where UserAccount=@UserAccount";
 
         return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserAccount = userInformation.UserAccount });
     }

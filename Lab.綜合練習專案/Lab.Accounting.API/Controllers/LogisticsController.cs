@@ -7,8 +7,11 @@ namespace Lab.Accounting.API.Controllers
     [Authorize]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
-    public class LogisticsController(ILogisticsService logisticsService) : ControllerBase
+    public class LogisticsController(ILogisticsService logisticsService, IConfiguration config) : ControllerBase
     {
+        // 前端網址基底
+        private string fronturl = config["FrontendUrl"];
+
         /// <summary>
         /// 產生綠界超商門市地圖網址
         /// </summary>
@@ -23,7 +26,7 @@ namespace Lab.Accounting.API.Controllers
         }
 
         /// <summary>
-        /// 接收綠界回傳的門市資料存進暫存表
+        /// 接收綠界回傳的門市資料存進暫存表 ( 綠界回來後呼叫的 API , 這裡是中繼站)
         /// </summary>
         /// <param name="request">綠界回傳門市資料</param>
         /// <returns></returns>
@@ -34,8 +37,12 @@ namespace Lab.Accounting.API.Controllers
         {
             await logisticsService.HandleCvsStoreCallback(request);
 
-            // 綠界要求回傳純文字 "1|OK"，不是 JSON
-            return Content("1|OK", "text/plain");
+            var sessionKey = request.ExtraData;
+
+            return Content(
+                $"<script>window.location.href='{fronturl}/product-bought?sessionKey={sessionKey}';</script>",
+                "text/html"
+            );
         }
 
         /// <summary>
@@ -49,6 +56,19 @@ namespace Lab.Accounting.API.Controllers
         public async Task<IActionResult> SaveLogisticsTemp([FromBody] LogisticsTempInsertRequest request)
         {
             return Ok(await logisticsService.SaveLogisticsTemp(request));
+        }
+
+        /// <summary>
+        /// 查看物流暫存訂單資料
+        /// </summary>
+        /// <param name="sessionKey">SessionKey ( 對應金流的 MerchantTradeNo )</param>
+        /// <returns>物流暫存訂單資料</returns>
+        [HttpGet]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<OrderLogisticsTemp>))]
+        public async Task<IActionResult> GetLogisticsTemp([FromQuery] string sessionKey)
+        {
+            return Ok(await logisticsService.GetLogisticsTemp(sessionKey));
         }
     }
 }

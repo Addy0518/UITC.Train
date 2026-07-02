@@ -4,6 +4,7 @@ import { getUserCoupon } from '@/api/couponService';
 import { couponTypeEnum } from '@/common/enum';
 import defaultImgurl from '@/img/預設圖片.jpg';
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 /*
    變數名稱代表意義
@@ -18,14 +19,17 @@ import { computed } from 'vue';
    coupon : 選擇的優惠卷
 */
 const router = useRouter();
+const route = useRoute();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
-const address = ref();
+const name = ref(authStore.userName ?? '');
+const phone = ref(authStore.userPhone ?? '');
+const address = ref(authStore.userAddress ?? '');
 const orderStore = useOrderStore();
 const items = orderStore.selectedItems;
 const allCoupons = ref();
 const coupon = ref(null);
-
+const logisticsTemp = ref(null);
 /*
    注入 Loading 跟 Toast
 */
@@ -40,6 +44,9 @@ const selectedStore = ref(null); // 儲存選回來的門市資訊
 */
 onMounted(() => {
   getMyCoupon();
+  if (route.query.sessionKey) {
+    getLogistics();
+  }
 });
 
 /*
@@ -47,6 +54,8 @@ onMounted(() => {
 */
 const rules = computed(() => ({
   // authstore 有的情況就不驗證
+  name: authStore.userName ? {} : { required, maxLength: maxLength(50) },
+  phone: authStore.userPhone ? {} : { required, vaildCellPhone, maxLength: maxLength(20) },
   address: authStore.userAddress ? {} : { required, maxLength: maxLength(200) },
 }));
 
@@ -74,12 +83,29 @@ const goToCvsMap = async () => {
   // 1. 呼叫你後端的 GetCvsMapUrl
   const res = await getCvsMapUrl({
     merchantTradeNo: 'TEST' + Date.now(), // 確保唯一性
-    logisticsSubType: 'UNIMART',
+    logisticsSubType: 'UNIMARTC2C',
   });
-
+  const { data } = res;
   // 2. 跳轉到綠界地圖
-  if (res.data) {
-    window.location.href = res.data.returnData;
+  if (data.codeStatus === 2000) {
+    // 建立一個隱藏的 form 表單
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = res.data.returnData.ActionUrl;
+
+    // 將後端給的參數全部轉換為 input 塞進去
+    Object.keys(data.returnData).forEach((key) => {
+      if (key !== 'ActionUrl') {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = res.data.returnData[key];
+        form.appendChild(input);
+      }
+    });
+
+    document.body.appendChild(form);
+    form.submit();
   }
 };
 
@@ -89,6 +115,23 @@ onMounted(() => {
   const savedStore = localStorage.getItem('selectedStore');
   if (savedStore) selectedStore.value = JSON.parse(savedStore);
 });
+
+const getLogistics = async () => {
+  try {
+    showLoading();
+
+    const res = await getLogisticsTemp(route.query.sessionKey);
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      logisticsTemp.value = data.returnData;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
 
 /*
   計算總金額
@@ -331,8 +374,23 @@ const userBuy = async () => {
       <h2 class="text-base font-bold text-ink-900">填寫購買資訊</h2>
       <div class="flex flex-col gap-1">
         <label class="text-sm mb-3 text-ink-900">配送方式</label>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm mb-3 text-ink-900">收件人姓名</label>
 
-        <div class="flex gap-4 mb-4">
+          <InputGroup>
+            <InputText v-model="name" placeholder="收件人姓名" :invalid="v$.name.$error" />
+          </InputGroup>
+          <InValidErrorMessage :errorDto="v$.name.$errors" vaildChiName="收件人姓名" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm mb-3 text-ink-900">收件人電話</label>
+
+          <InputGroup>
+            <InputText v-model="phone" placeholder="收件人電話" :invalid="v$.phone.$error" />
+          </InputGroup>
+          <InValidErrorMessage :errorDto="v$.phone.$errors" vaildChiName="收件人電話" />
+        </div>
+        <div class="flex gap-4 mb-4 mt-10">
           <button
             @click="shippingType = 'Home'"
             :class="[
@@ -371,25 +429,25 @@ const userBuy = async () => {
               重新選擇門市
             </button>
           </div>
+          <div
+            v-if="logisticsTemp"
+            class="border border-border-soft rounded-card p-4 mt-2 flex flex-col gap-1 text-sm"
+          >
+            <span class="text-ink-900 font-bold mb-1">門市資料</span>
+            <span class="text-ink-500">門市代號：{{ logisticsTemp.storeCode }}</span>
+            <span class="text-ink-500">門市名稱：{{ logisticsTemp.storeName }}</span>
+            <span class="text-ink-500">門市地址：{{ logisticsTemp.storeAddress }}</span>
+          </div>
         </div>
 
         <div v-else>
           <div class="flex flex-col gap-1">
             <label class="text-sm mb-3 text-ink-900">收件地址</label>
-            <div v-if="authStore.userAddress">
-              <InputText
-                v-model="authStore.userAddress"
-                class="text-sm rounded-card p-3 text-ink-500"
-                readonly
-              >
-              </InputText>
-            </div>
-            <div v-else>
-              <InputGroup>
-                <InputText v-model="address" placeholder="收件地址" :invalid="v$.address.$error" />
-              </InputGroup>
-              <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
-            </div>
+
+            <InputGroup>
+              <InputText v-model="address" placeholder="收件地址" :invalid="v$.address.$error" />
+            </InputGroup>
+            <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
           </div>
         </div>
       </div>

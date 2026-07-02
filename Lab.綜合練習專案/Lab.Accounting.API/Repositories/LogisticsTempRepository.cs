@@ -44,8 +44,7 @@ public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRe
         var sql =
             @"
             SELECT * FROM OrderLogisticsTemp
-            WHERE SessionKey = @SessionKey
-              AND ExpiredAt > GETDATE()";
+            WHERE SessionKey = @SessionKey";
         return await conn.QueryFirstOrDefaultAsync<OrderLogisticsTemp>(sql, new { SessionKey = sessionKey });
     }
 

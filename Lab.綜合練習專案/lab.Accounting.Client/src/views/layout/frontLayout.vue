@@ -3,21 +3,20 @@ import { logoutApi } from '@/api/userService';
 import { getAllProduct } from '@/api/productsService';
 import defaultImgurl from '@/img/預設圖片.jpg';
 import FrontFooter from '@/views/footer/frontFooter.vue';
+import { computed, watch } from 'vue';
 
 /*
    變數名稱代表意義
    authStore : pinia 注入
    route : 獲取路由資訊
    allProductsRaw : 初始資料 ( 全部購物車商品 )
-   products : 篩選完的全部購物車商品
    baseUrl : 圖片基底位址
    search : 搜尋
    suggestions : 搜尋建議
 */
 const authStore = useAuthStore();
 const router = useRouter();
-const products = ref([]);
-const allProductsRaw = ref();
+const allProductsRaw = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const search = ref();
 const suggestions = ref([]);
@@ -36,6 +35,7 @@ const showToastError = inject('showToastError');
 onMounted(() => {
   loadShopingCarProducts();
 });
+
 /*
    呼叫登出 API , 並退回登入頁面
 */
@@ -102,12 +102,6 @@ const loadShopingCarProducts = async () => {
 
     if (data.codeStatus === 2000) {
       allProductsRaw.value = data.returnData;
-
-      /*
-        在解構的陣列 products 裡面再建立一個陣列 [x.productCategoryName, x] , 為 key 跟 value
-        用 map 去除重複的 key 再把陣列轉回 values 陣列
-    */
-      products.value = [...new Map(allProductsRaw.value.map((x) => [x.productsId, x])).values()];
     } else {
       allProductsRaw.value = [];
       products.value = [];
@@ -192,10 +186,10 @@ const loadShopingCarProducts = async () => {
           <RouterLink :to="{ name: 'shopping-car' }" class="relative text-ink-on-dark">
             <i class="pi pi-shopping-cart" style="font-size: 1.5rem"></i>
             <span
-              v-if="products.length > 0"
+              v-if="allProductsRaw.length > 0"
               class="absolute -top-1.5 -right-2 bg-brand-tag text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1"
             >
-              {{ products.length > 99 ? '99+' : products.length }}
+              {{ allProductsRaw.length > 99 ? '99+' : allProductsRaw.length }}
             </span>
           </RouterLink>
 

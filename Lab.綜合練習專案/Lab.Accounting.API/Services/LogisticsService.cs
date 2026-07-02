@@ -15,9 +15,9 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="request">物流訂單資訊</param>
         /// <returns>地圖網址</returns>
-        public ApiResponse<string> GetCvsMapUrl(GetCvsMapRequest request)
+        public ApiResponse<Dictionary<string, string>> GetCvsMapUrl(GetCvsMapRequest request)
         {
-            // ExtraData 帶 SessionKey（也就是 MerchantTradeNo），
+            // ExtraData 帶 SessionKey（也就是 MerchantTradeNo）
             // 選完門市綠界 POST 回來時，後端靠這個知道是哪一筆結帳的暫存資料要更新
             var parameters = new SortedDictionary<string, string>
             {
@@ -39,11 +39,10 @@ namespace Lab.Accounting.API.Services
             );
             parameters.Add("CheckMacValue", checkMacValue);
 
-            var queryString = string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
+            var result = new Dictionary<string, string>(parameters);
+            result.Add("ActionUrl", $"{LogisticsStageUrl}/Express/map");
 
-            var url = $"{LogisticsStageUrl}/Express/map?{queryString}";
-
-            return ApiResponseHelper.Success(url);
+            return ApiResponseHelper.Success(result);
         }
 
         /// <summary>
@@ -119,6 +118,21 @@ namespace Lab.Accounting.API.Services
             }
 
             return ApiResponseHelper.Success<string>("配送資訊已儲存");
+        }
+
+        /// <summary>
+        /// 查看物流暫存訂單資料
+        /// </summary>
+        /// <param name="sessionKey">SessionKey ( 對應金流的 MerchantTradeNo )</param>
+        /// <returns>物流暫存訂單資料</returns>
+        public async Task<ApiResponse<OrderLogisticsTemp>> GetLogisticsTemp(string sessionKey)
+        {
+            var temp = await logisticsTempRepository.GetLogisticsTemp(sessionKey);
+            if (temp == null)
+            {
+                return ApiResponseHelper.NotFound<OrderLogisticsTemp>();
+            }
+            return ApiResponseHelper.Success(temp);
         }
     }
 }
