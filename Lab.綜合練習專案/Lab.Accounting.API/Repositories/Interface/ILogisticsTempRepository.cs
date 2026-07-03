@@ -21,6 +21,13 @@ public interface ILogisticsTempRepository
     Task CreateHomeLogisticsTemp(OrderLogisticsTemp logisticsTemp);
 
     /// <summary>
+    /// 儲存物流暫存訂單收件人 ( 超商 )
+    /// </summary>
+    /// <param name="logisticsTemp">物流暫存訂單資訊</param>
+    /// <returns></returns>
+    Task UpdateCVSLogisticsTemp(OrderLogisticsTemp logisticsTemp);
+
+    /// <summary>
     /// 查看物流暫存訂單資料
     /// </summary>
     /// <param name="sessionKey">SessionKey ( 對應金流的 MerchantTradeNo )</param>

@@ -8,11 +8,6 @@
         public int LogisticsId { get; set; }
 
         /// <summary>
-        /// 訂單 ID
-        /// </summary>
-        public int OrderId { get; set; }
-
-        /// <summary>
         /// 物流方式 (CVS: 超商 / Home: 宅配)
         /// </summary>
         public string LogisticsType { get; set; }

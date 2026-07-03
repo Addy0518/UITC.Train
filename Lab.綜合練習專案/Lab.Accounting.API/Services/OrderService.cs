@@ -10,6 +10,8 @@ public class OrderService(
     IProductsRateRepository productsRateRepositories,
     IProductsOrderRepository productsBuyRepositories,
     IProductsShoppingCarRepository productsShoppingCarRepository,
+    ILogisticsRepository logisticsRepository,
+    ILogisticsTempRepository logisticsTempRepository,
     ICouponRepository couponRepository
 ) : IOrderService
 {
@@ -189,7 +191,8 @@ public class OrderService(
             decimal remainingDiscount = coupon != null ? coupon.Discount : 0;
             // 用來計算算到哪件商品了，判斷 remainingDiscount 分攤到最後一件商品時，直接把剩餘的折扣全扣掉
             int productCounter = 0;
-
+            // 記錄每一筆訂單 , 用來新增對應的物流單
+            var sellerMap = new List<(int orderId, int sellerId)>();
             // 開始處理每一件商品的訂單
             foreach (var product in Request.Products)
             {
@@ -264,6 +267,7 @@ public class OrderService(
                     OrderNumber = merchantTradeNo,
                     SellerUserId = target.UserId,
                     UserId = Request.UserId,
+                    LogisticsId = null,
                     ProductsId = product.ProductsId,
                     ProductsName = target.ProductsName,
                     ProductCategoryId = target.ProductCategoryId,
@@ -273,11 +277,12 @@ public class OrderService(
                     PlatformDiscount = currentProductDiscount,
                     AccountAmount = accountPrice,
                     BoughtTime = DateTime.Now,
-                    ShippingAddress = Request.ShippingAddress,
                     ShippingStatus = (int)ShippingStatusEnum.PendingPayment,
                 };
                 var order = await productsBuyRepositories.BuyProducts(buytarget);
+
                 orderIds.Add(order);
+                sellerMap.Add((order, target.UserId));
 
                 if (coupon != null && targetUserCoupon?.UserCouponId != null)
                 {
@@ -285,6 +290,47 @@ public class OrderService(
                 }
 
                 await productsShoppingCarRepository.DeleteProductsInShoppingCar(product.ProductsId, Request.UserId);
+            }
+
+            // 根據賣家分訂單 , 假設同一筆訂單的兩件商品是一個賣家的 , 那就是一張物流單就好
+            var sellerGroups = sellerMap.GroupBy(s => s.sellerId);
+            // 用來生成物流單邊號末碼
+            int shipmentIndex = 0;
+            // 拿出暫存表塞入主表
+            var orderLogisticsTemp = await logisticsTempRepository.GetLogisticsTemp(Request.SessionKey);
+
+            if (orderLogisticsTemp == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "SessionKey", new[] { "配送資料已過期或不存在，請重新選擇配送方式" } },
+                };
+                return ApiResponseHelper.RequestError<List<int>>(errors);
+            }
+
+            foreach (var sellerGroup in sellerGroups)
+            {
+                shipmentIndex++;
+                var logistics = new OrderLogistics
+                {
+                    LogisticsType = orderLogisticsTemp.LogisticsType,
+                    LogisticsSubType = orderLogisticsTemp.LogisticsSubType,
+                    StoreCode = orderLogisticsTemp.StoreCode ?? null,
+                    StoreName = orderLogisticsTemp.StoreName ?? null,
+                    StoreAddress = orderLogisticsTemp.StoreAddress ?? null,
+                    ReceiverName = orderLogisticsTemp.ReceiverName,
+                    ReceiverPhone = orderLogisticsTemp.ReceiverPhone,
+                    ReceiverAddress = orderLogisticsTemp.ReceiverAddress ?? null,
+                    MerchantTradeNo = $"{merchantTradeNo}-{shipmentIndex}",
+                    LogisticsStatus = LogisticsStatusEnum.Created,
+                };
+
+                var logisticsId = await logisticsRepository.CreateLogistics(logistics);
+
+                foreach (var (orderId, _) in sellerGroup)
+                {
+                    await productsBuyRepositories.UpdateLogisticsId(orderId, logisticsId);
+                }
             }
 
             trxScope.Complete();

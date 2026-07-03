@@ -23,6 +23,11 @@ public class Order
     public int UserId { get; set; }
 
     /// <summary>
+    /// 物流單 ID
+    /// </summary>
+    public int? LogisticsId { get; set; }
+
+    /// <summary>
     /// 商品 ID
     /// </summary>
     public int ProductsId { get; set; }
@@ -76,11 +81,6 @@ public class Order
     /// 付款時間
     /// </summary>
     public DateTime? PaidTime { get; set; }
-
-    /// <summary>
-    /// 運送地址
-    /// </summary>
-    public string? ShippingAddress { get; set; }
 
     /// <summary>
     /// 運送狀態

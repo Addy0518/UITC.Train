@@ -1,6 +1,7 @@
 <script setup>
 import { userBuyProduct } from '@/api//orderService';
 import { getUserCoupon } from '@/api/couponService';
+import { saveCvsReceiver } from '@/api/logisticsService';
 import { couponTypeEnum } from '@/common/enum';
 import defaultImgurl from '@/img/預設圖片.jpg';
 import { computed } from 'vue';
@@ -22,6 +23,7 @@ import { useRoute } from 'vue-router';
    logisticsTemp : 物流暫存單
    shippingType : 物流方式 ( 宅配或超商 )
    cvsSessionKey : 超商的物流單編號
+   homeSessionKey : 宅配的物流單編號
 */
 const router = useRouter();
 const route = useRoute();
@@ -37,6 +39,7 @@ const coupon = ref(null);
 const logisticsTemp = ref(null);
 const shippingType = ref('Home');
 const cvsSessionKey = ref(route.query.sessionKey || null);
+const homeSessionKey = ref();
 /*
    注入 Loading 跟 Toast
 */
@@ -51,9 +54,11 @@ const showToastError = inject('showToastError');
 onMounted(() => {
   getMyCoupon();
 
-  if (cvsSessionKey) {
+  if (cvsSessionKey.value) {
     getLogistics();
     shippingType.value = 'CVS';
+  } else if (shippingType.value === 'Home' && !homeSessionKey.value) {
+    homeSessionKey.value = 'GN' + crypto.randomUUID().replace(/-/g, '').substring(0, 11);
   }
 });
 
@@ -93,10 +98,10 @@ const goToCvsMap = async () => {
   try {
     showLoading();
     if (!cvsSessionKey.value) {
-      cvsSessionKey.value = 'TEST' + Date.now();
+      cvsSessionKey.value = 'GN' + crypto.randomUUID().replace(/-/g, '').substring(0, 11);
     }
     const res = await getCvsMapUrl({
-      merchantTradeNo: cvsSessionKey.value,
+      sessionKey: cvsSessionKey.value,
       logisticsSubType: 'UNIMARTC2C',
     });
     const { data } = res;
@@ -134,8 +139,11 @@ const goToCvsMap = async () => {
 const InsertHomeLogisticsTemp = async () => {
   try {
     showLoading();
+    if (!homeSessionKey.value) {
+      homeSessionKey.value = 'GN' + crypto.randomUUID().replace(/-/g, '').substring(0, 11);
+    }
     const request = {
-      sessionKey: 'TEST' + Date.now(),
+      sessionKey: homeSessionKey.value,
       logisticsType: 'Home',
       logisticsSubType: 'TCAT',
       receiverName: name.value,
@@ -244,13 +252,28 @@ const userBuy = async () => {
   const isFormCorrect = await v$.value.$validate();
   if (!isFormCorrect) return;
 
+  if (shippingType.value === 'CVS' && !cvsSessionKey.value) {
+    showToastError('請先選擇取貨門市');
+    return;
+  }
+  // 存收件人資料到暫存表
+  if (shippingType.value == 'Home') {
+    await InsertHomeLogisticsTemp();
+  } else if (shippingType.value == 'CVS') {
+    const request = {
+      sessionKey: cvsSessionKey.value,
+      receiverName: name.value,
+      receiverPhone: phone.value,
+    };
+    await saveCvsReceiver(request);
+  }
   const bought = {
     products: items.map((item) => ({
       productsId: item.productsId,
       boughtQuantity: item.boughtQuantity,
     })),
+    sessionKey: shippingType.value === 'CVS' ? cvsSessionKey.value : homeSessionKey.value,
     couponId: coupon.value,
-    shippingAddress: authStore.userAddress ?? address.value,
     boughtTime: new Date().toLocaleDateString('en-CA'),
   };
 
@@ -276,10 +299,6 @@ const userBuy = async () => {
           input.name = key;
           input.value = ecpayData[key];
           form.appendChild(input);
-        }
-        // 存收件人資料到暫存表
-        if (shippingType.value == 'Home') {
-          await InsertHomeLogisticsTemp();
         }
 
         // 把表單加到 body 並送出 (這就會觸發頁面跳轉)

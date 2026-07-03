@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Lab.Accounting.API.Common.Requests.Logistics;
+using Microsoft.Extensions.Options;
 
 namespace Lab.Accounting.API.Services
 {
@@ -22,12 +23,12 @@ namespace Lab.Accounting.API.Services
             var parameters = new SortedDictionary<string, string>
             {
                 { "MerchantID", _settings.MerchantId },
-                { "MerchantTradeNo", request.MerchantTradeNo },
+                { "MerchantTradeNo", request.SessionKey },
                 { "LogisticsType", "CVS" },
                 { "LogisticsSubType", request.LogisticsSubType },
                 { "IsCollection", "N" },
                 { "ServerReplyURL", $"{_settings.ServerBaseUrl}/api/Logistics/CvsStoreCallback" },
-                { "ExtraData", request.MerchantTradeNo },
+                { "ExtraData", request.SessionKey },
                 { "Device", "0" },
             };
 
@@ -77,7 +78,36 @@ namespace Lab.Accounting.API.Services
                 ExpiredAt = DateTime.Now.AddHours(2),
             };
             await logisticsTempRepository.CreateCVSLogisticsTemp(temp);
+
             return ApiResponseHelper.Success<string>("配送資訊已儲存");
+        }
+
+        /// <summary>
+        /// 儲存物流暫存訂單收件人 ( 超商 )
+        /// </summary>
+        /// <param name="request">收件人資訊</param>
+        /// <returns>是否成功</returns>
+        public async Task<ApiResponse<string>> SaveCvsReceiver(CvsReceiverInsertRequest request)
+        {
+            var existingTemp = await logisticsTempRepository.GetLogisticsTemp(request.SessionKey);
+
+            if (existingTemp == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "SessionKey", new[] { "找不到門市資料，請重新選擇門市" } },
+                };
+                return ApiResponseHelper.RequestError<string>(errors);
+            }
+
+            // 門市資料維持不動，只補姓名電話
+            existingTemp.ReceiverName = request.ReceiverName;
+            existingTemp.ReceiverPhone = request.ReceiverPhone;
+            existingTemp.ExpiredAt = DateTime.Now.AddHours(2);
+
+            await logisticsTempRepository.UpdateCVSLogisticsTemp(existingTemp);
+
+            return ApiResponseHelper.Success<string>("收件人資訊已儲存");
         }
 
         /// <summary>

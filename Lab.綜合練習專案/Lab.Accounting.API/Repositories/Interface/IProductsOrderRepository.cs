@@ -56,6 +56,14 @@ public interface IProductsOrderRepository
     Task<int> UpdateShippingStatus(int orderId, ShippingStatusEnum shippingStatus);
 
     /// <summary>
+    /// 新增物流訂單編號
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <param name="logisticsId">物流訂單 ID</param>
+    /// <returns>影響行數</returns>
+    Task<int> UpdateLogisticsId(int orderId, int logisticsId);
+
+    /// <summary>
     /// 商品購買
     /// </summary>
     /// <param name="order">購買資訊</param>

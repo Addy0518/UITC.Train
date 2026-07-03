@@ -57,6 +57,24 @@ public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRe
     }
 
     /// <summary>
+    /// 儲存物流暫存訂單收件人 ( 超商 )
+    /// </summary>
+    /// <param name="logisticsTemp">物流暫存訂單資訊</param>
+    /// <returns></returns>
+    public async Task UpdateCVSLogisticsTemp(OrderLogisticsTemp logisticsTemp)
+    {
+        using var conn = connecting.CreateConnecting();
+        var sql =
+            @"
+        UPDATE OrderLogisticsTemp
+        SET ReceiverName = @ReceiverName,
+            ReceiverPhone = @ReceiverPhone,
+            ExpiredAt = @ExpiredAt
+        WHERE SessionKey = @SessionKey";
+        await conn.ExecuteAsync(sql, logisticsTemp);
+    }
+
+    /// <summary>
     /// 查看物流暫存訂單資料
     /// </summary>
     /// <param name="sessionKey">SessionKey</param>

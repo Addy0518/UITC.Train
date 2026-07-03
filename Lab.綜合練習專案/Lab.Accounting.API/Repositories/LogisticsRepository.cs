@@ -18,14 +18,14 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
         var sql =
             @"
             INSERT INTO OrderLogistics (
-                OrderId, LogisticsType, LogisticsSubType,
+                LogisticsType, LogisticsSubType,
                 StoreCode, StoreName, StoreAddress,
                 ReceiverName, ReceiverPhone, ReceiverAddress,
                 MerchantTradeNo, LogisticsTrackingNo,
                 LogisticsStatus, CreatedAt
             )
             VALUES (
-                @OrderId, @LogisticsType, @LogisticsSubType,
+                 @LogisticsType, @LogisticsSubType,
                 @StoreCode, @StoreName, @StoreAddress,
                 @ReceiverName, @ReceiverPhone, @ReceiverAddress,
                 @MerchantTradeNo, NULL,

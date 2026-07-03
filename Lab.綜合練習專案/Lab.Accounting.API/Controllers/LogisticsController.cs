@@ -1,4 +1,5 @@
-﻿using NPOI.POIFS.Properties;
+﻿using Lab.Accounting.API.Common.Requests.Logistics;
+using NPOI.POIFS.Properties;
 
 namespace Lab.Accounting.API.Controllers
 {
@@ -32,7 +33,7 @@ namespace Lab.Accounting.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> CvsStoreCallback([FromForm] CvsStoreCallbackRequest request)
         {
             await logisticsService.SaveCvsLogisticsTemp(request);
@@ -43,6 +44,19 @@ namespace Lab.Accounting.API.Controllers
                 $"<script>window.location.href='{fronturl}/product-bought?sessionKey={sessionKey}';</script>",
                 "text/html"
             );
+        }
+
+        /// <summary>
+        /// 儲存物流暫存訂單收件人 ( 超商 )
+        /// </summary>
+        /// <param name="request">收件人資訊</param>
+        /// <returns>是否成功</returns>
+        [HttpPost]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+        public async Task<IActionResult> SaveCvsReceiver([FromBody] CvsReceiverInsertRequest request)
+        {
+            return Ok(await logisticsService.SaveCvsReceiver(request));
         }
 
         /// <summary>

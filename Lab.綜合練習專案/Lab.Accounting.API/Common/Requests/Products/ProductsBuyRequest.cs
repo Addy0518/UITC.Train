@@ -10,6 +10,14 @@ public class ProductsBuyRequest
     public int UserId { get; set; }
 
     /// <summary>
+    /// 物流訂單編號
+    /// </summary>
+    [Display(Name = "物流訂單編號")]
+    [Required(ErrorMessage = "{0} 不能為空!")]
+    [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
+    public string SessionKey { get; set; } = string.Empty;
+
+    /// <summary>
     /// 所有購買的商品
     /// </summary>
     [Display(Name = "所有購買的商品")]
@@ -21,14 +29,6 @@ public class ProductsBuyRequest
     /// </summary>
     [Display(Name = "優惠券 ID")]
     public int? CouponId { get; set; }
-
-    /// <summary>
-    /// 運送地址
-    /// </summary>
-    [Display(Name = "運送地址")]
-    [Required(ErrorMessage = "{0} 必輸")]
-    [MaxLength(300, ErrorMessage = "{0} 長度最長為 {1} 字")]
-    public string ShippingAddress { get; set; }
 
     /// <summary>
     /// 購買時間

@@ -194,6 +194,24 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     }
 
     /// <summary>
+    /// 新增物流訂單編號
+    /// </summary>
+    /// <param name="orderId">訂單 ID</param>
+    /// <param name="logisticsId">物流訂單 ID</param>
+    /// <returns>影響行數</returns>
+    public async Task<int> UpdateLogisticsId(int orderId, int logisticsId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var addBoughtProductsql =
+            @"Update [Order] Set LogisticsId = @LogisticsId
+      
+            WHERE  OrderId = @OrderId ";
+
+        return await conn.ExecuteAsync(addBoughtProductsql, new { OrderId = orderId, LogisticsId = logisticsId });
+    }
+
+    /// <summary>
     /// 商品購買
     /// </summary>
     /// <param name="order">購買資訊</param>
@@ -216,7 +234,6 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              PlatformDiscount,
                              AccountAmount,
                              BoughtTime,
-                             ShippingAddress,
                              ShippingStatus)
 
                 VALUES      (@OrderNumber,
@@ -231,7 +248,6 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                              @PlatformDiscount,
                              @AccountAmount,
                              @BoughtTime,
-                             @ShippingAddress,
                              @ShippingStatus)
                  Select 
                             Cast(

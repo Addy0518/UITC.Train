@@ -111,10 +111,7 @@ const getProductsImg = (product) => {
               <p class="text-xs text-ink-500 m-0 mb-1">付款方式</p>
               <p class="text-sm m-0 text-ink-900">{{ order.paidType }}</p>
             </div>
-            <div class="col-span-2">
-              <p class="text-xs text-ink-500 m-0 mb-1">寄送地址</p>
-              <p class="text-sm m-0 text-ink-900">{{ order.shippingAddress }}</p>
-            </div>
+
           </div>
         </div>
       </div>

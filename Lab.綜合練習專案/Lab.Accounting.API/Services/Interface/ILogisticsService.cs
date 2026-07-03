@@ -1,4 +1,6 @@
-﻿namespace Lab.Accounting.API.Services;
+﻿using Lab.Accounting.API.Common.Requests.Logistics;
+
+namespace Lab.Accounting.API.Services;
 
 public interface ILogisticsService
 {
@@ -17,6 +19,12 @@ public interface ILogisticsService
     Task<ApiResponse<string>> SaveCvsLogisticsTemp(CvsStoreCallbackRequest request);
 
     /// <summary>
+    /// 儲存物流暫存訂單收件人 ( 超商 )
+    /// </summary>
+    /// <param name="request">收件人資訊</param>
+    /// <returns>是否成功</returns>
+    Task<ApiResponse<string>> SaveCvsReceiver(CvsReceiverInsertRequest request);
+
     /// 儲存物流暫存訂單資料 ( 宅配 )
     /// </summary>
     /// <param name="request">物流暫存表單資料</param>

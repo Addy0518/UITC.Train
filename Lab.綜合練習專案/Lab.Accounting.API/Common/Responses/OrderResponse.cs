@@ -88,11 +88,6 @@
         public DateTime BoughtTime { get; set; }
 
         /// <summary>
-        /// 運送地址
-        /// </summary>
-        public string? ShippingAddress { get; set; }
-
-        /// <summary>
         /// 運送狀態
         /// </summary>
         public ShippingStatusEnum ShippingStatus { get; set; }
