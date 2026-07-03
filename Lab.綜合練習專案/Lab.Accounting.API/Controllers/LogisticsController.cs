@@ -35,7 +35,7 @@ namespace Lab.Accounting.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CvsStoreCallback([FromForm] CvsStoreCallbackRequest request)
         {
-            await logisticsService.HandleCvsStoreCallback(request);
+            await logisticsService.SaveCvsLogisticsTemp(request);
 
             var sessionKey = request.ExtraData;
 
@@ -46,16 +46,16 @@ namespace Lab.Accounting.API.Controllers
         }
 
         /// <summary>
-        /// 收件人資料存進暫存表
+        /// 儲存物流暫存訂單資料 ( 宅配 )
         /// </summary>
         /// <param name="request">物流暫存表單資料</param>
         /// <returns>操作結果</returns>
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
-        public async Task<IActionResult> SaveLogisticsTemp([FromBody] LogisticsTempInsertRequest request)
+        public async Task<IActionResult> SaveHomeLogisticsTemp([FromBody] LogisticsTempInsertRequest request)
         {
-            return Ok(await logisticsService.SaveLogisticsTemp(request));
+            return Ok(await logisticsService.SaveHomeLogisticsTemp(request));
         }
 
         /// <summary>

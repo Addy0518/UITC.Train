@@ -7,11 +7,11 @@ namespace Lab.Accounting.API.Repositories;
 public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRepository
 {
     /// <summary>
-    /// 儲存物流暫存訂單資料
+    /// 儲存物流暫存訂單資料 ( 超商 )
     /// </summary>
     /// <param name="logisticsTemp">物流暫存訂單資訊</param>
     /// <returns></returns>
-    public async Task CreateLogisticsTemp(OrderLogisticsTemp logisticsTemp)
+    public async Task CreateCVSLogisticsTemp(OrderLogisticsTemp logisticsTemp)
     {
         using var conn = connecting.CreateConnecting();
 
@@ -20,13 +20,37 @@ public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRe
               INSERT INTO OrderLogisticsTemp (
                 SessionKey, LogisticsType, LogisticsSubType,
                 StoreCode, StoreName, StoreAddress,
-                ReceiverName, ReceiverPhone, ReceiverAddress,
+                ReceiverName, ReceiverPhone,
                 ExpiredAt
             )
             VALUES (
                 @SessionKey, @LogisticsType, @LogisticsSubType,
                 @StoreCode, @StoreName, @StoreAddress,
-                @ReceiverName, @ReceiverPhone, @ReceiverAddress,
+                @ReceiverName, @ReceiverPhone,
+                @ExpiredAt
+            );";
+        await conn.ExecuteAsync(sql, logisticsTemp);
+    }
+
+    /// <summary>
+    /// 儲存物流暫存訂單資料 ( 宅配 )
+    /// </summary>
+    /// <param name="logisticsTemp">物流暫存訂單資訊</param>
+    /// <returns></returns>
+    public async Task CreateHomeLogisticsTemp(OrderLogisticsTemp logisticsTemp)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+            INSERT INTO OrderLogisticsTemp (
+                SessionKey, LogisticsType, LogisticsSubType,
+                ReceiverName, ReceiverPhone,ReceiverAddress,
+                ExpiredAt
+            )
+            VALUES (
+                @SessionKey, @LogisticsType, @LogisticsSubType,
+                @ReceiverName, @ReceiverPhone,@ReceiverAddress,
                 @ExpiredAt
             );";
         await conn.ExecuteAsync(sql, logisticsTemp);
@@ -35,7 +59,7 @@ public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRe
     /// <summary>
     /// 查看物流暫存訂單資料
     /// </summary>
-    /// <param name="sessionKey">SessionKey ( 對應金流的 MerchantTradeNo )</param>
+    /// <param name="sessionKey">SessionKey</param>
     /// <returns>物流暫存訂單資料</returns>
     public async Task<OrderLogisticsTemp> GetLogisticsTemp(string sessionKey)
     {
@@ -51,7 +75,7 @@ public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRe
     /// <summary>
     /// 刪除暫存物流訂單資料
     /// </summary>
-    /// <param name="sessionKey">SessionKey ( 對應金流的 MerchantTradeNo )</param>
+    /// <param name="sessionKey">SessionKey</param>
     /// <returns>物流訂單資訊</returns>
     public async Task<int> DeleteBySessionKey(string sessionKey)
     {

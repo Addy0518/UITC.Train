@@ -46,16 +46,16 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 接收綠界回傳的門市資料存進暫存表
+        /// 儲存物流暫存訂單資料 ( 超商 )
         /// </summary>
         /// <param name="request">綠界回傳門市資料</param>
-        /// <returns></returns>
-        public async Task HandleCvsStoreCallback(CvsStoreCallbackRequest request)
+        /// <returns>是否成功</returns>
+        public async Task<ApiResponse<string>> SaveCvsLogisticsTemp(CvsStoreCallbackRequest request)
         {
             // ExtraData 帶的就是 SessionKey
             var sessionKey = request.ExtraData;
             if (string.IsNullOrEmpty(sessionKey))
-                return;
+                return ApiResponseHelper.NotFound<string>();
 
             var existingTemp = await logisticsTempRepository.GetLogisticsTemp(sessionKey);
             if (existingTemp != null)
@@ -76,47 +76,28 @@ namespace Lab.Accounting.API.Services
                 ReceiverPhone = string.Empty,
                 ExpiredAt = DateTime.Now.AddHours(2),
             };
-            await logisticsTempRepository.CreateLogisticsTemp(temp);
+            await logisticsTempRepository.CreateCVSLogisticsTemp(temp);
+            return ApiResponseHelper.Success<string>("配送資訊已儲存");
         }
 
         /// <summary>
-        /// 收件人資料存進暫存表
+        /// 儲存物流暫存訂單資料 ( 宅配 )
         /// </summary>
         /// <param name="request">物流暫存表單資料</param>
-        /// <returns>操作結果</returns>
-        public async Task<ApiResponse<string>> SaveLogisticsTemp(LogisticsTempInsertRequest request)
+        /// <returns>是否成功</returns>
+        public async Task<ApiResponse<string>> SaveHomeLogisticsTemp(LogisticsTempInsertRequest request)
         {
-            var existingTemp = await logisticsTempRepository.GetLogisticsTemp(request.SessionKey);
-
-            if (existingTemp == null)
+            var homeTemp = new OrderLogisticsTemp
             {
-                // 宅配 or 第一次存（超商應該在 CvsStoreCallback 已建好，走這裡是保護邏輯）
-                var temp = new OrderLogisticsTemp
-                {
-                    SessionKey = request.SessionKey,
-                    LogisticsType = request.LogisticsType,
-                    LogisticsSubType = request.LogisticsSubType,
-                    StoreCode = request.StoreCode,
-                    StoreName = request.StoreName,
-                    StoreAddress = request.StoreAddress,
-                    ReceiverName = request.ReceiverName,
-                    ReceiverPhone = request.ReceiverPhone,
-                    ReceiverAddress = request.ReceiverAddress,
-                    ExpiredAt = DateTime.Now.AddHours(2),
-                };
-                await logisticsTempRepository.CreateLogisticsTemp(temp);
-            }
-            else
-            {
-                await logisticsTempRepository.DeleteBySessionKey(request.SessionKey);
-
-                // 超商：補上收件人姓名電話（門市資料已存在）
-                existingTemp.ReceiverName = request.ReceiverName;
-                existingTemp.ReceiverPhone = request.ReceiverPhone;
-                existingTemp.ExpiredAt = DateTime.Now.AddHours(2); // 重新計算過期時間
-                await logisticsTempRepository.CreateLogisticsTemp(existingTemp);
-            }
-
+                SessionKey = request.SessionKey,
+                LogisticsType = request.LogisticsType,
+                LogisticsSubType = request.LogisticsSubType,
+                ReceiverName = request.ReceiverName,
+                ReceiverPhone = request.ReceiverPhone,
+                ReceiverAddress = request.ReceiverAddress,
+                ExpiredAt = DateTime.Now.AddHours(2),
+            };
+            await logisticsTempRepository.CreateHomeLogisticsTemp(homeTemp);
             return ApiResponseHelper.Success<string>("配送資訊已儲存");
         }
 

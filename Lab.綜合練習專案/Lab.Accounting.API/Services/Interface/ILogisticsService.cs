@@ -10,18 +10,18 @@ public interface ILogisticsService
     ApiResponse<Dictionary<string, string>> GetCvsMapUrl(GetCvsMapRequest request);
 
     /// <summary>
-    /// 接收綠界回傳的門市資料存進暫存表
+    /// 儲存物流暫存訂單資料 ( 超商 )
     /// </summary>
     /// <param name="request">綠界回傳門市資料</param>
-    /// <returns></returns>
-    Task HandleCvsStoreCallback(CvsStoreCallbackRequest request);
+    /// <returns>是否成功</returns>
+    Task<ApiResponse<string>> SaveCvsLogisticsTemp(CvsStoreCallbackRequest request);
 
     /// <summary>
-    /// 收件人資料存進暫存表
+    /// 儲存物流暫存訂單資料 ( 宅配 )
     /// </summary>
     /// <param name="request">物流暫存表單資料</param>
-    /// <returns>操作結果</returns>
-    Task<ApiResponse<string>> SaveLogisticsTemp(LogisticsTempInsertRequest request);
+    /// <returns>是否成功</returns>
+    Task<ApiResponse<string>> SaveHomeLogisticsTemp(LogisticsTempInsertRequest request);
 
     /// <summary>
     /// 查看物流暫存訂單資料

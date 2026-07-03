@@ -11,7 +11,14 @@ public interface ILogisticsTempRepository
     /// </summary>
     /// <param name="logisticsTemp">物流暫存訂單資訊</param>
     /// <returns></returns>
-    Task CreateLogisticsTemp(OrderLogisticsTemp logisticsTemp);
+    Task CreateCVSLogisticsTemp(OrderLogisticsTemp logisticsTemp);
+
+    /// <summary>
+    /// 儲存物流暫存訂單資料 ( 宅配 )
+    /// </summary>
+    /// <param name="logisticsTemp">物流暫存訂單資訊</param>
+    /// <returns></returns>
+    Task CreateHomeLogisticsTemp(OrderLogisticsTemp logisticsTemp);
 
     /// <summary>
     /// 查看物流暫存訂單資料

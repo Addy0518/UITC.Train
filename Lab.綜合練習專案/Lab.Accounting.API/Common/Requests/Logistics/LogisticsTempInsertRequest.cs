@@ -20,7 +20,7 @@
         public string LogisticsType { get; set; } = string.Empty;
 
         /// <summary>
-        /// 物流子類型 (UNIMART: 7-11 / FAMIC2C: 全家 / HILIFEC2C: 萊爾富 / TCAT: 黑貓宅急便)
+        /// 物流子類型 (UNIMARTC2C: 7-ELEVEN超商交貨便 / FAMIC2C: 全家店到店 / HILIFEC2C：萊爾富店到店 / TCAT: 黑貓宅急便 等)
         /// </summary>
         [Display(Name = "物流子類型")]
         [Required(ErrorMessage = "{0} 不能為空!")]

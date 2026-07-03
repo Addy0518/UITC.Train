@@ -9,14 +9,19 @@ import { useRoute } from 'vue-router';
 /*
    變數名稱代表意義
    router : 改變路由
+   route : 路由資訊
    product : 商品資訊
    baseUrl : 環境變數裡的圖片基底位址
    authStore : pinia
-   boughtQuantity : 購買數量
-   address : 地址
+   name : 收件人姓名
+   phone : 收件人電話
+   address : 收件人地址
    items : 存在 pinia 的購物車選擇的商品
    allCoupons : 用戶的所有優惠卷
    coupon : 選擇的優惠卷
+   logisticsTemp : 物流暫存單
+   shippingType : 物流方式 ( 宅配或超商 )
+   cvsSessionKey : 超商的物流單編號
 */
 const router = useRouter();
 const route = useRoute();
@@ -30,6 +35,8 @@ const items = orderStore.selectedItems;
 const allCoupons = ref();
 const coupon = ref(null);
 const logisticsTemp = ref(null);
+const shippingType = ref('Home');
+const cvsSessionKey = ref(route.query.sessionKey || null);
 /*
    注入 Loading 跟 Toast
 */
@@ -37,15 +44,16 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
-const shippingType = ref('Home'); // Home 或 CVS
-const selectedStore = ref(null); // 儲存選回來的門市資訊
+
 /*
    初始化
 */
 onMounted(() => {
   getMyCoupon();
-  if (route.query.sessionKey) {
+
+  if (cvsSessionKey) {
     getLogistics();
+    shippingType.value = 'CVS';
   }
 });
 
@@ -78,44 +86,73 @@ const getProductImg = (item) => {
   return defaultImgurl;
 };
 
-// 呼叫你的 API 取得地圖網址
+/*
+   取得門市資訊 ( 正式區才能選門市 , 這裡測試直接給一個固定的門市 )
+*/
 const goToCvsMap = async () => {
-  // 1. 呼叫你後端的 GetCvsMapUrl
-  const res = await getCvsMapUrl({
-    merchantTradeNo: 'TEST' + Date.now(), // 確保唯一性
-    logisticsSubType: 'UNIMARTC2C',
-  });
-  const { data } = res;
-  // 2. 跳轉到綠界地圖
-  if (data.codeStatus === 2000) {
-    // 建立一個隱藏的 form 表單
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = res.data.returnData.ActionUrl;
-
-    // 將後端給的參數全部轉換為 input 塞進去
-    Object.keys(data.returnData).forEach((key) => {
-      if (key !== 'ActionUrl') {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = res.data.returnData[key];
-        form.appendChild(input);
-      }
+  try {
+    showLoading();
+    if (!cvsSessionKey.value) {
+      cvsSessionKey.value = 'TEST' + Date.now();
+    }
+    const res = await getCvsMapUrl({
+      merchantTradeNo: cvsSessionKey.value,
+      logisticsSubType: 'UNIMARTC2C',
     });
+    const { data } = res;
 
-    document.body.appendChild(form);
-    form.submit();
+    if (data.codeStatus === 2000) {
+      // 建立一個隱藏的 form 表單
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = res.data.returnData.ActionUrl;
+
+      // 將後端給的參數全部轉換為 input 塞進去
+      Object.keys(data.returnData).forEach((key) => {
+        if (key !== 'ActionUrl') {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = res.data.returnData[key];
+          form.appendChild(input);
+        }
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
   }
 };
 
-// 處理門市資料 (這通常會在頁面重新載入後從 localStorage 或 Pinia 拿回)
-// 如果你是從 CvsStoreCallback 回來，記得把資料存入 localStorage 後再導回此頁面
-onMounted(() => {
-  const savedStore = localStorage.getItem('selectedStore');
-  if (savedStore) selectedStore.value = JSON.parse(savedStore);
-});
+/*
+   存收件人資訊到物流暫存單
+*/
+const InsertHomeLogisticsTemp = async () => {
+  try {
+    showLoading();
+    const request = {
+      sessionKey: 'TEST' + Date.now(),
+      logisticsType: 'Home',
+      logisticsSubType: 'TCAT',
+      receiverName: name.value,
+      receiverPhone: phone.value,
+      receiverAddress: address.value,
+    };
+    const res = await saveHomeLogisticsTemp(request);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
 
+/*
+   取得物流暫存單 ( 門市資訊 )
+*/
 const getLogistics = async () => {
   try {
     showLoading();
@@ -239,6 +276,10 @@ const userBuy = async () => {
           input.name = key;
           input.value = ecpayData[key];
           form.appendChild(input);
+        }
+        // 存收件人資料到暫存表
+        if (shippingType.value == 'Home') {
+          await InsertHomeLogisticsTemp();
         }
 
         // 把表單加到 body 並送出 (這就會觸發頁面跳轉)
@@ -413,22 +454,12 @@ const userBuy = async () => {
 
         <div v-if="shippingType === 'CVS'" class="flex flex-col gap-2">
           <div
-            v-if="!selectedStore"
             @click="goToCvsMap"
             class="cursor-pointer border border-dashed border-selection text-selection p-4 rounded-card text-center hover:bg-selection-50 transition-colors"
           >
             + 點擊選擇超商門市
           </div>
-          <div
-            v-else
-            class="border border-selection bg-selection-50 p-4 rounded-card flex flex-col gap-1"
-          >
-            <span class="font-bold text-ink-900">{{ selectedStore.storeName }}</span>
-            <span class="text-sm text-ink-500">{{ selectedStore.storeAddress }}</span>
-            <button @click="goToCvsMap" class="text-xs text-selection mt-2 underline">
-              重新選擇門市
-            </button>
-          </div>
+
           <div
             v-if="logisticsTemp"
             class="border border-border-soft rounded-card p-4 mt-2 flex flex-col gap-1 text-sm"
