@@ -301,8 +301,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         // 更新所有 ID 的訂單編號
         var addBoughtProductsql =
             @"Update [Order]
-                  Set OrderNumber =@NewOrderNumber
-                  Where OrderId in @OrderIds";
+              Set OrderNumber =@NewOrderNumber
+              Where OrderId in @OrderIds";
 
         return await conn.ExecuteAsync(
             addBoughtProductsql,

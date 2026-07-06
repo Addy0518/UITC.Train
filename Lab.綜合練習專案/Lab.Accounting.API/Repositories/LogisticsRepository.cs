@@ -25,30 +25,32 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
                 LogisticsStatus, CreatedAt
             )
             VALUES (
-                 @LogisticsType, @LogisticsSubType,
+                @LogisticsType, @LogisticsSubType,
                 @StoreCode, @StoreName, @StoreAddress,
                 @ReceiverName, @ReceiverPhone, @ReceiverAddress,
                 @MerchantTradeNo, NULL,
-                @LogisticsStatus, GETDATE()
+                @LogisticsStatus, @CreatedAt
             );
             SELECT CAST(SCOPE_IDENTITY() AS INT);";
         return await conn.ExecuteScalarAsync<int>(sql, logistics);
     }
 
     /// <summary>
-    /// 依訂單 ID 查詢物流資訊（買家查訂單進度用）
+    /// 查看單筆訂單所有物流單
     /// </summary>
-    /// <param name="orderId">物流訂單資訊</param>
+    /// <param name="orderNumber">訂單編號</param>
     /// <returns>物流訂單資訊</returns>
-    public async Task<OrderLogistics?> GetByOrderId(int orderId)
+    public async Task<IEnumerable<OrderLogistics>> GetByOrderNumber(string orderNumber)
     {
         using var conn = connecting.CreateConnecting();
         var sql =
             @"
-            SELECT * FROM OrderLogistics
-            WHERE OrderId = @OrderId";
+            SELECT l.* FROM OrderLogistics l
+            JOIN [Order] o 
+            ON   o.LogisticsId=l.LogisticsId
+            WHERE o.OrderNumber = @OrderNumber";
 
-        return await conn.QueryFirstOrDefaultAsync<OrderLogistics>(sql, new { OrderId = orderId });
+        return await conn.QueryAsync<OrderLogistics>(sql, new { OrderNumber = orderNumber });
     }
 
     /// <summary>
@@ -68,6 +70,23 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
             sql,
             new { LogisticsTrackingNo = logisticsTrackingNo }
         );
+    }
+
+    /// <summary>
+    ///查看多筆訂單下對應的物流單 ID
+    /// </summary>
+    /// <param name="orderIds">訂單編號列表</param>
+    /// <returns>物流訂單 ID 列表</returns>
+    public async Task<IEnumerable<int>> GetLogisticsIdsByOrderIds(List<int> orderIds)
+    {
+        using var conn = connecting.CreateConnecting();
+        var sql =
+            @"
+        SELECT DISTINCT LogisticsId
+        FROM [Order]
+        WHERE OrderId IN @OrderIds 
+        AND LogisticsId IS NOT NULL";
+        return await conn.QueryAsync<int>(sql, new { OrderIds = orderIds });
     }
 
     /// <summary>
@@ -103,23 +122,21 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
         // Shipped → ShippedAt
         // Delivered → DeliveredAt
         // PickedUp → PickedUpAt
-        // 其他狀態不需要更新時間欄位
         var now = timeStamp ?? DateTime.Now;
 
         var timeColumn = status switch
         {
-            LogisticsStatusEnum.Shipped => "ShippedAt = @TimeStamp,",
-            LogisticsStatusEnum.Delivered => "DeliveredAt = @TimeStamp,",
-            LogisticsStatusEnum.PickedUp => "PickedUpAt = @TimeStamp,",
+            LogisticsStatusEnum.Shipped => ",ShippedAt = @TimeStamp",
+            LogisticsStatusEnum.Delivered => ",DeliveredAt = @TimeStamp",
+            LogisticsStatusEnum.PickedUp => ",PickedUpAt = @TimeStamp",
             _ => "",
         };
 
         var sql =
             $@"
             UPDATE OrderLogistics
-            SET LogisticsStatus = @LogisticsStatus,
+            SET LogisticsStatus = @LogisticsStatus
                 {timeColumn}
-                UpdatedAt = GETDATE()
             WHERE LogisticsId = @LogisticsId";
 
         await conn.ExecuteAsync(
@@ -127,26 +144,27 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
             new
             {
                 LogisticsId = logisticsId,
-                LogisticsStatus = status.ToString(),
+                LogisticsStatus = status,
                 TimeStamp = now,
             }
         );
     }
 
     /// <summary>
-    /// 取消物流訂單
+    /// 更新物流單訂單編號
     /// </summary>
     /// <param name="logisticsId">物流訂單 ID</param>
-    /// <returns></returns>
-    public async Task CancelLogistics(int logisticsId)
+    /// <param name="merchantTradeNo">訂單編號</param>
+    /// <returns>物流訂單資訊</returns>
+    public async Task UpdateMerchantTradeNo(int logisticsId, string merchantTradeNo)
     {
         using var conn = connecting.CreateConnecting();
         var sql =
             @"
-             UPDATE OrderLogistics
-            SET LogisticsStatus = @LogisticsStatus
+            UPDATE OrderLogistics
+            SET MerchantTradeNo = @MerchantTradeNo
             WHERE LogisticsId = @LogisticsId";
 
-        await conn.ExecuteAsync(sql, new { LogisticsId = logisticsId });
+        await conn.ExecuteAsync(sql, new { LogisticsId = logisticsId, MerchantTradeNo = merchantTradeNo });
     }
 }

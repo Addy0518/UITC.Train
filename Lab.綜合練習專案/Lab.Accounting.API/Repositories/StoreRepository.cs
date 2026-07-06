@@ -14,18 +14,18 @@ namespace Lab.Accounting.API.Repositories.Interface
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"INSERT INTO [dbo].[seller]
+                @"INSERT INTO [dbo].Store
                             (userid,
-                             sellername,
-                             sellerunifiednumber,
-                             sellercompanyname,
+                             Storename,
+                             Storeunifiednumber,
+                             Storecompanyname,
                              createtime,
                              updatetime,
                              IsDelete)
                 VALUES      (@userid,
-                             @SellerName,
-                             @SellerUnifiedNumber,
-                             @SellerCompanyName,
+                             @StoreName,
+                             @StoreUnifiedNumber,
+                             @StoreCompanyName,
                              GetDate(),
                              GetDate(),
                              @IsDelete)

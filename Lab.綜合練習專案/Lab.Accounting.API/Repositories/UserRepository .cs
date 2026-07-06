@@ -66,17 +66,18 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
     /// <param name="password">密碼</param>
     /// <param name="userName">使用者名稱</param>
     /// <param name="pic">使用者 Google 頭貼照片</param>
+    /// <param name="role">角色權限</param>
     /// <returns>使用者 ID</returns>
-    public async Task<int> GoogleUserLogin(string email, string password, string userName, string pic)
+    public async Task<int> GoogleUserLogin(string email, string password, string userName, string pic, string role)
     {
         using var conn = connecting.CreateConnecting();
         var sql =
             @"Insert Into [User] (
-                  UserName, UserAccount, UserPassword,UserHeadshot,UserRegisterMethod,CreateTime,UpdateTime,IsDelete
+                  UserName, UserAccount, UserPassword,UserHeadshot,UserRegisterMethod,UserRole,CreateTime,UpdateTime,IsDelete
                 ) 
                 values 
                   (
-                    @UserName, @UserAccount, @UserPassword,@UserHeadshot,@UserRegisterMethod,GetDate(),GetDate(),@IsDelete
+                    @UserName, @UserAccount, @UserPassword,@UserHeadshot,@UserRegisterMethod,@UserRole,GetDate(),GetDate(),@IsDelete
                   );
                 Select 
                   Cast(
@@ -92,6 +93,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                 UserPassword = password,
                 UserHeadshot = pic,
                 UserRegisterMethod = (int)RegisterMethodEnum.Google登入,
+                UserRole = role,
                 IsDelete = 0,
             }
         );
@@ -146,7 +148,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserAccount,UserId,UserName,UserRegisterMethod  From [User]
+            @"Select UserAccount,UserId,UserName,UserRole,UserRegisterMethod  From [User]
               Where  UserAccount = @UserAccount";
 
         return await conn.QueryFirstOrDefaultAsync<UserResponse>(sql, new { UserAccount = userAccount });

@@ -142,7 +142,7 @@ public class UserService(
         if (dbUser == null)
         {
             var password = passwordSecureHelper.HashPassword(Guid.NewGuid().ToString());
-            await userrepo.GoogleUserLogin(email, password, googleName, pic);
+            await userrepo.GoogleUserLogin(email, password, googleName, pic, dbUser.UserRole = null);
             dbUser = await userrepo.GetUserByAccount(email);
         }
         else if (dbUser.UserRegisterMethod != RegisterMethodEnum.Google登入)

@@ -25,8 +25,9 @@ public interface IUserRepository
     /// <param name="password">密碼</param>
     /// <param name="userName">使用者名稱</param>
     /// <param name="pic">使用者 Google 頭貼照片</param>
+    /// <param name="role">角色權限</param>
     /// <returns>使用者 ID</returns>
-    Task<int> GoogleUserLogin(string email, string password, string userName, string pic);
+    Task<int> GoogleUserLogin(string email, string password, string userName, string pic, string role);
 
     /// <summary>
     /// 檢查使用者是否註冊過

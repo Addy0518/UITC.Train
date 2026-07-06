@@ -4,7 +4,7 @@ namespace Lab.Accounting.API.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
-[Authorize(Roles = RolesAuth.賣家)]
+[Authorize]
 [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<ProblemDetails>))]
 [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Dictionary<string, string[]>>))]
 public class StoreController(IStoreService sellerservice) : ControllerBase
@@ -44,6 +44,7 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     /// <param name="request">編輯資訊</param>
     /// <returns>影響列數</returns>
     [HttpPut]
+    [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
     public async Task<IActionResult> UpdateSeller(StoreUpdateRequest request)
     {

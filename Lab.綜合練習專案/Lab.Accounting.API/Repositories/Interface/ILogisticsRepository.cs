@@ -13,11 +13,11 @@ public interface ILogisticsRepository
     Task<int> CreateLogistics(OrderLogistics logistics);
 
     /// <summary>
-    /// 依訂單 ID 查詢物流資訊（買家查訂單進度用）
+    /// 查看單筆訂單所有物流單
     /// </summary>
-    /// <param name="orderId">物流訂單資訊</param>
+    /// <param name="orderNumber">訂單編號</param>
     /// <returns>物流訂單資訊</returns>
-    Task<OrderLogistics?> GetByOrderId(int orderId);
+    Task<IEnumerable<OrderLogistics>> GetByOrderNumber(string orderNumber);
 
     /// <summary>
     /// 依綠界物流追蹤編號查詢（ServerReplyURL 收到通知時用來對應是哪一筆）
@@ -25,6 +25,13 @@ public interface ILogisticsRepository
     /// <param name="logisticsTrackingNo">物流訂單編號</param>
     /// <returns>物流訂單資訊</returns>
     Task<OrderLogistics?> GetByTrackingNo(string logisticsTrackingNo);
+
+    /// <summary>
+    ///查看多筆訂單下對應的物流單 ID
+    /// </summary>
+    /// <param name="orderIds">訂單編號列表</param>
+    /// <returns>物流訂單 ID 列表</returns>
+    Task<IEnumerable<int>> GetLogisticsIdsByOrderIds(List<int> orderIds);
 
     /// <summary>
     /// 更新物流追蹤編號（呼叫建立物流 API 成功後，把綠界回傳的 LogisticsTrackingNo 存進來）
@@ -44,9 +51,10 @@ public interface ILogisticsRepository
     Task UpdateStatus(int logisticsId, LogisticsStatusEnum status, DateTime? timeStamp = null);
 
     /// <summary>
-    /// 取消物流訂單
+    /// 更新物流單訂單編號
     /// </summary>
     /// <param name="logisticsId">物流訂單 ID</param>
-    /// <returns></returns>
-    Task CancelLogistics(int logisticsId);
+    /// <param name="merchantTradeNo">訂單編號</param>
+    /// <returns>物流訂單資訊</returns>
+    Task UpdateMerchantTradeNo(int logisticsId, string merchantTradeNo);
 }

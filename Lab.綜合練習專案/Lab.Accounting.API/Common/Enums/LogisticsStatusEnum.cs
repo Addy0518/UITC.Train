@@ -5,18 +5,21 @@ public enum LogisticsStatusEnum
     [Description("物流單已建立")]
     Created = 0,
 
+    [Description("付款完成，等待出貨")]
+    PendingShipment = 1,
+
     [Description("賣家已出貨")]
-    Shipped = 1,
+    Shipped = 2,
 
     [Description("配送中")]
-    InTransit = 2,
+    InTransit = 3,
 
     [Description("已送達門市/已配達")]
-    Delivered = 3,
+    Delivered = 4,
 
     [Description("買家已取件")]
-    PickedUp = 4,
+    PickedUp = 5,
 
     [Description("已取消")]
-    Cancelled = 5,
+    Cancelled = 6,
 }

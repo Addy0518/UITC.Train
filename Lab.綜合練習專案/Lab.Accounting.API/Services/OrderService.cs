@@ -323,6 +323,7 @@ public class OrderService(
                     ReceiverAddress = orderLogisticsTemp.ReceiverAddress ?? null,
                     MerchantTradeNo = $"{merchantTradeNo}-{shipmentIndex}",
                     LogisticsStatus = LogisticsStatusEnum.Created,
+                    CreatedAt = DateTime.Now,
                 };
 
                 var logisticsId = await logisticsRepository.CreateLogistics(logistics);
@@ -332,7 +333,10 @@ public class OrderService(
                     await productsBuyRepositories.UpdateLogisticsId(orderId, logisticsId);
                 }
             }
-
+            if (!string.IsNullOrEmpty(Request.SessionKey))
+            {
+                await logisticsTempRepository.DeleteBySessionKey(Request.SessionKey);
+            }
             trxScope.Complete();
             return ApiResponseHelper.Success(orderIds);
         }
@@ -436,14 +440,27 @@ public class OrderService(
         {
             //驗證成功!這是綠界傳來的不是其他地方傳的
             var rtnCode = collection["RtnCode"].ToString();
+
+            var orderNo = collection["MerchantTradeNo"].ToString();
+            // 交易失敗的話
             if (rtnCode != "1")
             {
+                var failedOrders = await logisticsRepository.GetByOrderNumber(orderNo);
+
+                if (failedOrders != null)
+                {
+                    // 從這些 Order 裡取出 LogisticsId，去重（同賣家多商品會共用同一個 LogisticsId）
+                    var logisticsIds = failedOrders.Select(o => o.LogisticsId).Distinct();
+
+                    foreach (var logisticsId in logisticsIds)
+                    {
+                        await logisticsRepository.UpdateStatus(logisticsId, LogisticsStatusEnum.Cancelled);
+                    }
+                }
                 return "0|PaymentFailed";
             }
 
             //訂單成立之後,開始更新資料庫
-            var orderNo = collection["MerchantTradeNo"].ToString();
-
             var couponCompleted = await couponRepository.CompleteUserCoupon(orderNo);
 
             var buyProduct = await productsBuyRepositories.GetOrderByOrderNumber(orderNo);
@@ -468,18 +485,35 @@ public class OrderService(
             {
                 paidTime = DateTime.Now; // 如果解析不到時間，就用系統現在時間
             }
-            var paymentCompleted = await productsBuyRepositories.PaidProducts(
-                orderNo,
-                (int)ShippingStatusEnum.PendingShipment,
-                collection["PaymentType"].ToString(),
-                paidTime
-            );
-            if (paymentCompleted <= 0)
-            {
-                return "0|DBUpdateFailed";
-            }
 
-            //因為綠界規定交易成功要回傳1跟ok
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var paymentCompleted = await productsBuyRepositories.PaidProducts(
+                    orderNo,
+                    (int)ShippingStatusEnum.PendingShipment,
+                    collection["PaymentType"].ToString(),
+                    paidTime
+                );
+                if (paymentCompleted <= 0)
+                {
+                    return "0|DBUpdateFailed";
+                }
+
+                //交易成功
+
+                var successOrders = await logisticsRepository.GetByOrderNumber(orderNo);
+
+                if (successOrders != null)
+                {
+                    var logisticsIds = successOrders.Select(o => o.LogisticsId).Distinct();
+
+                    foreach (var logisticsId in logisticsIds)
+                    {
+                        await logisticsRepository.UpdateStatus(logisticsId, LogisticsStatusEnum.PendingShipment);
+                    }
+                }
+                trxScope.Complete();
+            }
 
             return "1|OK";
         }
@@ -526,8 +560,25 @@ public class OrderService(
 
             totalAmount += target.AccountAmount;
         }
-        // 重新生成編號
-        await productsBuyRepositories.RetryPaidProducts(orderIds, merchantTradeNo);
+        using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            // 重新生成訂單編號
+            await productsBuyRepositories.RetryPaidProducts(orderIds, merchantTradeNo);
+            // 撈出這批 orderIds 底下，實際牽涉到哪幾張不同的物流單
+            var logisticsIds = await logisticsRepository.GetLogisticsIdsByOrderIds(orderIds);
+            // 重新生成物流訂單編號
+            int shipmentIndex = 0;
+
+            foreach (var logisticsId in logisticsIds)
+            {
+                shipmentIndex++;
+                var no = $"{merchantTradeNo}-{shipmentIndex}";
+                await logisticsRepository.UpdateMerchantTradeNo(logisticsId, no);
+            }
+
+            trxScope.Complete();
+        }
+
         // 接下來就跟原本付款邏輯一樣
         var ecpay = new Dictionary<string, string>
         {
