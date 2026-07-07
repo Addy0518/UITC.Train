@@ -1,10 +1,12 @@
-﻿using Lab.Accounting.API.Common.Requests.Order;
+﻿using Lab.Accounting.API.Common.Requests.Logistics;
+using Lab.Accounting.API.Common.Requests.Order;
 using Lab.Accounting.API.Common.Requests.Products;
 using Org.BouncyCastle.Asn1.X509;
 
 namespace Lab.Accounting.API.Services;
 
 public class OrderService(
+    IUserRepository userRepository,
     IProductsRepository productsRepositories,
     IProductsImgRepository productsImgRepository,
     IProductsRateRepository productsRateRepositories,
@@ -12,6 +14,7 @@ public class OrderService(
     IProductsShoppingCarRepository productsShoppingCarRepository,
     ILogisticsRepository logisticsRepository,
     ILogisticsTempRepository logisticsTempRepository,
+    ILogisticsService logisticsService,
     ICouponRepository couponRepository
 ) : IOrderService
 {
@@ -498,23 +501,81 @@ public class OrderService(
                 {
                     return "0|DBUpdateFailed";
                 }
-
-                //交易成功
-
+                // 交易成功後 , 更新物流單狀態
                 var successOrders = await logisticsRepository.GetByOrderNumber(orderNo);
-
                 if (successOrders != null)
                 {
                     var logisticsIds = successOrders.Select(o => o.LogisticsId).Distinct();
-
                     foreach (var logisticsId in logisticsIds)
                     {
                         await logisticsRepository.UpdateStatus(logisticsId, LogisticsStatusEnum.PendingShipment);
                     }
                 }
+
                 trxScope.Complete();
             }
+            // 開始呼叫綠界的物流 API , 生成物流單 ( 不寫在交易裡是因為交易只管系統內部 , 這種呼叫外部操作的他管不到 )
+            var confirmedOrders = await logisticsRepository.GetByOrderNumber(orderNo);
 
+            if (confirmedOrders != null)
+            {
+                var logisticsIds = confirmedOrders.Select(o => o.LogisticsId).Distinct();
+
+                foreach (var logisticsId in logisticsIds)
+                {
+                    await logisticsRepository.UpdateStatus(logisticsId, LogisticsStatusEnum.PendingShipment);
+
+                    // logistics 是這張物流單的完整資訊
+                    var logistics = confirmedOrders.First(o => o.LogisticsId == logisticsId);
+
+                    // ordersUnderThisLogistics 是這張物流單底下的所有訂單
+                    var ordersUnderThisLogistics = buyProduct.Where(o => o.LogisticsId == logisticsId);
+
+                    // 商品名稱可能不只一種，用逗號串起來，避免只顯示第一件
+                    var productNames = ordersUnderThisLogistics.Select(o => o.ProductsName).Distinct().ToList();
+                    var goodsName =
+                        productNames.Count == 1 ? productNames[0] : $"{productNames[0]} 等{productNames.Count}件商品";
+                    // 欄位長度限制
+                    if (goodsName.Length > 20)
+                    {
+                        goodsName = goodsName.Substring(0, 20) + "...";
+                    }
+
+                    if (logistics.LogisticsType == "CVS")
+                    {
+                        // 這幾筆訂單的賣家是誰
+                        var sellerId = ordersUnderThisLogistics.First().SellerUserId;
+                        var seller = await userRepository.GetUser(sellerId);
+
+                        var createInfo = new LogisticsOrderInfoRequest
+                        {
+                            MerchantTradeNo = logistics.MerchantTradeNo,
+                            LogisticsSubType = logistics.LogisticsSubType,
+                            GoodsAmount = ordersUnderThisLogistics.Sum(o => o.AccountAmount),
+                            GoodsName = goodsName,
+                            SenderName = seller?.UserName ?? "賣家",
+                            SenderPhone = seller?.UserPhone,
+                            ReceiverName = logistics.ReceiverName,
+                            ReceiverPhone = logistics.ReceiverPhone,
+                            ReceiverStoreID = logistics.StoreCode ?? "",
+                        };
+
+                        var createResult = await logisticsService.CreateLogisticsOrder(createInfo);
+
+                        Console.WriteLine(
+                            $"CodeStatus: {createResult.CodeStatus}, ReturnData: {string.Join(",", createResult.ReturnData?.Select(kv => $"{kv.Key}={kv.Value}") ?? [])}"
+                        );
+                        if (
+                            createResult.CodeStatus == CodeStatusEnum.Success
+                            && createResult.ReturnData!.TryGetValue("AllPayLogisticsID", out var trackingNo)
+                        )
+                        {
+                            // 綠界成功的話就會回傳物流編號 , 再把它更新到資料庫
+                            await logisticsRepository.UpdateTrackingNo(logisticsId, trackingNo);
+                        }
+                    }
+                }
+            }
             return "1|OK";
         }
         else

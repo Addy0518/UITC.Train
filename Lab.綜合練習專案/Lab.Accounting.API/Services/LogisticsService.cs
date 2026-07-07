@@ -5,6 +5,7 @@ namespace Lab.Accounting.API.Services
 {
     public class LogisticsService(
         ILogisticsTempRepository logisticsTempRepository,
+        ILogisticsRepository logisticsRepository,
         IOptions<EcpayLogisticsSettings> ecpayLogisticsOptions
     ) : ILogisticsService
     {
@@ -47,6 +48,29 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
+        /// 接收綠界物流狀態通知，更新對應物流單的狀態
+        /// </summary>
+        /// <param name="request">綠界回傳的物流狀態資料</param>
+        /// <returns>是否處理成功</returns>
+        public async Task<bool> HandleLogisticsStatusNotify(LogisticsStatusCallbackRequest request)
+        {
+            var logistics = await logisticsRepository.GetByTrackingNo(request.AllPayLogisticsID);
+
+            if (logistics == null)
+            {
+                return false;
+            }
+
+            var newStatus = MapRtnToStatus(request.LogisticsStatus);
+
+            if (newStatus.HasValue)
+            {
+                await logisticsRepository.UpdateStatus(logistics.LogisticsId, newStatus.Value);
+            }
+            return true;
+        }
+
+        /// <summary>
         /// 呼叫綠界建立物流訂單 ( 超商 )
         /// </summary>
         /// <param name="request">物流訂單資訊</param>
@@ -82,7 +106,7 @@ namespace Lab.Accounting.API.Services
                 { "ReceiverName", receiverName },
                 { "ReceiverCellPhone", request.ReceiverCellPhone ?? request.ReceiverPhone ?? "" },
                 { "ReceiverStoreID", request.ReceiverStoreID },
-                { "ServerReplyURL", $"{_settings.ServerBaseUrl}/api/Logistics/LogisticsStatusNotify" },
+                { "ServerReplyURL", $"{_settings.ServerBaseUrl}/api/Logistics/HandleLogisticsStatusNotify" },
                 // UNIMARTC2C 這個欄位不可為空，選店時發生問題（例如門市已關）綠界會透過這個網址通知
                 { "LogisticsC2CReplyURL", $"{_settings.ServerBaseUrl}/api/Logistics/LogisticsC2CReply" },
             };
@@ -95,15 +119,34 @@ namespace Lab.Accounting.API.Services
             );
             parameters.Add("CheckMacValue", checkMacValue);
 
+            // 跟金流還有超商門市地圖不一樣 , 他們是前端傳送隱藏表單 form.submit() , 這裡是直接後端對後端
+            // 所以直接用 http 請求工具發送 post 就行
             using var httpClient = new HttpClient();
+            // FormUrlEncodedContent 是把 SortedDictionary<string, string> 轉成 application/x-www-form-urlencoded 的格式 ( 就是 key1=value1&key2=value2 這種 )
             var content = new FormUrlEncodedContent(parameters);
-            var response = await httpClient.PostAsync(LogisticsStageUrl, content);
+            // 發送 post 後用 response 接綠界發回的結果 , 再用 ReadAsStringAsync() 讀出來
+            var response = await httpClient.PostAsync($"{LogisticsStageUrl}/Express/Create", content);
             var resultBody = await response.Content.ReadAsStringAsync();
 
-            var resultDict = HttpUtility
-                .ParseQueryString(resultBody)
-                .AllKeys.Where(k => k != null)
-                .ToDictionary(k => k!, k => HttpUtility.ParseQueryString(resultBody)[k] ?? "");
+            // 綠界固定格式為 "1|實際資料" 或 "0|錯誤訊息" , "1" 代表這次呼叫有被綠界成功接收
+            var separatorIndex = resultBody.IndexOf('|');
+            if (separatorIndex < 0 || resultBody.Substring(0, separatorIndex) != "1")
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "RtnCode", new[] { "建立物流訂單失敗 : " + resultBody } },
+                };
+                return ApiResponseHelper.RequestError<Dictionary<string, string>>(errors);
+            }
+
+            // 拿掉開頭的 "1|" , 剩下的才是真正的 querystring 資料
+            var actualData = resultBody.Substring(separatorIndex + 1);
+
+            // ParseQueryString 是把綠界回傳的結果 ( key1=value1&key2=value2 ) 轉成 NameValueCollection , 可以用 key 值去取值類似字典 , 但不是字典
+            var parsed = HttpUtility.ParseQueryString(actualData);
+
+            // 最後把這整理好的 NameValueCollection 轉成一般的字典 ( NameValueCollection 不能直接用 LINQ , 所以用 Allkeys 把裡面所有的 key（欄位名稱）撈出來變成一個字串陣列，這樣才能繼續往下用 LINQ)
+            var resultDict = parsed.AllKeys.Where(k => k != null).ToDictionary(k => k!, k => parsed[k] ?? "");
 
             return ApiResponseHelper.Success(resultDict);
         }
@@ -206,6 +249,94 @@ namespace Lab.Accounting.API.Services
                 return ApiResponseHelper.NotFound<OrderLogisticsTemp>();
             }
             return ApiResponseHelper.Success(temp);
+        }
+
+        /// <summary>
+        /// 查看物流暫存訂單資料
+        /// </summary>
+        /// <param name="rtnCode">物流回傳碼</param>
+        /// <returns>物流狀態</returns>
+        private LogisticsStatusEnum? MapRtnToStatus(string rtnCode)
+        {
+            // 綠界回傳的所有狀態碼跟我的列舉直的對照表 ( 格式為 => C2C 店到店 , 統一超商門市 ( 7-11 ) )
+            return rtnCode switch
+            {
+                // 訂單剛建立、處理中
+                "300" => LogisticsStatusEnum.PendingShipment,
+
+                // 賣家已出貨、貨物進入物流中心
+                "2030" => LogisticsStatusEnum.Shipped, // 物流中心驗收成功
+                "2068" => LogisticsStatusEnum.Shipped, // 賣家已到門市寄件
+
+                // 配送中（貨物在途，但還沒到取貨門市）
+                "2041" => LogisticsStatusEnum.InTransit, // 物流中心理貨中
+                "2043" => LogisticsStatusEnum.InTransit, // 門市指定時間不配送，後續配送中
+                "2058" => LogisticsStatusEnum.InTransit, // 天候不佳，後續配送中
+                "2062" => LogisticsStatusEnum.InTransit, // 包裹門市確認中
+                "2089" => LogisticsStatusEnum.InTransit, // 門市指定不配送(六、日)
+                "2093" => LogisticsStatusEnum.InTransit, // 爆量
+                "2102" => LogisticsStatusEnum.InTransit, // 門市舊店號更新
+                "2105" => LogisticsStatusEnum.InTransit, // 已申請門市變更
+
+                // 已送達取貨門市，等買家去拿
+                "2073" => LogisticsStatusEnum.Delivered,
+                "2098" => LogisticsStatusEnum.Delivered, // 包裹重新配達取件門市
+
+                // 買家已經去門市取貨完成
+                "2067" => LogisticsStatusEnum.PickedUp,
+
+                // 走取消/退貨流程
+                "2051" => LogisticsStatusEnum.Cancelled, // 賣家要求提早退貨
+                "2069" => LogisticsStatusEnum.Cancelled, // 退貨便收件
+                "2070" => LogisticsStatusEnum.Cancelled, // 賣家已取退回包裹
+                "2072" => LogisticsStatusEnum.Cancelled, // 包裹已退至原寄件門市
+                "2076" => LogisticsStatusEnum.Cancelled, // 買家未取包裹，已退回物流中心
+                "2078" => LogisticsStatusEnum.Cancelled, //
+                "2079" => LogisticsStatusEnum.Cancelled,
+                "2080" => LogisticsStatusEnum.Cancelled,
+                "2081" => LogisticsStatusEnum.Cancelled,
+                "2082" => LogisticsStatusEnum.Cancelled,
+                "2083" => LogisticsStatusEnum.Cancelled,
+                "2084" => LogisticsStatusEnum.Cancelled,
+                "2085" => LogisticsStatusEnum.Cancelled,
+                "2086" => LogisticsStatusEnum.Cancelled,
+                "2087" => LogisticsStatusEnum.Cancelled,
+                "2088" => LogisticsStatusEnum.Cancelled,
+                "2097" => LogisticsStatusEnum.Cancelled, // 包裹宅配退回中
+                "2099" => LogisticsStatusEnum.Cancelled, // 包裹重新配達寄件門市
+                "9999" => LogisticsStatusEnum.Cancelled, // 訂單取消
+
+                // 異常，需人工處理（賣家/客服要介入）
+                "2042" => LogisticsStatusEnum.Exception, // 包裹遺失，進入賠償程序
+                "2048" => LogisticsStatusEnum.Exception, // 包裝異常
+                "2053" => LogisticsStatusEnum.Exception, // 門市誤刷取件
+                "2061" => LogisticsStatusEnum.Exception, // 包裹異常
+                "2066" => LogisticsStatusEnum.Exception, // 包裹確認中，將退回物流中心
+                "2074" => LogisticsStatusEnum.Exception, // 買家未取包裹，將退回物流中心
+                "2075" => LogisticsStatusEnum.Exception, // 賣家未取包裹，將退回物流中心
+                "2077" => LogisticsStatusEnum.Exception, // 賣家未取包裹，待申請退回
+                "2092" => LogisticsStatusEnum.Exception, // 門市關轉（需重選門市）
+                "2094" => LogisticsStatusEnum.Exception, // 包裹異常
+                "2096" => LogisticsStatusEnum.Exception, // 賣家未取包裹，待申請退回
+                "2101" => LogisticsStatusEnum.Exception, // 門市關轉店
+                "2103" => LogisticsStatusEnum.Exception, // 無取件門市資料
+                "2104" => LogisticsStatusEnum.Exception, // 門市關轉，請重選門市
+                "2106" => LogisticsStatusEnum.Exception, // 重複寄件，需申請退回
+                "7013" => LogisticsStatusEnum.Exception, // 訂單超過驗收期限(賣家未出貨)
+                "7017" => LogisticsStatusEnum.Exception, // 取件包裹異常，協尋中
+                "7018" => LogisticsStatusEnum.Exception, // 包裹遺失，進入賠償程序
+                "7019" => LogisticsStatusEnum.Exception, // 寄件包裹異常，協尋中
+                "7020" => LogisticsStatusEnum.Exception, // 包裹遺失，進入賠償程序
+                "7038" => LogisticsStatusEnum.Exception, // 門市驗收異常
+
+                _ => null, // 對不到的代碼，先不更新狀態，等你之後遇到再補
+            };
+        }
+
+        // 測試綠界呼叫用 , 可以刪
+        public async Task<string> GetCheckMacValueForTest(Dictionary<string, string> parameters)
+        {
+            return ECPayHelper.GetCheckMacValueMD5(parameters, _settings.HashKey, _settings.HashIV);
         }
     }
 }

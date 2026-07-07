@@ -27,6 +27,34 @@ namespace Lab.Accounting.API.Controllers
         }
 
         /// <summary>
+        /// 接收綠界物流狀態通知，更新對應物流單的狀態
+        /// </summary>
+        /// <param name="request">綠界回傳的物流狀態資料</param>
+        /// <returns>是否處理成功</returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<bool>))]
+        public async Task<IActionResult> HandleLogisticsStatusNotify([FromForm] LogisticsStatusCallbackRequest request)
+        {
+            await logisticsService.HandleLogisticsStatusNotify(request);
+            return Content("1|OK");
+        }
+
+        /// <summary>
+        /// C2C 門市選店時發生異常會打這支
+        /// </summary>
+        /// <param name="collection">綠界回傳表單資訊</param>
+        /// <returns>訊息</returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+        public async Task<IActionResult> LogisticsC2CReply([FromForm] IFormCollection collection)
+        {
+            // 記錄下來，之後可以在賣家畫面提示「門市異常，需要重新選店」
+            return Content("1|OK");
+        }
+
+        /// <summary>
         /// 接收綠界回傳的門市資料存進暫存表 ( 綠界回來後呼叫的 API , 這裡是中繼站)
         /// </summary>
         /// <param name="request">綠界回傳門市資料</param>
@@ -83,6 +111,16 @@ namespace Lab.Accounting.API.Controllers
         public async Task<IActionResult> GetLogisticsTemp([FromQuery] string sessionKey)
         {
             return Ok(await logisticsService.GetLogisticsTemp(sessionKey));
+        }
+
+        // 測試綠界呼叫用 , 可以刪
+        [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+        public IActionResult GetCheckMacValueForTest([FromBody] Dictionary<string, string> parameters)
+        {
+            var checkMacValue = logisticsService.GetCheckMacValueForTest(parameters);
+            return Ok(checkMacValue);
         }
     }
 }

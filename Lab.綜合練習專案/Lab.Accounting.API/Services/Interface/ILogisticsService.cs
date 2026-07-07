@@ -12,6 +12,20 @@ public interface ILogisticsService
     ApiResponse<Dictionary<string, string>> GetCvsMapUrl(GetCvsMapRequest request);
 
     /// <summary>
+    /// 接收綠界物流狀態通知，更新對應物流單的狀態
+    /// </summary>
+    /// <param name="request">綠界回傳的物流狀態資料</param>
+    /// <returns>是否處理成功</returns>
+    Task<bool> HandleLogisticsStatusNotify(LogisticsStatusCallbackRequest request);
+
+    /// <summary>
+    /// 呼叫綠界建立物流訂單 ( 超商 )
+    /// </summary>
+    /// <param name="request">物流訂單資訊</param>
+    /// <returns>綠界回傳資料</returns>
+    Task<ApiResponse<Dictionary<string, string>>> CreateLogisticsOrder(LogisticsOrderInfoRequest request);
+
+    /// <summary>
     /// 儲存物流暫存訂單資料 ( 超商 )
     /// </summary>
     /// <param name="request">綠界回傳門市資料</param>
@@ -37,4 +51,6 @@ public interface ILogisticsService
     /// <param name="sessionKey">SessionKey ( 對應金流的 MerchantTradeNo )</param>
     /// <returns>物流暫存訂單資料</returns>
     Task<ApiResponse<OrderLogisticsTemp>> GetLogisticsTemp(string sessionKey);
+
+    Task<string> GetCheckMacValueForTest(Dictionary<string, string> parameters);
 }

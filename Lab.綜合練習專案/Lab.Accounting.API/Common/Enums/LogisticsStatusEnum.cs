@@ -22,4 +22,7 @@ public enum LogisticsStatusEnum
 
     [Description("已取消")]
     Cancelled = 6,
+
+    [Description("異常，需人工處理")]
+    Exception = 7,
 }
