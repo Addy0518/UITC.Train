@@ -443,7 +443,7 @@ public class OrderService(
         {
             //驗證成功!這是綠界傳來的不是其他地方傳的
             var rtnCode = collection["RtnCode"].ToString();
-
+            var rtnMessage = collection["RtnMsg"].ToString();
             var orderNo = collection["MerchantTradeNo"].ToString();
             // 交易失敗的話
             if (rtnCode != "1")
@@ -457,7 +457,12 @@ public class OrderService(
 
                     foreach (var logisticsId in logisticsIds)
                     {
-                        await logisticsRepository.UpdateStatus(logisticsId, LogisticsStatusEnum.Cancelled);
+                        await logisticsRepository.UpdateStatus(
+                            logisticsId,
+                            LogisticsStatusEnum.Cancelled,
+                            rtnCode,
+                            rtnMessage
+                        );
                     }
                 }
                 return "0|PaymentFailed";

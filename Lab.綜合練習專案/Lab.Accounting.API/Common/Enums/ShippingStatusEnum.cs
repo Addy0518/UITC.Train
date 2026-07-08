@@ -11,6 +11,12 @@ public enum ShippingStatusEnum
     [Description("運送中")]
     InTransit = 2,
 
-    [Description("已抵達")]
+    [Description("已抵達門市")]
     Arrived = 3,
+
+    [Description("已完成取貨")]
+    Completed = 4,
+
+    [Description("已取消")]
+    Cancelled = 5,
 }

@@ -8,7 +8,7 @@ import defaultImgurl from '@/img/預設圖片.jpg';
    變數名稱代表意義
    allOrders : 所有訂單
    baseUrl : 環境變數裡的圖片基底位址
-   tableNow : 顯示目前頁面狀態
+   currentGroup : 顯示目前頁面狀態
    router : 控制路由
    route : 抓取路由參數
    selectProducts : 選擇的商品
@@ -16,7 +16,6 @@ import defaultImgurl from '@/img/預設圖片.jpg';
 */
 const allOrders = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
-const tableNow = ref(shippingEnum.PendingShipment.value);
 const router = useRouter();
 const route = useRoute();
 const selectProducts = ref([]);
@@ -39,21 +38,35 @@ onMounted(() => {
   // 交易成功跳轉回來接下來的動作
   if (route.query.status === 'success' && route.query.orderNo) {
     showToastSuccess('付款成功!');
-    tableNow.value = shippingEnum.PendingShipment.value;
+    currentGroup.value = tabGroups.find((t) => t.label === '待出貨');
   }
   // 失敗則回到代付款
   if (route.query.status === 'fail') {
     showToastError('付款失敗，請重新嘗試!');
-    tableNow.value = shippingEnum.PendingPayment.value;
+    currentGroup.value = tabGroups.find((t) => t.label === '待付款');
   }
 });
 
 /*
+   頁面分類
+*/
+const tabGroups = [
+  { label: '待付款', statuses: [shippingEnum.PendingPayment.value] },
+  { label: '待出貨', statuses: [shippingEnum.PendingShipment.value] },
+  { label: '待收貨', statuses: [shippingEnum.InTransit.value, shippingEnum.Arrived.value] },
+  { label: '已完成', statuses: [shippingEnum.Completed.value] },
+  { label: '已取消', statuses: [shippingEnum.Cancelled.value] },
+];
+
+/*
    顯示目前頁面狀態
 */
+const currentGroup = ref(tabGroups[0]);
 const filtTable = computed(() => {
   if (!allOrders.value) return [];
-  return allOrders.value.filter((order) => order.shippingStatus == tableNow.value);
+  return allOrders.value.filter((order) =>
+    currentGroup.value.statuses.includes(order.shippingStatus),
+  );
 });
 
 /*
@@ -155,17 +168,17 @@ const retryPayment = async () => {
         <!--#region Tab -->
         <div class="flex border-b border-border-soft">
           <button
-            v-for="tab in shippingEnum"
+            v-for="tab in tabGroups"
             :key="tab.value"
-            @click="tableNow = tab.value"
+            @click="currentGroup = tab"
             class="flex-1 py-3 text-center text-sm transition-colors cursor-pointer"
             :class="
-              tableNow === tab.value
+              currentGroup.label === tab.label
                 ? 'border-b-2 border-brand-500 text-brand-500 font-medium'
                 : 'text-ink-500 hover:text-ink-900'
             "
           >
-            {{ tab.description }}
+            {{ tab.label }}
           </button>
         </div>
         <!-- #endregion -->
@@ -186,7 +199,7 @@ const retryPayment = async () => {
           class="border-b border-border-soft hover:bg-surface-muted transition-colors flex flex-row items-center px-6 py-4 cursor-pointer gap-5"
           @click="router.push({ name: 'purchase-orders-details', params: { id: order.orderId } })"
         >
-          <div v-if="tableNow === shippingEnum.PendingPayment.value" @click.stop>
+          <div v-if="currentGroup.label === '待付款'" @click.stop>
             <input
               type="checkbox"
               v-model="selectProducts"
@@ -197,7 +210,7 @@ const retryPayment = async () => {
           <img
             :src="getProductsImg(order)"
             alt="商品圖片"
-            class="w-16 h-16 object-cover rounded-card border border-border-soft flex-shrink-0"
+            class="w-16 h-16 object-cover rounded-card border border-border-soft"
           />
           <div class="flex-1 grid grid-cols-3 gap-3 items-center">
             <div>
@@ -215,20 +228,41 @@ const retryPayment = async () => {
               <p class="text-sm font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>
             </div>
           </div>
-          <div v-if="tableNow === shippingEnum.Arrived.value" @click.stop class="flex-shrink-0">
-            <span
-              v-if="ratedOrders.has(order.orderId)"
-              class="text-sm font-medium px-4 py-2 text-status-neutral"
+          <div class="flex flex-col items-end gap-2">
+            <div
+              v-if="order.shippingStatus === shippingEnum.InTransit.value"
+              class="text-xs font-medium px-2.5 py-1 rounded-full bg-orange-100 text-orange-700"
             >
-              已評價
-            </span>
-            <button
-              v-else
-              class="bg-brand-500 hover:opacity-90 text-white text-sm font-medium px-4 py-2 rounded-card cursor-pointer"
-              @click="router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })"
+              運送中
+            </div>
+
+            <div
+              v-else-if="order.shippingStatus === shippingEnum.Arrived.value"
+              class="text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700"
             >
-              去評價
-            </button>
+              已抵達門市
+            </div>
+
+            <div @click.stop>
+              <div v-if="currentGroup.label === '已完成'">
+                <span v-if="ratedOrders.has(order.orderId)" class="text-sm text-ink-400"
+                  >已評價</span
+                >
+                <button
+                  v-else
+                  class="bg-brand-500 hover:opacity-90 text-white text-sm font-medium px-4 py-1.5 rounded-lg shadow-sm transition-all"
+                  @click="router.push({ name: 'purchaseOrderRate', params: { id: order.orderId } })"
+                >
+                  去評價
+                </button>
+              </div>
+
+              <div v-else-if="currentGroup.label === '已取消'">
+                <span class="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-500 rounded-full">
+                  已取消
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         <!-- #endregion -->

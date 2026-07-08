@@ -56,7 +56,21 @@ export const shippingEnum = Object.freeze({
   PendingPayment: { value: 0, description: '待付款' },
   PendingShipment: { value: 1, description: '待出貨' },
   InTransit: { value: 2, description: '運送中' },
-  Arrived: { value: 3, description: '已抵達' },
+  Arrived: { value: 3, description: '已抵達門市' },
+  Completed: { value: 4, description: '已完成取貨' },
+  Cancelled: { value: 5, description: '已取消' },
+});
+
+// 物流單詳細 狀態
+export const logisticsEnum = Object.freeze({
+  Created: { value: 0, description: '物流單已建立' },
+  PendingShipment: { value: 1, description: '付款完成，等待出貨' },
+  Shipped: { value: 2, description: '賣家已出貨' },
+  InTransit: { value: 3, description: '配送中' },
+  Delivered: { value: 4, description: '已送達門市/已配達' },
+  PickedUp: { value: 5, description: '買家已取件' },
+  Cancelled: { value: 6, description: '已取消' },
+  Exception: { value: 7, description: '異常，需人工處理' },
 });
 
 // 審核狀態

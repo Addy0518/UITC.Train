@@ -6,7 +6,8 @@ namespace Lab.Accounting.API.Services
     public class LogisticsService(
         ILogisticsTempRepository logisticsTempRepository,
         ILogisticsRepository logisticsRepository,
-        IOptions<EcpayLogisticsSettings> ecpayLogisticsOptions
+        IOptions<EcpayLogisticsSettings> ecpayLogisticsOptions,
+        IProductsOrderRepository productsOrderRepository
     ) : ILogisticsService
     {
         private readonly EcpayLogisticsSettings _settings = ecpayLogisticsOptions.Value;
@@ -65,7 +66,21 @@ namespace Lab.Accounting.API.Services
 
             if (newStatus.HasValue)
             {
-                await logisticsRepository.UpdateStatus(logistics.LogisticsId, newStatus.Value);
+                await logisticsRepository.UpdateStatus(
+                    logistics.LogisticsId,
+                    newStatus.Value,
+                    request.LogisticsStatus,
+                    request.RtnMsg
+                );
+
+                var orderStatus = MapLogisticsStatusToOrderStatus(newStatus.Value);
+                if (orderStatus.HasValue)
+                {
+                    await productsOrderRepository.UpdateShippingStatusByLogisticsId(
+                        logistics.LogisticsId,
+                        orderStatus.Value
+                    );
+                }
             }
             return true;
         }
@@ -252,7 +267,7 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 查看物流暫存訂單資料
+        /// 映射綠界回傳的物流狀態碼到 LogisticsStatusEnum
         /// </summary>
         /// <param name="rtnCode">物流回傳碼</param>
         /// <returns>物流狀態</returns>
@@ -329,7 +344,26 @@ namespace Lab.Accounting.API.Services
                 "7020" => LogisticsStatusEnum.Exception, // 包裹遺失，進入賠償程序
                 "7038" => LogisticsStatusEnum.Exception, // 門市驗收異常
 
-                _ => null, // 對不到的代碼，先不更新狀態，等你之後遇到再補
+                _ => null, // 對不到的代碼，先不更新狀態
+            };
+        }
+
+        /// <summary>
+        /// 映射 LogisticsStatusEnum 到 ShippingStatusEnum
+        /// </summary>
+        /// <param name="logisticsStatus">物流單狀態列舉值</param>
+        /// <returns>物流狀態</returns>
+        private ShippingStatusEnum? MapLogisticsStatusToOrderStatus(LogisticsStatusEnum logisticsStatus)
+        {
+            return logisticsStatus switch
+            {
+                LogisticsStatusEnum.Shipped => ShippingStatusEnum.InTransit,
+                LogisticsStatusEnum.InTransit => ShippingStatusEnum.InTransit,
+                LogisticsStatusEnum.Delivered => ShippingStatusEnum.Arrived,
+                LogisticsStatusEnum.PickedUp => ShippingStatusEnum.Completed,
+                LogisticsStatusEnum.Cancelled => ShippingStatusEnum.Cancelled,
+                LogisticsStatusEnum.Exception => null, // 異常先不動 Order 狀態，只記錄詳細訊息讓客服介入
+                _ => null, // Created / PendingShipment 不需要觸發訂單狀態變化
             };
         }
 

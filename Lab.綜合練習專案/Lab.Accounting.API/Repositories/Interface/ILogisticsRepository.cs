@@ -46,9 +46,17 @@ public interface ILogisticsRepository
     /// </summary>
     ///<param name="logisticsId">物流訂單 ID</param>
     ///<param name="status">物流狀態</param>
+    ///<param name="rtnCode">物流狀態碼</param>
+    ///<param name="rtnMessage">物流狀態訊息</param>
     ///<param name="timeStamp">時間戳記</param>
     /// <returns>物流訂單資訊</returns>
-    Task UpdateStatus(int logisticsId, LogisticsStatusEnum status, DateTime? timeStamp = null);
+    Task UpdateStatus(
+        int logisticsId,
+        LogisticsStatusEnum status,
+        string? rtnCode = null,
+        string? rtnMessage = null,
+        DateTime? timeStamp = null
+    );
 
     /// <summary>
     /// 更新物流單訂單編號

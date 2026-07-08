@@ -112,9 +112,17 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
     /// </summary>
     ///<param name="logisticsId">物流訂單 ID</param>
     ///<param name="status">物流狀態</param>
+    ///<param name="rtnCode">物流狀態碼</param>
+    ///<param name="rtnMessage">物流狀態訊息</param>
     ///<param name="timeStamp">時間戳記</param>
     /// <returns>物流訂單資訊</returns>
-    public async Task UpdateStatus(int logisticsId, LogisticsStatusEnum status, DateTime? timeStamp = null)
+    public async Task UpdateStatus(
+        int logisticsId,
+        LogisticsStatusEnum status,
+        string? rtnCode = null,
+        string? rtnMessage = null,
+        DateTime? timeStamp = null
+    )
     {
         using var conn = connecting.CreateConnecting();
 
@@ -135,7 +143,9 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
         var sql =
             $@"
             UPDATE OrderLogistics
-            SET LogisticsStatus = @LogisticsStatus
+            SET LogisticsStatus = @LogisticsStatus,
+                LogisticsRtnCode=COALESCE(@LogisticsRtnCode, LogisticsRtnCode),
+                LogisticsRtnMessage=COALESCE(@LogisticsRtnMessage, LogisticsRtnMessage)
                 {timeColumn}
             WHERE LogisticsId = @LogisticsId";
 
@@ -145,6 +155,8 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
             {
                 LogisticsId = logisticsId,
                 LogisticsStatus = status,
+                LogisticsRtnCode = rtnCode,
+                LogisticsRtnMessage = rtnMessage,
                 TimeStamp = now,
             }
         );

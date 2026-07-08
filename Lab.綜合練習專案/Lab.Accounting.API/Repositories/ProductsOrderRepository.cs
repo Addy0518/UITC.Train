@@ -194,6 +194,25 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     }
 
     /// <summary>
+    /// 依物流單 ID，批次更新其底下所有訂單的運送狀態
+    /// </summary>
+    /// <param name="logisticsId">物流單 ID</param>
+    /// <param name="shippingStatus">運送狀態</param>
+    /// <returns>影響行數</returns>
+    public async Task<int> UpdateShippingStatusByLogisticsId(int logisticsId, ShippingStatusEnum shippingStatus)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+        UPDATE [Order]
+        SET ShippingStatus = @ShippingStatus
+        WHERE LogisticsId = @LogisticsId";
+
+        return await conn.ExecuteAsync(sql, new { LogisticsId = logisticsId, ShippingStatus = (int)shippingStatus });
+    }
+
+    /// <summary>
     /// 新增物流訂單編號
     /// </summary>
     /// <param name="orderId">訂單 ID</param>

@@ -63,6 +63,16 @@
         public LogisticsStatusEnum LogisticsStatus { get; set; }
 
         /// <summary>
+        /// 綠界回傳的物流狀態碼
+        /// </summary>
+        public string LogisticsRtnCode { get; set; }
+
+        /// <summary>
+        /// 綠界回傳的物流狀態訊息
+        /// </summary>
+        public string LogisticsRtnMessage { get; set; }
+
+        /// <summary>
         /// 物流資料建立時間
         /// </summary>
         public DateTime CreatedAt { get; set; }
