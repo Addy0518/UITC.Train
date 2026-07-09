@@ -100,3 +100,37 @@ export const getFirstDayOfMonth = () => {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), 1);
 };
+
+/**
+ * 顯示付款方式為中文
+ * @param {paidType} value 付款方式
+ * @returns {paidType} 付款方式中文
+ */
+export const formatPaidType = (paidType) => {
+  const map = {
+    Credit_CreditCard: '信用卡',
+    WebATM: '網路 ATM',
+    ATM: 'ATM 轉帳',
+    CVS: '超商代碼繳費',
+    BARCODE: '超商條碼繳費',
+    AndroidPay: 'Google Pay',
+    TWQRPay: '台灣 Pay',
+  };
+  return map[paidType] ?? paidType;
+};
+
+/**
+ * 顯示付款子方式為中文
+ *@param {paidType} value 付款子方式
+ * @returns {paidType} 付款子方式中文
+ */
+export const formatLogisticsSubType = (subType) => {
+  const map = {
+    UNIMARTC2C: '7-ELEVEN',
+    FAMIC2C: '全家',
+    HILIFEC2C: '萊爾富',
+    OKMARTC2C: 'OK 超商',
+    TCAT: '黑貓宅急便',
+  };
+  return map[subType] ?? subType;
+};

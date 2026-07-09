@@ -546,12 +546,15 @@ public class OrderService(
                         goodsName = goodsName.Substring(0, 20) + "...";
                     }
 
+                    // 這幾筆訂單的賣家是誰
+                    var sellerId = ordersUnderThisLogistics.First().SellerUserId;
+                    var seller = await userRepository.GetUser(sellerId);
+
+                    // 最後接收的物流單資訊
+                    ApiResponse<Dictionary<string, string>>? createResult = null;
+
                     if (logistics.LogisticsType == "CVS")
                     {
-                        // 這幾筆訂單的賣家是誰
-                        var sellerId = ordersUnderThisLogistics.First().SellerUserId;
-                        var seller = await userRepository.GetUser(sellerId);
-
                         var createInfo = new LogisticsOrderInfoRequest
                         {
                             MerchantTradeNo = logistics.MerchantTradeNo,
@@ -565,11 +568,27 @@ public class OrderService(
                             ReceiverStoreID = logistics.StoreCode ?? "",
                         };
 
-                        var createResult = await logisticsService.CreateLogisticsOrder(createInfo);
+                        createResult = await logisticsService.CreateCVSLogisticsOrder(createInfo);
+                    }
+                    else if (logistics.LogisticsType == "Home")
+                    {
+                        var createInfo = new LogisticsOrderInfoRequest
+                        {
+                            MerchantTradeNo = logistics.MerchantTradeNo,
+                            LogisticsSubType = logistics.LogisticsSubType,
+                            GoodsAmount = ordersUnderThisLogistics.Sum(o => o.AccountAmount),
+                            GoodsName = goodsName,
+                            SenderName = seller?.UserName ?? "賣家",
+                            SenderPhone = seller?.UserPhone,
+                            ReceiverName = logistics.ReceiverName,
+                            ReceiverPhone = logistics.ReceiverPhone,
+                            ReceiverAddress = logistics.ReceiverAddress,
+                        };
 
-                        Console.WriteLine(
-                            $"CodeStatus: {createResult.CodeStatus}, ReturnData: {string.Join(",", createResult.ReturnData?.Select(kv => $"{kv.Key}={kv.Value}") ?? [])}"
-                        );
+                        createResult = await logisticsService.CreateHomeLogisticsOrder(createInfo);
+                    }
+                    if (createResult != null)
+                    {
                         if (
                             createResult.CodeStatus == CodeStatusEnum.Success
                             && createResult.ReturnData!.TryGetValue("AllPayLogisticsID", out var trackingNo)

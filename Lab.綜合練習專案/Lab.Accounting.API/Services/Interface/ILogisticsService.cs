@@ -23,7 +23,14 @@ public interface ILogisticsService
     /// </summary>
     /// <param name="request">物流訂單資訊</param>
     /// <returns>綠界回傳資料</returns>
-    Task<ApiResponse<Dictionary<string, string>>> CreateLogisticsOrder(LogisticsOrderInfoRequest request);
+    Task<ApiResponse<Dictionary<string, string>>> CreateCVSLogisticsOrder(LogisticsOrderInfoRequest request);
+
+    /// <summary>
+    /// 呼叫綠界建立物流訂單 ( 宅配 )
+    /// </summary>
+    /// <param name="request">物流訂單資訊</param>
+    /// <returns>綠界回傳資料</returns>
+    Task<ApiResponse<Dictionary<string, string>>> CreateHomeLogisticsOrder(LogisticsOrderInfoRequest request);
 
     /// <summary>
     /// 儲存物流暫存訂單資料 ( 超商 )

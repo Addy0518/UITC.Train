@@ -49,6 +49,7 @@ public class ProductsController(IProductsService productsService) : ControllerBa
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<ProductsResponse>))]
     public async Task<IActionResult> SellerGetAllProducts([FromQuery] ProductsSearchRequest request)
     {
+        request.sellerId = CurrentUserId;
         return Ok(await productsService.SellerGetAllProducts(request));
     }
 

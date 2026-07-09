@@ -19,12 +19,17 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
         using var conn = connecting.CreateConnecting();
 
         var addBoughtProductsql =
-            @"SELECT m.*,p.IsDelete,
+            @"SELECT m.*,m.LogisticsId, 
+            o.LogisticsType, o.LogisticsSubType, o.StoreCode, o.StoreName, o.StoreAddress, 
+            o.ReceiverName, o.ReceiverPhone, o.ReceiverAddress, o.LogisticsStatus,
+            o.LogisticsRtnCode, o.LogisticsRtnMessage, o.CreatedAt, 
+            o.ShippedAt, o.DeliveredAt, o.PickedUpAt,p.IsDelete,
                    (SELECT TOP 1 productsimg
                     FROM   productimg i
                     WHERE  i.productsid = m.productsid) as ProductsImg
             FROM   [Order] m
             Left Join   product p on m.productsid=p.productsid
+            Left Join   OrderLogistics o on m.LogisticsId=o.LogisticsId
             Where OrderId = @OrderId
             And m.UserId = @UserId";
 

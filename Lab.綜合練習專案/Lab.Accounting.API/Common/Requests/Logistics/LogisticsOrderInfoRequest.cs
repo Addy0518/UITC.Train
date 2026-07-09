@@ -53,6 +53,11 @@
         public string? ReceiverCellPhone { get; set; }
 
         /// <summary>
+        /// 收件人地址
+        /// </summary>
+        public string? ReceiverAddress { get; set; }
+
+        /// <summary>
         /// 收件門市代號 ( 對應 OrderLogistics.StoreCode，也就是買家選門市時存下來的 CVSStoreID )
         /// </summary>
         public string ReceiverStoreID { get; set; } = string.Empty;

@@ -69,7 +69,10 @@ const rules = computed(() => ({
   // authstore 有的情況就不驗證
   name: authStore.userName ? {} : { required, maxLength: maxLength(50) },
   phone: authStore.userPhone ? {} : { required, vaildCellPhone, maxLength: maxLength(20) },
-  address: authStore.userAddress ? {} : { required, maxLength: maxLength(200) },
+  address:
+    shippingType.value === 'Home' && !authStore.userAddress
+      ? { required, maxLength: maxLength(200) }
+      : {},
 }));
 
 /*
@@ -78,7 +81,11 @@ const rules = computed(() => ({
    lazy : 元件載入時不會馬上驗證 , 等使用者開始互動才會
    scope : 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
 */
-const v$ = useVuelidate(rules, { address }, { $autoDirty: true, $lazy: true, $scope: false });
+const v$ = useVuelidate(
+  rules,
+  { name, phone, address },
+  { $autoDirty: true, $lazy: true, $scope: false },
+);
 
 /*
   讀取商品的第一張圖片 , 判斷是否有圖片沒有就回傳預設

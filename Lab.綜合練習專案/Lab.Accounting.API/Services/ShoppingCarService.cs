@@ -36,8 +36,9 @@ public class ShoppingCarService(
     /// <returns>影響列數</returns>
     public async Task<ApiResponse<int>> AddProductsInShoppingCar(int productsId, int userId, int boughtquantity)
     {
-        var userRole = await userRepository.GetUser(userId);
-        if (userRole.UserRole == RolesAuth.賣家)
+        var user = await userRepository.GetUser(userId);
+        var product = await productsRepositories.GetProducts(productsId);
+        if (user.UserRole == RolesAuth.賣家 && product.UserId == userId)
         {
             var errors = new Dictionary<string, string[]>
             {
@@ -52,7 +53,7 @@ public class ShoppingCarService(
 
             return ApiResponseHelper.RequestError<int>(errors);
         }
-        var product = await productsRepositories.GetProducts(productsId);
+
         if (product == null)
             return ApiResponseHelper.NotFound<int>();
 
