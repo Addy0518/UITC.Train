@@ -14,12 +14,12 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
         var sql =
             @"Insert Into [User] (
-                  UserName, UserAccount, UserPassword, UserPhone,UserAddress,UserRegisterMethod,CreateTime,UpdateTime,IsDelete
+                  UserName, UserAccount, UserPassword, UserPhone,UserAddress,UserZipCode,UserRegisterMethod,CreateTime,UpdateTime,IsDelete
                 ) 
                 values 
                   (
                     @UserName, @UserAccount, @UserPassword, 
-                    @UserPhone,@UserAddress,@UserRegisterMethod,GetDate(),GetDate(),@IsDelete
+                    @UserPhone,@UserAddress,@UserZipCode,@UserRegisterMethod,GetDate(),GetDate(),@IsDelete
                   );
                 Select 
                   Cast(
@@ -54,7 +54,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserId,UserName,UserRole,UserPassword,UserPhone,UserAddress From [User] Where UserAccount=@UserAccount";
+            @"Select UserId,UserName,UserRole,UserPassword,UserPhone,UserAddress,UserZipCode From [User] Where UserAccount=@UserAccount";
 
         return await conn.QueryFirstOrDefaultAsync<User>(sql, new { UserAccount = userInformation.UserAccount });
     }
@@ -131,7 +131,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
         using var conn = connecting.CreateConnecting();
 
         var sql =
-            @"Select UserAccount,UserId,UserName,UserHeadShot,UserPhone,UserBirthDate,UserGender,UserAddress,UserRole From [User]
+            @"Select UserAccount,UserId,UserName,UserHeadShot,UserPhone,UserBirthDate,UserGender,UserAddress,UserZipCode,UserRole From [User]
                 where 
                   UserId = @UserId";
 
@@ -270,6 +270,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                   SET
                        UserName      = COALESCE(@UserName, UserName),
                        UserAddress   = COALESCE(@UserAddress, UserAddress),
+                       UserZipCode=COALESCE(@UserZipCode, UserZipCode),
                        UserPhone     = COALESCE(@UserPhone, UserPhone),
                        UserBirthDate = COALESCE(@UserBirthDate, UserBirthDate),
                        UserGender    = COALESCE(@UserGender, UserGender),

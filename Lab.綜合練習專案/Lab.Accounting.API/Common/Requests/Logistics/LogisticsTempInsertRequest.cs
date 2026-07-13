@@ -71,5 +71,12 @@
         [Display(Name = "收件人地址")]
         [MaxLength(200, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string? ReceiverAddress { get; set; }
+
+        /// <summary>
+        /// 收件人郵遞區號 ( 宅配 )
+        /// </summary>
+        [Display(Name = "收件人郵遞區號")]
+        [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
+        public string? ReceiverZipCode { get; set; }
     }
 }

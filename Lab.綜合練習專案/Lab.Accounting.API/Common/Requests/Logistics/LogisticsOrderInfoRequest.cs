@@ -38,6 +38,11 @@
         public string? SenderCellPhone { get; set; }
 
         /// <summary>
+        /// 寄件人郵遞區號 ( 宅配 )
+        /// </summary>
+        public string? SenderZipCode { get; set; }
+
+        /// <summary>
         /// 收件人姓名
         /// </summary>
         public string ReceiverName { get; set; } = string.Empty;
@@ -56,6 +61,11 @@
         /// 收件人地址
         /// </summary>
         public string? ReceiverAddress { get; set; }
+
+        /// <summary>
+        /// 收件人郵遞區號 ( 宅配 )
+        /// </summary>
+        public string? ReceiverZipCode { get; set; }
 
         /// <summary>
         /// 收件門市代號 ( 對應 OrderLogistics.StoreCode，也就是買家選門市時存下來的 CVSStoreID )

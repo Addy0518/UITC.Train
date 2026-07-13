@@ -20,14 +20,14 @@ public class LogisticsRepository(DBConnecting connecting) : ILogisticsRepository
             INSERT INTO OrderLogistics (
                 LogisticsType, LogisticsSubType,
                 StoreCode, StoreName, StoreAddress,
-                ReceiverName, ReceiverPhone, ReceiverAddress,
+                ReceiverName, ReceiverPhone, ReceiverAddress,ReceiverZipCode,
                 MerchantTradeNo, LogisticsTrackingNo,
                 LogisticsStatus, CreatedAt
             )
             VALUES (
                 @LogisticsType, @LogisticsSubType,
                 @StoreCode, @StoreName, @StoreAddress,
-                @ReceiverName, @ReceiverPhone, @ReceiverAddress,
+                @ReceiverName, @ReceiverPhone, @ReceiverAddress,@ReceiverZipCode,
                 @MerchantTradeNo, NULL,
                 @LogisticsStatus, @CreatedAt
             );

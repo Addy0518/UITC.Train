@@ -1,12 +1,14 @@
 <script setup>
 import { getMyUser, updateUser } from '@/api/userService';
-
+import ZipCodeSelector from '@/common/ZipCodeSelector.vue';
 /*
    變數名稱代表意義
    userInfo : 用戶資料
+   zipInfo : 縣市/鄉鎮市區/郵遞區號
 */
 const userInfo = ref();
-
+const zipInfo = ref();
+const detailAddress = ref('');
 /*
    注入 Loading 跟 Toast
 */
@@ -20,7 +22,7 @@ const rules = computed(() => ({
   userAccount: { vaildEmail, required },
   userName: { required, maxLength: maxLength(50) },
   userPhone: { vaildCellPhone },
-  userAddress: { maxLength: maxLength(200) },
+  detailAddress: { maxLength: maxLength(200) },
 }));
 
 // 加入套件驗證設定 , 包含剛剛自定的規則 ( rules ) , 要驗證的資料 ( form )
@@ -29,7 +31,7 @@ const rules = computed(() => ({
 // scope => 隔離驗證範圍 , 設定 false 代表這個驗證只驗證這裡的 , 不驗證父元件
 const v$ = useVuelidate(
   rules,
-  computed(() => userInfo.value ?? {}),
+  computed(() => ({ ...userInfo.value, detailAddress: detailAddress.value })),
   { $autoDirty: true, $lazy: true, $scope: false },
 );
 
@@ -49,6 +51,19 @@ const getMineUser = async () => {
 
     if (data.codeStatus === 2000) {
       userInfo.value = data.returnData;
+      if (data.returnData.userZipCode) {
+        zipInfo.value = reverseLookupZipCode(data.returnData.userZipCode);
+
+        // 把完整地址開頭的「縣市 + 鄉鎮市區」截掉，剩下的塞進 detailAddress
+        const prefix = `${zipInfo.value.city}${zipInfo.value.district}`;
+        const fullAddress = data.returnData.userAddress ?? '';
+        detailAddress.value = fullAddress.startsWith(prefix)
+          ? fullAddress.slice(prefix.length)
+          : fullAddress;
+      } else {
+        // 沒有郵遞區號的舊資料 , 沒辦法拆 , 整串放進詳細地址就好
+        detailAddress.value = data.returnData.userAddress ?? '';
+      }
     }
   } catch (err) {
     console.log(err);
@@ -66,8 +81,14 @@ const updateMyUser = async () => {
   try {
     showLoading();
 
+    const fullAddress = detailAddress.value
+      ? `${zipInfo.value.city}${zipInfo.value.district}${detailAddress.value}`
+      : userInfo.value.userAddress;
+
     const request = {
       ...userInfo.value,
+      userAddress: fullAddress,
+      userZipCode: zipInfo.value?.zipCode ?? userInfo.value.userZipCode,
       // 生日轉為 DateOnly
       userBirthDate: userInfo.value.userBirthDate
         ? formatDateOnly(userInfo.value.userBirthDate)
@@ -141,16 +162,24 @@ const updateMyUser = async () => {
             </div>
             <!-- #endregion -->
             <!-- #region  地址 -->
-            <div class="flex items-center gap-4">
-              <label class="text-sm text-ink-500 w-20 text-right shrink-0">地址</label>
-              <div class="flex-1">
-                <InputText
-                  v-model="userInfo.userAddress"
-                  placeholder="地址"
-                  :invalid="v$.userAddress.$error"
-                  class="w-full"
-                />
-                <InValidErrorMessage :errorDto="v$.userAddress.$errors" vaildChiName="地址" />
+            <div class="flex items-start gap-4">
+              <label class="text-sm text-ink-500 w-20 text-right shrink-0 pt-2">地址</label>
+              <div class="flex-1 flex flex-col gap-2">
+                <ZipCodeSelector v-model="zipInfo" />
+
+                <InputGroup>
+                  <InputGroupAddon>
+                    <i class="pi pi-home"></i>
+                  </InputGroupAddon>
+
+                  <InputText
+                    v-model="detailAddress"
+                    placeholder="請輸入詳細地址 ( 路名、門牌、樓層 )"
+                    :invalid="v$.detailAddress.$error"
+                  />
+                </InputGroup>
+
+                <InValidErrorMessage :errorDto="v$.detailAddress.$errors" vaildChiName="地址" />
               </div>
             </div>
             <!-- #endregion -->

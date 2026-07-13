@@ -33,6 +33,7 @@ public class UserService(
             UserPhone = registerRequest.UserPhone,
             UserPassword = passwordSecureHelper.HashPassword(registerRequest.UserPassword),
             UserAddress = registerRequest.UserAddress,
+            UserZipCode = registerRequest.UserZipCode,
             UserRegisterMethod = (int)RegisterMethodEnum.本網站註冊,
             IsDelete = (int)IsDeleteStatusEnum.Normal,
         };
@@ -104,6 +105,7 @@ public class UserService(
             UserRole = dbuser.UserRole,
             UserPhone = dbuser.UserPhone,
             UserAddress = dbuser?.UserAddress,
+            UserZipCode = dbuser?.UserZipCode,
         };
 
         return ApiResponseHelper.Success(userresponse, "成功");

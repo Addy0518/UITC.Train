@@ -4,8 +4,7 @@ import { getUserCoupon } from '@/api/couponService';
 import { saveCvsReceiver } from '@/api/logisticsService';
 import { couponTypeEnum } from '@/common/enum';
 import defaultImgurl from '@/img/預設圖片.jpg';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import ZipCodeSelector from '@/common/ZipCodeSelector.vue';
 
 /*
    變數名稱代表意義
@@ -16,6 +15,7 @@ import { useRoute } from 'vue-router';
    authStore : pinia
    name : 收件人姓名
    phone : 收件人電話
+   zipInfo : 縣市/鄉鎮市區/郵遞區號
    address : 收件人地址
    items : 存在 pinia 的購物車選擇的商品
    allCoupons : 用戶的所有優惠卷
@@ -31,6 +31,9 @@ const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
 const name = ref(authStore.userName ?? '');
 const phone = ref(authStore.userPhone ?? '');
+const zipInfo = ref(
+  authStore.userZipCode ? reverseLookupZipCode(authStore.userZipCode) : undefined,
+);
 const address = ref(authStore.userAddress ?? '');
 const orderStore = useOrderStore();
 const items = orderStore.selectedItems;
@@ -149,13 +152,20 @@ const InsertHomeLogisticsTemp = async () => {
     if (!homeSessionKey.value) {
       homeSessionKey.value = 'GN' + crypto.randomUUID().replace(/-/g, '').substring(0, 11);
     }
+
+    // 把城市/地區/地址 組合成完整地址
+    const detailAddress = address.value
+      ? `${zipInfo.value.city}${zipInfo.value.district}${address.value}`
+      : '';
+
     const request = {
       sessionKey: homeSessionKey.value,
       logisticsType: 'Home',
       logisticsSubType: 'TCAT',
       receiverName: name.value,
       receiverPhone: phone.value,
-      receiverAddress: address.value,
+      receiverAddress: detailAddress,
+      receiverZipCode: zipInfo.value.zipCode,
     };
     const res = await saveHomeLogisticsTemp(request);
   } catch (err) {
@@ -499,12 +509,25 @@ const userBuy = async () => {
 
         <div v-else>
           <div class="flex flex-col gap-1">
-            <label class="text-sm mb-3 text-ink-900">收件地址</label>
+            <div>
+              <label class="block text-sm font-medium text-ink-900 mb-2"> 地址 </label>
 
-            <InputGroup>
-              <InputText v-model="address" placeholder="收件地址" :invalid="v$.address.$error" />
-            </InputGroup>
-            <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="收件地址" />
+              <ZipCodeSelector v-model="zipInfo" class="mb-2" />
+
+              <InputGroup>
+                <InputGroupAddon>
+                  <i class="pi pi-home"></i>
+                </InputGroupAddon>
+
+                <InputText
+                  v-model="address"
+                  placeholder="請輸入詳細地址 ( 路名、門牌、樓層 )"
+                  :invalid="v$.address.$error"
+                />
+              </InputGroup>
+
+              <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="地址" />
+            </div>
           </div>
         </div>
       </div>

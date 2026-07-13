@@ -324,6 +324,7 @@ public class OrderService(
                     ReceiverName = orderLogisticsTemp.ReceiverName,
                     ReceiverPhone = orderLogisticsTemp.ReceiverPhone,
                     ReceiverAddress = orderLogisticsTemp.ReceiverAddress ?? null,
+                    ReceiverZipCode = orderLogisticsTemp.ReceiverZipCode ?? null,
                     MerchantTradeNo = $"{merchantTradeNo}-{shipmentIndex}",
                     LogisticsStatus = LogisticsStatusEnum.Created,
                     CreatedAt = DateTime.Now,
@@ -580,9 +581,11 @@ public class OrderService(
                             GoodsName = goodsName,
                             SenderName = seller?.UserName ?? "賣家",
                             SenderPhone = seller?.UserPhone,
+                            SenderZipCode = seller?.UserZipCode,
                             ReceiverName = logistics.ReceiverName,
                             ReceiverPhone = logistics.ReceiverPhone,
                             ReceiverAddress = logistics.ReceiverAddress,
+                            ReceiverZipCode = logistics.ReceiverZipCode,
                         };
 
                         createResult = await logisticsService.CreateHomeLogisticsOrder(createInfo);

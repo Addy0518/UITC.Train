@@ -43,6 +43,11 @@ public class User
     public string? UserAddress { get; set; }
 
     /// <summary>
+    /// 使用者郵遞區號
+    /// </summary>
+    public string? UserZipCode { get; set; }
+
+    /// <summary>
     /// 使用者大頭照
     /// </summary>
     public string? UserHeadshot { get; set; }

@@ -53,6 +53,11 @@
         public string? ReceiverAddress { get; set; }
 
         /// <summary>
+        /// 收件人地址郵遞區號 (宅配才需要)
+        /// </summary>
+        public string? ReceiverZipCode { get; set; }
+
+        /// <summary>
         /// 過期時間 ( 未付款自動過期 )
         /// </summary>
         public DateTime ExpiredAt { get; set; }

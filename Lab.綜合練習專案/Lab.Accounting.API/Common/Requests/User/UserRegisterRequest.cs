@@ -42,4 +42,11 @@ public class UserRegisterRequest
     [Display(Name = "使用者地址")]
     [MaxLength(200, ErrorMessage = "{0} 不能超過 {1} 個字!")]
     public string? UserAddress { get; set; }
+
+    /// <summary>
+    /// 使用者郵遞區號
+    /// </summary>
+    [Display(Name = "使用者郵遞區號")]
+    [MaxLength(100, ErrorMessage = "{0} 不能超過 {1} 個字!")]
+    public string? UserZipCode { get; set; }
 }

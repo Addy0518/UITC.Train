@@ -48,6 +48,11 @@
         public string? ReceiverAddress { get; set; }
 
         /// <summary>
+        /// 收件人地址郵遞區號 (宅配才需要)
+        /// </summary>
+        public string? ReceiverZipCode { get; set; }
+
+        /// <summary>
         /// 物流訂單編號 (傳給綠界用)
         /// </summary>
         public string MerchantTradeNo { get; set; }

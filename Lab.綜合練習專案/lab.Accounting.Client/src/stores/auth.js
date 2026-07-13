@@ -10,6 +10,7 @@ export const useAuthStore = defineStore(
     const userHeadshot = ref(null);
     const userPhone = ref(null);
     const userAddress = ref(null);
+    const userZipCode = ref(null);
     const userRole = ref(null);
     /*
       登入時存入 token 資料
@@ -21,6 +22,7 @@ export const useAuthStore = defineStore(
       userHeadshot.value = data.userHeadshot;
       userPhone.value = data.userPhone;
       userAddress.value = data.userAddress;
+      userZipCode.value = data.userZipCode;
       userRole.value = data.userRole;
     }
     /*
@@ -33,6 +35,7 @@ export const useAuthStore = defineStore(
       userHeadshot.value = null;
       userPhone.value = null;
       userAddress.value = null;
+      userZipCode.value = null;
       userRole.value = null;
     }
     /*
@@ -46,6 +49,7 @@ export const useAuthStore = defineStore(
       userRole,
       userPhone,
       userAddress,
+      userZipCode,
       setAuth,
       clearAuth,
     };

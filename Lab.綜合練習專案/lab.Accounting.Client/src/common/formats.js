@@ -1,3 +1,5 @@
+import zipCodeData from '@/assets/zipCodeData.json';
+
 /**
  * 轉換台灣時區
  * @param {Date} value 時間
@@ -121,8 +123,8 @@ export const formatPaidType = (paidType) => {
 
 /**
  * 顯示付款子方式為中文
- *@param {paidType} value 付款子方式
- * @returns {paidType} 付款子方式中文
+ * @param {paidType} value 付款子方式
+ * @returns {subType} 付款子方式中文
  */
 export const formatLogisticsSubType = (subType) => {
   const map = {
@@ -134,3 +136,17 @@ export const formatLogisticsSubType = (subType) => {
   };
   return map[subType] ?? subType;
 };
+
+/**
+ *  依郵遞區號查看城市/地區
+ *  @param {zipCode} value 郵遞區號
+ *  @returns { { city: '', district: '', zipCode: '' }} 地址物件
+ */
+export function reverseLookupZipCode(zipCode) {
+  for (const [city, districts] of Object.entries(zipCodeData)) {
+    for (const [district, code] of Object.entries(districts)) {
+      if (code === zipCode) return { city, district, zipCode };
+    }
+  }
+  return { city: '', district: '', zipCode: '' };
+}

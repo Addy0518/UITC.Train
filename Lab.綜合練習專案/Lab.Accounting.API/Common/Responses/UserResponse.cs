@@ -28,6 +28,11 @@ public class UserResponse
     public string? UserAddress { get; set; }
 
     /// <summary>
+    /// 使用者郵遞區號
+    /// </summary>
+    public string? UserZipCode { get; set; }
+
+    /// <summary>
     /// 使用者電話
     /// </summary>
     public string? UserPhone { get; set; }

@@ -199,9 +199,11 @@ namespace Lab.Accounting.API.Services
                 { "GoodsName", request.GoodsName },
                 { "SenderName", senderName },
                 { "SenderCellPhone", request.SenderCellPhone ?? request.SenderPhone ?? "" },
+                { "SenderZipCode", request.SenderZipCode ?? "" },
                 { "ReceiverName", receiverName },
                 { "ReceiverCellPhone", request.ReceiverCellPhone ?? request.ReceiverPhone ?? "" },
                 { "ReceiverAddress", request.ReceiverAddress ?? "" },
+                { "ReceiverZipCode", request.ReceiverZipCode ?? "" },
                 { "ServerReplyURL", $"{_settings.ServerBaseUrl}/api/Logistics/HandleLogisticsStatusNotify" },
             };
 
@@ -321,6 +323,7 @@ namespace Lab.Accounting.API.Services
                 ReceiverName = request.ReceiverName,
                 ReceiverPhone = request.ReceiverPhone,
                 ReceiverAddress = request.ReceiverAddress,
+                ReceiverZipCode = request.ReceiverZipCode,
                 ExpiredAt = DateTime.Now.AddHours(2),
             };
             await logisticsTempRepository.CreateHomeLogisticsTemp(homeTemp);

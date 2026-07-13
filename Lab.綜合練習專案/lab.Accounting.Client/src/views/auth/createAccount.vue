@@ -1,35 +1,37 @@
 <script setup>
 import { registerApi } from '@/api/userService';
-
+import ZipCodeSelector from '@/common/ZipCodeSelector.vue';
 /*
-   變數名稱代表意義
-   route : 獲取路由資訊
-   account : 帳號
-   password : 密碼
-   name : 名稱
-   phone : 電話
-   address : 地址
-   tooglePassword　：　切換密碼顯示或隱藏
-*/
+    變數名稱代表意義
+    route : 獲取路由資訊
+    account : 帳號
+    password : 密碼
+    name : 名稱
+    phone : 電話
+    zipInfo : 縣市/鄉鎮市區/郵遞區號
+    address : 地址
+    tooglePassword　：　切換密碼顯示或隱藏
+  */
 const route = useRouter();
 const account = ref();
 const password = ref();
 const name = ref();
 const phone = ref();
+const zipInfo = ref();
 const address = ref();
 const tooglePassword = ref(true);
 
 /*
-   注入 Loading 跟 Toast
-*/
+    注入 Loading 跟 Toast
+  */
 const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
 /*
-   加入已經寫好的驗證規則
-*/
+    加入已經寫好的驗證規則
+  */
 const rules = computed(() => ({
   account: { required, maxLength: maxLength(200), vaildEmail },
   password: { required, vaildLoginPassword },
@@ -39,8 +41,8 @@ const rules = computed(() => ({
 }));
 
 /*
-   加入套件驗證設定
-*/
+    加入套件驗證設定
+  */
 const v$ = useVuelidate(
   rules,
   { account, password, name, phone, address },
@@ -48,20 +50,27 @@ const v$ = useVuelidate(
 );
 
 /*
-  呼叫註冊使用者 API
-*/
+    呼叫註冊使用者 API
+  */
 const userRegister = async () => {
   // 要儲存前先驗證
   const isFormCorrect = await v$.value.$validate();
   if (!isFormCorrect) return;
   try {
     showLoading();
+
+    // 把城市/地區/地址 組合成完整地址
+    const detailAddress = address.value
+      ? `${zipInfo.value.city}${zipInfo.value.district}${address.value}`
+      : '';
+
     const userRegisterData = {
       userAccount: account.value,
       userPassword: password.value,
       userName: name.value,
       userPhone: phone.value,
-      userAddress: address.value,
+      userAddress: detailAddress,
+      userZipCode: zipInfo.value.zipCode,
     };
 
     const res = await registerApi(userRegisterData);
@@ -164,16 +173,22 @@ const userRegister = async () => {
             <InValidErrorMessage :errorDto="v$.phone.$errors" vaildChiName="電話" />
           </div>
 
-          <!-- 地址 -->
+          <!-- 地址 : 縣市/鄉鎮市區 下拉 + 詳細地址輸入 -->
           <div>
             <label class="block text-sm font-medium text-ink-900 mb-2"> 地址 </label>
+
+            <ZipCodeSelector v-model="zipInfo" class="mb-2" />
 
             <InputGroup>
               <InputGroupAddon>
                 <i class="pi pi-home"></i>
               </InputGroupAddon>
 
-              <InputText v-model="address" placeholder="請輸入地址" :invalid="v$.address.$error" />
+              <InputText
+                v-model="address"
+                placeholder="請輸入詳細地址 ( 路名、門牌、樓層 )"
+                :invalid="v$.address.$error"
+              />
             </InputGroup>
 
             <InValidErrorMessage :errorDto="v$.address.$errors" vaildChiName="地址" />

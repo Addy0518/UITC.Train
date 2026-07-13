@@ -48,6 +48,16 @@ namespace Lab.Accounting.API.Services
         /// <returns>影響列數</returns>
         public async Task<ApiResponse<int>> StoreRegister(StoreRegisterRequest request)
         {
+            var user = await userRepository.GetUser(request.UserId);
+            if (string.IsNullOrEmpty(user.UserAddress) || string.IsNullOrEmpty(user.UserZipCode))
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "UserAddress", new[] { "開店前請先完善您的地址資訊，供日後出貨使用!" } },
+                };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
             var exist = await sellerRepository.GetStore(request.UserId);
 
             if (exist != null)
@@ -56,6 +66,7 @@ namespace Lab.Accounting.API.Services
 
                 return ApiResponseHelper.RequestError<int>(errors);
             }
+
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var seller = new Store

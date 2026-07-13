@@ -45,12 +45,12 @@ public class LogisticsTempRepository(DBConnecting connecting) : ILogisticsTempRe
             @"
             INSERT INTO OrderLogisticsTemp (
                 SessionKey, LogisticsType, LogisticsSubType,
-                ReceiverName, ReceiverPhone,ReceiverAddress,
+                ReceiverName, ReceiverPhone,ReceiverAddress,ReceiverZipCode,
                 ExpiredAt
             )
             VALUES (
                 @SessionKey, @LogisticsType, @LogisticsSubType,
-                @ReceiverName, @ReceiverPhone,@ReceiverAddress,
+                @ReceiverName, @ReceiverPhone,@ReceiverAddress,@ReceiverZipCode,
                 @ExpiredAt
             );";
         await conn.ExecuteAsync(sql, logisticsTemp);
