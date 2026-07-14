@@ -270,7 +270,7 @@ public class UserRepository(DBConnecting connecting) : IUserRepository
                   SET
                        UserName      = COALESCE(@UserName, UserName),
                        UserAddress   = COALESCE(@UserAddress, UserAddress),
-                       UserZipCode=COALESCE(@UserZipCode, UserZipCode),
+                       UserZipCode   = COALESCE(@UserZipCode, UserZipCode),
                        UserPhone     = COALESCE(@UserPhone, UserPhone),
                        UserBirthDate = COALESCE(@UserBirthDate, UserBirthDate),
                        UserGender    = COALESCE(@UserGender, UserGender),

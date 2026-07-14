@@ -32,7 +32,7 @@ public class UserUpdateRequest
     /// </summary>
     [Display(Name = "收件人郵遞區號")]
     [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
-    public string? ReceiverZipCode { get; set; }
+    public string? UserZipCode { get; set; }
 
     /// <summary>
     /// 使用者生日

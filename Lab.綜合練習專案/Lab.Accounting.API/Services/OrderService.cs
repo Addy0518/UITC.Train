@@ -582,6 +582,7 @@ public class OrderService(
                             SenderName = seller?.UserName ?? "賣家",
                             SenderPhone = seller?.UserPhone,
                             SenderZipCode = seller?.UserZipCode,
+                            SenderAddress = seller?.UserAddress,
                             ReceiverName = logistics.ReceiverName,
                             ReceiverPhone = logistics.ReceiverPhone,
                             ReceiverAddress = logistics.ReceiverAddress,

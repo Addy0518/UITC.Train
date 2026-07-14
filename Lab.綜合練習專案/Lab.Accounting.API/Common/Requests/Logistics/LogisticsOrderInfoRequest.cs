@@ -38,6 +38,11 @@
         public string? SenderCellPhone { get; set; }
 
         /// <summary>
+        /// 寄件人地址 ( 宅配 )
+        /// </summary>
+        public string? SenderAddress { get; set; }
+
+        /// <summary>
         /// 寄件人郵遞區號 ( 宅配 )
         /// </summary>
         public string? SenderZipCode { get; set; }
