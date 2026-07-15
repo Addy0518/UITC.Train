@@ -25,14 +25,6 @@
         public string StoreName { get; set; }
 
         /// <summary>
-        /// 統一編號
-        /// </summary>
-        [Display(Name = "統一編號")]
-        [Required(ErrorMessage = "{0} 不能為空!")]
-        [RegularExpression(@"^\d{8}$", ErrorMessage = "{0} 格式不正確，須為 8 位數字!")]
-        public string StoreUnifiedNumber { get; set; }
-
-        /// <summary>
         /// 公司名稱
         /// </summary>
         [Display(Name = "公司名稱")]

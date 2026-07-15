@@ -3,6 +3,11 @@
     public class StoreResponse
     {
         /// <summary>
+        /// 賣場 ID
+        /// </summary>
+        public int StoreId { get; set; }
+
+        /// <summary>
         /// 使用者 ID
         /// </summary>
         public int UserId { get; set; }

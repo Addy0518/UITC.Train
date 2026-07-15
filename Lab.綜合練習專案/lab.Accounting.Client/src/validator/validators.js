@@ -32,5 +32,10 @@ export const vaildCellPhone = helpers.withMessage(
   helpers.regex(/^09[\d]{8}$/),
 );
 
+export const vaildUnifiedNumber = helpers.withMessage(
+  '統一編號為 8 碼數字',
+  helpers.regex(/^\d{8}$/),
+);
+
 export const sameAsPassword = (newPasswordRef) =>
   helpers.withMessage('兩次輸入的密碼不一致', (value) => value === newPasswordRef.value);

@@ -17,10 +17,6 @@ export const getUserOrder = () => accountApiInstance.get(`Order/GetUserOrder`);
 export const getUserOneOrder = (id) =>
   accountApiInstance.get(`Order/GetUserOneOrder?orderId=${id}`);
 
-// 更新運輸狀態
-export const updateShippingStatus = (id, status) =>
-  accountApiInstance.put(`Order/UpdateShippingStatus?orderId=${id}&shippingStatus=${status}`);
-
 // 賣家查看所有訂單
 export const getSellerOrder = () => accountApiInstance.get(`Order/GetSellerOrder`);
 

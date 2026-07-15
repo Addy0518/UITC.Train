@@ -29,6 +29,7 @@ namespace Lab.Accounting.API.Services
             var productCount = await productsRepository.CountSellerProducts(sellerId);
             var result = new StoreResponse
             {
+                StoreId = target.StoreId,
                 UserId = target.UserId,
                 StoreName = target.StoreName,
                 StoreUnifiedNumber = target.StoreUnifiedNumber,

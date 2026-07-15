@@ -47,7 +47,7 @@ public class ProductsUpdateRequest
     /// 商品描述
     /// </summary>
     [Display(Name = "商品描述")]
-    [MaxLength(500, ErrorMessage = "{0} 不可超過 {1} 字!")]
+    [MaxLength(2500, ErrorMessage = "{0} 不可超過 {1} 字!")]
     [MinLength(1, ErrorMessage = "商品描述不可為空！")]
     public string? ProductsDescription { get; set; }
 

@@ -1,6 +1,6 @@
 <script setup>
 import { addCategory, getAllCategories } from '@/api/admin/categoryService';
-import { useRoute } from 'vue-router';
+import { getOneFatherCategory } from '@/api/categoryService';
 
 /*
    變數名稱代表意義
@@ -37,11 +37,8 @@ onMounted(() => {
 const getCategoriesAll = async () => {
   try {
     showLoading();
-    const request = {
-      pageIndex: 0,
-      pageSize: 9999,
-    };
-    const res = await getAllCategories(request);
+
+    const res = await getOneFatherCategory();
     const { data } = res;
 
     if (data.codeStatus === 2000) {
@@ -105,13 +102,6 @@ const createCategory = async () => {
 };
 
 /*
-   切換為父層類別時
-*/
-const changeParent = () => {
-  imgs.value = null;
-};
-
-/*
    上傳商品圖片並在前端顯示
 */
 const uploadFile = async (event) => {
@@ -144,36 +134,35 @@ const removeImage = () => {
       </div>
 
       <div class="p-6 flex flex-col gap-6">
-        <div v-if="!selectParent">
-          <div>
-            <p class="text-sm text-ink-500 mb-2">類別圖片</p>
-            <div class="flex flex-wrap gap-2.5">
-              <!-- 有圖片就顯示 -->
-              <div v-if="imgs" class="relative w-40 h-40">
-                <img
-                  :src="imgs.url"
-                  class="w-full h-full object-cover rounded-card border border-border-soft"
-                />
-                <button
-                  @click="removeImage"
-                  class="absolute -top-1.5 -right-1.5 bg-action-danger text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <!-- 沒圖片才顯示上傳 -->
-              <label
-                v-else
-                class="w-40 h-40 border border-dashed border-ink-300 rounded-card flex flex-col items-center justify-center cursor-pointer hover:bg-surface-muted gap-1"
+        <div>
+          <p class="text-sm text-ink-500 mb-2">類別圖片</p>
+          <div class="flex flex-wrap gap-2.5">
+            <!-- 有圖片就顯示 -->
+            <div v-if="imgs" class="relative w-40 h-40">
+              <img
+                :src="imgs.url"
+                class="w-full h-full object-cover rounded-card border border-border-soft"
+              />
+              <button
+                @click="removeImage"
+                class="absolute -top-1.5 -right-1.5 bg-action-danger text-white rounded-full w-4 h-4 flex items-center justify-center text-xs cursor-pointer"
               >
-                <i class="pi pi-plus text-ink-500 text-sm"></i>
-                <span class="text-xs text-ink-500">上傳圖片</span>
-                <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
-              </label>
+                ✕
+              </button>
             </div>
+
+            <!-- 沒圖片才顯示上傳 -->
+            <label
+              v-else
+              class="w-40 h-40 border border-dashed border-ink-300 rounded-card flex flex-col items-center justify-center cursor-pointer hover:bg-surface-muted gap-1"
+            >
+              <i class="pi pi-plus text-ink-500 text-sm"></i>
+              <span class="text-xs text-ink-500">上傳圖片</span>
+              <input type="file" @change="uploadFile" accept="image/*" class="hidden" />
+            </label>
           </div>
         </div>
+
         <!-- #endregion -->
         <!-- #region  表單欄位-->
         <div class="grid grid-cols-2 gap-4">
@@ -194,7 +183,6 @@ const removeImage = () => {
             <label class="text-sm text-ink-500 block mb-1.5">父類別（不選代表頂層類別）</label>
             <Select
               v-model="selectParent"
-              @change="changeParent"
               :options="[
                 { productCategoryName: '無（頂層類別）', productCategoryId: null },
                 ...allCategories,

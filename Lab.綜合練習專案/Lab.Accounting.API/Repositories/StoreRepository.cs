@@ -61,12 +61,11 @@ namespace Lab.Accounting.API.Repositories.Interface
             using var conn = connecting.CreateConnecting();
 
             var sql =
-                @"UPDATE [dbo].[seller]
-                  SET    sellername          = COALESCE(@SellerName, SellerName),
-                         sellerunifiednumber = COALESCE(@SellerUnifiedNumber, SellerUnifiedNumber),
-                         sellercompanyname   = COALESCE(@SellerCompanyName, SellerCompanyName),
+                @"UPDATE [dbo].[Store]
+                  SET    StoreName          = COALESCE(@StoreName, StoreName),
+                         StoreCompanyName   = COALESCE(@StoreCompanyName, StoreCompanyName),
                          updatetime          = GetDate()
-                  WHERE  userid = @UserId";
+                  WHERE  userid = @UserId and StoreId=@StoreId";
 
             return await conn.ExecuteAsync(sql, request);
         }

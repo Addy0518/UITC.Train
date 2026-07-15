@@ -152,6 +152,17 @@ const router = createRouter({
         },
         {
           /*
+            父類別詳細
+          */
+          path: 'mall-parent-category',
+          name: 'mall-parent-category',
+          meta: {
+            isPermissionVerification: false,
+          },
+          component: () => import('@/views/mall/mallParentCategory.vue'),
+        },
+        {
+          /*
             類別詳細
           */
           path: 'mall-category/:id',
@@ -334,6 +345,17 @@ const router = createRouter({
               },
               component: () => import('@/views/user/termsPrivacy.vue'),
             },
+            {
+              /*
+                註冊成為賣家
+              */
+              path: 'store-register',
+              name: 'store-register',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/storeRegister.vue'),
+            },
           ],
         },
       ],
@@ -346,7 +368,7 @@ const router = createRouter({
       path: '/backend-layout',
       name: 'backend-layout',
       component: () => import('@/views/layout/backendLayout.vue'),
-      redirect: { name: 'seller-product' },
+      redirect: { name: 'seller-store-edit' },
       children: [
         /*
             賣家區 ================================================================
@@ -361,6 +383,17 @@ const router = createRouter({
             isPermissionVerification: true,
           },
           component: () => import('@/views/layout/backendSidebar.vue'),
+        },
+        {
+          /*
+            賣家賣場
+          */
+          path: 'seller-store-edit',
+          name: 'seller-store-edit',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/backend/seller/sellerStoreEdit.vue'),
         },
         {
           /*

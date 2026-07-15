@@ -23,6 +23,7 @@
         [Display(Name = "統一編號")]
         [Required(ErrorMessage = "{0} 不能為空!")]
         [MaxLength(100, ErrorMessage = "{0} 長度最長為 {1} 字")]
+        [RegularExpression(@"^\d{8}$", ErrorMessage = "統編必須為 8 個數字")]
         public string StoreUnifiedNumber { get; set; }
 
         /// <summary>

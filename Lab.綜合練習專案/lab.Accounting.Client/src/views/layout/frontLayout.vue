@@ -122,20 +122,6 @@ const loadShopingCarProducts = async () => {
         <RouterLink :to="{ name: 'mall' }" class="text-ink-on-dark text-2xl font-bold">
           購物商城
         </RouterLink>
-        <RouterLink
-          v-if="authStore.userRole == 'Seller'"
-          :to="{ name: 'backend-layout' }"
-          class="text-ink-on-dark-muted text-base hover:text-ink-on-dark transition-colors"
-        >
-          賣家中心
-        </RouterLink>
-        <RouterLink
-          v-if="authStore.userRole == 'Admin'"
-          :to="{ name: 'admin-allreview' }"
-          class="text-ink-on-dark-muted text-base hover:text-ink-on-dark transition-colors"
-        >
-          管理中心
-        </RouterLink>
       </div>
 
       <div class="flex flex-1 items-center justify-center">
@@ -167,6 +153,28 @@ const loadShopingCarProducts = async () => {
                 class="block px-4 py-3 hover:bg-surface-muted text-sm text-ink-900"
               >
                 用戶中心
+              </RouterLink>
+
+              <RouterLink
+                v-if="authStore.userRole == 'Seller'"
+                :to="{ name: 'backend-layout' }"
+                class="block px-4 py-3 hover:bg-surface-muted text-sm text-ink-900"
+              >
+                賣家中心
+              </RouterLink>
+              <RouterLink
+                v-else-if="authStore.userRole != 'Admin'"
+                :to="{ name: 'store-register' }"
+                class="block px-4 py-3 hover:bg-surface-muted text-sm text-ink-900"
+              >
+                成為賣家
+              </RouterLink>
+              <RouterLink
+                v-if="authStore.userRole == 'Admin'"
+                :to="{ name: 'admin-allreview' }"
+                class="block px-4 py-3 hover:bg-surface-muted text-sm text-ink-900"
+              >
+                管理中心
               </RouterLink>
               <RouterLink
                 :to="{ name: 'ledger-centre' }"

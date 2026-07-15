@@ -15,7 +15,6 @@ const menuItems = ref([
   {
     label: '用戶資料',
     icon: 'pi pi-user',
-    command: () => router.push('/user-centre/profile'),
     items: [
       { label: '個人檔案', command: () => router.push('/user-centre/profile') },
       { label: '更改密碼', command: () => router.push('/user-centre/update-password') },
@@ -34,12 +33,11 @@ const menuItems = ref([
   {
     label: '更多功能',
     icon: 'pi pi-info-circle',
-    command: () => router.push('/user-centre/function'),
+    items: [{ label: '成為賣家', command: () => router.push('/user-centre/store-register') }],
   },
   {
     label: '服務支援',
     icon: 'pi pi-question-circle',
-    command: () => router.push('/user-centre/help'),
     items: [
       { label: '常見問題', command: () => router.push('/user-centre/faq') },
       { label: '服務條款', command: () => router.push('/user-centre/terms-privacy') },

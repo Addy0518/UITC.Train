@@ -3,15 +3,10 @@ import defaultImgurl from '@/img/預設圖片.jpg';
 import advertise1 from '@/img/廣告1.jpg';
 import advertise2 from '@/img/廣告2.jpg';
 import advertise3 from '@/img/廣告3.jpg';
-import { getAllProductsInShoppingCar } from '@/api/shoppingcarService';
 
 /*
   變數名稱代表意義
-  route : 獲取路由資訊
-  router :　改變路由
-  allProductsRaw : 初始資料 ( 全部商品 )
-  products : 全部商品
-  allProductsRaw : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
+  allProducts : 原始資料 ( 用來篩選類別之後能從原始資料重抓 )
   baseUrl : 環境變數裡的圖片基底位址
   totalCount : 商品數量
   allCategories : 所有類別
@@ -19,8 +14,6 @@ import { getAllProductsInShoppingCar } from '@/api/shoppingcarService';
 */
 const route = useRoute();
 const router = useRouter();
-const products = ref([]);
-const allProductsRaw = ref();
 const allProducts = ref([]);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const totalCount = ref();
@@ -70,6 +63,20 @@ watch(
     if (val) showToastError('你沒有訪問權限');
   },
 );
+
+/*
+   篩選要顯示在首頁的父類別
+*/
+const visibleCategories = computed(() =>
+  (allCategories.value?.length ?? 0) > 9
+    ? allCategories.value.slice(0, 9)
+    : (allCategories.value ?? []),
+);
+
+/*
+   是否需要顯示「查看全部」按鈕（超過 10 個才顯示）
+*/
+const hasMoreCategories = computed(() => (allCategories.value?.length ?? 0) > 9);
 
 /*
    初始化時加載商品 , 並取出唯一的類別值放類別區 , 跟去除重複名稱的商品 ( 因為一個商品會有多個類別 , 所以這裡去重複 )
@@ -172,9 +179,9 @@ const getCategoryImg = (category) => {
     <!-- #region 類別區 -->
     <div class="w-300 mt-8">
       <span class="text-xl font-bold text-ink-900 mb-5 block">分類</span>
-      <div class="grid grid-cols-4 gap-4">
+      <div class="grid grid-cols-5 gap-4">
         <RouterLink
-          v-for="category in allCategories"
+          v-for="category in visibleCategories"
           :key="category.productCategoryId"
           :to="{ name: 'mall-category', params: { id: category.productCategoryId } }"
           class="bg-page-bg border border-border-soft rounded-card hover:border-ink-300 transition-colors cursor-pointer flex flex-col items-center p-4"
@@ -184,6 +191,16 @@ const getCategoryImg = (category) => {
           </div>
           <span class="mt-3 text-sm text-ink-900">{{ category.productCategoryName }}</span>
         </RouterLink>
+        <!--#region 「查看全部」卡片（超過 10 個才顯示） -->
+        <div
+          v-if="hasMoreCategories"
+          @click="router.push({ name: 'mall-parent-category' })"
+          class="bg-page-bg border border-dashed border-border-soft rounded-card hover:bg-surface-muted transition-colors cursor-pointer flex flex-col items-center justify-center p-4 gap-2"
+        >
+          <i class="pi pi-th-large text-ink-300 text-2xl"></i>
+          <span class="text-sm text-ink-500">查看全部</span>
+        </div>
+        <!-- #endregion -->
       </div>
     </div>
     <!-- #endregion -->

@@ -20,6 +20,13 @@ onMounted(() => {});
       <!-- #region  賣家後台區-->
       <template v-if="authStore.userRole == 'Seller'">
         <RouterLink
+          :to="{ name: 'seller-store-edit' }"
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
+        >
+          <i class="pi pi-shop"></i>賣場管理
+        </RouterLink>
+        <RouterLink
           :to="{ name: 'seller-data' }"
           class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
           active-class="bg-brand-50 text-brand-500 font-medium"

@@ -1,5 +1,5 @@
 <script setup>
-import { getSellerOneOrder, updateShippingStatus } from '@/api/orderService';
+import { getSellerOneOrder } from '@/api/orderService';
 import defaultImgurl from '@/img/預設圖片.jpg';
 
 /*
@@ -52,24 +52,6 @@ const getProductsImg = (product) => {
     return `${baseUrl}/ProductsImg/${product.productsImg}`;
   }
   return defaultImgurl;
-};
-
-/*
-  改變運輸狀態
-*/
-const updateStatus = async (id, status) => {
-  try {
-    const res = await updateShippingStatus(id, status);
-    console.log('res', res);
-    const { data } = res;
-    if (data.codeStatus === 2000) {
-      showToastSuccess('成功更新運輸狀態!');
-      await getSellerProduct();
-    }
-  } catch (err) {
-    console.log(err);
-  } finally {
-  }
 };
 </script>
 
@@ -124,24 +106,11 @@ const updateStatus = async (id, status) => {
               <p class="text-xs text-ink-500 m-0 mb-1">付款方式</p>
               <p class="text-sm m-0 text-ink-900">{{ order.paidType }}</p>
             </div>
-
           </div>
         </div>
         <!-- #endregion -->
         <!-- #region  更新狀態 / 總金額-->
-        <div class="px-6 py-5 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <p class="text-sm text-ink-500 m-0">更新運送狀態</p>
-            <select
-              class="border border-border-soft rounded-card px-3 py-1.5 text-sm cursor-pointer text-ink-900"
-              :value="order.shippingStatus"
-              @change="updateStatus(order.orderId, Number($event.target.value))"
-            >
-              <option v-for="status in shippingEnum" :key="status.value" :value="status.value">
-                {{ status.description }}
-              </option>
-            </select>
-          </div>
+        <div class="px-6 py-5 flex items-center justify-center">
           <div class="text-right">
             <p class="text-xs text-ink-300 m-0 mb-1">訂單金額</p>
             <p class="text-xl font-medium text-brand-price m-0">$ {{ order.accountAmount }}</p>

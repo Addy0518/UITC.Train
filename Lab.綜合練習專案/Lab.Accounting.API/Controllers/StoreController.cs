@@ -46,7 +46,7 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     [HttpPut]
     [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> UpdateSeller(StoreUpdateRequest request)
+    public async Task<IActionResult> UpdateStore(StoreUpdateRequest request)
     {
         request.UserId = CurrentUserId;
         return Ok(await sellerservice.UpdateStore(request));
