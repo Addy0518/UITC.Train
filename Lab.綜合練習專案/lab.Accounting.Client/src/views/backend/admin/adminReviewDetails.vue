@@ -65,7 +65,7 @@ const getReview = async (id) => {
       if (data.returnData.productsId) {
         const productRes = await getProduct(data.returnData.productsId);
         if (productRes.data.codeStatus === 2000) {
-          oldProduct.value = productRes.data.returnData;
+          oldProduct.value = productRes.data.returnData;  
         }
       } else {
         const imgRes = await getReviewAllImg(data.returnData.productsReviewId);

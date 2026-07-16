@@ -318,8 +318,8 @@ const createOrUpdateProduct = async () => {
           }
         }
         showToastSuccess('更新商品成功!');
-
-        router.push({ name: 'mall' });
+        router.back();
+        //router.push({ name: 'mall' });
       }
     } catch (err) {
       console.log(err);
