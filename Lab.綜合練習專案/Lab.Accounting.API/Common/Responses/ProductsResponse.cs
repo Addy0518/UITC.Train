@@ -90,10 +90,7 @@ public class ProductDetails
     /// <summary>
     /// 打折後的價格
     /// </summary>
-    public decimal FinalPrice =>
-        Discount.HasValue && DiscountStart <= DateTime.Now && DiscountEnd >= DateTime.Now
-            ? ProductsPrice * (Discount.Value / 100)
-            : ProductsPrice;
+    public decimal FinalPrice => IsDiscount ? Math.Floor(ProductsPrice * (Discount.Value / 100)) : ProductsPrice;
 
     /// <summary>
     /// 購買數量

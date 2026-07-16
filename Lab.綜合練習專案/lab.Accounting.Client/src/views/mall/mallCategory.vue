@@ -20,6 +20,7 @@ import defaultImgurl from '@/img/預設圖片.jpg';
   rate = 評分
   visible : Dialog 開關
   isFiltering : 是否為第一次加載
+  pageSize : 單頁顯示筆數
 */
 const route = useRoute();
 const router = useRouter();
@@ -37,7 +38,7 @@ const minPrice = ref();
 const rate = ref();
 const visible = ref(false);
 const isFiltering = ref(false);
-
+const pageSize = ref(12);
 /*
    評價選項
 */
@@ -114,7 +115,7 @@ const loadproducts = async (parentId, page = 0, isFirstload = false) => {
     const res = await getAllProduct({
       productCategoryId: parentId,
       pageIndex: page,
-      pageSize: 12,
+      pageSize: pageSize.value,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
       rate: rate.value,
@@ -231,7 +232,7 @@ const breadCrumbItem = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full ">
+  <div class="flex flex-col w-full">
     <div class="flex flex-col items-center">
       <!-- #region  麵包屑-->
       <div class="card flex justify-start">
@@ -462,7 +463,7 @@ const breadCrumbItem = computed(() => {
               default:
                 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
             }"
-            :rows="12"
+            :rows="pageSize"
             :totalRecords="totalCount"
             @page="pageChange"
           >

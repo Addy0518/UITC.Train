@@ -31,6 +31,7 @@ const sortOrder = ref('desc');
 const search = ref();
 const suggestions = ref([]);
 const couponDialog = ref(null);
+const pageSize = ref(10);
 /*
    注入 Loading 跟 Toast
 */
@@ -60,7 +61,7 @@ const getCoupons = async (isFirstload = false) => {
 
     const request = {
       pageIndex: currentPage.value,
-      pageSize: 10,
+      pageSize: pageSize.value,
       keyWords: keyWords.value ?? null,
       isActive: isActive.value ?? null,
       sortBy: sortBy.value,
@@ -333,7 +334,7 @@ const openEditDialog = async (coupon) => {
             default:
               'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
           }"
-          :rows="10"
+          :rows="pageSize"
           :totalRecords="totalCount"
           @page="pageChange"
         />

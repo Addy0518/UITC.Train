@@ -91,7 +91,6 @@ const breadCrumbItem = ref([{ label: '全部分類' }]);
   <!--#region 整體容器 -->
   <div class="flex flex-col w-full items-center bg-page-bg">
     <div class="w-full max-w-screen-xl px-6 py-6">
-
       <!--#region 麵包屑 -->
       <Breadcrumb :home="home" :model="breadCrumbItem" class="mb-6" />
       <!-- #endregion -->
@@ -119,20 +118,36 @@ const breadCrumbItem = ref([{ label: '全部分類' }]);
 
       <!--#region 分類群組列表 -->
       <div v-for="group in filteredGroups" :key="group.parent.productCategoryId" class="mb-8">
-
         <!--#region 父類別標題 -->
         <div class="flex items-center gap-3 mb-4">
           <img
             :src="getCategoryImg(group.parent)"
             class="w-8 h-8 rounded-card object-cover border border-border-soft"
           />
-          <span class="text-base font-bold text-ink-900">{{ group.parent.productCategoryName }}</span>
+          <span class="text-base font-bold text-ink-900">{{
+            group.parent.productCategoryName
+          }}</span>
           <div class="flex-1 h-px bg-border-soft"></div>
         </div>
         <!-- #endregion -->
 
         <!--#region 子類別卡片列表 -->
         <div class="grid grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-3">
+          <!--#region 父類別 -->
+          <RouterLink
+            :to="{ name: 'mall-category', params: { id: group.parent.productCategoryId } }"
+            class="bg-page-bg border border-border-soft rounded-card overflow-hidden hover:border-ink-300 transition-colors cursor-pointer flex flex-col items-center p-3 gap-2"
+          >
+            <div class="w-full aspect-square bg-surface-muted rounded-card overflow-hidden">
+              <img :src="getCategoryImg(group.parent)" alt="" class="w-full h-full object-cover" />
+            </div>
+            <span class="text-xs text-ink-900 text-center">{{
+              group.parent.productCategoryName
+            }}</span>
+          </RouterLink>
+          <!-- #endregion -->
+
+          <!--#region 子類別 -->
           <RouterLink
             v-for="child in group.children"
             :key="child.productCategoryId"
@@ -146,25 +161,11 @@ const breadCrumbItem = ref([{ label: '全部分類' }]);
               {{ child.productCategoryName }}
             </span>
           </RouterLink>
-
-          <!--#region 若無子類別，直接顯示父類別本身可點 -->
-          <RouterLink
-            v-if="group.children.length === 0"
-            :to="{ name: 'mall-category', params: { id: group.parent.productCategoryId } }"
-            class="bg-page-bg border border-border-soft rounded-card overflow-hidden hover:border-ink-300 transition-colors cursor-pointer flex flex-col items-center p-3 gap-2"
-          >
-            <div class="w-full aspect-square bg-surface-muted rounded-card overflow-hidden">
-              <img :src="getCategoryImg(group.parent)" alt="" class="w-full h-full object-cover" />
-            </div>
-            <span class="text-xs text-ink-900 text-center">{{ group.parent.productCategoryName }}</span>
-          </RouterLink>
           <!-- #endregion -->
         </div>
         <!-- #endregion -->
-
       </div>
       <!-- #endregion -->
-
     </div>
   </div>
   <!-- #endregion -->

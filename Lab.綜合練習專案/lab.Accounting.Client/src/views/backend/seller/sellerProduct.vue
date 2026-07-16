@@ -20,6 +20,7 @@ import defaultImgurl from '@/img/預設圖片.jpg';
    totalCount : 商品數量
    search : 搜尋
    suggestions : 搜尋建議
+   pageSize : 單頁顯示筆數
 */
 const allproduct = ref(null);
 const currentPage = ref();
@@ -37,6 +38,7 @@ const isFiltering = ref(false);
 const totalCount = ref();
 const search = ref();
 const suggestions = ref([]);
+const pageSize = ref(10);
 
 /*
    評價選項
@@ -97,7 +99,7 @@ const getSellerProduct = async (isFirstload = false) => {
 
     const request = {
       pageIndex: currentPage.value,
-      pageSize: 10,
+      pageSize: pageSize.value,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
       rate: rate.value,
@@ -409,7 +411,7 @@ const goSearch = () => {
             default:
               'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
           }"
-          :rows="12"
+          :rows="pageSize"
           :totalRecords="totalCount"
           @page="pageChange"
         >

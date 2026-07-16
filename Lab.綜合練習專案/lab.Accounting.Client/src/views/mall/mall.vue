@@ -11,6 +11,7 @@ import advertise3 from '@/img/廣告3.jpg';
   totalCount : 商品數量
   allCategories : 所有類別
   advertiseImg : 廣告圖片
+  pageSize : 單頁顯示筆數
 */
 const route = useRoute();
 const router = useRouter();
@@ -23,6 +24,7 @@ const advertiseImg = ref([
   { itemImageSrc: advertise2 },
   { itemImageSrc: advertise3 },
 ]);
+const pageSize = ref(12);
 
 /*
    注入 Loading 跟 Toast
@@ -87,7 +89,7 @@ const loadproducts = async (page = 0) => {
     allProducts.value = [];
     const res = await getAllProduct({
       pageIndex: page,
-      pageSize: 12,
+      pageSize: pageSize.value,
       keyWords: route.query.keyword ?? null,
     });
     const { data } = res;
@@ -267,7 +269,7 @@ const getCategoryImg = (category) => {
             default:
               'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
           }"
-          :rows="12"
+          :rows="pageSize"
           :totalRecords="totalCount"
           @page="pageChange"
         >

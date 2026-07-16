@@ -33,7 +33,7 @@ const totalCount = ref();
 const search = ref();
 const suggestions = ref([]);
 const searchType = ref('ProductsName');
-
+const pageSize = ref(10);
 /*
    搜尋類型選項
 */
@@ -107,7 +107,7 @@ const getAllReview = async (isFirstload = false) => {
 
     const request = {
       pageIndex: currentPage.value,
-      pageSize: 10,
+      pageSize: pageSize.value,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
       reviewStatus: reviewStatus.value ?? null,
@@ -365,7 +365,7 @@ const changeReviewStatus = (status) => {
             default:
               'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
           }"
-          :rows="10"
+          :rows="pageSize"
           :totalRecords="totalCount"
           @page="pageChange"
         />

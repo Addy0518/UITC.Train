@@ -180,11 +180,13 @@ const userImg = (user) => {
    載入賣家頭貼
 */
 const sellerImg = (user) => {
-  if (user) {
-    return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
-  } else {
+  if (!user || !user.userHeadshot) {
     return defaultImgurl;
   }
+  if (user.userHeadshot.includes('googleusercontent.com')) {
+    return user.userHeadshot;
+  }
+  return `${baseUrl}/UserHeadShot/${user.userHeadshot}`;
 };
 
 /*
@@ -293,7 +295,13 @@ const breadCrumbItem = computed(() => {
                 :showItemNavigators="true"
                 :showThumbnailNavigators="true"
                 :pt="{
-                  mask: { onClick: () => (displayBasic = false) },
+                  mask: {
+                    onClick: (event) => {
+                      if (event.target === event.currentTarget) {
+                        displayBasic = false;
+                      }
+                    },
+                  },
                 }"
               >
                 <template #item="slotProps">
@@ -345,9 +353,19 @@ const breadCrumbItem = computed(() => {
 
             <!-- #region 價格 -->
             <div class="bg-brand-50 rounded-card px-4 py-3">
-              <span class="text-3xl font-medium text-brand-price"
-                >$ {{ product.productsPrice }}</span
-              >
+              <div v-if="product.isDiscount" class="flex items-center gap-2">
+                <span class="text-3xl font-medium text-brand-price"
+                  >$ {{ product.finalPrice }}</span
+                >
+                <span class="text-sm font-medium line-through text-ink-300">
+                  $ {{ product.productsPrice }}
+                </span>
+              </div>
+              <div v-else>
+                <span class="text-3xl font-medium text-brand-price"
+                  >$ {{ product.productsPrice }}</span
+                >
+              </div>
             </div>
             <!-- #endregion -->
 

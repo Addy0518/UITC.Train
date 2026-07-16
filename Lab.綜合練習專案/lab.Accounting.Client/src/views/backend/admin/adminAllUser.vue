@@ -34,7 +34,7 @@ const totalCount = ref();
 const search = ref();
 const suggestions = ref([]);
 const userRole = ref();
-
+const pageSize = ref(10);
 /*
    注入 Loading 跟 Toast
 */
@@ -82,7 +82,7 @@ const getUserAll = async (isFirstload = false) => {
 
     const request = {
       pageIndex: currentPage.value,
-      pageSize: 10,
+      pageSize: pageSize.value,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
       userGender: genderEnum.value?.value ?? null,
@@ -301,7 +301,7 @@ const getUserImg = (user) => {
             default:
               'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink JumpToPageDropdown JumpToPageInput',
           }"
-          :rows="10"
+          :rows="pageSize"
           :totalRecords="totalCount"
           @page="pageChange"
         />
