@@ -96,12 +96,12 @@ namespace Lab.Accounting.API.Services
         {
             // 綠界規則 :　名字不能有空白，且長度不能超過 10 個字元
             string senderName = request.SenderName.Replace(" ", "");
-            if (senderName.Length > 10)
-                senderName = senderName.Substring(0, 10);
+            if (senderName.Length > 5)
+                senderName = senderName.Substring(0, 5);
 
             string receiverName = request.ReceiverName.Replace(" ", "");
-            if (receiverName.Length > 10)
-                receiverName = receiverName.Substring(0, 10);
+            if (receiverName.Length > 5)
+                receiverName = receiverName.Substring(0, 5);
 
             // ExtraData 帶 SessionKey（也就是 MerchantTradeNo）
             // 選完門市綠界 POST 回來時，後端靠這個知道是哪一筆結帳的暫存資料要更新
@@ -215,6 +215,10 @@ namespace Lab.Accounting.API.Services
                 _settings.HashIV
             );
             parameters.Add("CheckMacValue", checkMacValue);
+
+            Console.WriteLine(
+                $"[Home] SenderAddress: {parameters["SenderAddress"]}, ReceiverAddress: {parameters["ReceiverAddress"]}"
+            );
 
             // 跟超商建立訂單邏輯一樣 , 要看解釋去超商那個 api 看
             using var httpClient = new HttpClient();

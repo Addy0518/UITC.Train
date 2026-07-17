@@ -51,7 +51,7 @@ export const useAuthStore = defineStore(
       userAddress,
       userZipCode,
       setAuth,
-      clearAuth,
+      clearAuth,  
     };
   },
   /*

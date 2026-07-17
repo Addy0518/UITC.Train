@@ -171,4 +171,17 @@ public class ProductsController(IProductsService productsService) : ControllerBa
         request.UserId = CurrentUserId;
         return Ok(await productsService.CreateProductRate(request));
     }
+
+    /// <summary>
+    /// 賣家回覆評論
+    /// </summary>
+    /// <param name="request">賣家回覆資訊</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> SellerReplyComment([FromBody] SellerReplyRequest request)
+    {
+        request.SellerId = CurrentUserId;
+        return Ok(await productsService.SellerReplyComment(request));
+    }
 }

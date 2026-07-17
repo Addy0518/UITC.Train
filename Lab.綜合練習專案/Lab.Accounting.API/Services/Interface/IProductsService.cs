@@ -90,4 +90,11 @@ public interface IProductsService
     /// <param name="request">商品評價資訊</param>
     /// <returns>影響列數</returns>
     Task<ApiResponse<int>> CreateProductRate(ProductsRateRequest request);
+
+    /// <summary>
+    /// 賣家回覆評論
+    /// </summary>
+    /// <param name="request">賣家回覆資訊</param>
+    /// <returns>影響列數</returns>
+    Task<ApiResponse<int>> SellerReplyComment(SellerReplyRequest request);
 }

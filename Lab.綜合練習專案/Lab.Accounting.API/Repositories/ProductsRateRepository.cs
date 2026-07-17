@@ -33,6 +33,33 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
     }
 
     /// <summary>
+    /// 賣家回覆評論
+    /// </summary>
+    /// <param name="productRateId">商品評價 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <param name="reply">賣家回復評論</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> SellerReplyComment(int productRateId, int sellerId, string reply)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"Update ProductRate
+              Set SellerReply = @Reply,
+                    SellerReplyTime = @ReplyTime
+              Where ProductsRateId = @ProductsRateId";
+        return await conn.ExecuteAsync(
+            sql,
+            new
+            {
+                Reply = reply,
+                ReplyTime = DateTime.Now,
+                ProductsRateId = productRateId,
+            }
+        );
+    }
+
+    /// <summary>
     /// 刪除單一商品評價
     /// </summary>
     /// <param name="productRateId">商品評價 ID</param>
@@ -58,12 +85,17 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
             @"SELECT   Top 1
                        u.UserName,        
                        u.UserHeadshot,
+                       r.ProductsRateId,
                        r.OrderId,
                        r.Rating,
                        r.Comment,
+                       r.SellerReply,
+                       r.SellerReplyTime,
+                       o.SellerUserId,
                        r.CreateTime
                 FROM   ProductRate r
-                Join   [User] u on r.UserId=u.UserId
+                Left Join   [User] u on r.UserId=u.UserId
+                Left Join   [Order] o on r.OrderId=o.OrderId
                 WHERE  r.OrderId = @OrderId ";
 
         return await conn.QueryFirstOrDefaultAsync<RateResponse>(sql, new { OrderId = orderId });
@@ -85,9 +117,13 @@ public class ProductsRateRepository(DBConnecting connecting) : IProductsRateRepo
                        r.OrderId,
                        r.Rating,
                        r.Comment,
+                       r.SellerReply,
+                       r.SellerReplyTime,
+                       o.SellerUserId,
                        r.CreateTime
                 FROM   ProductRate r
                 Join   [User] u on r.UserId=u.UserId
+                Left Join   [Order] o on r.OrderId=o.OrderId
                 WHERE  r.ProductsId = @ProductsId ";
 
         return await conn.QueryAsync<RateResponse>(sql, new { ProductsId = productId });

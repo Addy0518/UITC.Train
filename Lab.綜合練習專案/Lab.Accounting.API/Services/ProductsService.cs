@@ -356,7 +356,7 @@ public class ProductsService(
         if (order == null)
             return ApiResponseHelper.NotFound<int>();
 
-        if (order.ShippingStatus != ShippingStatusEnum.Arrived)
+        if (order.ShippingStatus != ShippingStatusEnum.Completed)
         {
             var errors = new Dictionary<string, string[]> { { "ShippingStatus", new[] { "商品尚未送達,無法評價!" } } };
 
@@ -398,6 +398,34 @@ public class ProductsService(
         };
 
         var result = await productsRateRepositories.CreateProductRate(rate);
+        return ApiResponseHelper.Success(result);
+    }
+
+    /// <summary>
+    /// 賣家回覆評論
+    /// </summary>
+    /// <param name="request">賣家回覆資訊</param>
+    /// <returns>影響列數</returns>
+    public async Task<ApiResponse<int>> SellerReplyComment(SellerReplyRequest request)
+    {
+        var rate = await productsRateRepositories.GetOrderRate(request.OrderId);
+        if (rate == null)
+            return ApiResponseHelper.NotFound<int>();
+        if (rate.SellerUserId != request.SellerId)
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { "ProductRate", new[] { "無法回覆不是自己商品的評論!" } },
+            };
+
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
+
+        var result = await productsRateRepositories.SellerReplyComment(
+            rate.ProductsRateId,
+            request.SellerId,
+            request.Reply
+        );
         return ApiResponseHelper.Success(result);
     }
 

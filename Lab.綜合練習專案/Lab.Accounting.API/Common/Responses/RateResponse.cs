@@ -3,6 +3,16 @@
     public class RateResponse
     {
         /// <summary>
+        /// 商品評價 ID
+        /// </summary>
+        public int ProductsRateId { get; set; }
+
+        /// <summary>
+        /// 訂單 ID
+        /// </summary>
+        public int? OrderId { get; set; }
+
+        /// <summary>
         /// 使用者名稱
         /// </summary>
         public string UserName { get; set; }
@@ -21,6 +31,21 @@
         /// 評論
         /// </summary>
         public string? Comment { get; set; }
+
+        /// <summary>
+        /// 賣家 ID
+        /// </summary>
+        public int? SellerUserId { get; set; }
+
+        /// <summary>
+        /// 賣家回覆內容
+        /// </summary>
+        public string? SellerReply { get; set; }
+
+        /// <summary>
+        /// 賣家回覆時間
+        /// </summary>
+        public DateTime? SellerReplyTime { get; set; }
 
         /// <summary>
         /// 發表時間

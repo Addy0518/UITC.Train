@@ -35,7 +35,7 @@
         /// 評論
         /// </summary>
         [Display(Name = "評論")]
-        [MaxLength(300, ErrorMessage = "{0} 長度最長為 {1} 字")]
+        [MaxLength(3000, ErrorMessage = "{0} 長度最長為 {1} 字")]
         public string? Comment { get; set; }
     }
 }

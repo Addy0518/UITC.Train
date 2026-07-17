@@ -46,3 +46,7 @@ export const getOrderRate = (id) => accountApiInstance.get(`Products/GetOrderRat
 // 新增單一商品評價
 export const createProductRate = (request) =>
   accountApiInstance.post(`Products/CreateProductRate`, request);
+
+// 賣家回覆單一商品評價
+export const sellerReplyComment = (request) =>
+  accountApiInstance.post(`Products/SellerReplyComment`, request);

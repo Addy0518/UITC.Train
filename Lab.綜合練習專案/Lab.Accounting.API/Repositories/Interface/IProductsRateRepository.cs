@@ -10,6 +10,15 @@ public interface IProductsRateRepository
     Task<int> CreateProductRate(ProductRate productrate);
 
     /// <summary>
+    /// 賣家回覆評論
+    /// </summary>
+    /// <param name="productRateId">商品評價 ID</param>
+    /// <param name="sellerId">賣家 ID</param>
+    /// <param name="reply">賣家回復評論</param>
+    /// <returns>影響列數</returns>
+    Task<int> SellerReplyComment(int productRateId, int sellerId, string reply);
+
+    /// <summary>
     /// 刪除單一商品評價
     /// </summary>
     /// <param name="productRateId">商品評價 ID</param>

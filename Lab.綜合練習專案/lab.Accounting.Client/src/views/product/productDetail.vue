@@ -1,6 +1,6 @@
 <script setup>
 import { getFatherCategories } from '@/api/categoryService';
-import { getProduct } from '@/api/productsService';
+import { getProduct, sellerReplyComment } from '@/api/productsService';
 import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import { getStore } from '@/api/storeService';
 import { getOneUser } from '@/api/userService';
@@ -21,6 +21,7 @@ import defaultImgurl from '@/img/預設圖片.jpg';
    seller : 賣家
    store : 賣場
    breadCrumCategories : 麵包屑的類別
+   replyComment : 賣家回復的評論
 */
 const route = useRoute();
 const router = useRouter();
@@ -35,7 +36,7 @@ const activeIndex = ref();
 const seller = ref();
 const store = ref({});
 const breadCrumCategories = ref([]);
-
+const replyComment = ref();
 /*
    注入 Loading 跟 Toast
 */
@@ -43,6 +44,18 @@ const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
+
+/*
+   加入已經寫好的驗證規則
+*/
+const rules = computed(() => ({
+  replyComment: { required, maxLength: maxLength(3000) },
+}));
+
+/*
+   加入套件驗證設定
+*/
+const v$ = useVuelidate(rules, { replyComment }, { $autoDirty: true, $lazy: true, $scope: false });
 
 /*
    查看商品細節資訊
@@ -112,6 +125,30 @@ const getStoreInfo = async (id) => {
       store.value = data.returnData;
       sellerAllRate.value = data.returnData.allProductsRateCount;
       sellerAVGRate.value = data.returnData.countAVGAllProductRate;
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    hideLoading();
+  }
+};
+
+/*
+   賣家回覆評論
+*/
+const sellerReply = async (orderId) => {
+  const isFormCorrect = await v$.value.$validate();
+  if (!isFormCorrect) return;
+
+  try {
+    showLoading();
+    const res = await sellerReplyComment({ orderId: orderId, reply: replyComment.value });
+    const { data } = res;
+
+    if (data.codeStatus === 2000) {
+      showToastSuccess('成功回覆 !');
+      replyComment.value = '';
+      await getProductDetail(route.params.id);
     }
   } catch (err) {
     console.log(err);
@@ -542,24 +579,67 @@ const breadCrumbItem = computed(() => {
         <span class="text-xs text-ink-500">{{ productAllRate?.length ?? 0 }} 則評價</span>
         <div
           v-for="rate in productAllRate"
-          class="bg-page-bg border border-border-soft rounded-card hover:border-ink-300 transition-colors h-20 flex flex-row ps-6 items-center"
+          :key="rate.productsRateId"
+          class="bg-page-bg border border-border-soft rounded-card hover:border-ink-300 transition-colors p-5 flex flex-col gap-3"
         >
-          <img :src="userImg(rate)" alt="頭貼" class="w-10 h-10 rounded-full object-cover me-5" />
-          <span class="me-5 text-ink-900">評價者名稱 : {{ rate.userName }}</span>
-          <span class="me-5 text-ink-500">評論 : {{ rate.comment }}</span>
-          <span class="me-5 text-ink-500"
-            >評價時間 : {{ formatDateTimeString(rate.createTime) }}</span
+          <!-- 買家評論 -->
+          <div class="flex items-start gap-4">
+            <img
+              :src="userImg(rate)"
+              alt="頭貼"
+              class="w-10 h-10 rounded-full object-cover shrink-0"
+            />
+            <div class="flex-1 flex flex-col gap-1">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-ink-900">{{ rate.userName }}</span>
+                <Rating
+                  :modelValue="rate.rating"
+                  :stars="5"
+                  :readonly="true"
+                  :pt="{
+                    onIcon: { class: 'text-brand-price' },
+                    offIcon: { class: 'text-slate-300' },
+                  }"
+                />
+              </div>
+              <p class="text-sm text-ink-500 m-0">{{ rate.comment }}</p>
+              <span class="text-xs text-ink-300">{{ formatDateTimeString(rate.createTime) }}</span>
+            </div>
+          </div>
+
+          <!-- 賣家回覆 ( 有回覆才顯示 ) -->
+          <div
+            v-if="rate.sellerReply"
+            class="ms-14 bg-brand-50 rounded-card px-4 py-3 flex flex-col gap-1"
           >
-          <span class="me-5 text-ink-900">評分 :</span>
-          <Rating
-            :modelValue="rate.rating"
-            :stars="5"
-            :readonly="true"
-            :pt="{
-              onIcon: { class: 'text-brand-price' } /* 已點亮星星的顏色 */,
-              offIcon: { class: 'text-slate-300' } /* 未點亮星星的顏色 */,
-            }"
-          />
+            <div class="flex items-center gap-2">
+              <i class="pi pi-reply text-brand-500 text-xs"></i>
+              <span class="text-xs font-medium text-brand-500">賣家回覆</span>
+            </div>
+            <p class="text-sm text-ink-900 m-0">{{ rate.sellerReply }}</p>
+            <span class="text-xs text-ink-300">{{
+              formatDateTimeString(rate.sellerReplyTime)
+            }}</span>
+          </div>
+          <div
+            v-else-if="authStore.userId === rate.sellerUserId"
+            class="ms-14 bg-brand-50 rounded-card px-4 py-3 flex flex-col gap-1"
+          >
+            <div class="flex items-center gap-2">
+              <i class="pi pi-reply text-brand-500 text-xs"></i>
+              <span class="text-xs font-medium text-brand-500">回覆買家</span>
+            </div>
+            <InputGroup>
+              <InputText
+                v-model="replyComment"
+                placeholder="回覆評論 ..."
+                :invalid="v$.replyComment.$error"
+              >
+              </InputText>
+            </InputGroup>
+
+            <InValidErrorMessage :errorDto="v$.replyComment.$errors" vaildChiName="賣家回覆" />
+          </div>
         </div>
         <!-- #endregion -->
       </div>

@@ -49,7 +49,7 @@ const testUser = () => {
   password.value = 'Andy1111';
 };
 /*
-  測試用買家帳號
+  測試用賣家2帳號
 */
 const test2User = () => {
   account.value = 'anggininder@gmail.com';
@@ -61,6 +61,14 @@ const test2User = () => {
 */
 const test3User = () => {
   account.value = 'aaa@gmail.com';
+  password.value = 'Andy1111';
+};
+
+/*
+  測試用買家帳號
+*/
+const test4User = () => {
+  account.value = 'app@gmail.com';
   password.value = 'Andy1111';
 };
 
@@ -225,11 +233,11 @@ const handleGoogleLogin = async (response) => {
               @click="testUser"
               class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
             >
-              賣家帳號
+              賣家 1 帳號
             </button>
 
             <button
-              @click="test2User"
+              @click="test4User"
               class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
             >
               買家帳號
@@ -240,6 +248,13 @@ const handleGoogleLogin = async (response) => {
               class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
             >
               管理員帳號
+            </button>
+
+            <button
+              @click="test2User"
+              class="py-2 px-3 text-sm border border-border-soft rounded-card bg-page-bg text-ink-900 cursor-pointer hover:bg-surface-muted"
+            >
+              賣家 2 帳號
             </button>
           </div>
         </div>

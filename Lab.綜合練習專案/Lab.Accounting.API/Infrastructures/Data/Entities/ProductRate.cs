@@ -5,7 +5,7 @@ public class ProductRate
     /// <summary>
     /// 商品評價 ID
     /// </summary>
-    public int ProductsRateId { get; set; }
+    public int? ProductsRateId { get; set; }
 
     /// <summary>
     /// 使用者 ID
@@ -33,7 +33,17 @@ public class ProductRate
     public string? Comment { get; set; }
 
     /// <summary>
+    /// 賣家回覆內容
+    /// </summary>
+    public string? SellerReply { get; set; }
+
+    /// <summary>
+    /// 賣家回覆時間
+    /// </summary>
+    public DateTime? SellerReplyTime { get; set; }
+
+    /// <summary>
     /// 發表時間
     /// </summary>
-    public DateTime CreateTime { get; set; }
+    public DateTime CreateTime { get; set; } = DateTime.Now;
 }

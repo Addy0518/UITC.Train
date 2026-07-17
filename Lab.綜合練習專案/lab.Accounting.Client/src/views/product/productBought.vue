@@ -29,7 +29,7 @@ const router = useRouter();
 const route = useRoute();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
-const name = ref(authStore.userName ?? '');
+const name = ref('');
 const phone = ref(authStore.userPhone ?? '');
 const zipInfo = ref(
   authStore.userZipCode ? reverseLookupZipCode(authStore.userZipCode) : undefined,
@@ -70,7 +70,7 @@ onMounted(() => {
 */
 const rules = computed(() => ({
   // authstore 有的情況就不驗證
-  name: authStore.userName ? {} : { required, maxLength: maxLength(50) },
+  name: { required, maxLength: maxLength(5) },
   phone: authStore.userPhone ? {} : { required, vaildCellPhone, maxLength: maxLength(20) },
   address:
     shippingType.value === 'Home' && !authStore.userAddress
