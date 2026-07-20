@@ -112,6 +112,23 @@ public class ProductsService(
     /// <returns>審核表 ID</returns>
     public async Task<ApiResponse<int>> CreateProducts(ProductsInsertRequest productsInsertRequest)
     {
+        var user = await userRepository.GetUser(productsInsertRequest.UserId);
+        var missingFields = new List<string>();
+        if (string.IsNullOrWhiteSpace(user.UserPhone))
+            missingFields.Add("電話");
+        if (string.IsNullOrWhiteSpace(user.UserAddress))
+            missingFields.Add("地址");
+        if (string.IsNullOrWhiteSpace(user.UserZipCode))
+            missingFields.Add("郵遞區號");
+
+        if (missingFields.Count > 0)
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { "UserProfile", new[] { $"請先完善以下資料再上架商品：{string.Join("、", missingFields)}" } },
+            };
+            return ApiResponseHelper.RequestError<int>(errors);
+        }
         var product = new ProductReview
         {
             ProductsName = productsInsertRequest.ProductsName,

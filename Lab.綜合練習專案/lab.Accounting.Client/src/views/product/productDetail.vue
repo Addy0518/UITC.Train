@@ -5,6 +5,7 @@ import { addProductsInShoppingCar } from '@/api/shoppingcarService';
 import { getStore } from '@/api/storeService';
 import { getOneUser } from '@/api/userService';
 import defaultImgurl from '@/img/預設圖片.jpg';
+import { useAuthStore } from '@/stores/auth';
 
 /*
    變數名稱代表意義
@@ -25,6 +26,7 @@ import defaultImgurl from '@/img/預設圖片.jpg';
 */
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 const product = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const productAllRate = ref(null);
@@ -636,6 +638,7 @@ const breadCrumbItem = computed(() => {
                 :invalid="v$.replyComment.$error"
               >
               </InputText>
+              <Button label="送出" icon="pi pi-send" @click="sellerReply(rate.orderId)" />
             </InputGroup>
 
             <InValidErrorMessage :errorDto="v$.replyComment.$errors" vaildChiName="賣家回覆" />

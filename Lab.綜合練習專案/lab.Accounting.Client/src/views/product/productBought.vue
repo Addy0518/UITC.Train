@@ -16,7 +16,8 @@ import ZipCodeSelector from '@/common/ZipCodeSelector.vue';
    name : 收件人姓名
    phone : 收件人電話
    zipInfo : 縣市/鄉鎮市區/郵遞區號
-   address : 收件人地址
+   detailAddress : 收件人地址
+   prefix : 去掉郵遞區號跟市區的地址
    items : 存在 pinia 的購物車選擇的商品
    allCoupons : 用戶的所有優惠卷
    coupon : 選擇的優惠卷
@@ -29,12 +30,21 @@ const router = useRouter();
 const route = useRoute();
 const baseUrl = import.meta.env.VITE_IMG_URL;
 const authStore = useAuthStore();
-const name = ref('');
+const name = ref(authStore.userName ?? '');
 const phone = ref(authStore.userPhone ?? '');
+
+// 把完整地址開頭的「縣市 + 鄉鎮市區」截掉，剩下的塞進 detailAddress
 const zipInfo = ref(
   authStore.userZipCode ? reverseLookupZipCode(authStore.userZipCode) : undefined,
 );
-const address = ref(authStore.userAddress ?? '');
+const initialPrefix = zipInfo.value ? `${zipInfo.value.city}${zipInfo.value.district}` : '';
+const rawAddress = authStore.userAddress ?? '';
+const address = ref(
+  initialPrefix && rawAddress.startsWith(initialPrefix)
+    ? rawAddress.slice(initialPrefix.length)
+    : rawAddress, // 沒有 zipCode 或對不上前綴，保底整串放進去
+);
+
 const orderStore = useOrderStore();
 const items = orderStore.selectedItems;
 const allCoupons = ref();
