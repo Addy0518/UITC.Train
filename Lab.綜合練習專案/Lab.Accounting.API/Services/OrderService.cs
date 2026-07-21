@@ -224,6 +224,16 @@ public class OrderService(
                 return ApiResponseHelper.RequestError<List<int>>(errors);
             }
 
+            // 檢查購物車內的商品是否有符合優惠券的賣家
+            if (!productsBySeller.ContainsKey(coupon.CreaterId))
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Coupon", new[] { "此優惠券不適用於本次購買的商品!" } },
+                };
+                return ApiResponseHelper.RequestError<List<int>>(errors);
+            }
+
             decimal sellerTotalAmount = productsBySeller[coupon.CreaterId].Sum(p => p.OriginalPrice);
 
             if (sellerTotalAmount < coupon.MinimunSpend)
@@ -276,7 +286,7 @@ public class OrderService(
                         // 2. 固定金額按比例分攤邏輯
                         else if (coupon.Type == (int)CouponTypeEnum.固定金額折抵 && remainingDiscount > 0)
                         {
-                            if (productCounter < Request.Products.Count())
+                            if (productCounter < sellerProducts.Count())
                             {
                                 // 公式：(此商品原價 /  該賣家商品總原價) * 優惠券總面額
                                 decimal sellerTotalAmount = sellerProducts.Sum(p => p.OriginalPrice);
@@ -505,8 +515,6 @@ public class OrderService(
             }
 
             //訂單成立之後,開始更新資料庫
-            var couponCompleted = await couponRepository.CompleteUserCoupon(orderNo);
-
             var buyProduct = await productsBuyRepositories.GetOrderByOrderNumber(orderNo);
             if (buyProduct == null)
             {
@@ -542,7 +550,9 @@ public class OrderService(
                 {
                     return "0|DBUpdateFailed";
                 }
-                // 交易成功後 , 更新物流單狀態
+                // 交易成功後 , 更新優惠卷跟物流單狀態
+                var couponCompleted = await couponRepository.CompleteUserCoupon(orderNo);
+
                 var successOrders = await logisticsRepository.GetByOrderNumber(orderNo);
                 if (successOrders != null)
                 {
@@ -635,6 +645,19 @@ public class OrderService(
                         {
                             // 綠界成功的話就會回傳物流編號 , 再把它更新到資料庫
                             await logisticsRepository.UpdateTrackingNo(logisticsId, trackingNo);
+                        }
+                        // 建立失敗的話
+                        else
+                        {
+                            var failMsg =
+                                createResult.Error400?.Values.SelectMany(v => v).FirstOrDefault() ?? "建立物流單失敗";
+                            // 存失敗狀態跟訊息
+                            await logisticsRepository.UpdateStatus(
+                                logisticsId,
+                                LogisticsStatusEnum.Exception,
+                                null,
+                                failMsg
+                            );
                         }
                     }
                 }

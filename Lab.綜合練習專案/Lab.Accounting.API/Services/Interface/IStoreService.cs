@@ -19,6 +19,13 @@ namespace Lab.Accounting.API.Services
         Task<ApiResponse<int>> StoreRegister(StoreRegisterRequest request);
 
         /// <summary>
+        /// 賣場升級成公司帳號
+        /// </summary>
+        /// <param name="request">公司資訊</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateCompanyRequest request);
+
+        /// <summary>
         /// 編輯賣場資訊
         /// </summary>
         /// <param name="request">編輯資訊</param>

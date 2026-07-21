@@ -39,6 +39,19 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     }
 
     /// <summary>
+    /// 賣場升級成公司帳號
+    /// </summary>
+    /// <param name="request">公司資訊</param>
+    /// <returns>影響列數</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
+    public async Task<IActionResult> StoreUpdateToCompany(StoreUpdateCompanyRequest request)
+    {
+        request.UserId = CurrentUserId;
+        return Ok(await sellerservice.StoreUpdateToCompany(request));
+    }
+
+    /// <summary>
     /// 編輯賣場資訊
     /// </summary>
     /// <param name="request">編輯資訊</param>
