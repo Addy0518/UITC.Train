@@ -36,7 +36,10 @@ const showToastError = inject('showToastError');
 */
 const rules = computed(() => ({
   storeName: { required, maxLength: maxLength(100) },
-  storeCompanyName: { maxLength: maxLength(100) },
+  // 只有企業賣場才需要驗證公司名稱
+  storeCompanyName: store.value?.isCompanyStore
+    ? { required, maxLength: maxLength(100) }
+    : { maxLength: maxLength(100) },
 }));
 
 const v$ = useVuelidate(
@@ -146,8 +149,7 @@ const saveStore = async () => {
     const res = await updateStore({
       storeId: store.value.storeId,
       storeName: storeName.value,
-      storeUnifiedNumber: store.value.storeUnifiedNumber,
-      storeCompanyName: storeCompanyName.value || null,
+      storeCompanyName: store.value.isCompanyStore ? storeCompanyName.value : null,
     });
     const { data } = res;
     if (data.codeStatus === 2000) {
@@ -238,36 +240,55 @@ const saveStore = async () => {
         </div>
         <!-- #endregion -->
 
-        <!--#region 統一編號（唯讀） -->
-        <div class="flex items-start gap-4">
-          <label class="text-sm text-ink-500 w-24 text-right shrink-0 pt-1.5">統一編號</label>
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <InputText :modelValue="store.storeUnifiedNumber" disabled class="w-full" />
-              <span
-                class="shrink-0 flex items-center gap-1 text-xs text-ink-300 border border-border-soft rounded-card px-2 py-1"
-              >
-                <i class="pi pi-lock text-xs"></i>
-                不可修改
-              </span>
+        <!--#region 統一編號 + 公司名稱 ( 只有企業賣場才顯示  ) -->
+        <div v-if="store.storeUnifiedNumber" class="flex flex-col gap-4">
+          <div class="flex items-start gap-4">
+            <label class="text-sm text-ink-500 w-24 text-right shrink-0 pt-1.5">統一編號</label>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <InputText :modelValue="store.storeUnifiedNumber" disabled class="w-full" />
+                <span
+                  class="shrink-0 flex items-center gap-1 text-xs text-ink-300 border border-border-soft rounded-card px-2 py-1"
+                >
+                  <i class="pi pi-lock text-xs"></i>不可修改
+                </span>
+              </div>
+              <p class="text-xs text-ink-300 mt-1 m-0">如需修改請聯絡客服</p>
             </div>
-            <p class="text-xs text-ink-300 mt-1 m-0">如需修改請聯絡客服</p>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <label class="text-sm text-ink-500 w-24 text-right shrink-0 pt-1.5">公司名稱</label>
+            <div class="flex-1">
+              <InputText
+                v-model="storeCompanyName"
+                placeholder="輸入公司名稱"
+                :invalid="v$.storeCompanyName.$error"
+                class="w-full"
+              />
+              <InValidErrorMessage
+                :errorDto="v$.storeCompanyName.$errors"
+                vaildChiName="公司名稱"
+              />
+            </div>
           </div>
         </div>
-        <!-- #endregion -->
 
-        <!--#region 公司名稱 -->
-        <div class="flex items-start gap-4">
-          <label class="text-sm text-ink-500 w-24 text-right shrink-0 pt-1.5">公司名稱</label>
-          <div class="flex-1">
-            <InputText
-              v-model="storeCompanyName"
-              placeholder="輸入公司名稱（選填）"
-              :invalid="v$.storeCompanyName.$error"
-              class="w-full"
-            />
-            <InValidErrorMessage :errorDto="v$.storeCompanyName.$errors" vaildChiName="公司名稱" />
+        <!--#region 未升級企業賣場時的提示 -->
+        <div
+          v-else
+          class="border border-dashed border-border-soft rounded-card p-4 flex items-center justify-between"
+        >
+          <div>
+            <p class="text-sm text-ink-900 m-0 font-medium">尚未升級為企業賣場</p>
+            <p class="text-xs text-ink-500 m-0 mt-1">升級後可顯示公司名稱與統編，提升買家信任度</p>
           </div>
+          <button
+            @click="router.push({ name: 'seller-store-update' })"
+            class="shrink-0 px-4 py-1.5 border border-brand-500 text-brand-500 text-xs rounded-card cursor-pointer hover:bg-brand-50"
+          >
+            立即升級
+          </button>
         </div>
         <!-- #endregion -->
       </div>

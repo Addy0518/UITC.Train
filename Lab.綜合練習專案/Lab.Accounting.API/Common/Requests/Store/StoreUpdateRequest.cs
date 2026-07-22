@@ -30,5 +30,11 @@
         [Display(Name = "公司名稱")]
         [MaxLength(100, ErrorMessage = "{0} 不能超過 {1} 個字!")]
         public string? StoreCompanyName { get; set; }
+
+        /// <summary>
+        /// 更新日期
+        /// </summary>
+        [Display(Name = "更新日期")]
+        public DateTime? UpdateTime { get; set; } = DateTime.Now;
     }
 }

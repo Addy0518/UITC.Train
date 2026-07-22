@@ -23,7 +23,7 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="request">公司資訊</param>
         /// <returns>影響列數</returns>
-        Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateCompanyRequest request);
+        Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateToCompanyRequest request);
 
         /// <summary>
         /// 編輯賣場資訊

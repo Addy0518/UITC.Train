@@ -397,6 +397,17 @@ const router = createRouter({
         },
         {
           /*
+            賣場升級成公司賣場
+          */
+          path: 'seller-store-update',
+          name: 'seller-store-update',
+          meta: {
+            isPermissionVerification: true,
+          },
+          component: () => import('@/views/backend/seller/sellerStoreUpdate.vue'),
+        },
+        {
+          /*
             賣家數據
           */
           path: 'seller-data',
@@ -493,7 +504,7 @@ const router = createRouter({
         */
         {
           /*
-              審查表列
+              商品審查表列
           */
           path: 'admin-allreview',
           name: 'admin-allreview',
@@ -504,7 +515,7 @@ const router = createRouter({
         },
         {
           /*
-              審查細項
+              商品審查細項
           */
           path: 'admin-review-details/:id',
           name: 'admin-review-details',
@@ -512,6 +523,28 @@ const router = createRouter({
             isAdmin: true,
           },
           component: () => import('@/views/backend/admin/adminReviewDetails.vue'),
+        },
+        {
+          /*
+              賣場審查表列
+          */
+          path: 'admin-all-store-review',
+          name: 'admin-all-store-review',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminAllStoreReview.vue'),
+        },
+        {
+          /*
+              賣場審查細項
+          */
+          path: 'admin-store-review-details/:id',
+          name: 'admin-store-review-details',
+          meta: {
+            isAdmin: true,
+          },
+          component: () => import('@/views/backend/admin/adminStoreReviewDetails.vue'),
         },
         {
           /*

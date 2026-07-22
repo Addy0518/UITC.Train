@@ -80,7 +80,14 @@ onMounted(() => {});
           class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
           active-class="bg-brand-50 text-brand-500 font-medium"
         >
-          <i class="pi pi-list-check"></i>審查列表
+          <i class="pi pi-list-check"></i>商品審查列表
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'admin-all-store-review' }"
+          class="w-auto p-3 text-base flex items-center gap-3 rounded-card text-ink-500 hover:bg-surface-muted hover:text-ink-900 transition-colors"
+          active-class="bg-brand-50 text-brand-500 font-medium"
+        >
+          <i class="pi pi-list-check"></i>賣場審查列表
         </RouterLink>
         <RouterLink
           :to="{ name: 'admin-alluser' }"

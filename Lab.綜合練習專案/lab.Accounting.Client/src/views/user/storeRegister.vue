@@ -4,13 +4,10 @@ import { register } from '@/api/storeService';
 /*
    變數名稱代表意義
    storeName          : 賣場名稱
-   storeUnifiedNumber : 統一編號
-   storeCompanyName   : 公司名稱
 */
 const router = useRouter();
 const storeName = ref('');
-const storeUnifiedNumber = ref('');
-const storeCompanyName = ref('');
+
 
 /*
    注入 Loading 跟 Toast
@@ -25,13 +22,11 @@ const showToastError = inject('showToastError');
 */
 const rules = computed(() => ({
   storeName: { required, maxLength: maxLength(100) },
-  storeUnifiedNumber: { required, vaildUnifiedNumber },
-  storeCompanyName: { maxLength: maxLength(100) },
 }));
 
 const v$ = useVuelidate(
   rules,
-  { storeName, storeUnifiedNumber, storeCompanyName },
+  { storeName },
   { $autoDirty: true, $lazy: true, $scope: false },
 );
 
@@ -46,16 +41,13 @@ const submitRegister = async () => {
     showLoading();
     const res = await register({
       storeName: storeName.value,
-      storeUnifiedNumber: storeUnifiedNumber.value,
-      storeCompanyName: storeCompanyName.value || null,
     });
 
     const { data } = res;
 
     if (data.codeStatus === 2000) {
       showToastSuccess('已成功申請成為賣家！');
-      // TODO: 導去編輯賣場頁面，待路由建立後補上 name
-      // router.push({ name: 'edit-store' });
+      router.push({ name: 'seller-store-edit' });
     } else {
       showToastError(data.message || '申請失敗，請稍後再試');
     }
@@ -94,45 +86,6 @@ const submitRegister = async () => {
               </div>
             </div>
             <!-- #endregion -->
-
-            <!--#region 統一編號 -->
-            <div class="flex items-center gap-4">
-              <label class="text-sm text-ink-500 w-24 text-right shrink-0"> 統一編號 </label>
-              <div class="flex-1">
-                <InputText
-                  v-model="storeUnifiedNumber"
-                  placeholder="輸入 8 碼統一編號"
-                  :invalid="v$.storeUnifiedNumber.$error"
-                  class="w-full"
-                  :maxlength="8"
-                />
-                <p class="text-xs text-ink-300 mt-1 m-0">請輸入合法的台灣公司或商號統一編號</p>
-                <InValidErrorMessage
-                  :errorDto="v$.storeUnifiedNumber.$errors"
-                  vaildChiName="統一編號"
-                />
-              </div>
-            </div>
-            <!-- #endregion -->
-
-            <!--#region 公司名稱 -->
-            <div class="flex items-center gap-4">
-              <label class="text-sm text-ink-500 w-24 text-right shrink-0">公司名稱</label>
-              <div class="flex-1">
-                <InputText
-                  v-model="storeCompanyName"
-                  placeholder="輸入公司名稱（選填）"
-                  :invalid="v$.storeCompanyName.$error"
-                  class="w-full"
-                />
-                <p class="text-xs text-ink-300 mt-1 m-0">選填，若有公司登記名稱可填寫</p>
-                <InValidErrorMessage
-                  :errorDto="v$.storeCompanyName.$errors"
-                  vaildChiName="公司名稱"
-                />
-              </div>
-            </div>
-            <!-- #endregion -->
           </div>
 
           <!--#region 注意事項 -->
@@ -158,7 +111,7 @@ const submitRegister = async () => {
               @click="submitRegister"
               class="bg-brand-500 hover:opacity-90 text-white px-8 py-2 rounded-card cursor-pointer text-sm font-medium transition-colors"
             >
-              送出申請
+              成為賣家
             </button>
           </div>
           <!-- #endregion -->

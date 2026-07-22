@@ -32,56 +32,6 @@ namespace Lab.Accounting.API.Repositories.Interface
         }
 
         /// <summary>
-        /// 賣場升級成公司帳號
-        /// </summary>
-        /// <param name="seller">公司資訊</param>
-        /// <returns>審核表 ID</returns>
-        public async Task<int> StoreUpdateToCompanyReview(StoreCompanyReview seller)
-        {
-            using var conn = connecting.CreateConnecting();
-
-            var sql =
-                @"INSERT INTO StoreCompanyReview
-                        (StoreId,
-                         UserId,
-                         StoreCompanyName,
-                         StoreUnifiedNumber,
-                         DocumentPath,
-                         ReviewStatus,
-                         CreateTime)
-                VALUES      
-                        (@StoreId,
-                        @UserId,
-                        @StoreCompanyName,
-                        @StoreUnifiedNumber,
-                        @DocumentPath,
-                        @ReviewStatus,
-                        @CreateTime);
-                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-            return await conn.ExecuteScalarAsync<int>(sql, seller);
-        }
-
-        /// <summary>
-        ///  通過審核正式成立帳號
-        /// </summary>
-        /// <param name="seller">公司資訊</param>
-        /// <returns>影響列數</returns>
-        public async Task<int> StoreUpdateToCompany(StoreCompanyReview seller)
-        {
-            using var conn = connecting.CreateConnecting();
-
-            var sql =
-                @"Update StoreCompanyReview
-                   SET   StoreName          = COALESCE(@StoreName, StoreName),
-                         StoreCompanyName   = COALESCE(@StoreCompanyName, StoreCompanyName),
-                         updatetime         = GetDate()
-                WHERE  userid = @UserId and StoreId=@StoreId";
-
-            return await conn.ExecuteAsync(sql, seller);
-        }
-
-        /// <summary>
         /// 取得賣場資訊
         /// </summary>
         /// <param name="sellerId">賣家 ID </param>
@@ -95,6 +45,37 @@ namespace Lab.Accounting.API.Repositories.Interface
                 where UserId = @UserId";
 
             return await conn.QueryFirstOrDefaultAsync<Store>(sql, new { UserId = sellerId });
+        }
+
+        /// <summary>
+        /// 通過審核正式成立帳號
+        /// </summary>
+        /// <param name="seller">公司資訊</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> StoreUpdateToCompany(StoreCompanyReview seller)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Update Store
+                   SET   StoreUnifiedNumber = @StoreUnifiedNumber,
+                         StoreCompanyName   = @StoreCompanyName,
+                         DocumentPath       = @DocumentPath,
+                         updatetime         = @UpdateTime
+                WHERE    userid = @UserId and StoreId=@StoreId";
+
+            return await conn.ExecuteAsync(
+                sql,
+                new
+                {
+                    StoreUnifiedNumber = seller.StoreUnifiedNumber,
+                    StoreCompanyName = seller.StoreCompanyName,
+                    DocumentPath = seller.DocumentPath,
+                    UpdateTime = DateTime.Now,
+                    UserId = seller.UserId,
+                    StoreId = seller.StoreId,
+                }
+            );
         }
 
         /// <summary>

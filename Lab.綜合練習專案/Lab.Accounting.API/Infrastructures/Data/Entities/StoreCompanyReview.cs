@@ -8,7 +8,7 @@
         public int StoreCompanyReviewId { get; set; }
 
         /// <summary>
-        /// 對應的賣場 ID ( 這個賣場申請升級成企業賣場 )
+        /// 賣場 ID
         /// </summary>
         public int StoreId { get; set; }
 

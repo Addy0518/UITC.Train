@@ -28,6 +28,11 @@
         public string? StoreCompanyName { get; set; }
 
         /// <summary>
+        /// 上傳的營業登記證明文件路徑
+        /// </summary>
+        public string? DocumentPath { get; set; }
+
+        /// <summary>
         /// 創建時間
         /// </summary>
         public DateTime CreateTime { get; set; }

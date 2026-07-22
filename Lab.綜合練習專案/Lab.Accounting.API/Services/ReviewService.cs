@@ -1,4 +1,5 @@
 ﻿using Lab.Accounting.API.Common.Requests.Products;
+using Lab.Accounting.API.Common.Requests.Store;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using NPOI.HPSF;
@@ -10,6 +11,8 @@ namespace Lab.Accounting.API.Services
         IProductsReviewRepository productsReviewRepository,
         IProductsRepository productsRepository,
         IProductsImgRepository productsImgRepository,
+        IStoreRepository storeRepository,
+        IStoreReviewRepository storeReviewRepository,
         IWebHostEnvironment env
     ) : IReviewService
     {
@@ -71,7 +74,7 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
-        /// 審核通過或駁回
+        /// 商品審核通過或駁回
         /// </summary>
         /// <param name="request">商品審核請求</param>
         /// <returns>影響列數</returns>
@@ -121,7 +124,7 @@ namespace Lab.Accounting.API.Services
                     }
                     else if (request.ProductsId != null)
                     {
-                        var updateInfo = new Infrastructures.Data.Entities.Product
+                        var updateInfo = new Product
                         {
                             ProductsId = reviewInfo.ProductsId ?? request.ProductsId,
                             UserId = reviewInfo.SellerId,
@@ -158,6 +161,89 @@ namespace Lab.Accounting.API.Services
                         await productsImgRepository.DeleteProductsImg(img.ProductsImgId);
                     }
                 }
+                trxScope.Complete();
+                return ApiResponseHelper.Success(target);
+            }
+        }
+
+        /// <summary>
+        /// 取得單一賣場審核資訊
+        /// </summary>
+        /// <param name="reviewId">審核表 ID</param>
+        /// <returns>單一賣場審核資訊</returns>
+        public async Task<ApiResponse<StoreReview>> GetStoreReview(int reviewId)
+        {
+            var result = await storeReviewRepository.GetStoreReview(reviewId);
+
+            if (result == null)
+            {
+                return ApiResponseHelper.NotFound<StoreReview>();
+            }
+
+            return ApiResponseHelper.Success(result);
+        }
+
+        /// <summary>
+        /// 取得賣場審核資訊
+        /// </summary>
+        /// <param name="request">審核表搜尋請求</param>
+        /// <returns>賣場審核資訊</returns>
+        public async Task<ApiResponse<StoreReviewResponse>> GetAllStoreReview(StoreRiviewSearchRequest request)
+        {
+            var target = await storeReviewRepository.GetAllStoreReview(request);
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<StoreReviewResponse>();
+            }
+
+            var response = new StoreReviewResponse
+            {
+                StoreReviews = target,
+                TotalCount = target.FirstOrDefault()?.TotalCount ?? 0,
+            };
+
+            return ApiResponseHelper.Success(response);
+        }
+
+        /// <summary>
+        /// 賣場審核通過或駁回
+        /// </summary>
+        /// <param name="request">賣場審核請求</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> ApproveOrRejectStoreReview(StoreReviewRequest request)
+        {
+            if (request.ReviewStatus == ReviewStatusEnum.Reject && request.NotPassReson == null)
+            {
+                var errors = new Dictionary<string, string[]> { { "NotPassReson", new[] { "請填寫駁回原因 !" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var target = await storeReviewRepository.ApproveOrRejectStoreReview(request);
+
+                if (target <= 0)
+                    return ApiResponseHelper.InternalException<int>("申請審核失敗");
+
+                // 通過申請
+                if (request.ReviewStatus == ReviewStatusEnum.Approved)
+                {
+                    var reviewInfo = await storeReviewRepository.GetStoreReview(request.StoreCompanyReviewId);
+
+                    var createInfo = new StoreCompanyReview
+                    {
+                        UserId = reviewInfo.UserId,
+                        StoreId = reviewInfo.StoreId,
+                        StoreCompanyName = reviewInfo.StoreCompanyName,
+                        StoreUnifiedNumber = reviewInfo.StoreUnifiedNumber,
+                        DocumentPath = reviewInfo.DocumentPath,
+                        ReviewStatus = reviewInfo.ReviewStatus,
+                    };
+                    var Insert = await storeRepository.StoreUpdateToCompany(createInfo);
+                    if (Insert <= 0)
+                        return ApiResponseHelper.InternalException<int>("賣場升級成公司帳號失敗");
+                }
+
                 trxScope.Complete();
                 return ApiResponseHelper.Success(target);
             }

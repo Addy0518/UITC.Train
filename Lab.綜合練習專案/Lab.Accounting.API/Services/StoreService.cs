@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Identity.Data;
 namespace Lab.Accounting.API.Services
 {
     public class StoreService(
-        IStoreRepository sellerRepository,
+        IStoreRepository storeRepository,
+        IStoreReviewRepository storeReviewRepository,
         IUserRepository userRepository,
         IProductsRepository productsRepository,
         IProductsRateRepository productsRateRepository
@@ -17,7 +18,7 @@ namespace Lab.Accounting.API.Services
         /// <returns>賣場資訊</returns>
         public async Task<ApiResponse<StoreResponse>> GetStore(int sellerId)
         {
-            var target = await sellerRepository.GetStore(sellerId);
+            var target = await storeRepository.GetStore(sellerId);
 
             if (target == null)
             {
@@ -66,7 +67,7 @@ namespace Lab.Accounting.API.Services
                 };
                 return ApiResponseHelper.RequestError<int>(errors);
             }
-            var exist = await sellerRepository.GetStore(request.UserId);
+            var exist = await storeRepository.GetStore(request.UserId);
 
             if (exist != null)
             {
@@ -85,7 +86,7 @@ namespace Lab.Accounting.API.Services
                     UpdateTime = DateTime.Now,
                     IsDelete = IsDeleteStatusEnum.Normal,
                 };
-                var result = await sellerRepository.StoreRegister(seller);
+                var result = await storeRepository.StoreRegister(seller);
 
                 if (result == null)
                     return ApiResponseHelper.InternalException<int>("註冊失敗");
@@ -103,13 +104,13 @@ namespace Lab.Accounting.API.Services
         /// </summary>
         /// <param name="request">公司資訊</param>
         /// <returns>影響列數</returns>
-        public async Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateCompanyRequest request)
+        public async Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateToCompanyRequest request)
         {
             if (request.UserId <= 0 || request.StoreId <= 0)
             {
                 return ApiResponseHelper.NotFound<int>();
             }
-            var exist = await sellerRepository.GetStore(request.UserId);
+            var exist = await storeRepository.GetStore(request.UserId);
 
             if (exist == null)
             {
@@ -124,7 +125,7 @@ namespace Lab.Accounting.API.Services
 
                 return ApiResponseHelper.RequestError<int>(errors);
             }
-            var seller = new StoreCompanyReview
+            var seller = new StoreUpdateToCompanyRequest
             {
                 UserId = request.UserId,
                 StoreId = request.StoreId,
@@ -135,7 +136,7 @@ namespace Lab.Accounting.API.Services
                 CreateTime = DateTime.Now,
             };
 
-            var result = await sellerRepository.StoreUpdateToCompanyReview(seller);
+            var result = await storeReviewRepository.StoreUpdateToCompanyReview(seller);
             if (result <= 0)
                 return ApiResponseHelper.InternalException<int>("升級公司帳號失敗");
             return ApiResponseHelper.Success<int>(result);
@@ -153,7 +154,7 @@ namespace Lab.Accounting.API.Services
                 return ApiResponseHelper.NotFound<int>();
             }
 
-            var result = await sellerRepository.UpdateStore(request);
+            var result = await storeRepository.UpdateStore(request);
             if (result <= 0)
                 return ApiResponseHelper.InternalException<int>("送出審核申請失敗");
             return ApiResponseHelper.Success<int>(result);

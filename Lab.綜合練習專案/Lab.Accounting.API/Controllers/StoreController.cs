@@ -44,8 +44,8 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     /// <param name="request">公司資訊</param>
     /// <returns>影響列數</returns>
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserResponse>))]
-    public async Task<IActionResult> StoreUpdateToCompany(StoreUpdateCompanyRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> StoreUpdateToCompany([FromBody] StoreUpdateToCompanyRequest request)
     {
         request.UserId = CurrentUserId;
         return Ok(await sellerservice.StoreUpdateToCompany(request));
@@ -59,7 +59,7 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     [HttpPut]
     [Authorize(Roles = RolesAuth.賣家)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> UpdateStore(StoreUpdateRequest request)
+    public async Task<IActionResult> UpdateStore([FromBody] StoreUpdateRequest request)
     {
         request.UserId = CurrentUserId;
         return Ok(await sellerservice.UpdateStore(request));
