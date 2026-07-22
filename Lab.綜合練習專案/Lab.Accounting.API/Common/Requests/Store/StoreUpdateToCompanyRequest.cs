@@ -55,6 +55,6 @@
         /// 更新日期
         /// </summary>
         [Display(Name = "更新日期")]
-        public DateTime? UpdateTime { get; set; } = DateTime.Now;
+        public DateTime? UpdateTime { get; set; }
     }
 }
