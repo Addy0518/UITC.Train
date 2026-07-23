@@ -16,6 +16,7 @@ import { getAllStoreReview } from '@/api/admin/reviewService';
    search : 搜尋
    suggestions : 搜尋建議
    searchType : 搜尋類型
+   searchTypeOptions : 搜尋類型選項
 */
 const allreview = ref(null);
 const router = useRouter();
@@ -41,10 +42,16 @@ const searchTypeOptions = [
 const showLoading = inject('showLoading');
 const hideLoading = inject('hideLoading');
 
+/*
+   初始化
+*/
 onMounted(() => {
   getAllReview(true);
 });
 
+/*
+   切換顯示順序類型
+*/
 const toggleSort = (type) => {
   if (currentSort.value.type === type) {
     if (currentSort.value.order === 'asc') {
@@ -60,6 +67,9 @@ const toggleSort = (type) => {
   getAllReview();
 };
 
+/*
+   切換審查狀態顯示
+*/
 const toggleReviewStatusFilter = () => {
   if (reviewStatus.value === null || reviewStatus.value === undefined) {
     reviewStatus.value = 0;
@@ -74,6 +84,9 @@ const toggleReviewStatusFilter = () => {
   getAllReview();
 };
 
+/*
+   拿取所有審查表
+*/
 const getAllReview = async (isFirstload = false) => {
   try {
     if (isFirstload) {
@@ -109,11 +122,17 @@ const getAllReview = async (isFirstload = false) => {
   }
 };
 
+/*
+   頁面切換
+*/
 const pageChange = (event) => {
   currentPage.value = event.page;
   getAllReview();
 };
 
+/*
+   搜尋建議
+*/
 const searchSuggestions = async (event) => {
   if (!event.query) return [];
 
@@ -143,6 +162,9 @@ const searchSuggestions = async (event) => {
   }
 };
 
+/*
+   搜尋
+*/
 const goSearch = () => {
   if (!search.value) return;
   keyWords.value = search.value;

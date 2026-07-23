@@ -21,14 +21,23 @@ const hideLoading = inject('hideLoading');
 const showToastSuccess = inject('showToastSuccess');
 const showToastError = inject('showToastError');
 
+/*
+   初始化
+*/
 onMounted(() => {
   getReview(route.params.id);
 });
 
+/*
+   加入已經寫好的驗證規則
+*/
 const rules = computed(() => ({
   notPassReson: { required, maxLength: maxLength(500) },
 }));
 
+/*
+   加入套件驗證設定
+*/
 const v$ = useVuelidate(rules, { notPassReson }, { $autoDirty: true, $lazy: true, $scope: false });
 
 /*
