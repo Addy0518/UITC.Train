@@ -61,27 +61,25 @@ const submitUpgrade = async () => {
 
   try {
     showLoading();
-    const res = await storeUpdateToCompany({
-      storeId: storeId.value,
-      storeUnifiedNumber: storeUnifiedNumber.value,
-      storeCompanyName: storeCompanyName.value,
-    });
+
+    const fd = new FormData();
+    fd.append('StoreId', storeId.value);
+    fd.append('StoreCompanyName', storeCompanyName.value);
+    fd.append('StoreUnifiedNumber', storeUnifiedNumber.value);
+
+    if (documentFile.value) {
+      fd.append('Document', documentFile.value);
+    }
+
+    const res = await storeUpdateToCompany(fd);
 
     const { data } = res;
 
     if (data.codeStatus === 2000) {
-      // TODO : 後端尚未提供文件上傳 API，等後端補上 uploadStoreCompanyDocument 這支後補上呼叫
-      // if (documentFile.value) {
-      //   const fd = new FormData();
-      //   fd.append('documentFile', documentFile.value);
-      //   fd.append('reviewId', data.returnData);
-      //   await uploadStoreCompanyDocument(fd);
-      // }
-
       showToastSuccess('已送出審核申請');
       router.push({ name: 'seller-store-edit' });
     } else {
-      showToastError(data.message || '申請失敗，請稍後再試');
+      showToastError(data.message || '申請失敗請稍後再試');
     }
   } catch (err) {
     console.log(err);

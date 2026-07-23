@@ -60,7 +60,6 @@ namespace Lab.Accounting.API.Repositories.Interface
                 @"Update Store
                    SET   StoreUnifiedNumber = @StoreUnifiedNumber,
                          StoreCompanyName   = @StoreCompanyName,
-                         DocumentPath       = @DocumentPath,
                          updatetime         = @UpdateTime
                 WHERE    userid = @UserId and StoreId=@StoreId";
 
@@ -70,7 +69,6 @@ namespace Lab.Accounting.API.Repositories.Interface
                 {
                     StoreUnifiedNumber = seller.StoreUnifiedNumber,
                     StoreCompanyName = seller.StoreCompanyName,
-                    DocumentPath = seller.DocumentPath,
                     UpdateTime = DateTime.Now,
                     UserId = seller.UserId,
                     StoreId = seller.StoreId,

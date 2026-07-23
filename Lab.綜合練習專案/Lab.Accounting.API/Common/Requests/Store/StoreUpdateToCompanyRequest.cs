@@ -34,10 +34,11 @@
         public string StoreUnifiedNumber { get; set; }
 
         /// <summary>
-        /// 營業登記證明文件路徑
+        /// 營業登記證明文件
         /// </summary>
         [Display(Name = "營業登記證明文件")]
-        public string? DocumentPath { get; set; }
+        [Required(ErrorMessage = "{0} 不能為空!")]
+        public IFormFile Document { get; set; }
 
         /// <summary>
         /// 審核狀態 (例如：0=待審核, 1=審核通過, 2=審核失敗)

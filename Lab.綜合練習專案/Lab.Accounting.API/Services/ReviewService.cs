@@ -224,24 +224,28 @@ namespace Lab.Accounting.API.Services
 
                 if (target <= 0)
                     return ApiResponseHelper.InternalException<int>("申請審核失敗");
-
+                var reviewInfo = await storeReviewRepository.GetStoreReview(request.StoreCompanyReviewId);
                 // 通過申請
                 if (request.ReviewStatus == ReviewStatusEnum.Approved)
                 {
-                    var reviewInfo = await storeReviewRepository.GetStoreReview(request.StoreCompanyReviewId);
-
                     var createInfo = new StoreCompanyReview
                     {
                         UserId = reviewInfo.UserId,
                         StoreId = reviewInfo.StoreId,
                         StoreCompanyName = reviewInfo.StoreCompanyName,
                         StoreUnifiedNumber = reviewInfo.StoreUnifiedNumber,
-                        DocumentPath = reviewInfo.DocumentPath,
-                        ReviewStatus = reviewInfo.ReviewStatus,
                     };
                     var Insert = await storeRepository.StoreUpdateToCompany(createInfo);
                     if (Insert <= 0)
                         return ApiResponseHelper.InternalException<int>("賣場升級成公司帳號失敗");
+                }
+                // 駁回申請
+                if (request.ReviewStatus == ReviewStatusEnum.Reject)
+                {
+                    if (!string.IsNullOrWhiteSpace(reviewInfo.DocumentPath))
+                    {
+                        FileUploadHelper.DeleteFile(env.WebRootPath, "StoreUpdateDocument", reviewInfo.DocumentPath);
+                    }
                 }
 
                 trxScope.Complete();

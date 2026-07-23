@@ -28,4 +28,4 @@ export const getAllStoreReview = (request) =>
 
 // 賣場審核通過或駁回
 export const approveOrRejectStoreReview = (request) =>
-  accountApiInstance.put(`admin/Review/ApproveOrRejectStoreReview`, request);
+  accountApiInstance.post(`admin/Review/ApproveOrRejectStoreReview`, request);

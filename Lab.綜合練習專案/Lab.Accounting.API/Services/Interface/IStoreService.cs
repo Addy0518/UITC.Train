@@ -22,7 +22,7 @@ namespace Lab.Accounting.API.Services
         /// 賣場升級成公司帳號
         /// </summary>
         /// <param name="request">公司資訊</param>
-        /// <returns>影響列數</returns>
+        /// <returns>審核表 ID</returns>
         Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateToCompanyRequest request);
 
         /// <summary>

@@ -71,7 +71,7 @@ const approveReview = async (status) => {
 
     if (data.codeStatus === 2000) {
       showToastSuccess('成功!');
-      router.push({ name: 'admin-store-allreview' });
+      router.push({ name: 'admin-all-store-review' });
     }
   } catch (err) {
     console.log(err);
@@ -80,12 +80,14 @@ const approveReview = async (status) => {
 };
 
 /*
-   營業登記文件是否為圖片格式 ( 用副檔名簡單判斷 )
+  讀取登記文件 , 判斷是否有文件沒有就回傳預設
 */
-const isImageDocument = computed(() => {
-  if (!review.value?.documentPath) return false;
-  return /\.(jpg|jpeg|png|gif|webp)$/i.test(review.value.documentPath);
-});
+const getProductsImg = (img) => {
+  if (img) {
+    return `${baseUrl}/StoreUpdateDocument/${img}`;
+  }
+  return defaultImgurl;
+};
 </script>
 
 <template>
@@ -162,9 +164,8 @@ const isImageDocument = computed(() => {
         <p class="text-xs text-ink-500 mb-2">營業登記證明文件</p>
         <div v-if="review.documentPath">
           <img
-            v-if="isImageDocument"
-            :src="`${baseUrl}/StoreDocument/${review.documentPath}`"
-            class="w-60 h-60 object-cover rounded-card border border-border-soft"
+            :src="getProductsImg(review.documentPath)"
+            class="w-50 h-50 object-cover rounded-card border border-border-soft"
           />
         </div>
         <span v-else class="text-sm text-ink-500">未上傳文件</span>

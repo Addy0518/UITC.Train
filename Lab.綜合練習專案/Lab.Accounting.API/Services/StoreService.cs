@@ -1,4 +1,5 @@
 ﻿using Lab.Accounting.API.Common.Requests.Store;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.Data;
 
 namespace Lab.Accounting.API.Services
@@ -8,7 +9,8 @@ namespace Lab.Accounting.API.Services
         IStoreReviewRepository storeReviewRepository,
         IUserRepository userRepository,
         IProductsRepository productsRepository,
-        IProductsRateRepository productsRateRepository
+        IProductsRateRepository productsRateRepository,
+        IWebHostEnvironment env
     ) : IStoreService
     {
         /// <summary>
@@ -103,7 +105,7 @@ namespace Lab.Accounting.API.Services
         /// 賣場升級成公司帳號
         /// </summary>
         /// <param name="request">公司資訊</param>
-        /// <returns>影響列數</returns>
+        /// <returns>審核表 ID</returns>
         public async Task<ApiResponse<int>> StoreUpdateToCompany(StoreUpdateToCompanyRequest request)
         {
             if (request.UserId <= 0 || request.StoreId <= 0)
@@ -125,21 +127,41 @@ namespace Lab.Accounting.API.Services
 
                 return ApiResponseHelper.RequestError<int>(errors);
             }
-            var seller = new StoreUpdateToCompanyRequest
+            using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                UserId = request.UserId,
-                StoreId = request.StoreId,
-                StoreCompanyName = request.StoreCompanyName,
-                StoreUnifiedNumber = request.StoreUnifiedNumber,
-                DocumentPath = request.DocumentPath,
-                ReviewStatus = ReviewStatusEnum.Pending,
-                CreateTime = DateTime.Now,
-            };
+                var seller = new StoreUpdateToCompanyRequest
+                {
+                    UserId = request.UserId,
+                    StoreId = request.StoreId,
+                    StoreCompanyName = request.StoreCompanyName,
+                    StoreUnifiedNumber = request.StoreUnifiedNumber,
+                    ReviewStatus = ReviewStatusEnum.Pending,
+                    CreateTime = DateTime.Now,
+                };
 
-            var result = await storeReviewRepository.StoreUpdateToCompanyReview(seller);
-            if (result <= 0)
-                return ApiResponseHelper.InternalException<int>("升級公司帳號失敗");
-            return ApiResponseHelper.Success<int>(result);
+                var reviewId = await storeReviewRepository.StoreUpdateToCompanyReview(seller);
+                if (reviewId <= 0)
+                {
+                    return ApiResponseHelper.InternalException<int>("升級公司帳號失敗");
+                }
+
+                if (request.Document != null)
+                {
+                    var imgUpload = await StoreDocumentUpload(request.Document, reviewId);
+                    if (imgUpload.CodeStatus != CodeStatusEnum.Success)
+                    {
+                        var errors = new Dictionary<string, string[]>
+                        {
+                            { "Document", new[] { "文件上傳失敗 , 請重新申請 !" } },
+                        };
+
+                        return ApiResponseHelper.RequestError<int>(errors);
+                    }
+                }
+
+                trxScope.Complete();
+                return ApiResponseHelper.Success<int>(reviewId);
+            }
         }
 
         /// <summary>
@@ -158,6 +180,27 @@ namespace Lab.Accounting.API.Services
             if (result <= 0)
                 return ApiResponseHelper.InternalException<int>("送出審核申請失敗");
             return ApiResponseHelper.Success<int>(result);
+        }
+
+        /// <summary>
+        /// 賣場公司文件上傳
+        /// </summary>
+        /// <param name="storeFiles">賣場公司文件檔案</param>
+        /// <param name="reviewId">審核表 ID</param>
+        /// <returns>文件路徑</returns>
+        private async Task<ApiResponse<string>> StoreDocumentUpload(IFormFile storeFiles, int reviewId)
+        {
+            var path = await FileUploadHelper.SaveFileAsync(storeFiles, env.WebRootPath, "StoreUpdateDocument");
+            var imgUpload = await storeReviewRepository.StoreDocumentUpload(reviewId, path);
+
+            if (imgUpload <= 0)
+            {
+                // DB 失敗，把剛存的實體檔案清掉，避免孤兒檔案
+                FileUploadHelper.DeleteFile(env.WebRootPath, "StoreUpdateDocument", path);
+                return ApiResponseHelper.InternalException<string>("圖片上傳失敗");
+            }
+
+            return ApiResponseHelper.Success(path);
         }
     }
 }

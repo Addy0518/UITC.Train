@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\CategoryImg\" />
+    <Folder Include="wwwroot\StoreUpdateDocument\" />
     <Folder Include="wwwroot\ProductsDescriptionImg\" />
     <Folder Include="wwwroot\ProductsImg\" />
     <Folder Include="wwwroot\UserHeadShot\" />

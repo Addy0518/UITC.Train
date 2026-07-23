@@ -32,5 +32,13 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <param name="request">賣場審核請求</param>
         /// <returns>影響列數</returns>
         Task<int> ApproveOrRejectStoreReview(StoreReviewRequest request);
+
+        /// <summary>
+        /// 上傳公司賣場文件路徑
+        /// </summary>
+        /// <param name="reviewId">審核表 ID</param>
+        /// <param name="path">文件路徑</param>
+        /// <returns>影響列數</returns>
+        Task<int> StoreDocumentUpload(int reviewId, string path);
     }
 }

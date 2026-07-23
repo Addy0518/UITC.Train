@@ -45,7 +45,7 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     /// <returns>影響列數</returns>
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
-    public async Task<IActionResult> StoreUpdateToCompany([FromBody] StoreUpdateToCompanyRequest request)
+    public async Task<IActionResult> StoreUpdateToCompany([FromForm] StoreUpdateToCompanyRequest request)
     {
         request.UserId = CurrentUserId;
         return Ok(await sellerservice.StoreUpdateToCompany(request));

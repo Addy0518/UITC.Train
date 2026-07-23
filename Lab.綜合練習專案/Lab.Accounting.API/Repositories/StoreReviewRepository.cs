@@ -92,7 +92,6 @@ namespace Lab.Accounting.API.Repositories.Interface
                          UserId,
                          StoreCompanyName,
                          StoreUnifiedNumber,
-                         DocumentPath,
                          ReviewStatus,
                          CreateTime)
                 VALUES      
@@ -100,7 +99,6 @@ namespace Lab.Accounting.API.Repositories.Interface
                         @UserId,
                         @StoreCompanyName,
                         @StoreUnifiedNumber,
-                        @DocumentPath,
                         @ReviewStatus,
                         @CreateTime);
                 SELECT CAST(SCOPE_IDENTITY() AS INT);";
@@ -126,6 +124,24 @@ namespace Lab.Accounting.API.Repositories.Interface
                   Where StoreCompanyReviewId = @StoreCompanyReviewId";
 
             return await conn.ExecuteAsync(sql, request);
+        }
+
+        /// <summary>
+        /// 上傳公司賣場文件路徑
+        /// </summary>
+        /// <param name="reviewId">審核表 ID</param>
+        /// <param name="path">文件路徑</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> StoreDocumentUpload(int reviewId, string path)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"UPDATE dbo.StoreCompanyReview
+                  SET    DocumentPath        = @DocumentPath
+                  WHERE  StoreCompanyReviewId = @StoreCompanyReviewId";
+
+            return await conn.ExecuteAsync(sql, new { DocumentPath = path, StoreCompanyReviewId = reviewId });
         }
     }
 }
