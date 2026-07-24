@@ -1,4 +1,5 @@
-﻿using Lab.Accounting.API.Common.Requests.Products;
+﻿using Lab.Accounting.API.Common.Requests.Notification;
+using Lab.Accounting.API.Common.Requests.Products;
 using Lab.Accounting.API.Common.Requests.Store;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -13,6 +14,8 @@ namespace Lab.Accounting.API.Services
         IProductsImgRepository productsImgRepository,
         IStoreRepository storeRepository,
         IStoreReviewRepository storeReviewRepository,
+        INotificationRepository notificationRepository,
+        INotificationService notificationService,
         IWebHostEnvironment env
     ) : IReviewService
     {
@@ -89,14 +92,14 @@ namespace Lab.Accounting.API.Services
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var target = await productsReviewRepository.ApproveOrRejectProductsReview(request);
+                Notification notificationRequest = null;
 
                 if (target <= 0)
                     return ApiResponseHelper.InternalException<int>("申請審核失敗");
-
+                var reviewInfo = await productsReviewRepository.GetProductsReview(request.ProductsReviewId);
                 // 通過申請
                 if (request.ReviewStatus == ReviewStatusEnum.Approved)
                 {
-                    var reviewInfo = await productsReviewRepository.GetProductsReview(request.ProductsReviewId);
                     // 判斷是更新商品還是新增商品 ( Id 是 null 就是新增 )
                     if (reviewInfo.ProductsId == null)
                     {
@@ -121,6 +124,13 @@ namespace Lab.Accounting.API.Services
                             return ApiResponseHelper.InternalException<int>("商品新增失敗");
                         await productsImgRepository.UpdateImgsToProductId(reviewInfo.ProductsReviewId, Insert);
                         await productsRepository.UpdateReviewProductsId(reviewInfo.ProductsReviewId, Insert);
+                        await notificationService.CreateNotification(
+                            reviewInfo.SellerId,
+                            NotificationTypeEnum.ProductApproved,
+                            "商品審核通過",
+                            $"您的商品 {reviewInfo.ProductsName} 通過審核，已上架至賣場。",
+                            Insert
+                        );
                     }
                     else if (request.ProductsId != null)
                     {
@@ -146,6 +156,13 @@ namespace Lab.Accounting.API.Services
                             reviewInfo.ProductsReviewId,
                             reviewInfo.ProductsId.Value
                         );
+                        await notificationService.CreateNotification(
+                            reviewInfo.SellerId,
+                            NotificationTypeEnum.ProductApproved,
+                            "商品審核通過",
+                            $"您的商品 {reviewInfo.ProductsName} 通過審核，已更新。",
+                            update
+                        );
                     }
                 }
                 // 駁回申請
@@ -160,7 +177,18 @@ namespace Lab.Accounting.API.Services
 
                         await productsImgRepository.DeleteProductsImg(img.ProductsImgId);
                     }
+                    if (request.ProductsId != null)
+                    {
+                        await notificationService.CreateNotification(
+                            reviewInfo.SellerId,
+                            NotificationTypeEnum.ProductRejected,
+                            "商品審核駁回",
+                            $"您的商品 {reviewInfo.ProductsName} 未通過審核，請檢查並修改後重新提交。",
+                            request.ProductsId
+                        );
+                    }
                 }
+
                 trxScope.Complete();
                 return ApiResponseHelper.Success(target);
             }
