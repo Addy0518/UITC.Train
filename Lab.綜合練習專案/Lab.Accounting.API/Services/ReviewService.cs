@@ -266,6 +266,13 @@ namespace Lab.Accounting.API.Services
                     var Insert = await storeRepository.StoreUpdateToCompany(createInfo);
                     if (Insert <= 0)
                         return ApiResponseHelper.InternalException<int>("賣場升級成公司帳號失敗");
+                    await notificationService.CreateNotification(
+                        createInfo.UserId,
+                        NotificationTypeEnum.StoreCompanyApproved,
+                        "賣場審核通過",
+                        $"您的賣場通過審核，已升級為公司帳號。",
+                        createInfo.StoreId
+                    );
                 }
                 // 駁回申請
                 if (request.ReviewStatus == ReviewStatusEnum.Reject)
@@ -274,6 +281,13 @@ namespace Lab.Accounting.API.Services
                     {
                         FileUploadHelper.DeleteFile(env.WebRootPath, "StoreUpdateDocument", reviewInfo.DocumentPath);
                     }
+                    await notificationService.CreateNotification(
+                        reviewInfo.UserId,
+                        NotificationTypeEnum.StoreCompanyRejected,
+                        "賣場審核駁回",
+                        $"您的賣場審核未通過，請查看原因並重新提交。",
+                        reviewInfo.StoreId
+                    );
                 }
 
                 trxScope.Complete();

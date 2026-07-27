@@ -10,6 +10,7 @@ namespace Lab.Accounting.API.Services
         IUserRepository userRepository,
         IProductsRepository productsRepository,
         IProductsRateRepository productsRateRepository,
+        INotificationService notificationService,
         IWebHostEnvironment env
     ) : IStoreService
     {
@@ -96,7 +97,15 @@ namespace Lab.Accounting.API.Services
                 var role = await userRepository.UpdateRole(request.UserId, RolesAuth.賣家);
                 if (role <= 0)
                     return ApiResponseHelper.InternalException<int>("更新使用者身份失敗");
+
+                await notificationService.CreateNotification(
+                    request.UserId,
+                    NotificationTypeEnum.StoreCompanyApproved,
+                    "賣場審核通過",
+                    $"您的賣場通過審核，已升級為公司帳號。"
+                );
                 trxScope.Complete();
+
                 return ApiResponseHelper.Success<int>(result, "成功!");
             }
         }

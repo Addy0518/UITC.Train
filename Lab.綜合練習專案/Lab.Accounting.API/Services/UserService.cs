@@ -14,6 +14,7 @@ public class UserService(
     VerifyCodeHelper verifyCodelHelper,
     ITokenBlacklistRepository tokenBlacklistRepositories,
     IOptions<GoogleAuthSetting> googleAuthOptions,
+    INotificationService notificationService,
     IWebHostEnvironment env
 ) : IUserService
 {
@@ -144,8 +145,14 @@ public class UserService(
         if (dbUser == null)
         {
             var password = passwordSecureHelper.HashPassword(Guid.NewGuid().ToString());
-            await userrepo.GoogleUserLogin(email, password, googleName, pic, dbUser.UserRole = null);
+            await userrepo.GoogleUserLogin(email, password, googleName, pic, null);
             dbUser = await userrepo.GetUserByAccount(email);
+            await notificationService.CreateNotification(
+                dbUser.UserId,
+                NotificationTypeEnum.ProductApproved,
+                "Google登入成功!",
+                $"您已成功使用 Google 帳號登入 , 進入個人頁面修改資料。"
+            );
         }
         else if (dbUser.UserRegisterMethod != RegisterMethodEnum.Google登入)
         {

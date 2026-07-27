@@ -28,6 +28,13 @@ public interface IProductsOrderRepository
     Task<IEnumerable<Order>> GetOrderByOrderNumber(string orderNumber);
 
     /// <summary>
+    /// 依物流單 ID 查詢底下所有訂單
+    /// </summary>
+    /// <param name="logisticsId">物流單 ID</param>
+    /// <returns>訂單列表</returns>
+    Task<IEnumerable<Order>> GetOrdersByLogisticsId(int logisticsId);
+
+    /// <summary>
     /// 買家查看所有訂單
     /// </summary>
     /// <param name="userId">使用者 ID</param>

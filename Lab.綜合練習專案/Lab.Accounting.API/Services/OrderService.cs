@@ -15,6 +15,7 @@ public class OrderService(
     ILogisticsRepository logisticsRepository,
     ILogisticsTempRepository logisticsTempRepository,
     ILogisticsService logisticsService,
+    INotificationService notificationService,
     ICouponRepository couponRepository
 ) : IOrderService
 {
@@ -565,6 +566,26 @@ public class OrderService(
 
                 trxScope.Complete();
             }
+
+            // 交易成功後 , 發送通知給賣家
+            var sellerIds = buyProduct.GroupBy(b => b.SellerUserId);
+
+            foreach (var sellerId in sellerIds)
+            {
+                var productNamesForSeller = sellerId.Select(o => o.ProductsName).Distinct().ToList();
+                var summary =
+                    productNamesForSeller.Count == 1
+                        ? productNamesForSeller[0]
+                        : $"{productNamesForSeller[0]} 等{productNamesForSeller.Count}件商品";
+
+                await notificationService.CreateNotification(
+                    sellerId.Key,
+                    NotificationTypeEnum.NewOrder,
+                    "收到新訂單",
+                    $"您有一筆新訂單成立，商品：{summary}"
+                );
+            }
+
             // 開始呼叫綠界的物流 API , 生成物流單 ( 不寫在交易裡是因為交易只管系統內部 , 這種呼叫外部操作的他管不到 )
             var confirmedOrders = await logisticsRepository.GetByOrderNumber(orderNo);
 
@@ -657,6 +678,14 @@ public class OrderService(
                                 LogisticsStatusEnum.Exception,
                                 null,
                                 failMsg
+                            );
+
+                            await notificationService.CreateNotification(
+                                sellerId,
+                                NotificationTypeEnum.LogisticsStatusUpdated,
+                                "物流單建立失敗",
+                                $"訂單「{goodsName}」的物流單建立失敗，原因：{failMsg}，請檢查賣場地址或聯絡客服。",
+                                logisticsId
                             );
                         }
                     }

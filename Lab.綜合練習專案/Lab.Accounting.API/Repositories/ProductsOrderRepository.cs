@@ -84,6 +84,20 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     }
 
     /// <summary>
+    /// 依物流單 ID 查詢底下所有訂單
+    /// </summary>
+    /// <param name="logisticsId">物流單 ID</param>
+    /// <returns>訂單列表</returns>
+    public async Task<IEnumerable<Order>> GetOrdersByLogisticsId(int logisticsId)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql = @"SELECT * FROM [Order] WHERE LogisticsId = @LogisticsId";
+
+        return await conn.QueryAsync<Order>(sql, new { LogisticsId = logisticsId });
+    }
+
+    /// <summary>
     /// 買家查看所有訂單
     /// </summary>
     /// <param name="userId">使用者 ID</param>

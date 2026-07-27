@@ -14,6 +14,7 @@ public class ProductsService(
     IProductsRepository productsRepository,
     IProductsReviewRepository productsReviewRepository,
     ICategoryService categoryService,
+    INotificationService notificationService,
     IWebHostEnvironment env
 ) : IProductsService
 {
@@ -157,7 +158,12 @@ public class ProductsService(
         var reviewProduct = await productsReviewRepository.CreateInsertProductsReview(product);
         if (reviewProduct <= 0)
             return ApiResponseHelper.InternalException<int>("申請審核失敗");
-
+        await notificationService.CreateNotification(
+            productsInsertRequest.UserId,
+            NotificationTypeEnum.ProductUnderReview,
+            "商品審核中",
+            $"已提交新增申請 , 等待平台審核"
+        );
         return ApiResponseHelper.Success(reviewProduct);
     }
 
@@ -219,6 +225,12 @@ public class ProductsService(
             var reviewProduct = await productsReviewRepository.CreateInsertProductsReview(review);
             if (reviewProduct <= 0)
                 return ApiResponseHelper.InternalException<int>("申請審核失敗");
+            await notificationService.CreateNotification(
+                productsUpdateRequest.UserId,
+                NotificationTypeEnum.ProductUnderReview,
+                "商品審核中",
+                $"已提交修改申請 , 等待平台審核"
+            );
             trxScope.Complete();
             return ApiResponseHelper.Success(reviewProduct);
         }

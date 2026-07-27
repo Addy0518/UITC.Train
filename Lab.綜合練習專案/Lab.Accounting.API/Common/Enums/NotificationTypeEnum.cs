@@ -23,4 +23,7 @@ public enum NotificationTypeEnum
 
     [Description(" 賣家評論被回覆 ( 或評論收到賣家回覆，通知買家 )")]
     ProductRateReplied = 7,
+
+    [Description(" 商品審核中")]
+    ProductUnderReview = 8,
 }

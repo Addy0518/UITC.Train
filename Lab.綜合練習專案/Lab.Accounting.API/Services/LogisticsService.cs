@@ -7,7 +7,8 @@ namespace Lab.Accounting.API.Services
         ILogisticsTempRepository logisticsTempRepository,
         ILogisticsRepository logisticsRepository,
         IOptions<EcpayLogisticsSettings> ecpayLogisticsOptions,
-        IProductsOrderRepository productsOrderRepository
+        IProductsOrderRepository productsOrderRepository,
+        INotificationService notificationService
     ) : ILogisticsService
     {
         private readonly EcpayLogisticsSettings _settings = ecpayLogisticsOptions.Value;
@@ -81,6 +82,8 @@ namespace Lab.Accounting.API.Services
                         orderStatus.Value
                     );
                 }
+                // 給買家傳通知訊息
+                await NotifyUser(logistics, newStatus.Value, request.RtnMsg);
             }
             return true;
         }
@@ -449,6 +452,57 @@ namespace Lab.Accounting.API.Services
                 LogisticsStatusEnum.Exception => null, // 異常先不動 Order 狀態，只記錄詳細訊息讓客服介入
                 _ => null, // Created / PendingShipment 不需要觸發訂單狀態變化
             };
+        }
+
+        /// <summary>
+        /// 依物流狀態，判斷是否需要通知買家並發送
+        /// </summary>
+        /// <param name="logistics">物流單資訊</param>
+        /// <param name="status">最新物流狀態</param>
+        /// <param name="rtnMsg">綠界回傳訊息</param>
+        private async Task NotifyUser(OrderLogistics logistics, LogisticsStatusEnum status, string rtnMsg)
+        {
+            // 一張物流單底下可能有多筆訂單（同賣家多商品），但都是同一個買家，取第一筆的 UserId 即可
+            var orders = await productsOrderRepository.GetOrdersByLogisticsId(logistics.LogisticsId);
+            var buyerId = orders?.FirstOrDefault()?.UserId;
+            if (buyerId == null)
+                return;
+
+            (NotificationTypeEnum type, string title, string content)? notify = status switch
+            {
+                LogisticsStatusEnum.Shipped => (
+                    NotificationTypeEnum.LogisticsStatusUpdated,
+                    "商品已出貨",
+                    "您的訂單已由賣家出貨，正在配送途中。"
+                ),
+                LogisticsStatusEnum.Delivered => (
+                    NotificationTypeEnum.LogisticsStatusUpdated,
+                    "包裹已送達門市",
+                    "您的訂單已送達指定門市，請盡快前往取貨。"
+                ),
+                LogisticsStatusEnum.Cancelled => (
+                    NotificationTypeEnum.LogisticsStatusUpdated,
+                    "訂單物流已取消",
+                    "您的訂單物流狀態已被取消，如有疑問請聯繫客服。"
+                ),
+                LogisticsStatusEnum.Exception => (
+                    NotificationTypeEnum.LogisticsStatusUpdated,
+                    "訂單物流異常",
+                    $"您的訂單物流發生異常：{rtnMsg}，我們正在協助處理。"
+                ),
+                _ => null,
+            };
+
+            if (notify.HasValue)
+            {
+                await notificationService.CreateNotification(
+                    buyerId.Value,
+                    notify.Value.type,
+                    notify.Value.title,
+                    notify.Value.content,
+                    logistics.LogisticsId
+                );
+            }
         }
 
         // 測試綠界呼叫用 , 可以刪
