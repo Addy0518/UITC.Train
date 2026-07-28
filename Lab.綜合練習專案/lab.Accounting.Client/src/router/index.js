@@ -258,6 +258,17 @@ const router = createRouter({
             },
             {
               /*
+                通知訊息
+              */
+              path: 'notifications',
+              name: 'notifications',
+              meta: {
+                isPermissionVerification: true,
+              },
+              component: () => import('@/views/user/notifications.vue'),
+            },
+            {
+              /*
                 買家訂單管理
               */
               path: 'purchase-orders',
