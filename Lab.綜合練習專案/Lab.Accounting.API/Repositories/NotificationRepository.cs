@@ -104,7 +104,7 @@ public class NotificationRepository(DBConnecting connecting) : INotificationRepo
     }
 
     /// <summary>
-    /// 改變已讀狀態
+    /// 改變單一通知已讀狀態
     /// </summary>
     /// <param name="notificationId">通知 ID </param>
     /// <param name="userId">用戶 ID </param>
@@ -127,5 +127,22 @@ public class NotificationRepository(DBConnecting connecting) : INotificationRepo
                 IsRead = isRead,
             }
         );
+    }
+
+    /// <summary>
+    /// 改變所有通知已讀狀態
+    /// </summary>
+    /// <param name="userId">用戶 ID </param>
+    /// <param name="isRead">是否已讀</param>
+    /// <returns>影響列數</returns>
+    public async Task<int> UpdateAllNotificationReadStatus(int userId, bool isRead)
+    {
+        using var conn = connecting.CreateConnecting();
+        var sql =
+            @"UPDATE dbo.Notification
+              SET IsRead = @IsRead
+              WHERE UserId=@UserId";
+
+        return await conn.ExecuteAsync(sql, new { UserId = userId, IsRead = isRead });
     }
 }

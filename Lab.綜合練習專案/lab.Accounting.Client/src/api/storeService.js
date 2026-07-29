@@ -19,3 +19,14 @@ export const storeUpdateToCompany = (userRegister) =>
       'Content-Type': 'multipart/form-data',
     },
   });
+
+// 用戶追蹤賣場
+export const followStore = (storeId) =>
+  accountApiInstance.post(`Store/FollowStore?storeId=${storeId}`);
+// 用戶取消追蹤賣場
+export const unfollowStore = (storeId) =>
+  accountApiInstance.delete(`Store/UnfollowStore?storeId=${storeId}`);
+
+// 查看用戶是否追蹤賣場
+export const isFollowingStore = (storeId) =>
+  accountApiInstance.get(`Store/IsFollowingStore?storeId=${storeId}`);

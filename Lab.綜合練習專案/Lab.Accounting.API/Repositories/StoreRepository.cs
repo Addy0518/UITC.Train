@@ -32,7 +32,23 @@ namespace Lab.Accounting.API.Repositories.Interface
         }
 
         /// <summary>
-        /// 取得賣場資訊
+        /// 取得賣場資訊 ( 賣場 ID )
+        /// </summary>
+        /// <param name="storeId">賣家 ID </param>
+        /// <returns>賣場資訊</returns>
+        public async Task<Store> GetStorebyStoreId(int storeId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Select * From Store
+                where StoreId = @StoreId";
+
+            return await conn.QueryFirstOrDefaultAsync<Store>(sql, new { StoreId = storeId });
+        }
+
+        /// <summary>
+        /// 取得賣場資訊 ( 賣家 ID )
         /// </summary>
         /// <param name="sellerId">賣家 ID </param>
         /// <returns>賣場資訊</returns>
@@ -93,6 +109,56 @@ namespace Lab.Accounting.API.Repositories.Interface
                   WHERE  userid = @UserId and StoreId=@StoreId";
 
             return await conn.ExecuteAsync(sql, request);
+        }
+
+        /// <summary>
+        /// 用戶追蹤賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> FollowStore(int userId, int storeId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Insert Into [UserFollowStore] (
+                  UserId, StoreId
+                ) 
+                values 
+                  (
+                    @UserId, @StoreId
+                  );";
+            return await conn.ExecuteAsync(sql, new { UserId = userId, StoreId = storeId });
+        }
+
+        /// <summary>
+        /// 用戶取消追蹤賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> UnfollowStore(int userId, int storeId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql = @"Delete From UserFollowStore Where UserId = @UserId And StoreId = @StoreId";
+            return await conn.ExecuteAsync(sql, new { UserId = userId, StoreId = storeId });
+        }
+
+        /// <summary>
+        /// 查看用戶是否已追蹤某賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>是否已追蹤</returns>
+        public async Task<bool> IsFollowingStore(int userId, int storeId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql = @"Select Count(1) From UserFollowStore Where UserId = @UserId And StoreId = @StoreId";
+            var count = await conn.ExecuteScalarAsync<int>(sql, new { UserId = userId, StoreId = storeId });
+            return count > 0;
         }
     }
 }

@@ -162,7 +162,6 @@ const filterProducts = computed(() => {
             />
           </div>
 
-          ```
           <!-- 賣場主資訊 -->
           <div class="flex-1">
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">

@@ -59,5 +59,16 @@ namespace Lab.Accounting.API.Services
         {
             await notificationRepository.CreateNotification(userId, type, title, content, relatedId);
         }
+
+        /// <summary>
+        /// 改變所有通知已讀狀態
+        /// </summary>
+        /// <param name="userId">用戶 ID </param>
+        /// <param name="isRead">是否已讀</param>
+        /// <returns>影響列數</returns>
+        public async Task<int> UpdateAllNotificationReadStatus(int userId, bool isRead)
+        {
+            return await notificationRepository.UpdateAllNotificationReadStatus(userId, isRead);
+        }
     }
 }

@@ -6,6 +6,7 @@ import { getStore } from '@/api/storeService';
 import { getOneUser } from '@/api/userService';
 import defaultImgurl from '@/img/預設圖片.jpg';
 import { useAuthStore } from '@/stores/auth';
+import FollowStoreButton from '@/common/followStore.vue';
 
 /*
    變數名稱代表意義
@@ -39,6 +40,7 @@ const seller = ref();
 const store = ref({});
 const breadCrumCategories = ref([]);
 const replyComment = ref();
+
 /*
    注入 Loading 跟 Toast
 */
@@ -512,6 +514,7 @@ const breadCrumbItem = computed(() => {
                 >
                   <i class="pi pi-arrow-circle-right text-xs"></i>前往賣場
                 </button>
+                <FollowStoreButton v-if="store.storeId" :storeId="store.storeId" />
               </div>
             </div>
           </div>

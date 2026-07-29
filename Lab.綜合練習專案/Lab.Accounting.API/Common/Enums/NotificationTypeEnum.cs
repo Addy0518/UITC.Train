@@ -26,4 +26,7 @@ public enum NotificationTypeEnum
 
     [Description(" 商品審核中")]
     ProductUnderReview = 8,
+
+    [Description(" 訂單物流建立失敗")]
+    LogisticsCreateFailed = 9,
 }

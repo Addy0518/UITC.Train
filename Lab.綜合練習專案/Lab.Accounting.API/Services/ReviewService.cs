@@ -161,7 +161,7 @@ namespace Lab.Accounting.API.Services
                             NotificationTypeEnum.ProductApproved,
                             "商品審核通過",
                             $"您的商品 {reviewInfo.ProductsName} 通過審核，已更新。",
-                            update
+                            reviewInfo.ProductsId
                         );
                     }
                 }
@@ -183,8 +183,7 @@ namespace Lab.Accounting.API.Services
                             reviewInfo.SellerId,
                             NotificationTypeEnum.ProductRejected,
                             "商品審核駁回",
-                            $"您的商品 {reviewInfo.ProductsName} 未通過審核，請檢查並修改後重新提交。",
-                            request.ProductsId
+                            $"您的商品 {reviewInfo.ProductsName} 未通過審核，請檢查並修改後重新提交。"
                         );
                     }
                 }
@@ -271,7 +270,7 @@ namespace Lab.Accounting.API.Services
                         NotificationTypeEnum.StoreCompanyApproved,
                         "賣場審核通過",
                         $"您的賣場通過審核，已升級為公司帳號。",
-                        createInfo.StoreId
+                        reviewInfo.StoreId
                     );
                 }
                 // 駁回申請

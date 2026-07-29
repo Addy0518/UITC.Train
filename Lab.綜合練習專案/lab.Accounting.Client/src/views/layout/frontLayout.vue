@@ -1,7 +1,11 @@
 <script setup>
 import { logoutApi } from '@/api/userService';
 import { getAllProduct } from '@/api/productsService';
-import { getAllNotifications, getNotification } from '@/api/notificationService';
+import {
+  getAllNotifications,
+  getNotification,
+  updateAllNotificationReadStatus,
+} from '@/api/notificationService';
 import defaultImgurl from '@/img/預設圖片.jpg';
 import FrontFooter from '@/views/footer/frontFooter.vue';
 
@@ -65,18 +69,6 @@ const handleClickOutside = (e) => {
 const hasUnreadNotification = computed(() => notifications.value.some((n) => !n.isRead));
 
 /*
-   通知類型對應 badge 文字與樣式
-*/
-const notifBadge = (type) => {
-  if ([5, 6].includes(type)) return { label: '訂單', style: 'background:#fff4ed; color:#ff6b35;' };
-  if ([1, 2, 8].includes(type))
-    return { label: '審核', style: 'background:#f1efe8; color:#888780;' };
-  if ([3, 4].includes(type)) return { label: '商店', style: 'background:#f1efe8; color:#888780;' };
-  if ([7].includes(type)) return { label: '評價', style: 'background:#fff4ed; color:#c9543f;' };
-  return { label: '通知', style: 'background:#f1efe8; color:#888780;' };
-};
-
-/*
    載入最新 5 筆通知（預覽用）
 */
 const loadNotifications = async () => {
@@ -102,6 +94,19 @@ const toggleNotification = async () => {
 };
 
 /*
+   通知類型對應 badge 文字與樣式
+*/
+const notifBadge = (type) => {
+  if ([5, 6].includes(type)) return { label: '訂單', style: 'background:#fff4ed; color:#ff6b35;' };
+  if ([1, 2, 8].includes(type))
+    return { label: '審核', style: 'background:#f1efe8; color:#888780;' };
+  if ([3, 4].includes(type)) return { label: '商店', style: 'background:#f1efe8; color:#888780;' };
+  if ([7].includes(type)) return { label: '評價', style: 'background:#fff4ed; color:#c9543f;' };
+  if ([9].includes(type)) return { label: '物流', style: 'background:#fff4ed; color:#ff6b35;' };
+  return { label: '通知', style: 'background:#f1efe8; color:#888780;' };
+};
+
+/*
    點擊單一通知：標記已讀 + 根據類型跳轉
 */
 const readNotification = async (notif) => {
@@ -111,12 +116,14 @@ const readNotification = async (notif) => {
     showNotification.value = false;
 
     // 根據通知類型導向對應頁面
-    if ([5, 6].includes(notif.notificationType) && notif.relatedId) {
-      router.push({ name: 'order-detail', params: { id: notif.relatedId } });
+    if (notif.notificationType === 5 && notif.relatedId) {
+      router.push({ name: 'purchase-orders-details', params: { id: notif.relatedId } });
+    } else if ([6, 9].includes(notif.notificationType) && notif.relatedId) {
+      router.push({ name: 'seller-orders-details', params: { id: notif.relatedId } });
     } else if ([1, 2, 8].includes(notif.notificationType) && notif.relatedId) {
-      router.push({ name: 'edit-product', params: { id: notif.relatedId } });
+      router.push({ name: 'product-detail', params: { id: notif.relatedId } });
     } else if ([3, 4].includes(notif.notificationType)) {
-      router.push({ name: 'store-edit' });
+      router.push({ name: 'seller-store-edit' });
     }
   } catch (err) {
     console.log(err);
@@ -128,9 +135,7 @@ const readNotification = async (notif) => {
 */
 const markAllRead = async () => {
   try {
-    await Promise.all(
-      notifications.value.filter((n) => !n.isRead).map((n) => getNotification(n.notificationId)),
-    );
+    await updateAllNotificationReadStatus();
     notifications.value.forEach((n) => (n.isRead = true));
   } catch (err) {
     console.log(err);

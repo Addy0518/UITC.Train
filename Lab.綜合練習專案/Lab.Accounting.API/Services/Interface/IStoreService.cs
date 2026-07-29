@@ -31,5 +31,29 @@ namespace Lab.Accounting.API.Services
         /// <param name="request">編輯資訊</param>
         /// <returns>影響列數</returns>
         Task<ApiResponse<int>> UpdateStore(StoreUpdateRequest request);
+
+        /// <summary>
+        /// 用戶追蹤賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> FollowStore(int userId, int storeId);
+
+        /// <summary>
+        /// 用戶取消追蹤賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>影響列數</returns>
+        Task<ApiResponse<int>> UnfollowStore(int userId, int storeId);
+
+        /// <summary>
+        /// 查看用戶是否已追蹤某賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>是否已追蹤</returns>
+        Task<ApiResponse<bool>> IsFollowingStore(int userId, int storeId);
     }
 }

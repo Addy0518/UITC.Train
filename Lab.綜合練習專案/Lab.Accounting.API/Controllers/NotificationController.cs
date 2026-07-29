@@ -38,5 +38,16 @@ namespace Lab.Accounting.API.Controllers
         {
             return Ok(await notificationService.GetNotification(notificationId, CurrentUserId));
         }
+
+        /// <summary>
+        /// 改變所有通知已讀狀態
+        /// </summary>
+        /// <returns>影響列數</returns>
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+        public async Task<IActionResult> UpdateAllNotificationReadStatus()
+        {
+            return Ok(await notificationService.UpdateAllNotificationReadStatus(CurrentUserId, true));
+        }
     }
 }

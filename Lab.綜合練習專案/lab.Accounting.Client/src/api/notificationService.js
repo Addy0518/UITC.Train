@@ -9,3 +9,7 @@ export const getAllNotifications = (request) =>
 // 查看單一通知
 export const getNotification = (notificationId) =>
   accountApiInstance.get('Notification/GetNotification', { params: { notificationId } });
+
+// 改變所有通知已讀狀態
+export const updateAllNotificationReadStatus = () =>
+  accountApiInstance.put('Notification/UpdateAllNotificationReadStatus');

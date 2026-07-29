@@ -64,4 +64,40 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
         request.UserId = CurrentUserId;
         return Ok(await sellerservice.UpdateStore(request));
     }
+
+    /// <summary>
+    /// 用戶追蹤賣場
+    /// </summary>
+    /// <param name="storeId">賣場 ID</param>
+    /// <returns>影響列數</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> FollowStore([FromQuery] int storeId)
+    {
+        return Ok(await sellerservice.FollowStore(CurrentUserId, storeId));
+    }
+
+    /// <summary>
+    /// 用戶取消追蹤賣場
+    /// </summary>
+    /// <param name="storeId">賣場 ID</param>
+    /// <returns>影響列數</returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> UnfollowStore([FromQuery] int storeId)
+    {
+        return Ok(await sellerservice.UnfollowStore(CurrentUserId, storeId));
+    }
+
+    /// <summary>
+    /// 查看用戶是否已追蹤某賣場
+    /// </summary>
+    /// <param name="storeId">賣場 ID</param>
+    /// <returns>是否已追蹤</returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<bool>))]
+    public async Task<IActionResult> IsFollowingStore([FromQuery] int storeId)
+    {
+        return Ok(await sellerservice.IsFollowingStore(CurrentUserId, storeId));
+    }
 }

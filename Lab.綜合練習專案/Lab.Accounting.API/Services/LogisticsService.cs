@@ -381,7 +381,7 @@ namespace Lab.Accounting.API.Services
                 "2105" => LogisticsStatusEnum.InTransit, // 已申請門市變更
 
                 // 已送達取貨門市，等買家去拿
-                "2073" => LogisticsStatusEnum.Delivered,
+                "2073" => LogisticsStatusEnum.Delivered, // 包裹已配達取件門市
                 "2098" => LogisticsStatusEnum.Delivered, // 包裹重新配達取件門市
 
                 // 買家已經去門市取貨完成
@@ -500,7 +500,7 @@ namespace Lab.Accounting.API.Services
                     notify.Value.type,
                     notify.Value.title,
                     notify.Value.content,
-                    logistics.LogisticsId
+                    orders.FirstOrDefault().OrderId
                 );
             }
         }

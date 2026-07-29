@@ -95,8 +95,12 @@ export const notificationTypeEnum = Object.freeze({
   ProductRejected: { value: 2, description: '商品審核駁回' },
   StoreCompanyApproved: { value: 3, description: '企業賣場審核通過' },
   StoreCompanyRejected: { value: 4, description: '企業賣場審核駁回' },
-  LogisticsStatusUpdated: { value: 5, description: '訂單物流狀態更新 ( 已出貨 / 已送達 / 買家已取貨 )' },
+  LogisticsStatusUpdated: {
+    value: 5,
+    description: '訂單物流狀態更新 ( 已出貨 / 已送達 / 買家已取貨 )',
+  },
   NewOrder: { value: 6, description: '賣家收到新訂單' },
   ProductRateReplied: { value: 7, description: '賣家評論被回覆 ( 或評論收到賣家回覆，通知買家 )' },
   ProductUnderReview: { value: 8, description: '商品審核中' },
+  LogisticsCreateFailed: { value: 9, description: '訂單物流建立失敗' },
 });

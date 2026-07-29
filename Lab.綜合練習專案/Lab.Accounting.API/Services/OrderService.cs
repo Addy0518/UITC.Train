@@ -582,7 +582,8 @@ public class OrderService(
                     sellerId.Key,
                     NotificationTypeEnum.NewOrder,
                     "收到新訂單",
-                    $"您有一筆新訂單成立，商品：{summary}"
+                    $"您有一筆新訂單成立，商品：{summary}",
+                    sellerId.First().OrderId
                 );
             }
 
@@ -682,10 +683,10 @@ public class OrderService(
 
                             await notificationService.CreateNotification(
                                 sellerId,
-                                NotificationTypeEnum.LogisticsStatusUpdated,
+                                NotificationTypeEnum.LogisticsCreateFailed,
                                 "物流單建立失敗",
                                 $"訂單「{goodsName}」的物流單建立失敗，原因：{failMsg}，請檢查賣場地址或聯絡客服。",
-                                logisticsId
+                                ordersUnderThisLogistics.First().OrderId
                             );
                         }
                     }

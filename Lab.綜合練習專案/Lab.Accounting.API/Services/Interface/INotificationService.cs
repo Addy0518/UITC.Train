@@ -38,5 +38,13 @@ namespace Lab.Accounting.API.Services
             string content,
             int? relatedId = null
         );
+
+        /// <summary>
+        /// 改變所有通知已讀狀態
+        /// </summary>
+        /// <param name="userId">用戶 ID </param>
+        /// <param name="isRead">是否已讀</param>
+        /// <returns>影響列數</returns>
+        Task<int> UpdateAllNotificationReadStatus(int userId, bool isRead);
     };
 }

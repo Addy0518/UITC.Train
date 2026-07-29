@@ -211,5 +211,83 @@ namespace Lab.Accounting.API.Services
 
             return ApiResponseHelper.Success(path);
         }
+
+        /// <summary>
+        /// 用戶追蹤賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> FollowStore(int userId, int storeId)
+        {
+            var store = await storeRepository.GetStorebyStoreId(storeId);
+            if (store == null)
+            {
+                var errors = new Dictionary<string, string[]> { { "Store", new[] { "查無賣場" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+
+            if (store.UserId == userId)
+            {
+                var errors = new Dictionary<string, string[]> { { "Store", new[] { "無法追蹤自己的賣場" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+            var follow = await storeRepository.FollowStore(userId, storeId);
+
+            if (follow <= 0)
+                return ApiResponseHelper.InternalException<int>("追蹤失敗 ! ");
+            return ApiResponseHelper.Success<int>(follow);
+        }
+
+        /// <summary>
+        /// 用戶取消追蹤賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>影響列數</returns>
+        public async Task<ApiResponse<int>> UnfollowStore(int userId, int storeId)
+        {
+            var target = await storeRepository.GetStorebyStoreId(storeId);
+            if (target == null)
+            {
+                var errors = new Dictionary<string, string[]> { { "Store", new[] { "查無賣場" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+            if (target.UserId == userId)
+            {
+                var errors = new Dictionary<string, string[]> { { "Store", new[] { "無法取消追蹤自己的賣場" } } };
+
+                return ApiResponseHelper.RequestError<int>(errors);
+            }
+            var delete = await storeRepository.UnfollowStore(userId, storeId);
+
+            if (delete <= 0)
+                return ApiResponseHelper.InternalException<int>("取消追蹤失敗 ! ");
+            return ApiResponseHelper.Success<int>(delete);
+        }
+
+        /// <summary>
+        /// 查看用戶是否已追蹤某賣場
+        /// </summary>
+        /// <param name="userId">用戶 ID</param>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>是否已追蹤</returns>
+        public async Task<ApiResponse<bool>> IsFollowingStore(int userId, int storeId)
+        {
+            var target = await storeRepository.GetStorebyStoreId(storeId);
+            if (target == null)
+            {
+                var errors = new Dictionary<string, string[]> { { "Store", new[] { "查無賣場" } } };
+
+                return ApiResponseHelper.RequestError<bool>(errors);
+            }
+
+            var isfollow = await storeRepository.IsFollowingStore(userId, storeId);
+
+            return ApiResponseHelper.Success<bool>(isfollow);
+        }
     }
 }

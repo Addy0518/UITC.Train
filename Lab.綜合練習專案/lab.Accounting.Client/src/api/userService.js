@@ -7,8 +7,7 @@ export const registerApi = (userRegister) => accountApiInstance.post(`User/Regis
 // 使用者登入
 export const loginApi = (userLogin) => accountApiInstance.post(`User/Login`, userLogin);
 // Google 第三方登入
-export const googleLoginApi = (request) =>
-  accountApiInstance.post(`User/GoogleLogin`, request);
+export const googleLoginApi = (request) => accountApiInstance.post(`User/GoogleLogin`, request);
 // 使用者登出
 export const logoutApi = () => accountApiInstance.post(`User/Logout`);
 
@@ -34,3 +33,5 @@ export const forgetUpdatePassword = (request) =>
 
 // 寄送忘記密碼的驗證碼
 export const sendVerfiyCode = (request) => accountApiInstance.post(`User/SendVerfiyCode`, request);
+
+
