@@ -473,22 +473,22 @@ namespace Lab.Accounting.API.Services
                 LogisticsStatusEnum.Shipped => (
                     NotificationTypeEnum.LogisticsStatusUpdated,
                     "商品已出貨",
-                    "您的訂單已由賣家出貨，正在配送途中。"
+                    "您的訂單已由賣家出貨，正在配送途中"
                 ),
                 LogisticsStatusEnum.Delivered => (
                     NotificationTypeEnum.LogisticsStatusUpdated,
                     "包裹已送達門市",
-                    "您的訂單已送達指定門市，請盡快前往取貨。"
+                    "您的訂單已送達指定門市，請盡快前往取貨"
                 ),
                 LogisticsStatusEnum.Cancelled => (
                     NotificationTypeEnum.LogisticsStatusUpdated,
                     "訂單物流已取消",
-                    "您的訂單物流狀態已被取消，如有疑問請聯繫客服。"
+                    "您的訂單物流狀態已被取消，如有疑問請聯繫客服"
                 ),
                 LogisticsStatusEnum.Exception => (
                     NotificationTypeEnum.LogisticsStatusUpdated,
                     "訂單物流異常",
-                    $"您的訂單物流發生異常：{rtnMsg}，我們正在協助處理。"
+                    $"您的訂單物流發生異常：{rtnMsg}，我們正在協助處理"
                 ),
                 _ => null,
             };
