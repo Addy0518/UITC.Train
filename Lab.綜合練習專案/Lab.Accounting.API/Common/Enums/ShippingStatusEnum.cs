@@ -19,4 +19,7 @@ public enum ShippingStatusEnum
 
     [Description("已取消")]
     Cancelled = 5,
+
+    [Description("退貨處理中")]
+    Returning = 6,
 }

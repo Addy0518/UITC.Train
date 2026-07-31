@@ -12,6 +12,13 @@ namespace Lab.Accounting.API.Services
         Task<ApiResponse<StoreResponse>> GetStore(int sellerId);
 
         /// <summary>
+        /// 查看所有追蹤賣場的用戶數量
+        /// </summary>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>用戶追蹤數量</returns>
+        Task<ApiResponse<int>> GetStoreFollowers(int storeId);
+
+        /// <summary>
         /// 賣場註冊
         /// </summary>
         /// <param name="request">註冊資訊</param>

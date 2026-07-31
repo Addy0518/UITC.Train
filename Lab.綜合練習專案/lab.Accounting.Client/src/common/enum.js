@@ -103,4 +103,5 @@ export const notificationTypeEnum = Object.freeze({
   ProductRateReplied: { value: 7, description: '賣家評論被回覆 ( 或評論收到賣家回覆，通知買家 )' },
   ProductUnderReview: { value: 8, description: '商品審核中' },
   LogisticsCreateFailed: { value: 9, description: '訂單物流建立失敗' },
+  ProductListing: { value: 10, description: '商品上架' },
 });

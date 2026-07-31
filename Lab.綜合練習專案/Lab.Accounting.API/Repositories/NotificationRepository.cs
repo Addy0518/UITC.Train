@@ -104,6 +104,28 @@ public class NotificationRepository(DBConnecting connecting) : INotificationRepo
     }
 
     /// <summary>
+    /// 新增多筆通知紀錄
+    /// </summary>
+    /// <param name="notifications">通知訊息清單</param>
+    /// <returns>通知 ID</returns>
+    public async Task<int> CreateAllNotifications(IEnumerable<Notification> notifications)
+    {
+        using var conn = connecting.CreateConnecting();
+
+        var sql =
+            @"
+            INSERT INTO Notification (
+                UserId , NotificationType, Title,Content,RelatedId,IsRead,CreateTime
+            )
+            VALUES (
+                @UserId ,@NotificationType,@Title,@Content,@RelatedId,@IsRead,@CreateTime
+            );
+            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+        return await conn.ExecuteAsync(sql, notifications);
+    }
+
+    /// <summary>
     /// 改變單一通知已讀狀態
     /// </summary>
     /// <param name="notificationId">通知 ID </param>

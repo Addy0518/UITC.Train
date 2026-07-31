@@ -5,6 +5,10 @@ import accountApiInstance from '@/api/accountInstance.js';
 // 查看賣場
 export const getStore = (id) => accountApiInstance.get(`Store/GetStore?sellerId=${id}`);
 
+// 查看所有追蹤賣場的用戶數量
+export const getStoreFollowers = (storeId) =>
+  accountApiInstance.get(`Store/GetStoreFollowers?storeId=${storeId}`);
+
 // 賣場註冊
 export const register = (userRegister) => accountApiInstance.post(`Store/Register`, userRegister);
 

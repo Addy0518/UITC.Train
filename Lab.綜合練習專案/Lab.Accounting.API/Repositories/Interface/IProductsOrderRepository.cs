@@ -92,8 +92,15 @@ public interface IProductsOrderRepository
     /// <param name="shippingStatus">運送狀態</param>
     /// <param name="paidType">付款方式</param>
     /// <param name="paidTime">付款時間</param>
+    /// <param name="ecpayTradeNo">綠界交易編號</param>
     /// <returns>影響列數</returns>
-    Task<int> PaidProducts(string orderNumber, int shippingStatus, string paidType, DateTime paidTime);
+    Task<int> PaidProducts(
+        string orderNumber,
+        int shippingStatus,
+        string paidType,
+        DateTime paidTime,
+        string ecpayTradeNo
+    );
 
     /// <summary>
     /// 商品重新付款

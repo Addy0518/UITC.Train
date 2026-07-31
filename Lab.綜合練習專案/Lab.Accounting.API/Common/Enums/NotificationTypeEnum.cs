@@ -29,4 +29,7 @@ public enum NotificationTypeEnum
 
     [Description(" 訂單物流建立失敗")]
     LogisticsCreateFailed = 9,
+
+    [Description(" 商品上架")]
+    ProductListing = 10,
 }

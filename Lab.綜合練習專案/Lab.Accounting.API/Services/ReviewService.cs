@@ -89,14 +89,21 @@ namespace Lab.Accounting.API.Services
 
                 return ApiResponseHelper.RequestError<int>(errors);
             }
+
+            // 審核結果的影響列數
+            int target;
+            // 審核資訊
+            Review reviewInfo;
+            // 新增的商品的 ID
+            int? newProductId = null;
+
             using (var trxScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var target = await productsReviewRepository.ApproveOrRejectProductsReview(request);
-                Notification notificationRequest = null;
+                target = await productsReviewRepository.ApproveOrRejectProductsReview(request);
 
                 if (target <= 0)
                     return ApiResponseHelper.InternalException<int>("申請審核失敗");
-                var reviewInfo = await productsReviewRepository.GetProductsReview(request.ProductsReviewId);
+                reviewInfo = await productsReviewRepository.GetProductsReview(request.ProductsReviewId);
                 // 通過申請
                 if (request.ReviewStatus == ReviewStatusEnum.Approved)
                 {
@@ -124,13 +131,8 @@ namespace Lab.Accounting.API.Services
                             return ApiResponseHelper.InternalException<int>("商品新增失敗");
                         await productsImgRepository.UpdateImgsToProductId(reviewInfo.ProductsReviewId, Insert);
                         await productsRepository.UpdateReviewProductsId(reviewInfo.ProductsReviewId, Insert);
-                        await notificationService.CreateNotification(
-                            reviewInfo.SellerId,
-                            NotificationTypeEnum.ProductApproved,
-                            "商品審核通過",
-                            $"您的商品 {reviewInfo.ProductsName} 通過審核，已上架至賣場。",
-                            Insert
-                        );
+
+                        newProductId = Insert;
                     }
                     else if (request.ProductsId != null)
                     {
@@ -156,17 +158,10 @@ namespace Lab.Accounting.API.Services
                             reviewInfo.ProductsReviewId,
                             reviewInfo.ProductsId.Value
                         );
-                        await notificationService.CreateNotification(
-                            reviewInfo.SellerId,
-                            NotificationTypeEnum.ProductApproved,
-                            "商品審核通過",
-                            $"您的商品 {reviewInfo.ProductsName} 通過審核，已更新。",
-                            reviewInfo.ProductsId
-                        );
                     }
                 }
                 // 駁回申請
-                if (request.ReviewStatus == ReviewStatusEnum.Reject)
+                else if (request.ReviewStatus == ReviewStatusEnum.Reject)
                 {
                     // 查出這筆審核的所有圖片
                     var imgs = await productsImgRepository.GetReviewAllImg(request.ProductsReviewId);
@@ -177,20 +172,57 @@ namespace Lab.Accounting.API.Services
 
                         await productsImgRepository.DeleteProductsImg(img.ProductsImgId);
                     }
-                    if (request.ProductsId != null)
-                    {
-                        await notificationService.CreateNotification(
-                            reviewInfo.SellerId,
-                            NotificationTypeEnum.ProductRejected,
-                            "商品審核駁回",
-                            $"您的商品 {reviewInfo.ProductsName} 未通過審核，請檢查並修改後重新提交。"
-                        );
-                    }
                 }
 
                 trxScope.Complete();
-                return ApiResponseHelper.Success(target);
             }
+
+            // 交易結束再發送通知 ( 不管是新增更新還是駁回 ) , 這樣就不會影響交易內的新增或更新商品
+            if (request.ReviewStatus == ReviewStatusEnum.Approved)
+            {
+                var relatedProductId = newProductId ?? reviewInfo.ProductsId;
+                var text = newProductId == null ? "已上架至賣場" : "已更新";
+
+                await notificationService.CreateNotification(
+                    reviewInfo.SellerId,
+                    NotificationTypeEnum.ProductApproved,
+                    "商品審核通過",
+                    $"您的商品 {reviewInfo.ProductsName} 通過審核，{text}。",
+                    relatedProductId
+                );
+
+                if (newProductId != null)
+                {
+                    var store = await storeRepository.GetStore(reviewInfo.SellerId);
+                    if (store != null)
+                    {
+                        var followers = await storeRepository.GetStoreFollowers(store.StoreId);
+                        var notifications = followers.Select(followerId => new Notification
+                        {
+                            UserId = followerId,
+                            NotificationType = NotificationTypeEnum.ProductListing,
+                            Title = "商品上架",
+                            Content = $"您關注的賣場 {store.StoreName} 有新商品上架：{reviewInfo.ProductsName}。",
+                            RelatedId = newProductId,
+                            IsRead = false,
+                            CreateTime = DateTime.Now,
+                        });
+
+                        await notificationRepository.CreateAllNotifications(notifications);
+                    }
+                }
+            }
+            else if (request.ReviewStatus == ReviewStatusEnum.Reject && request.ProductsId != null)
+            {
+                await notificationService.CreateNotification(
+                    reviewInfo.SellerId,
+                    NotificationTypeEnum.ProductRejected,
+                    "商品審核駁回",
+                    $"您的商品 {reviewInfo.ProductsName} 未通過審核，請檢查並修改後重新提交。",
+                    request.ProductsId
+                );
+            }
+            return ApiResponseHelper.Success(target);
         }
 
         /// <summary>

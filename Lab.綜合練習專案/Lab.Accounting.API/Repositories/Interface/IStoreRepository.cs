@@ -62,5 +62,12 @@ namespace Lab.Accounting.API.Repositories.Interface
         /// <param name="storeId">賣場 ID</param>
         /// <returns>是否已追蹤</returns>
         Task<bool> IsFollowingStore(int userId, int storeId);
+
+        /// <summary>
+        /// 查看所有追蹤賣場的用戶
+        /// </summary>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>用戶 ID 列表</returns>
+        Task<IEnumerable<int>> GetStoreFollowers(int storeId);
     }
 }

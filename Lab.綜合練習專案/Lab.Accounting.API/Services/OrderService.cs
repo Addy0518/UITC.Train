@@ -492,6 +492,7 @@ public class OrderService(
             var rtnCode = collection["RtnCode"].ToString();
             var rtnMessage = collection["RtnMsg"].ToString();
             var orderNo = collection["MerchantTradeNo"].ToString();
+            var tradeNo = collection["TradeNo"].ToString();
             // 交易失敗的話
             if (rtnCode != "1")
             {
@@ -545,7 +546,8 @@ public class OrderService(
                     orderNo,
                     (int)ShippingStatusEnum.PendingShipment,
                     collection["PaymentType"].ToString(),
-                    paidTime
+                    paidTime,
+                    tradeNo
                 );
                 if (paymentCompleted <= 0)
                 {

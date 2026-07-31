@@ -281,7 +281,7 @@ const createOrUpdateProduct = async () => {
           }
         }
 
-        showToastSuccess('上架商品成功!');
+        showToastSuccess('送出成功 ! 等待審核通過');
         router.push({ name: 'mall' });
       }
       if (data.codeStatus === 4000) {
@@ -317,9 +317,8 @@ const createOrUpdateProduct = async () => {
             await productsImgUpload(fd);
           }
         }
-        showToastSuccess('更新商品成功!');
+        showToastSuccess('送出成功 ! 等待審核通過');
         router.back();
-        //router.push({ name: 'mall' });
       }
     } catch (err) {
       console.log(err);

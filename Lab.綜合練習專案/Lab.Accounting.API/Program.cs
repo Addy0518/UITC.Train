@@ -90,7 +90,11 @@ try
             {
                 policy
                     //  只允許來自這個來源的請求，其他來源會被瀏覽器阻擋
-                    .WithOrigins("http://localhost:5173")
+                    .WithOrigins(
+                        "http://localhost:5173",
+                        "http://localhost",
+                        "https://veneering-bannister-outlook.ngrok-free.dev"
+                    )
                     // 允許任何 HTTP 方法（GET、POST、PUT、DELETE 等）
                     .AllowAnyMethod()
                     // 允許任何 HTTP 標頭（Header）
@@ -217,6 +221,15 @@ try
 
     // 瀏覽靜態檔案
     app.UseStaticFiles();
+
+    // 設定 Cross-Origin-Opener-Policy 標頭，允許同源的彈出視窗 ( 讓 Google 登入進來 )
+    app.Use(
+        async (context, next) =>
+        {
+            context.Response.Headers.Add("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+            await next();
+        }
+    );
 
     // 使用剛剛設定的 Cors
     // 排序上 , 必須在 UseAuthentication、UseAuthorization 之前

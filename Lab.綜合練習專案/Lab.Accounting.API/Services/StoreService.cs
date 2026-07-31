@@ -47,6 +47,25 @@ namespace Lab.Accounting.API.Services
         }
 
         /// <summary>
+        /// 查看所有追蹤賣場的用戶數量
+        /// </summary>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>用戶追蹤數量</returns>
+        public async Task<ApiResponse<int>> GetStoreFollowers(int storeId)
+        {
+            var target = await storeRepository.GetStorebyStoreId(storeId);
+
+            if (target == null)
+            {
+                return ApiResponseHelper.NotFound<int>();
+            }
+
+            var followers = await storeRepository.GetStoreFollowers(storeId);
+            var followersCount = followers.Count();
+            return ApiResponseHelper.Success(followersCount);
+        }
+
+        /// <summary>
         /// 賣場註冊
         /// </summary>
         /// <param name="request">註冊資訊</param>

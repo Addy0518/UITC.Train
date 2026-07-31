@@ -41,6 +41,13 @@ public interface INotificationRepository
     );
 
     /// <summary>
+    /// 新增多筆通知紀錄
+    /// </summary>
+    /// <param name="notifications">通知訊息清單</param>
+    /// <returns>通知 ID</returns>
+    Task<int> CreateAllNotifications(IEnumerable<Notification> notifications);
+
+    /// <summary>
     /// 改變單一通知已讀狀態
     /// </summary>
     /// <param name="notificationId">通知 ID </param>

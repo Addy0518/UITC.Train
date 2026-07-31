@@ -24,6 +24,7 @@ import FollowStoreButton from '@/common/followStore.vue';
    store : 賣場
    breadCrumCategories : 麵包屑的類別
    replyComment : 賣家回復的評論
+   followerCount : 追蹤賣場粉絲數
 */
 const route = useRoute();
 const router = useRouter();
@@ -40,7 +41,7 @@ const seller = ref();
 const store = ref({});
 const breadCrumCategories = ref([]);
 const replyComment = ref();
-
+const followerCount = ref(0);
 /*
    注入 Loading 跟 Toast
 */
@@ -129,6 +130,12 @@ const getStoreInfo = async (id) => {
       store.value = data.returnData;
       sellerAllRate.value = data.returnData.allProductsRateCount;
       sellerAVGRate.value = data.returnData.countAVGAllProductRate;
+
+      // 查看多少追縱數
+      const followRes = await getStoreFollowers(data.returnData.storeId);
+      if (followRes.data.codeStatus === 2000) {
+        followerCount.value = followRes.data.returnData;
+      }
     }
   } catch (err) {
     console.log(err);
@@ -486,78 +493,94 @@ const breadCrumbItem = computed(() => {
 
         <!--#region 賣場資訊 -->
         <div
-          class="bg-page-bg rounded-card border border-border-soft p-6 flex gap-8 items-center"
+          class="bg-page-bg rounded-card border border-border-soft p-5 flex gap-6 items-center"
           v-if="product.userId"
         >
-          <!--#region  頭像 + 名稱 + 按鈕 -->
-          <div class="flex gap-5 items-center min-w-52">
-            <img
-              :src="sellerImg(seller)"
-              alt="賣家頭像"
-              class="w-18 h-18 rounded-full object-cover border border-border-soft"
-            />
-            <div class="flex flex-col gap-1.5">
-              <p class="m-0 text-base font-medium text-ink-900">{{ store.storeName }}</p>
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-status-success inline-block"></span>
-                <span class="text-xs text-ink-500">在線上</span>
-              </div>
-              <div class="flex gap-2 mt-1">
-                <button
-                  class="px-3 py-1 border border-border-soft text-ink-500 text-xs rounded-card cursor-pointer hover:bg-surface-muted flex items-center gap-1"
-                >
-                  <i class="pi pi-comment text-xs"></i>聊聊
-                </button>
-                <button
-                  class="px-3 py-1 border border-brand-500 text-brand-500 text-xs rounded-card cursor-pointer hover:bg-brand-50 flex items-center gap-1"
-                  @click="router.push({ name: 'seller-store', params: { id: seller.userId } })"
-                >
-                  <i class="pi pi-arrow-circle-right text-xs"></i>前往賣場
-                </button>
-                <FollowStoreButton v-if="store.storeId" :storeId="store.storeId" />
-              </div>
-            </div>
-          </div>
+          <!--#region 頭像 -->
+          <img
+            :src="sellerImg(seller)"
+            alt="賣家頭像"
+            class="w-14 h-14 rounded-full object-cover border border-border-soft shrink-0"
+          />
           <!-- #endregion -->
 
-          <!-- 分隔線 -->
-          <div class="w-px h-20 bg-border-soft"></div>
-
-          <!--#region  統計資訊 -->
-          <div class="grid grid-cols-3 gap-x-10 gap-y-2.5 flex-1 text-sm">
+          <!--#region 名稱 + 評分 + 按鈕 -->
+          <div class="flex flex-col gap-2 min-w-48 shrink-0">
             <div class="flex items-center gap-2">
-              <span class="text-ink-500">商品</span>
-              <span class="text-brand-price font-medium">{{ store.allProductsCount }}</span>
+              <p class="m-0 text-sm font-bold text-ink-900">{{ store.storeName }}</p>
+              <div class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-status-success inline-block"></span>
+                <span class="text-[11px] text-ink-500">在線上</span>
+              </div>
             </div>
 
-            <div class="flex items-center gap-2">
-              <span class="text-ink-500">加入時間</span>
-              <span class="text-ink-900 font-medium">{{ formatDateOnly(store.createTime) }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-ink-500">評價</span>
-              <span class="text-brand-price font-medium">{{ sellerAllRate }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-ink-500">賣場評分</span
-              ><span class="text-brand-price font-medium">{{ sellerAVGRate }}</span>
+            <!--
+      評分獨立一行：數字 + 星星 + 評價數，不跟 grid 統計欄混在一起
+      原本問題：stars 寬度不定，跟文字同一個 flex 導致換行
+    -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-sm font-bold text-brand-price">{{ sellerAVGRate }}</span>
               <Rating
                 :modelValue="sellerAVGRate"
                 :stars="5"
                 :readonly="true"
                 :pt="{
-                  onIcon: { class: 'text-brand-price' } /* 已點亮星星的顏色 */,
-                  offIcon: { class: 'text-slate-300' } /* 未點亮星星的顏色 */,
+                  onIcon: { class: 'text-brand-price' },
+                  offIcon: { class: 'text-slate-300' },
                 }"
               />
+              <span class="text-[11px] text-ink-300">{{ sellerAllRate }} 則</span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-ink-500">公司名稱</span>
-              <span class="text-ink-900 font-medium">{{ store.storeCompanyName }}</span>
+
+            <div class="flex gap-1.5">
+              <button
+                class="px-2.5 py-1 border border-border-soft text-ink-500 text-[11px] rounded-card cursor-pointer hover:bg-surface-muted flex items-center gap-1"
+              >
+                <i class="pi pi-comment text-[10px]"></i>聊聊
+              </button>
+              <button
+                class="px-2.5 py-1 border border-brand-500 text-brand-500 text-[11px] rounded-card cursor-pointer hover:bg-brand-50 flex items-center gap-1"
+                @click="router.push({ name: 'seller-store', params: { id: seller.userId } })"
+              >
+                <i class="pi pi-arrow-circle-right text-[10px]"></i>前往賣場
+              </button>
+              <FollowStoreButton v-if="store.storeId" :storeId="store.storeId" />
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-ink-500">公司統編</span>
-              <span class="text-ink-900 font-medium">{{ store.storeUnifiedNumber }}</span>
+          </div>
+          <!-- #endregion -->
+
+          <!-- 分隔線 -->
+          <div class="w-px h-16 bg-border-soft shrink-0"></div>
+
+          <!--#region 統計欄位 — 3 欄 × 2 列，追蹤人數補進第三欄 -->
+          <div class="grid grid-cols-3 gap-x-8 gap-y-3 flex-1 text-sm">
+            <div>
+              <p class="text-[11px] text-ink-500 m-0 mb-0.5">商品數量</p>
+              <p class="text-sm font-medium text-brand-price m-0">{{ store.allProductsCount }}</p>
+            </div>
+            <div>
+              <p class="text-[11px] text-ink-500 m-0 mb-0.5">評價數</p>
+              <p class="text-sm font-medium text-ink-900 m-0">{{ sellerAllRate }}</p>
+            </div>
+            <div>
+              <p class="text-[11px] text-ink-500 m-0 mb-0.5">追蹤人數</p>
+              <p class="text-sm font-medium text-ink-900 m-0">{{ followerCount }}</p>
+            </div>
+            <div>
+              <p class="text-[11px] text-ink-500 m-0 mb-0.5">加入時間</p>
+              <p class="text-sm font-medium text-ink-900 m-0">
+                {{ formatDateOnly(store.createTime) }}
+              </p>
+            </div>
+            <div v-if="store.storeCompanyName">
+              <p class="text-[11px] text-ink-500 m-0 mb-0.5">公司名稱</p>
+              <p class="text-sm font-medium text-ink-900 m-0 truncate">
+                {{ store.storeCompanyName }}
+              </p>
+            </div>
+            <div v-if="store.storeUnifiedNumber">
+              <p class="text-[11px] text-ink-500 m-0 mb-0.5">統一編號</p>
+              <p class="text-sm font-medium text-ink-900 m-0">{{ store.storeUnifiedNumber }}</p>
             </div>
           </div>
           <!-- #endregion -->

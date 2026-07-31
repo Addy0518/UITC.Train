@@ -86,4 +86,9 @@ public class Order
     /// 運送狀態
     /// </summary>
     public ShippingStatusEnum ShippingStatus { get; set; }
+
+    /// <summary>
+    /// 綠界交易編號
+    /// </summary>
+    public string? EcpayTradeNo { get; set; }
 }

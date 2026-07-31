@@ -160,5 +160,18 @@ namespace Lab.Accounting.API.Repositories.Interface
             var count = await conn.ExecuteScalarAsync<int>(sql, new { UserId = userId, StoreId = storeId });
             return count > 0;
         }
+
+        /// <summary>
+        /// 查看所有追蹤賣場的用戶
+        /// </summary>
+        /// <param name="storeId">賣場 ID</param>
+        /// <returns>用戶 ID 列表</returns>
+        public async Task<IEnumerable<int>> GetStoreFollowers(int storeId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql = @"Select UserId From UserFollowStore Where StoreId = @StoreId";
+            return await conn.QueryAsync<int>(sql, new { StoreId = storeId });
+        }
     }
 }

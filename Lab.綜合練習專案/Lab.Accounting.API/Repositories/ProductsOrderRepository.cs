@@ -302,8 +302,15 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
     /// <param name="shippingStatus">運送狀態</param>
     /// <param name="paidType">付款方式</param>
     /// <param name="paidTime">付款時間</param>
+    /// <param name="ecpayTradeNo">綠界交易編號</param>
     /// <returns>影響列數</returns>
-    public async Task<int> PaidProducts(string orderNumber, int shippingStatus, string paidType, DateTime paidTime)
+    public async Task<int> PaidProducts(
+        string orderNumber,
+        int shippingStatus,
+        string paidType,
+        DateTime paidTime,
+        string ecpayTradeNo
+    )
     {
         using var conn = connecting.CreateConnecting();
 
@@ -311,7 +318,8 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
             @"Update [Order]
                   Set ShippingStatus = COALESCE(@ShippingStatus, ShippingStatus),
                       PaidType = COALESCE(@PaidType, PaidType),
-                      PaidTime = COALESCE(@PaidTime, PaidTime)
+                      PaidTime = COALESCE(@PaidTime, PaidTime),
+                      EcpayTradeNo = COALESCE(@EcpayTradeNo, EcpayTradeNo)
                   Where OrderNumber = @OrderNumber";
 
         return await conn.ExecuteAsync(
@@ -322,6 +330,7 @@ public class ProductsOrderRepository(DBConnecting connecting) : IProductsOrderRe
                 ShippingStatus = shippingStatus,
                 PaidType = paidType,
                 PaidTime = paidTime,
+                EcpayTradeNo = ecpayTradeNo,
             }
         );
     }

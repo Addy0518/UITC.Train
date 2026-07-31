@@ -15,6 +15,7 @@ import defaultImgurl from '@/img/預設圖片.jpg';
    store : 賣場
    sellerAllRate : 賣家的所有評價
    sellerAVGRate : 賣家評分
+   followerCount : 追蹤賣場粉絲數
 */
 const allproduct = ref(null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
@@ -25,6 +26,7 @@ const seller = ref();
 const store = ref({});
 const sellerAllRate = ref(null);
 const sellerAVGRate = ref();
+const followerCount = ref(0);
 /*
    注入 Loading 跟 Toast
 */
@@ -112,6 +114,12 @@ const getStoreInfo = async (id) => {
       store.value = data.returnData;
       sellerAllRate.value = data.returnData.allProductsRateCount;
       sellerAVGRate.value = data.returnData.countAVGAllProductRate;
+
+      // 查看多少追縱數
+      const followRes = await getStoreFollowers(data.returnData.storeId);
+      if (followRes.data.codeStatus === 2000) {
+        followerCount.value = followRes.data.returnData;
+      }
     }
   } catch (err) {
     console.log(err);
@@ -153,78 +161,74 @@ const filterProducts = computed(() => {
     <div class="max-w-5xl mx-auto flex flex-col gap-4">
       <!-- #region 賣場資訊 -->
       <div class="bg-page-bg border border-border-soft rounded-card p-6">
-        <div class="flex flex-col md:flex-row gap-6">
-          <!-- 頭像 -->
-          <div class="shrink-0">
-            <img
-              :src="sellerImg(seller)"
-              class="w-24 h-24 rounded-full object-cover border border-border-soft"
-            />
-          </div>
+        <!--#region 頭像 + 賣場名稱 + 評分 -->
+        <div class="flex items-center gap-4 mb-5">
+          <img
+            :src="sellerImg(seller)"
+            class="w-16 h-16 rounded-full object-cover border border-border-soft shrink-0"
+          />
+          <div class="flex-1 min-w-0">
+            <h1 class="text-lg font-bold text-ink-900 m-0 mb-1">{{ store.storeName }}</h1>
 
-          <!-- 賣場主資訊 -->
-          <div class="flex-1">
-            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-              <div>
-                <h1 class="text-xl font-bold text-ink-900 m-0">
-                  {{ store.storeName }}
-                </h1>
-
-                <div class="flex items-center gap-2 mt-2">
-                  <span class="text-brand-price font-bold text-base">
-                    {{ sellerAVGRate }}
-                  </span>
-
-                  <Rating
-                    :modelValue="sellerAVGRate"
-                    :stars="5"
-                    :readonly="true"
-                    :pt="{
-                      onIcon: { class: 'text-brand-price' },
-                      offIcon: { class: 'text-slate-300' },
-                    }"
-                  />
-
-                  <span class="text-xs text-ink-500"> {{ sellerAllRate }} 則評價 </span>
-                </div>
-
-                <p class="text-xs text-ink-500 mt-2 mb-0">共 {{ allproduct.length }} 件商品</p>
-              </div>
+            <!--評分-->
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <span class="text-sm font-bold text-brand-price">{{ sellerAVGRate }}</span>
+              <Rating
+                :modelValue="sellerAVGRate"
+                :stars="5"
+                :readonly="true"
+                :pt="{
+                  onIcon: { class: 'text-brand-price' },
+                  offIcon: { class: 'text-slate-300' },
+                }"
+              />
+              <span class="text-xs text-ink-500">{{ sellerAllRate }} 則評價</span>
             </div>
 
-            <div
-              class="mt-6 pt-6 border-t border-border-soft grid grid-cols-2 lg:grid-cols-4 gap-4"
-            >
-              <div>
-                <p class="text-xs text-ink-500 mb-1">商品數量</p>
-                <p class="text-brand-price font-bold m-0">
-                  {{ store.allProductsCount }}
-                </p>
-              </div>
-
-              <div>
-                <p class="text-xs text-ink-500 mb-1">加入時間</p>
-                <p class="text-ink-900 m-0">
-                  {{ formatDateOnly(store.createTime) }}
-                </p>
-              </div>
-
-              <div>
-                <p class="text-xs text-ink-500 mb-1">公司名稱</p>
-                <p class="text-ink-900 m-0 truncate">
-                  {{ store.storeCompanyName }}
-                </p>
-              </div>
-
-              <div>
-                <p class="text-xs text-ink-500 mb-1">統一編號</p>
-                <p class="text-ink-900 m-0">
-                  {{ store.storeUnifiedNumber }}
-                </p>
-              </div>
-            </div>
+            <p class="text-xs text-ink-500 m-0">
+              加入時間：{{ formatDateOnly(store.createTime) }}　·　共 {{ allproduct.length }} 件商品
+            </p>
           </div>
         </div>
+        <!-- #endregion -->
+
+        <!--#region 統計卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 border-t border-border-soft pt-4">
+          <div class="bg-page-bg-soft rounded-card p-3 border border-border-soft">
+            <p class="text-[11px] text-ink-500 m-0 mb-1">上架商品</p>
+            <p class="text-lg font-bold text-brand-price m-0">{{ store.allProductsCount }}</p>
+          </div>
+          <div class="bg-page-bg-soft rounded-card p-3 border border-border-soft">
+            <p class="text-[11px] text-ink-500 m-0 mb-1">累計評價</p>
+            <p class="text-lg font-bold text-ink-900 m-0">{{ sellerAllRate }}</p>
+          </div>
+          <!-- 追蹤人數  -->
+          <div class="bg-page-bg-soft rounded-card p-3 border border-border-soft">
+            <p class="text-[11px] text-ink-500 m-0 mb-1">追蹤人數</p>
+            <p class="text-lg font-bold text-ink-900 m-0">{{ followerCount }}</p>
+          </div>
+          <div class="bg-page-bg-soft rounded-card p-3 border border-border-soft">
+            <p class="text-[11px] text-ink-500 m-0 mb-1">平均評分</p>
+            <p class="text-lg font-bold text-brand-price m-0">{{ sellerAVGRate }}</p>
+          </div>
+        </div>
+        <!-- #endregion -->
+
+        <!--#region 公司資訊 -->
+        <div
+          v-if="store.storeCompanyName || store.storeUnifiedNumber"
+          class="flex gap-6 mt-4 pt-4 border-t border-border-soft"
+        >
+          <div v-if="store.storeCompanyName">
+            <p class="text-[11px] text-ink-500 m-0 mb-0.5">公司名稱</p>
+            <p class="text-sm text-ink-900 m-0">{{ store.storeCompanyName }}</p>
+          </div>
+          <div v-if="store.storeUnifiedNumber">
+            <p class="text-[11px] text-ink-500 m-0 mb-0.5">統一編號</p>
+            <p class="text-sm text-ink-900 m-0">{{ store.storeUnifiedNumber }}</p>
+          </div>
+        </div>
+        <!-- #endregion -->
       </div>
       <!-- #endregion -->
 

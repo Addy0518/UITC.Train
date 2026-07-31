@@ -26,6 +26,19 @@ public class StoreController(IStoreService sellerservice) : ControllerBase
     }
 
     /// <summary>
+    /// 查看所有追蹤賣場的用戶數量
+    /// </summary>
+    /// <param name="storeId">賣場 ID</param>
+    /// <returns>用戶追蹤數量</returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<int>))]
+    public async Task<IActionResult> GetStoreFollowers([FromQuery] int storeId)
+    {
+        return Ok(await sellerservice.GetStoreFollowers(storeId));
+    }
+
+    /// <summary>
     /// 賣場註冊
     /// </summary>
     /// <param name="request">賣家註冊資訊</param>

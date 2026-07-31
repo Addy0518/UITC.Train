@@ -78,6 +78,7 @@ const notifBadge = (type) => {
   if ([3, 4].includes(type)) return { label: '商店', style: 'background:#f1efe8; color:#888780;' };
   if ([7].includes(type)) return { label: '評價', style: 'background:#fff4ed; color:#c9543f;' };
   if ([9].includes(type)) return { label: '物流', style: 'background:#fff4ed; color:#ff6b35;' };
+  if ([10].includes(type)) return { label: '商品', style: 'background:#f0fdf4; color:#16a34a;' };
   return { label: '通知', style: 'background:#f1efe8; color:#888780;' };
 };
 
@@ -93,7 +94,7 @@ const readNotification = async (notif) => {
       router.push({ name: 'purchase-orders-details', params: { id: notif.relatedId } });
     } else if ([6, 9].includes(notif.notificationType) && notif.relatedId) {
       router.push({ name: 'seller-orders-details', params: { id: notif.relatedId } });
-    } else if ([1, 2, 8].includes(notif.notificationType) && notif.relatedId) {
+    } else if ([1, 2, 8, 10].includes(notif.notificationType) && notif.relatedId) {
       router.push({ name: 'product-detail', params: { id: notif.relatedId } });
     } else if ([3, 4].includes(notif.notificationType)) {
       router.push({ name: 'seller-store-edit' });
