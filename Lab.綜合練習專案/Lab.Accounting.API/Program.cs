@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using Lab.Accounting.API.Infrastructures.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -205,6 +206,9 @@ try
     // 快取
     builder.Services.AddMemoryCache();
 
+    // 即時通訊
+    builder.Services.AddSignalR();
+
     // 自訂的 DI 設定
     builder.Services.AddDiConfig(builder.Configuration);
 
@@ -273,6 +277,8 @@ try
     app.UseMiddleware<TokenBlackListMiddleware>();
     app.UseAuthorization();
     app.UseRateLimiter();
+
+    app.MapHub<ChatHub>("/chatHub");
 
     app.MapControllers();
 
