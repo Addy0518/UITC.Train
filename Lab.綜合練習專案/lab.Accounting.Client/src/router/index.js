@@ -183,6 +183,24 @@ const router = createRouter({
           },
           component: () => import('@/views/mall/shoppingCar.vue'),
         },
+        {
+          /*
+                聊天室列表
+              */
+          path: 'chat',
+          name: 'chat-list',
+          component: () => import('@/views/user/chat.vue'),
+        },
+
+        {
+          /*
+                單一聊天室
+              */
+          path: 'chat/:targetUserId',
+          name: 'chat',
+          component: () => import('@/views/user/chat.vue'),
+          props: (route) => ({ targetUserId: Number(route.params.targetUserId) }),
+        },
         /*
             商品區 ================================================================
         */
@@ -267,6 +285,7 @@ const router = createRouter({
               },
               component: () => import('@/views/user/notifications.vue'),
             },
+
             {
               /*
                 買家訂單管理

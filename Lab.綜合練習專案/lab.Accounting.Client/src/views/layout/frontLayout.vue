@@ -310,6 +310,12 @@ const loadShopingCarProducts = async () => {
           </RouterLink>
           <!-- #endregion -->
 
+          <!--#region 聊天 -->
+          <RouterLink :to="{ name: 'chat-list' }" class="relative text-ink-on-dark">
+            <i class="pi pi-comments" style="font-size: 1.5rem"></i>
+          </RouterLink>
+          <!-- #endregion -->
+
           <!--#region 通知鈴鐺 + dropdown -->
           <div class="relative" ref="notifPanelRef">
             <button

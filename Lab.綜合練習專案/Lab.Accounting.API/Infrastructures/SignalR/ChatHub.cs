@@ -2,18 +2,23 @@
 
 namespace Lab.Accounting.API.Infrastructures.SignalR
 {
-    public class ChatHub : Hub
+    /// <summary>
+    /// ChatHub 是 SignalR 即時通訊的中繼站，類似 controller
+    /// </summary>
+    public class ChatHub(IChatRepository chatRepository) : Hub
     {
-        // 存 UserId 對應 ConnectionId，靜態所以全域共享
+        /// <summary>
+        ///  存 UserId 對應 ConnectionId，靜態所以全域共享
+        /// </summary>
         private static Dictionary<int, string> _onlineUsers = new();
 
         /// <summary>
-        /// 使用者連線時呼叫，把 UserId 跟 ConnectionId 對應起來
+        /// 用 override 把 Hub 裡的 OnConnectedAsync 改寫成我的方法 , 而 base.OnConnectedAsync() 是呼叫原本的 Hub 的方法 , 用來連線時觸發
+        /// 這裡是把連線時的 Query ( /chatHub?userId=123 ) 拿到 UserId 存起來
+        /// 比如 UserId =1 的 , 就會是 { 1 : ConnectionId }
         /// </summary>
         public override async Task OnConnectedAsync()
         {
-            // 從 Query String 拿 UserId
-            // 前端連線時要帶：/chatHub?userId=123
             var userIdStr = Context.GetHttpContext()?.Request.Query["userId"];
             if (int.TryParse(userIdStr, out int userId))
             {
@@ -23,11 +28,11 @@ namespace Lab.Accounting.API.Infrastructures.SignalR
         }
 
         /// <summary>
-        /// 使用者斷線時清除
+        /// 使用者斷線時清除 , base.OnDisconnectedAsync 就是斷線時觸發
+        /// 找到這個 ConnectionId 對應的 UserId 並移除
         /// </summary>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            // 找到這個 ConnectionId 對應的 UserId 並移除
             var user = _onlineUsers.FirstOrDefault(x => x.Value == Context.ConnectionId);
             if (user.Key != 0)
             {
@@ -37,15 +42,24 @@ namespace Lab.Accounting.API.Infrastructures.SignalR
         }
 
         /// <summary>
-        /// 傳送訊息
+        /// 傳送訊息 , Client 指定要傳送的對象 , SendAsync("ReceiveMessage", content) 會觸發前端的 ReceiveMessage 方法
         /// </summary>
-        public async Task SendMessage(int receiverId, string content)
+        public async Task SendMessage(int senderId, int receiverId, string content)
         {
-            // 找到接收者的 ConnectionId
+            await chatRepository.SaveMessage(
+                new ChatMessage
+                {
+                    SenderId = senderId,
+                    ReceiverId = receiverId,
+                    Content = content,
+                    SendTime = DateTime.UtcNow,
+                    IsRead = false,
+                }
+            );
+
             if (_onlineUsers.TryGetValue(receiverId, out string? connectionId))
             {
-                // 推訊息給接收者
-                await Clients.Client(connectionId).SendAsync("ReceiveMessage", content);
+                await Clients.Client(connectionId).SendAsync("ReceiveMessage", senderId, content, DateTime.Now);
             }
         }
     }

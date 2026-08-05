@@ -1,31 +1,30 @@
-import * as signalR from '@microsoft/signalr'
-import { useAuthStore } from '@/stores/authStore'
+import * as signalR from '@microsoft/signalr';
 
-let connection = null
+let connection = null;
 
 export const startConnection = async () => {
-  const authStore = useAuthStore()
-  const userId = authStore.userId
+  const authStore = useAuthStore();
+  const userId = authStore.userId;
 
   connection = new signalR.HubConnectionBuilder()
-    .withUrl(`/shopping-api/chatHub?userId=${userId}`, {
+    .withUrl(`http://localhost:5215/chatHub?userId=${userId}`, {
       // 把 JWT token 帶進去，後端才能驗證
-      accessTokenFactory: () => authStore.token
+      accessTokenFactory: () => authStore.token,
     })
     .withAutomaticReconnect()
-    .build()
+    .build();
 
-  await connection.start()
-  console.log('SignalR 連線成功')
+  await connection.start();
+  console.log('SignalR 連線成功');
 
-  return connection
-}
+  return connection;
+};
 
-export const getConnection = () => connection
+export const getConnection = () => connection;
 
 export const stopConnection = async () => {
   if (connection) {
-    await connection.stop()
-    connection = null
+    await connection.stop();
+    connection = null;
   }
-}
+};
