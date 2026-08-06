@@ -9,20 +9,28 @@ namespace Lab.Accounting.API.Repositories
         /// </summary>
         /// <param name="userId">用戶 ID</param>
         /// <returns>訊息紀錄</returns>
-        public async Task<IEnumerable<int>> GetChatUserList(int userId)
+        public async Task<IEnumerable<ChatUserResponse>> GetChatUserList(int userId)
         {
             using var conn = connecting.CreateConnecting();
 
             var sql =
                 @"Select Distinct 
-                        Case
-                           When SenderId = @UserId Then ReceiverId
-                           Else SenderId
-                        end as ChatPartnerId
-                        From [dbo].chatmessage
-                        Where SenderId = @UserId or ReceiverId = @UserId";
+                            Case
+                               When c.SenderId = @UserId Then c.ReceiverId
+                               Else c.SenderId
+                            end as ChatPartnerId,
+                            u.UserName,
+                            u.UserHeadshot,
+                            u.UserGender
+                        From [dbo].chatmessage as c
+                        Left Join [User] as u on u.UserId =  
+                            Case
+                               When c.SenderId = @UserId Then c.ReceiverId
+                               Else c.SenderId
+                            end
+                        Where c.SenderId = @UserId or c.ReceiverId = @UserId";
 
-            return await conn.QueryAsync<int>(sql, new { UserId = userId });
+            return await conn.QueryAsync<ChatUserResponse>(sql, new { UserId = userId });
         }
 
         /// <summary>

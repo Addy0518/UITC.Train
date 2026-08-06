@@ -9,7 +9,7 @@ public interface IChatRepository
     /// </summary>
     /// <param name="userId">用戶 ID</param>
     /// <returns>訊息紀錄</returns>
-    Task<IEnumerable<int>> GetChatUserList(int userId);
+    Task<IEnumerable<ChatUserResponse>> GetChatUserList(int userId);
 
     /// <summary>
     /// 取得訊息歷史紀錄

@@ -1,50 +1,70 @@
 <script setup>
 import { GetMessageHistory, getChatUserList } from '@/api/chatService';
 import { startConnection, getConnection, stopConnection } from '@/common/signalrConnection';
-
+import defaultImgurl from '@/img/預設圖片.jpg';
 const props = defineProps({
   targetUserId: Number,
 });
 
+/*
+   變數名稱代表意義
+   myUserId : 用戶 ID
+   chatUserList : 左側用戶列表
+   messages : 所有歷史訊息
+   inputContent : 傳送的訊息
+   messageList : 訊息列表
+   currentTargetId : 聊天對象 ID
+   baseUrl : 基底位址
+*/
 const router = useRouter();
 const authStore = useAuthStore();
 const myUserId = authStore.userId;
-
-// 左側列表
 const chatUserList = ref([]);
-
-// 右側對話
 const messages = ref([]);
 const inputContent = ref('');
 const messageList = ref(null);
 const currentTargetId = ref(props.targetUserId ?? null);
-
+const baseUrl = import.meta.env.VITE_IMG_URL;
+/*
+   初始化
+*/
 onMounted(async () => {
-  // 載入聊天對象列表
   await loadChatUserList();
 
-  // 建立 SignalR 連線
+  // 開始建立 Signal 連線
   await startConnection();
   const connection = getConnection();
 
-  // 監聽收到訊息
+  // 監聽收到的訊息
+  // ReceiveMessage 是後端 Hub 裡的自訂事件 ( SendMessage )
+  // 也就是當今天一則訊息發送的順序是
+  // 1. A 發送訊息 => 後端 SendMessage 觸發
+  // 2. SendMessage 裡儲存訊息到資料庫順便觸發 ReceiveMessage
+  // 3. B 接收到訊息 => 前端 connection.on('ReceiveMessage', ...) 觸發
   connection.on('ReceiveMessage', (senderId, content, sendTime) => {
+    // 確認傳送的訊息是不是當下的聊天對象
     if (Number(senderId) === Number(currentTargetId.value)) {
       messages.value.push({ senderId: Number(senderId), content, sendTime });
       scrollToBottom();
     }
   });
-  // 如果路由有帶 targetUserId，直接載入對話
+  // 如果路由有帶 targetUserId，直接載入歷史對話
   if (currentTargetId.value) {
     await loadMessages(currentTargetId.value);
   }
 });
 
+/*
+   onUnmounted 是初始化的相反 , onMounted 是開啟網頁時觸發 , onUnmounted 則是離開網頁時觸發
+   這裡離開網頁時 stopConnection 是因為 Signal 不會自動關閉連線 , 要手動關
+*/
 onUnmounted(() => {
   stopConnection();
 });
 
-// 載入聊天對象列表
+/*
+   載入聊天對象列表
+*/
 const loadChatUserList = async () => {
   try {
     const res = await getChatUserList();
@@ -56,14 +76,21 @@ const loadChatUserList = async () => {
   }
 };
 
-// 點擊左側某個聊天對象
-const selectUser = async (targetId) => {
-  currentTargetId.value = targetId;
-  router.replace({ name: 'chat', params: { targetUserId: targetId } });
-  await loadMessages(targetId);
+/*
+   點擊左側某個聊天對象
+*/
+const selectUser = async (user) => {
+  currentTargetId.value = user.chatPartnerId;
+
+  // 替換路由到這個聊天對象的聊天室
+  router.replace({ name: 'chat', params: { targetUserId: user.chatPartnerId } });
+  // 一樣載入歷史聊天紀錄
+  await loadMessages(user.chatPartnerId);
 };
 
-// 載入歷史訊息
+/*
+   載入歷史訊息
+*/
 const loadMessages = async (targetId) => {
   try {
     const res = await GetMessageHistory(targetId);
@@ -76,13 +103,19 @@ const loadMessages = async (targetId) => {
   }
 };
 
-// 傳送訊息
+/*
+   傳送訊息
+*/
 const sendMessage = async () => {
   if (!inputContent.value.trim() || !currentTargetId.value) return;
 
   const connection = getConnection();
+
+  // invoke 是呼叫後端 Hub 的方法 , 後端 Hub 有一隻我自訂的方法是 SendMessage
+  // 後面則是對應這個方法要的參數 , 一樣順序要對其
   await connection.invoke('SendMessage', myUserId, currentTargetId.value, inputContent.value);
 
+  // 順便把訊息也堆上前端畫面 , 讓前端畫面同步即時更新
   messages.value.push({
     senderId: myUserId,
     content: inputContent.value,
@@ -93,13 +126,30 @@ const sendMessage = async () => {
   scrollToBottom();
 };
 
-// 自動捲到最下面
+/*
+   自動捲到最下面
+*/
 const scrollToBottom = () => {
+  // nextTick 是等待 Dom 更新完之後再執行 , 這裡是等最新訊息更新完再執行捲動
   nextTick(() => {
     if (messageList.value) {
       messageList.value.scrollTop = messageList.value.scrollHeight;
     }
   });
+};
+
+/*
+   載入頭貼
+*/
+const imgUrl = (user) => {
+  const headshot = user.userHeadshot;
+  if (!headshot) {
+    return defaultImgurl;
+  }
+  if (headshot.includes('googleusercontent.com')) {
+    return headshot;
+  }
+ return `${baseUrl}/UserHeadShot/${headshot}`;
 };
 </script>
 
@@ -116,16 +166,16 @@ const scrollToBottom = () => {
       </div>
 
       <div
-        v-for="userId in chatUserList"
-        :key="userId"
-        @click="selectUser(userId)"
+        v-for="user in chatUserList"
+        :key="user.chatPartnerId"
+        @click="selectUser(user)"
         class="px-4 py-3 cursor-pointer hover:bg-surface-muted border-b border-border-soft flex items-center gap-3"
-        :class="currentTargetId === userId ? 'bg-surface-muted' : ''"
+        :class="currentTargetId === user.chatPartnerId ? 'bg-surface-muted' : ''"
       >
         <div class="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
-          <i class="pi pi-user text-brand-500 text-sm"></i>
+          <img  :src="imgUrl"></img>
         </div>
-        <span class="text-sm text-ink-900">用戶 {{ userId }}</span>
+        <span class="text-sm text-ink-900">{{ user.userName }}</span>
       </div>
     </div>
 
