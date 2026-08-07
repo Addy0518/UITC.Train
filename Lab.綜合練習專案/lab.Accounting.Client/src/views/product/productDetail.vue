@@ -25,6 +25,7 @@ import FollowStoreButton from '@/common/followStore.vue';
    breadCrumCategories : 麵包屑的類別
    replyComment : 賣家回復的評論
    followerCount : 追蹤賣場粉絲數
+   chatUser : 暫存的賣家用戶資料
 */
 const route = useRoute();
 const router = useRouter();
@@ -42,6 +43,7 @@ const store = ref({});
 const breadCrumCategories = ref([]);
 const replyComment = ref();
 const followerCount = ref(0);
+const chatUser = useChatUserStore();
 /*
    注入 Loading 跟 Toast
 */
@@ -290,6 +292,24 @@ const breadCrumbItem = computed(() => {
       }),
   }));
 });
+
+/*
+  前往賣家聊天室
+*/
+const goChat = () => {
+  if (!authStore.token) {
+    router.push({ name: 'login' });
+    return;
+  }
+
+  chatUser.userProfile = {
+    chatPartnerId: seller.value.userId,
+    userName: seller.value.userName,
+    userHeadshot: seller.value.userHeadshot,
+  };
+
+  router.push({ name: 'chat', params: { targetUserId: seller.value.userId } });
+};
 </script>
 
 <template>
@@ -535,6 +555,7 @@ const breadCrumbItem = computed(() => {
             <div class="flex gap-1.5">
               <button
                 class="px-2.5 py-1 border border-border-soft text-ink-500 text-[11px] rounded-card cursor-pointer hover:bg-surface-muted flex items-center gap-1"
+                @click="goChat"
               >
                 <i class="pi pi-comment text-[10px]"></i>聊聊
               </button>

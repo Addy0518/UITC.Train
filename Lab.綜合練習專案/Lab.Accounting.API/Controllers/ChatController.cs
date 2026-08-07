@@ -36,4 +36,15 @@ public class ChatController(IChatRepository chatRepository) : ControllerBase
         var result = await chatRepository.GetMessageHistory(CurrentUserId, targetUserId);
         return Ok(ApiResponseHelper.Success(result));
     }
+
+    /// <summary>
+    /// 改變已讀狀態
+    /// </summary>
+    /// <param name="senderId">寄送人 ID</param>
+    /// <returns>影響列數</returns>
+    [HttpPut]
+    public async Task UpdateReadStatus([FromQuery] int senderId)
+    {
+        await chatRepository.UpdateReadStatus(senderId, CurrentUserId);
+    }
 }

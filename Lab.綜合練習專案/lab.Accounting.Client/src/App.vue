@@ -1,7 +1,10 @@
 <script setup>
 //#region 提供控制 Toast 的方法給子組件
 import { useToast } from 'primevue/usetoast';
+import { setToast } from '@/common/toast';
+
 const toast = useToast();
+setToast(toast);
 let loadingTimer = null;
 
 //#region 提供控制 Loading 的方法給子組件

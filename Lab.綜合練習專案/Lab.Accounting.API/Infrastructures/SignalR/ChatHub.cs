@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using MimeKit;
+using SendGrid.Helpers.Mail;
 
 namespace Lab.Accounting.API.Infrastructures.SignalR
 {
@@ -61,6 +63,25 @@ namespace Lab.Accounting.API.Infrastructures.SignalR
             {
                 await Clients.Client(connectionId).SendAsync("ReceiveMessage", senderId, content, DateTime.Now);
             }
+        }
+
+        public async Task MarkAsRead(int senderId)
+        {
+            await chatRepository.UpdateReadStatus(senderId, GetCurrentUserId());
+
+            if (_onlineUsers.TryGetValue(senderId, out string? connectionId))
+            {
+                await Clients.Client(connectionId).SendAsync("MessageRead", GetCurrentUserId());
+            }
+        }
+
+        /// <summary>
+        /// 從 QueryString 拿 UserId 的
+        /// </summary>
+        private int GetCurrentUserId()
+        {
+            var userIdStr = Context.GetHttpContext()?.Request.Query["userId"];
+            return int.TryParse(userIdStr, out int userId) ? userId : 0;
         }
     }
 }

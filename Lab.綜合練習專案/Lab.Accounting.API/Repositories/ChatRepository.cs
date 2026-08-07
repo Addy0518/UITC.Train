@@ -17,7 +17,7 @@ namespace Lab.Accounting.API.Repositories
                 @"Select Distinct 
                             Case
                                When c.SenderId = @UserId Then c.ReceiverId
-                               Else c.SenderId
+                               Else c.SenderId  
                             end as ChatPartnerId,
                             u.UserName,
                             u.UserHeadshot,
@@ -83,6 +83,24 @@ namespace Lab.Accounting.API.Repositories
                   );";
 
             return await conn.QuerySingleAsync<int>(sql, chatMessage);
+        }
+
+        /// <summary>
+        /// 改變已讀狀態
+        /// </summary>
+        /// <param name="senderId">寄送人 ID</param>
+        /// <param name="receiverId">接收人 ID</param>
+        public async Task UpdateReadStatus(int senderId, int receiverId)
+        {
+            using var conn = connecting.CreateConnecting();
+
+            var sql =
+                @"Update [dbo].ChatMessage Set IsRead=1 
+                WHERE SenderId = @SenderId 
+                AND ReceiverId = @ReceiverId 
+                AND IsRead = 0";
+
+            await conn.ExecuteAsync(sql, new { SenderId = senderId, ReceiverId = receiverId });
         }
     }
 }

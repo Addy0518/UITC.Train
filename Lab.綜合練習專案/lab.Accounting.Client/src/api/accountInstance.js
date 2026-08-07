@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router';
-import { app } from '@/main';
+import { getToast } from '@/common/toast';
 import { httpCodeStatusEnum } from '../common/enum';
 /*
    創建一個 axios ( VITE_BASE_URL 是放在環境設定 ( env ) 的 url )
@@ -44,7 +44,7 @@ instance.interceptors.response.use(
   },
   function (error) {
     // 取得全域的 toast
-    const toast = app.config.globalProperties.$toast;
+    const toast = getToast();
 
     // 網路完全斷線的情況
     if (!error.response) {

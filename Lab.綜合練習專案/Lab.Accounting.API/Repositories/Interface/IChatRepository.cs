@@ -25,4 +25,11 @@ public interface IChatRepository
     /// <param name="chatMessage">訊息內容</param>
     /// <returns>訊息 ID</returns>
     Task<int> SaveMessage(ChatMessage chatMessage);
+
+    /// <summary>
+    /// 改變已讀狀態
+    /// </summary>
+    /// <param name="senderId">寄送人 ID</param>
+    /// <param name="receiverId">接收人 ID</param>
+    Task UpdateReadStatus(int senderId, int receiverId);
 }

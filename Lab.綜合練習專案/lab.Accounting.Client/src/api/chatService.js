@@ -10,3 +10,7 @@ export const GetMessageHistory = (targetUserId) =>
 
 // 取得聊天對象列表
 export const getChatUserList = () => accountApiInstance.get(`/Chat/GetChatUserList`);
+
+// 改變已讀狀態
+export const updateReadStatus = (senderId) =>
+  accountApiInstance.put(`/Chat/UpdateReadStatus`, null, { params: { senderId } });

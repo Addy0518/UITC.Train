@@ -1,5 +1,5 @@
 <script setup>
-import { GetMessageHistory, getChatUserList } from '@/api/chatService';
+import { GetMessageHistory, getChatUserList, updateReadStatus } from '@/api/chatService';
 import { startConnection, getConnection, stopConnection } from '@/common/signalrConnection';
 import defaultImgurl from '@/img/預設圖片.jpg';
 const props = defineProps({
@@ -15,6 +15,8 @@ const props = defineProps({
    messageList : 訊息列表
    currentTargetId : 聊天對象 ID
    baseUrl : 基底位址
+   searchKeyword :　搜尋關鍵字
+   chatUser : 暫存的賣家用戶資料
 */
 const router = useRouter();
 const authStore = useAuthStore();
@@ -25,11 +27,22 @@ const inputContent = ref('');
 const messageList = ref(null);
 const currentTargetId = ref(props.targetUserId ?? null);
 const baseUrl = import.meta.env.VITE_IMG_URL;
+const searchKeyword = ref('');
+const chatUser = useChatUserStore();
+const sellerProfile = chatUser.userProfile;
 /*
    初始化
 */
 onMounted(async () => {
   await loadChatUserList();
+
+  if (sellerProfile && sellerProfile.chatPartnerId) {
+    const exists = chatUserList.value.find((u) => u.chatPartnerId === sellerProfile.chatPartnerId);
+    if (!exists) {
+      chatUserList.value.unshift(sellerProfile);
+    }
+    chatUser.userProfile = { chatPartnerId: null, userName: null, userHeadshot: null };
+  }
 
   // 開始建立 Signal 連線
   await startConnection();
@@ -41,13 +54,26 @@ onMounted(async () => {
   // 1. A 發送訊息 => 後端 SendMessage 觸發
   // 2. SendMessage 裡儲存訊息到資料庫順便觸發 ReceiveMessage
   // 3. B 接收到訊息 => 前端 connection.on('ReceiveMessage', ...) 觸發
-  connection.on('ReceiveMessage', (senderId, content, sendTime) => {
+  connection.on('ReceiveMessage', async (senderId, content, sendTime) => {
     // 確認傳送的訊息是不是當下的聊天對象
     if (Number(senderId) === Number(currentTargetId.value)) {
       messages.value.push({ senderId: Number(senderId), content, sendTime });
       scrollToBottom();
+
+      await connection.invoke('MarkAsRead', Number(currentTargetId.value));
     }
   });
+
+  // 監聽對方已讀事件
+  connection.on('MessageRead', (readerUserId) => {
+    // 把我傳給這個人的訊息全部標為已讀
+    messages.value.forEach((msg) => {
+      if (msg.senderId === myUserId && msg.receiverId === Number(readerUserId)) {
+        msg.isRead = true;
+      }
+    });
+  });
+
   // 如果路由有帶 targetUserId，直接載入歷史對話
   if (currentTargetId.value) {
     await loadMessages(currentTargetId.value);
@@ -97,6 +123,11 @@ const loadMessages = async (targetId) => {
     if (res.data.codeStatus === 2000) {
       messages.value = res.data.returnData;
       scrollToBottom();
+
+      const connection = getConnection();
+      if (connection) {
+        await connection.invoke('MarkAsRead', Number(targetId));
+      }
     }
   } catch (err) {
     console.log(err);
@@ -118,6 +149,7 @@ const sendMessage = async () => {
   // 順便把訊息也堆上前端畫面 , 讓前端畫面同步即時更新
   messages.value.push({
     senderId: myUserId,
+    receiverId: currentTargetId.value,
     content: inputContent.value,
     sendTime: new Date().toLocaleTimeString(),
   });
@@ -139,6 +171,14 @@ const scrollToBottom = () => {
 };
 
 /*
+   根據搜尋關鍵字過濾聊天對象列表
+*/
+const filteredChatUserList = computed(() => {
+  if (!searchKeyword.value) return chatUserList.value;
+  return chatUserList.value.filter((user) => user.userName.includes(searchKeyword.value));
+});
+
+/*
    載入頭貼
 */
 const imgUrl = (user) => {
@@ -149,85 +189,138 @@ const imgUrl = (user) => {
   if (headshot.includes('googleusercontent.com')) {
     return headshot;
   }
- return `${baseUrl}/UserHeadShot/${headshot}`;
+  return `${baseUrl}/UserHeadShot/${headshot}`;
 };
 </script>
 
 <template>
-  <div class="flex w-full h-[calc(100vh-80px)]">
-    <!-- 左側：聊天對象列表 -->
-    <div class="w-64 border-r border-border-soft bg-page-bg overflow-y-auto shrink-0">
-      <div class="px-4 py-3 border-b border-border-soft">
-        <span class="text-sm font-medium text-ink-900">訊息</span>
-      </div>
-
-      <div v-if="chatUserList.length === 0" class="py-8 text-center text-xs text-ink-500">
-        還沒有任何對話
-      </div>
-
-      <div
-        v-for="user in chatUserList"
-        :key="user.chatPartnerId"
-        @click="selectUser(user)"
-        class="px-4 py-3 cursor-pointer hover:bg-surface-muted border-b border-border-soft flex items-center gap-3"
-        :class="currentTargetId === user.chatPartnerId ? 'bg-surface-muted' : ''"
-      >
-        <div class="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
-          <img  :src="imgUrl"></img>
+  <div class="container mx-auto max-w-5xl">
+    <div class="flex gap-6 p-6 h-[calc(100vh-160px)]">
+      <!--#region 左側：聊天對象列表 -->
+      <aside class="w-60 rounded-card overflow-hidden flex flex-col border-2 border-surface-dark">
+        <!--#region 標題 -->
+        <div class="px-4 py-3 border-b border-border-soft">
+          <span class="text-sm font-medium text-ink-900">訊息</span>
         </div>
-        <span class="text-sm text-ink-900">{{ user.userName }}</span>
-      </div>
-    </div>
+        <!-- #endregion -->
 
-    <!-- 右側：對話內容 -->
-    <div class="flex flex-col flex-1 overflow-hidden">
-      <!-- 沒選對象時的提示 -->
-      <div
-        v-if="!currentTargetId"
-        class="flex-1 flex items-center justify-center text-ink-500 text-sm"
-      >
-        請選擇一個聊天對象
-      </div>
+        <!--#region 搜尋框 -->
+        <div class="px-3 py-2 border-b border-border-soft">
+          <input
+            v-model="searchKeyword"
+            placeholder="搜尋聯絡人..."
+            class="w-full border border-border-soft rounded-full px-3 py-1.5 text-sm outline-none focus:border-brand-500"
+          />
+        </div>
+        <!-- #endregion -->
 
-      <template v-else>
-        <!-- 訊息列表 -->
-        <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-3" ref="messageList">
+        <!--#region 沒有對話時的提示 -->
+        <div v-if="filteredChatUserList.length === 0" class="py-8 text-center text-xs text-ink-500">
+          {{ searchKeyword ? '找不到相關聯絡人' : '還沒有任何對話' }}
+        </div>
+        <!-- #endregion -->
+
+        <!--#region 聊天對象列表 -->
+        <div class="overflow-y-auto flex-1">
           <div
-            v-for="(msg, index) in messages"
-            :key="index"
-            class="flex"
-            :class="msg.senderId === myUserId ? 'justify-end' : 'justify-start'"
+            v-for="user in filteredChatUserList"
+            :key="user.chatPartnerId"
+            @click="selectUser(user)"
+            class="px-4 py-3 cursor-pointer hover:bg-surface-muted border-b border-border-soft flex items-center gap-3"
+            :class="currentTargetId === user.chatPartnerId ? 'bg-surface-muted' : ''"
           >
+            <!--#region 頭貼 -->
             <div
-              class="max-w-xs px-4 py-2 rounded-2xl text-sm"
-              :class="
-                msg.senderId === myUserId
-                  ? 'bg-brand-500 text-white rounded-br-sm'
-                  : 'bg-surface-muted text-ink-900 rounded-bl-sm'
-              "
+              class="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center shrink-0"
             >
-              <p class="m-0">{{ msg.content }}</p>
-              <small class="text-[10px] opacity-60 block text-right mt-1">{{ msg.sendTime }}</small>
+              <img :src="imgUrl(user)" class="rounded-full object-cover" />
             </div>
+            <!-- #endregion -->
+
+            <!--#region 用戶名稱 -->
+            <span class="text-sm text-ink-900">{{ user.userName }}</span>
+            <!-- #endregion -->
           </div>
         </div>
+        <!-- #endregion -->
+      </aside>
+      <!-- #endregion -->
 
-        <!-- 輸入框 -->
-        <div class="border-t border-border-soft px-4 py-3 flex gap-3 items-center bg-page-bg">
-          <input
-            v-model="inputContent"
-            @keyup.enter="sendMessage"
-            placeholder="輸入訊息..."
-            class="flex-1 border border-border-soft rounded-full px-4 py-2 text-sm outline-none focus:border-brand-500"
-          />
-          <button
-            @click="sendMessage"
-            class="bg-brand-500 text-white px-4 py-2 rounded-full text-sm hover:opacity-90 cursor-pointer"
-          >
-            傳送
-          </button>
+      <!--#region 右側：對話內容 -->
+      <main class="flex-1 flex flex-col overflow-hidden rounded-card border border-border-soft">
+        <!--#region 沒選對象時的提示 -->
+        <div
+          v-if="!currentTargetId"
+          class="flex-1 flex items-center justify-center text-ink-500 text-sm"
+        >
+          請選擇一個聊天對象
         </div>
-      </template>
+        <!-- #endregion -->
+
+        <template v-else>
+          <!--#region 訊息列表 -->
+          <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-3" ref="messageList">
+            <div
+              v-for="(msg, index) in messages"
+              :key="index"
+              class="flex flex-col"
+              :class="msg.senderId === myUserId ? 'items-end' : 'items-start'"
+            >
+              <!--#region 訊息泡泡 + 時間 -->
+              <div class="relative group">
+                <!--#region 訊息泡泡 -->
+                <div
+                  class="max-w-xs px-4 py-2 rounded-2xl text-sm"
+                  :class="
+                    msg.senderId === myUserId
+                      ? 'bg-brand-500 text-white rounded-br-sm'
+                      : 'bg-surface-muted text-ink-900 rounded-bl-sm'
+                  "
+                >
+                  <p class="m-0">{{ msg.content }}</p>
+                </div>
+                <!-- #endregion -->
+                <!--#region 已讀狀態 -->
+                <small
+                  v-if="msg.senderId === myUserId"
+                  class="text-[10px] text-ink-300 px-1 block text-right"
+                >
+                  {{ msg.isRead ? '已讀' : '未讀' }}
+                </small>
+                <!-- #endregion -->
+                <!--#region 時間-->
+                <small
+                  class="text-[10px] text-ink-500 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 block"
+                  :class="msg.senderId === myUserId ? 'text-right' : 'text-left'"
+                >
+                  {{ formatDateTimeString(msg.sendTime) }}
+                </small>
+                <!-- #endregion -->
+              </div>
+              <!-- #endregion -->
+            </div>
+          </div>
+          <!-- #endregion -->
+
+          <!--#region 輸入框 -->
+          <div class="border-t border-border-soft px-4 py-3 flex gap-3 items-center bg-page-bg">
+            <input
+              v-model="inputContent"
+              @keyup.enter="sendMessage"
+              placeholder="輸入訊息..."
+              class="flex-1 border border-border-soft rounded-full px-4 py-2 text-sm outline-none focus:border-brand-500"
+            />
+            <button
+              @click="sendMessage"
+              class="bg-brand-500 text-white px-4 py-2 rounded-full text-sm hover:opacity-90 cursor-pointer"
+            >
+              傳送
+            </button>
+          </div>
+          <!-- #endregion -->
+        </template>
+      </main>
+      <!-- #endregion -->
     </div>
   </div>
 </template>
